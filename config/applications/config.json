@@ -1,0 +1,114 @@
+{
+  "initresources": [],
+  "redirect":{
+    "/": "/site/000000000000000000000000/verb_index/a?o={%22skip%22:0,%22limit%22:4}"
+  },
+  "services": [
+    {
+      "url": "/",
+      "lib": "./server/applications/front/api"
+    },
+    {
+      "url": "/",
+      "lib": "./server/applications/front/pages"
+    }
+  ],
+
+  "messages" : {
+    "mail": {
+      "regist": {
+        "subject": "承ります"
+      },
+      "member": {
+        "subject": "member"
+      },
+      "notation": {
+        "subject": "notation"
+      },
+      "password": {
+        "subject": "パスワード変更"
+      },
+      "username": {
+        "subject": "ユーザ名変更"
+      },
+      "inquiry": {
+        "subject": "お問い合わせ承ります"
+      }
+    },
+    "auth_dialogs" : {
+      "regist_dialog": {
+        "title": "User Regist",
+        "long": "too long",
+        "short": "Too Short",
+        "required": "Required.",
+        "mail": "invalid mail format.",
+        "password_missmatch": "password missmatch",
+        "password_field": "Password",
+        "re_password_field": "Password",
+        "nickname_field": "Nickname",
+        "mail_field": "Mail Address",
+        "ok": "OK",
+        "cancel": "Cancel"
+      },
+      "login_dialog": {
+        "title": "Login",
+        "long": "too long",
+        "short": "Too Short",
+        "required": "Required.",
+        "mail_field": "Mail Address",
+        "password_field": "Password",
+        "ok": "OK"
+      },
+      "regist_confirm_dialog": {
+        "title": "Register Mail Sent",
+        "text": "メールの認証をクリックして、認証を完了してください。",
+        "ok": "OK"
+      },
+      "member_dialog": {
+        "title": "Member Regist",
+        "long": "too long",
+        "short": "Too Short",
+        "required": "Required.",
+        "mail": "invalid mail format.",
+        "password_missmatch": "password missmatch",
+        "password_field": "Password",
+        "re_password_field": "Password",
+        "nickname_field": "Nickname",
+        "mail_field": "Mail Address",
+        "ok": "OK",
+        "cancel": "Cancel"
+      },
+      "member_confirm_dialog": {
+        "title": "Member Register Mail Sent",
+        "text": "メンバーはメールの認証をクリックして、認証を完了してください。",
+        "ok": "OK"
+      },
+      "password_dialog": {
+        "title": "Password Reset",
+        "long": "too long",
+        "short": "Too Short",
+        "required": "Required.",
+        "mail": "invalid mail format.",
+        "password_missmatch": "password missmatch",
+        "password_field": "Password",
+        "re_password_field": "Password",
+        "nickname_field": "Nickname",
+        "mail_field": "Mail Address",
+        "ok": "OK",
+        "cancel": "Cancel"
+      },
+      "password_confirm_dialog": {
+        "title": "Password reset mail sent.",
+        "text": "",
+        "ok": "OK"
+      }
+    },
+    "errors":{
+      "usernamealreadyregist": "同じユーザ名が登録されています",
+      "usernamenotfound": "ユーザ名が登録されていません",
+      "mailerror": "メールエラー",
+      "wrongusername": "ユーザ名かパスワードが違っています"
+    }
+
+  }
+}
