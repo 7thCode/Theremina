@@ -1,0 +1,12 @@
+{
+  "account_content": {
+    "mails" : [],
+    "nickname": "",
+    "address": "",
+    "category": "",
+    "group": "",
+    "magazine": {
+      "send": false
+    }
+  }
+}

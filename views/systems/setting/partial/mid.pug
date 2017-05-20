@@ -1,0 +1,125 @@
+.box.box-primary
+    .box-body
+        ng-form(name="content")
+            .row
+                .col-xs-12.col-sm-6.col-lg-4
+                    .box.box-success
+                        .box-header.with-border
+
+                            .box-title Database
+                            .box-tools.pull-right
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+
+                        .box-body.row
+
+                            .col-xs-12
+                                label.h6(for="db_address") address
+                                span(ng-messages="content.db_address.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#db_address(tabindex="1" ng-model="system_setting.db.address", type="text", name='db_address', ng-maxlength="128")
+
+                            .col-xs-12
+                                label.h6(for="db_user") user name
+                                span(ng-messages="content.db_user.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#db_user(tabindex="2" ng-model="system_setting.db.user", type="text", name='db_user', ng-maxlength="128")
+
+                            .col-xs-12
+                                label.h6(for="db_password") password
+                                span(ng-messages="content.db_password.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#db_password(tabindex="3" ng-model="system_setting.db.password", type="password", name='db_password', ng-maxlength="128")
+
+                            .col-xs-12
+                                label.h6(for="db_name") db name
+                                span(ng-messages="content.db_name.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#db_name(tabindex="4" ng-model="system_setting.db.name", type="text", name='db_name', ng-maxlength="128")
+
+                            .col-xs-12
+                                div(style="margin-top:10px;background-size: 40px 40px;")
+                                    button.btn.btn-danger.flash#backup(tabindex="5" style="width:33%;margin-left:33%;margin-right:33%;margin-top:20px;margin-bottom:20px;",type="button" ,ng-click='Backup();', ng-disabled="progress", aria-label="") Backup
+                            .col-xs-12
+                                div(style="margin-top:10px;background-size: 40px 40px;background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.75) 25%, rgba(235, 235, 0, 0.5) 25%, rgba(235, 235, 0, 0.5) 50%, rgba(0, 0, 0, 0.75) 50%, rgba(0, 0, 0, 0.75) 75%, rgba(235, 235, 0, 0.5) 75%, rgba(235, 235, 0, 0.5));border-radius:10px;-webkit-border-radius:10px;")
+                                    button.btn.btn-info.flash#maintenance(tabindex="6" style="width:60%;margin-left:20%;margin-right:20%;margin-top:20px;margin-bottom:20px;",type="button" ,ng-click='Maintenance();', ng-disabled="progress", aria-label="") Maintenance Mode
+
+                .col-xs-12.col-sm-6.col-lg-4
+                    .box.box-success
+                        .box-header.with-border
+                            .box-title Domain
+                            .box-tools.pull-right
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                        .box-body.row
+                            .col-xs-12
+                                label.h6(for="domain") domain
+                                span(ng-messages="content.domain.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#domain(tabindex="7" ng-model="system_setting.domain", type="text", name='domain', ng-maxlength="128")
+
+                .col-xs-12.col-sm-6.col-lg-4
+                    .box.box-primary
+                        .box-header.with-border
+                            .box-title Mail Message
+                            .box-tools.pull-right
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                        .box-body.row
+                            .col-xs-12
+                                label.h6(for="regist") regist
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#regist(tabindex="8" ng-model="application_setting.messages.mail.regist.subject", type="text", name='mail_regist_subject', ng-maxlength="50")
+                            .col-xs-12
+                                label.h6(for="member") member
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#member(tabindex="9" ng-model="application_setting.messages.mail.member.subject", type="text", name='mail_member_subject', ng-maxlength="50")
+                            .col-xs-12
+                                label.h6(for="notation") notation
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#notation(tabindex="10" ng-model="application_setting.messages.mail.notation.subject", type="text", name='mail_notation_subject', ng-maxlength="50")
+                            .col-xs-12
+                                label.h6(for="password") password
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#password(tabindex="11" ng-model="application_setting.messages.mail.password.subject", type="text", name='mail_password_subject', ng-maxlength="50")
+                            .col-xs-12
+                                label.h6(for="username") username
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#username(tabindex="12" ng-model="application_setting.messages.mail.username.subject", type="text", name='mail_username_subject', ng-maxlength="50")
+                            .col-xs-12
+                                label.h6(for="inquiry") inquiry
+                                span(ng-messages="content.mail_regist_subject.$error")
+                                    span.error-message(ng-message="maxlength") もう少し短く
+                                input.form-control.no-zoom#inquiry(tabindex="13" ng-model="application_setting.messages.mail.inquiry.subject", type="text", name='mail_inquiry_subject', ng-maxlength="50")
+
+                .col-xs-12.col-sm-6.col-lg-4
+                    .box.box-info
+                        .box-header.with-border
+                            .box-title Log
+                            .box-tools.pull-right
+                                button.btn.btn-box-tool(tabindex="14" type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                        .box-body.row
+                            .col-xs-12
+                                label.h6(for="loglevel") loglevel
+                                select.form-control.no-zoom#loglevel(tabindex="15" ng-model="system_setting.loglevel")
+                                    option ALL
+                                    option TRACE
+                                    option DEBUG
+                                    option INFO
+                                    option WARN
+                                    option ERROR
+                                    option FATAL
+                                    option OFF
+
+            .row
+                .col-xs-12
+                    .row(style="margin-top:3rem")
+                        .col-xs-2.col-xs-offset-5
+                            button.btn.btn-primary#save(tabindex="16" style="width:100%",type="button" ,ng-click='Write();content.$dirty = false;', ng-disabled="progress || content.$invalid", aria-label="") Save
+

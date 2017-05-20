@@ -1,0 +1,62 @@
+aside.main-sidebar(ng-controller='LoginController' style="background:#214ce7;")
+    section.sidebar
+        if user
+            .user-panel
+                .pull-left.image
+                    img.img-circle(src="/files/api/" + user.userid + "/" + user.username, style="width:5rem;height:5rem;", alt='')
+                .pull-left.info
+                    p #{user.local.nickname}
+                    a(href='#')
+                        i.fa.fa-circle.text-success
+                        |  #{user.type}
+            ul.sidebar-menu
+                li
+                    a(href='/')
+                        i.fa.fa-home
+                        span ホーム
+                li
+                    a(href='/self')
+                        i.fa.fa-user-circle
+                        span プロファイル
+                li
+                    a(href="/photo")
+                        i.fa.fa-file
+                        span 写真
+                li
+                    a(href="/svg")
+                        i.fa.fa-file-image-o
+                        span イラスト
+                li
+                    a(href="/data")
+                        i.fa.fa-database
+                        span 記事
+                li
+                    a(href="/pages")
+                        i.fa.fa-file-text
+                        span ページ
+                if config.regist.member
+                    li
+                        a(href="/members")
+                            i.fa.fa-user-plus.fa-fw
+                            span メンバー
+
+                if user.provider == "local"
+                    li
+                        a(href='#', ng-click="showPasswordDialog()")
+                            i.fa.fa-key.fa-fw
+                            span パスワード...
+                if user.type == "System"
+                    li
+                        a(href='/backoffice')
+                            span.fa-stack
+                                i.fa.fa-cog.fa-spin.text-info
+                                i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
+                            span バックオフイス
+                li
+                    a(href='#', ng-click="Logout()")
+                        i.fa.fa-sign-out
+                        span ログアウト
+                li
+                    a(href='#')
+                        input(type="checkbox" data-layout="sidebar-collapse")
+                        span &nbsp;&nbsp;クローズ

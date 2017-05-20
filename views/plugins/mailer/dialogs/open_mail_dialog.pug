@@ -1,0 +1,26 @@
+div
+    .modal-header
+        span.h5.modal-title {{subject}}
+    .modal-body.noto
+        .row
+            .col-xs-12(style="word-wrap:break-word;word-break:break-all")
+                ng-form(name="validate")
+                    .form-group
+                        .row-fluid
+                            .panel.panel-primary
+                                .panel-heading
+                                        div from: {{from}}
+                                        div to: {{to}}
+                                .panel-body
+                                    div subject
+                                    .well.well-sm {{subject}}
+                                    div doc
+                                        .well.well-sm(style="height:40vh;overflow:scroll;" ng-bind-html="html")
+        .row
+            .col-xs-12
+                include ../../../systems/common/error_message
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-primary(type="button" ,ng-click='answer();', aria-label="") OK

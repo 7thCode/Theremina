@@ -1,0 +1,28 @@
+.box.box-primary.pallete-shadow.pallete-background(ng-cloak ng-show="opened")
+    .box-header.with-border
+        div
+            .box-tools.pull-right
+                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                    i.fa.fa-minus
+        span.hidden-xs.hidden-sm
+            include ../../../../systems/common/next_prev
+
+    .box-body
+        //div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
+            .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
+                .flex-row(ng-repeat="article in articles" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                    .ellipsis(ng-class="{selected: hover || SelectedArticle(article._id)}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectArticle(article._id)") {{article.name}}
+        //div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
+            .flex-column(style="display:block;overflow-y:scroll;")
+                .flex-row(ng-repeat="article in articles" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                    .ellipsis(ng-class="{selected: hover || SelectedArticle(article._id)}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectArticle(article._id)") {{article.name}}
+
+        table.table.table-striped
+            tr(ng-repeat="article in articles")
+                td(ng-class="{selected: hover || SelectedArticle(article._id)}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectArticle(article._id)")
+                    span {{article.name}}
+
+
+.box.box-success(ng-cloak ng-show="opened")
+    .box-body
+        .input-root

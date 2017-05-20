@@ -1,0 +1,41 @@
+div
+    .modal-header
+        span.h5.modal-title Resize
+        span.pull-right
+            button.btn.btn-box-tool(type='button',ng-click='cancel()')
+                i.fa.fa-times
+    .modal-body.noto
+        .row
+            .col-xs-12
+                .row
+                    .col-xs-6
+                        .box.box-info
+                            .box-body
+                                .row.ng-form(name="validate")
+                                    .col-xs-12
+                                        .form-group
+                                            label.h6(for="ratio") Size Ratio
+                                            input.form-control.no-zoom#ratio(name="ratio" type="number" min=0.001 max=10 ng-model='ratio', ng-change="RatioChange();", required, placeholder="Ratio")
+                                    .col-xs-12
+                                        .form-group
+                                            label.h6(for="aspect") W/H Ratio
+                                            input.form-control.no-zoom#aspect(name="aspect" type="number" min=0.001 max=10 ng-model='aspect', ng-change="RatioChange();" required placeholder="W/H")
+                    .col-xs-6
+                        .box.box-info
+                            .box-body
+                                .row
+                                    .col-xs-4.col-xs-offset-4(style="font-size:2rem;") W: {{width}}
+                                    .col-xs-4.col-xs-offset-4(style="font-size:2rem;") H: {{height}}
+                                .row
+                                    .col-xs-12
+                                        img.img-responsive(ng-src="{{image}}")
+
+            .col-xs-12
+                include ../../../systems/common/error_message
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") Cancel
+                    button.btn.btn-info(type="button", ng-click='no();',ng-disabled="progress", aria-label="") No Resize
+                    button.btn.btn-primary(type="button" ,ng-click='answer();',ng-disabled="progress || validate.$invalid", aria-label="") Resize

@@ -1,0 +1,38 @@
+div
+    .modal-header
+        span.h5.modal-title Create
+        span.pull-right
+            button.btn.btn-xs.btn-box-tool(type='button',ng-click='cancel()')
+                i.fa.fa-times
+    .modal-body.noto
+        .row
+            .col-xs-12(style="word-wrap:break-word;word-break:break-all")
+                ng-form(name="validate")
+                    .form-group
+                        .row
+                            .col-xs-12
+                                label(for="sender") sender
+                                chips(ng-model='sender',style="height: 36px;")
+                                    chip-tmpl
+                                        .default-chip {{chip}}
+                                            span.fa.fa-times(remove-chip='')
+                                    input#sender(name="", style="background-color:transparent;" chip-control)
+
+                            .col-xs-12
+                                label.h6(for="subject") subject
+                                span(ng-messages="validate.subject.$error")
+                                    span.error-message(ng-message="required") #{messages.required}
+                                input.form-control.no-zoom#subject(ng-model="subject", type="text", name='subject', required)
+
+                            .col-xs-12
+                                div(text-angular ng-model='doc', type='text', name='doc' ta-toolbar="[['h1','h3','h5','bold'],['justifyLeft', 'justifyCenter', 'justifyRight'],['html', 'insertImage','insertLink']]")
+
+        .row
+            .col-xs-12
+                include ../../../systems/common/error_message
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
+                    button.btn.btn-primary(type="button" ,ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") OK

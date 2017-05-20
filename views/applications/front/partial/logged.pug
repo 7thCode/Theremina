@@ -1,0 +1,9 @@
+.container(ng-controller='LoginController', style="padding:0;")
+
+
+    //div(style="text-align:center;padding-bottom:8em;background-image: url('./applications/img/main_back.jpg');")
+    //article(style="margin:5vw;height:auto;")
+        h1#title.limelight(style="text-align:left;font-size: 14.0vw;font-weight: 700;margin: 1rem 0 2vw 0;") #{status}
+        p.quicksand(style='margin: 1vw 0 2vw 0;font-size: 6vw;color:#d0d0d0;text-shadow: 0 0.3rem 0 #7f8c8d;font-weight: 100;') #{message}
+    //article(style="margin:5vw;")
+        button.btn(ng-click="Notify('Hello!!')") Notify

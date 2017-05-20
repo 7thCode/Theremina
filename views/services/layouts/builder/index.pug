@@ -1,0 +1,17 @@
+extends ../../../backoffice_layout
+
+block content
+    section.content-header
+        .h5.text-gray Builder
+    section.content(ng-controller="BuilderController")
+        include partial/navbar
+        .row
+            .col-sm-12.col-md-12#draggable_area
+                include partial/canvas
+
+        div
+            include partial/images
+            include partial/mode
+            include partial/attribute
+
+        div(ng-bind="message")

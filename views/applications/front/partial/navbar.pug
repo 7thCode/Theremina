@@ -1,0 +1,30 @@
+nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;opacity:0.95", ng-controller='LoginController')
+    .container-fluid(style="padding:0").noto
+        .navbar-header(style="padding-left:10px;")
+            button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
+                span.sr-only Toggle navigation
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+            a.navbar-brand.page-scroll(href="/", ng-click="go('/')")
+                span(style="text-align:center")
+                    img(src="/img/nlogo.png", style="height:3rem")
+                    span(style="font-size:2rem;margin-top:2px;") #{user.local.nickname}
+
+        #bs-navbar.navbar-collapse.collapse(style="padding-right:10px;")
+            div
+                //span(style="float:right;text-align:center;")
+                //    div(style="font-size:4rem;") 0800-888-1887
+                //    div(style="font-size:.5rem;") 営業時間 9:00-18:00 (土日祝日は定休となります)
+
+                //span(style="float:right")
+                //    button.btn.btn-primary(type="button" ,ng-click="", style="margin:2rem;background-color:#FF3B11;border: none;color: white;padding: 5px 32px;text-align: center;text-decoration: none;display: inline-block;font-size: 13px;", aria-label="")
+                //        i.fa.fa-chevron-circle-right
+                //        span WEBからお問い合わせ
+                        
+                //if !user
+                //    span(style="float:right")
+                //        button.btn.btn-primary(type="button" ,href='#', ng-click="showLoginDialog()", style="margin:2rem;background-color: #4CAF50;border: none;color: white;padding: 5px 32px;text-align: center;text-decoration: none;display: inline-block;font-size: 13px;", aria-label="")
+                //            i.fa.fa-chevron-circle-right
+                //            span ログイン
+

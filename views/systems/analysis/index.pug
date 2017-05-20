@@ -1,0 +1,52 @@
+extends ../../backoffice_layout
+
+block content
+    section.content-header
+        .h5.text-gray Analysis
+    section.content(ng-controller="AnalysisController")
+        include partial/navbar
+        .box.box-info
+            .box-header.with-border
+                div
+                    .box-tools.pull-right
+                        button.btn.btn-sm.btn-box-tool(type='button', data-widget='collapse')
+                            i.fa.fa-minus
+                include ../../systems/common/next_prev
+            .box-body
+                .row
+                    .col-xs-12
+                        div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
+                            .flex-column(style="background-color: #eeeeee;height:3.0rem;")
+                                .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
+                                    .ellipsis(style="width:15%;") time
+                                    .ellipsis(style="width:30%;") address
+                                    .ellipsis(style="width:30%;") headers
+                                    .ellipsis(style="width:25%;") referer
+
+                            .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
+                                .flex-row(ng-repeat="log in logs" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                                    .ellipsis(style="width:15%;") {{log.content.time | date:medium}}
+                                    .ellipsis(style="width:30%;") {{log.content.address}}
+                                    .ellipsis(style="width:30%;") {{log.content.headers | length:36}}
+                                    .ellipsis(style="width:25%;") {{log.content.referer}}
+
+                //.table-responsive(style="height:70vh;overflow:scroll;")
+                    table.table.table-striped
+                        thead
+                            tr
+                                th time
+                                th address
+                                th headers
+                                th referer
+                        tbody
+                            tr.gradeX(ng-repeat="log in logs")
+                                td {{log.content.time | date:medium}}
+                                td {{log.content.address}}
+                                td {{log.content.headers | length:36}}
+                                td {{log.content.referer}}
+
+            .box-footer.clearfix
+                div(ng-bind="message")
+
+
+

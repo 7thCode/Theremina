@@ -1,0 +1,43 @@
+.box.box-primary
+    .box-header.with-border
+        .box-tools.pull-right
+            button.btn.btn-box-tool(type='button', data-widget='collapse')
+                i.fa.fa-minus
+        .h5.box-title(style="text-color:#ffffffff;" ng-bind="username")
+    .box-body
+        .col-xs-12
+            ng-form(name="validate")
+                .row
+                    .col-xs-2
+                        label.h6 画像
+                        div(ng-controller="PhotoController",flow-init)
+                            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createProfile($files);")
+                            div(flow-drop,data-toggle="tooltip" data-placement="top" title="プロファイル画像をドロップしてください。ページ再読み込みで反映します。")
+                                img.center-block.thumbnail#profile(ng-src="/files/api/" + '{{userid}}' + "/" + '{{username}}', style="width:100px;height:100px;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+
+                    .col-xs-10
+                        .row
+                            .col-xs-6
+                                .form-group
+                                    label.h6(for="nickname") ニックネーム
+                                    span(ng-messages="validate.nickname.$error")
+                                        span.error-message(ng-message="required") 必須項目です。
+                                        span.error-message(ng-message="maxlength") 30字以内にして下さい。
+                                    input.form-control.no-zoom#nickname(ng-model='nickname', type='text', name='nickname', placeholder='xxxxxxx', required, ng-maxlength="30",data-toggle="tooltip" data-placement="top" title="ニックネームを入力してください。")
+
+                    .col-xs-12
+                        label.h6(for="mails") メールアドレス（改行で複数登録可能）
+                        chips(ng-model='mails',style="height: 36px;")
+                            chip-tmpl
+                                .default-chip {{chip}}
+                                    span.fa.fa-times(remove-chip='')
+                            input#mails(name="mails",style="background-color:transparent;" chip-control,data-toggle="tooltip" data-placement="top" title="メールアドレスを入力して、改行を押下してください。")
+                    .col-xs-12
+                        .row(style="margin-top:3rem")
+                            .col-xs-2.col-xs-offset-5
+                                button.btn.btn-primary#save(style="width:100%",type="button" ,ng-click='Save();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty",data-toggle="tooltip" data-placement="top" title="ユーザ情報を更新します", aria-label="") 更新
+
+                    .col-xs-12
+                        .row(style="margin-top:3rem")
+                            .col-xs-2.col-xs-offset-5
+                                button.btn.btn-danger#help(style="width:100%",type="button" ,ng-click='to(0)', aria-label="") Help

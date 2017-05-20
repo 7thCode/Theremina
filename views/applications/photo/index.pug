@@ -1,0 +1,10 @@
+extends ../../layout
+
+block content
+    section.content(ng-controller="PhotoController")
+        include ../common/navbar
+        .row
+            .col-xs-12
+                include ./partial/mid
+
+    guidance(scenario="{{scenario}}")

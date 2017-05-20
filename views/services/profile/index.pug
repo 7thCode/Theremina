@@ -1,0 +1,10 @@
+extends ../../backoffice_layout
+
+block content
+    section.content-header
+        .h5.text-gray Profile
+    section.content(ng-controller="ProfileController")
+        include ./partial/navbar
+        .row
+            .col-xs-12
+                include ./partial/mid

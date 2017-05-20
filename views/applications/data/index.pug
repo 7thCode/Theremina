@@ -1,0 +1,41 @@
+extends ../../layout
+
+block content
+    section.content(ng-controller="DataController")
+        include ../common/navbar
+        .flex-column#draggable_area
+            .flex-row
+                .flex-auto(style="padding:0 5px;")
+                    include partial/select
+            .flex-row
+                div(style="width:250px;padding:0 5px;")
+                    include partial/pallete
+                .flex-auto(style="padding:0 5px;")
+                    .box.box-primary
+                        .box-header
+                            .h5(ng-show="current_page.name") Pages: {{current_page.name}} &nbsp;
+                            .h5(ng-show="current_article.name") Article: {{current_article.name}}
+                            .box-tools.pull-right
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                        .box-body
+                            ng-form(name="validate",ng-show="opened")
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                            i.fa.fa-cloud
+                                            span.hidden-xs.hidden-sm Save
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        #root
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                            i.fa.fa-cloud
+                                            span.hidden-xs.hidden-sm Save
+                        .box-footer.clearfix
+                            div(ng-bind="message")
+        div
+            include partial/images
+
+    guidance(scenario="{{scenario}}")

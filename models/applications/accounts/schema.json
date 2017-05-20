@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "mails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "zip": {
+      "type": "string"
+    },
+    "nickname": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "street": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "group": {
+      "type": "string"
+    },
+    "magazine": {
+      "type": "object",
+      "properties": {
+        "send": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "send"
+      ]
+    }
+  },
+  "required": [
+    "mails",
+    "nickname",
+    "address",
+    "category",
+    "magazine"
+  ]
+}

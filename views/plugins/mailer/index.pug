@@ -1,0 +1,80 @@
+extends ../../backoffice_layout
+
+block content
+    section.content-header
+        .h5.text-gray Mailer
+    section.content(ng-controller="MailerController")
+        include partial/navbar
+        .box.box-info
+            .box-header.with-border
+                div
+                    .box-tools.pull-right
+                        button.btn.btn-sm.btn-box-tool(type='button', data-widget='collapse')
+                            i.fa.fa-minus
+            .box-body
+                .row
+                    //.col-xs-12
+                        button.btn.btn-danger(type="button", ng-click='SendMail();' aria-label="" style="margin:10px;") Create Mail...
+                    .col-xs-12
+                        .input-group(style="margin:0 10px;")
+                            span.input-group-addon find
+                            input.form-control.no-zoom(ng-model='send_find_name', name="send_find_name", type='text', ng-maxlength="30", placeholder='Name', ng-change="SendFind(send_find_name);")
+                            span.input-group-btn
+                                button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="SendNext()", ng-disabled="over")
+                                    i.fa.fa-chevron-down
+                            span.input-group-btn
+                                button.btn.btn-sm.btn-success(style="border-radius:0 0.6rem 0.6rem 0;",ng-click="SendPrev()", ng-disabled="under")
+                                    i.fa.fa-chevron-up
+                    .col-xs-12
+                        div(style="margin:10px;border-style: solid; border-color: #eeeeee;border-width:1px;")
+                            div(style="background-color: #eeeeee;height:3.0rem;")
+                                .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
+                                    div(style="width:100px;") time
+                                    div(style="width:300px;") subject
+                                    div(style="width:200px;") sender
+                                    div(style="width:200px;") receiver
+                                    div(style="width:200px;text-align:center;") a
+                            .flex-column(style="display:block;height:40vh;overflow-y:scroll;")
+                                .flex-row(ng-repeat="mail in sendmails" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                                    .ellipsis(style="width:100px;") {{mail.create | date:medium}}
+                                    .ellipsis(style="width:300px;") {{mail | mailer:"subject"}}
+                                    .ellipsis(style="width:200px;") {{mail | mailer:"sender"}}
+                                    .ellipsis(style="width:200px;") {{mail | mailer:"receiver"}}
+                                    div(style="width:200px;display:flex;justify-content:flex-end;")
+                                        button.btn.btn-box-tool(type='button', ng-click="OpenMail(mail);")
+                                            i.fa.fa-envelope(style="font-size:12px;color:#428bca;")
+                                        button.btn.btn-box-tool(type='button', ng-click="DeleteMail(mail);")
+                                            i.fa.fa-trash(style="font-size:12px;color:#d9534f;")
+                    .col-xs-12
+                        .input-group(style="margin:0 10px;")
+                            span.input-group-addon find
+                            input.form-control.no-zoom(ng-model='receive_find_name', name="receive_find_name", type='text', ng-maxlength="30", placeholder='Name', ng-change="ReceiveFind(receive_find_name);")
+                            span.input-group-btn
+                                button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="ReceiveNext()", ng-disabled="over")
+                                    i.fa.fa-chevron-down
+                            span.input-group-btn
+                                button.btn.btn-sm.btn-success(style="border-radius:0 0.6rem 0.6rem 0;",ng-click="ReceivePrev()", ng-disabled="under")
+                                    i.fa.fa-chevron-up
+                    .col-xs-12
+                        div(style="margin:10px;border-style: solid; border-color: #eeeeee;border-width:1px;")
+                            div(style="background-color: #eeeeee;height:3.0rem;")
+                                .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
+                                    div(style="width:100px;") time
+                                    div(style="width:300px;") subject
+                                    div(style="width:200px;") sender
+                                    div(style="width:200px;") receiver
+                                    div(style="width:200px;text-align:center;") a
+                            .flex-column(style="display:block;height:40vh;overflow-y:scroll;")
+                                .flex-row(ng-repeat="mail in receivemails" ng-style="{'background-color': ($index % 2 === 0 ? '#ddffdd':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                                    .ellipsis(style="width:100px;") {{mail.create | date:medium}}
+                                    .ellipsis(style="width:300px;") {{mail | mailer:"subject"}}
+                                    .ellipsis(style="width:200px;") {{mail | mailer:"sender"}}
+                                    .ellipsis(style="width:200px;") {{mail | mailer:"receiver"}}
+                                    div(style="width:200px;display:flex;justify-content:flex-end;")
+                                        button.btn.btn-box-tool(type='button', ng-click="OpenMail(mail);")
+                                            i.fa.fa-envelope(style="font-size:12px;color:#428bca;")
+                                        button.btn.btn-box-tool(type='button', ng-click="DeleteMail(mail);")
+                                            i.fa.fa-trash(style="font-size:12px;color:#d9534f;")
+
+            .box-footer.clearfix
+                div(ng-bind="message")

@@ -1,0 +1,29 @@
+div
+    .modal-header
+        span.h5.modal-title Field
+    .modal-body.noto
+        .row.row-padded
+            .col-xs-6
+                div {{control.kind}}
+            .col-xs-6
+                div {{control.type}}
+        .row.row-padded
+            .col-xs-12
+                table.table.table-striped
+                    tr(ng-repeat="element in control.elements")
+                        td.row(ng-mouseenter="hover = true")
+                            .col-xs-4(ng-bind="element.type")
+                            .col-xs-4(ng-bind="element.id")
+                            .col-xs-4
+                                button.btn.btn-sm.btn-primary(ng-click="ElementOpen(element.id);")
+                                    i.fa.fa-chevron-up
+
+            .col-xs-12
+                include ../../../../../systems/common/error_message
+
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
+                    button.btn.btn-primary(type="button", ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK

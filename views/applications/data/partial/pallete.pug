@@ -1,0 +1,25 @@
+.box.box-info
+    .box-header.with-border
+        .h5 記事
+        .box-tools.pull-right
+            button.btn.btn-box-tool(type='button', data-widget='collapse')
+                i.fa.fa-minus
+
+        span.hidden-xs.hidden-sm
+            include ../../../systems/common/next_prev
+        .btn-group(role="group", style="width:100%;margin-top:10px;")
+            button.btn.btn-primary(ng-click="CreateArticle();",style="width:50%;")
+                i.fa.fa-plus
+                span.hidden-xs.hidden-sm Create
+
+            button.btn.btn-danger(ng-class="{disabled: !opened}", ng-click="DeleteArticle();", ng-disabled="!Selected();",style="width:50%;")
+                i.fa.fa-trash
+                span.hidden-xs.hidden-sm Delete
+
+    .box-body
+        div(style="display:flex;flex-direction:row;flex-wrap:nowrap;")
+            div(style="flex:1;padding5px;height:30rem;overflow:scroll;")
+                table.table.table-striped(ng-cloak)
+                    tr(ng-repeat="article in articles")
+                        td(ng-class="{selected: hover  || ArticleSelected(article._id)}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectArticle(article._id);")
+                            span(ng-bind="article.name")
