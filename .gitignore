@@ -27,3 +27,9 @@ public/fonts/photon-entypo.eot
 public/fonts/photon-entypo.svg
 public/fonts/photon-entypo.ttf
 public/fonts/photon-entypo.woff
+
+config/systems/config.json
+
+config/plugins/config.json
+
+config/systems/config.json
