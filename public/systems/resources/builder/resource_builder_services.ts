@@ -5,7 +5,6 @@
  */
 
 "use strict";
-//import {version} from "punycode";
 
 let ResourceBuilderServices: angular.IModule = angular.module('ResourceBuilderServices', []);
 
@@ -40,25 +39,57 @@ ResourceBuilderServices.factory('ResourceCount', ['$resource',
 ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount",
     function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any): void {
 
-        this.SetQuery = (query:any, type:number = 0, pagesize:number=10) => {
+        this.InitQuery = (query: any, type: number = 0, pagesize: number = 10) => {
             this.pagesize = pagesize;
 
             this.option.skip = 0;
             this.option.limit = this.pagesize;
 
-            this.query = {type:{$gte:type}};
+            this.query = {$and: [{}]};
             if (query) {
-                this.query = {$and:[{type:{$gte:type}},query]};
+                this.query = query;
             }
         };
+
+        this.GetQuery = (): any => {
+            return this.query;
+        };
+
+        this.AddQuery = (query: any) => {
+            if (this.query) {
+                if (this.query.$and) {
+                    this.query.$and.push(query);
+                }
+            }
+        };
+
+        this.RemoveQuery = (name: string) => {
+            if (this.query) {
+                if (this.query.$and) {
+                    let filted = [{}];
+                    this.query.$and.forEach((query) => {
+                        if (!query[name]) {
+                            filted.push(query);
+                        }
+                    });
+
+                    this.query.$and = filted;
+                    if (filted.length == 0) {
+                        this.query = {$and: [{}]};
+                        //            this.query = {$and:[{type:{$gte:0}}]};
+                    }
+                }
+            }
+        };
+
 
         let init = () => {
             this.pagesize = 10;
 
             this.option = {limit: this.pagesize, skip: 0};
-            this.SetQuery(null);
+            this.InitQuery();
 
-            this.current = {content:{}};
+            this.current = {content: {}};
         };
 
         this.Init = () => {

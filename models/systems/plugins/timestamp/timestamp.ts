@@ -4,8 +4,6 @@
  //opensource.org/licenses/mit-license.php
  */
 
-/// <reference path="../../../../typings/index.d.ts" />
-
 module.exports = exports = function lastModifiedPlugin(schema:any, options:any) {
 
     schema.add({ create: Date });

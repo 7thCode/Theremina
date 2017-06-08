@@ -159,6 +159,9 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
 
             $q.all(promises).then(function (result) {
                 progress(false);
+                files.forEach((file) => {
+                    file.cancel();
+                });
                 Draw();
             }).finally(() => {
             });

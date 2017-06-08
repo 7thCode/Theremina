@@ -64,6 +64,7 @@ namespace Setting {
                 SystemSettingService.Get((system_data: any): void => {
                     $scope.system_setting = system_data;
                 }, error_handler);
+
             };
 
             let Maintenance = () => {
@@ -87,6 +88,7 @@ namespace Setting {
                 SystemSettingService.Put($scope.system_setting, (system_data: any): void => {
                     $scope.system_setting = system_data;
                 });
+
             };
 
             $scope.Maintenance = Maintenance;

@@ -40,65 +40,65 @@ nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="
 
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Align
+                                | 配置
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") Align Top
+                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") 上辺を重ねる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") Align Right
+                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") 右辺を重ねる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") Align Bottom
+                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") 下辺を重ねる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") Align Left
+                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") 左辺を重ねる
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") Contact Top
+                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") 上辺に合わせる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") Contact Left
+                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") 右辺に合わせる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") Contact Bottom
+                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") 下辺に合わせる
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") Contact Right
-                                li.divider
-                                li
+                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") 左辺に合わせる
+                                //li.divider
+                                //li
                                     a(href="#", ng-click="opened && SetScale(1);", role="menuitem") Scale(1)
-                                li
+                                //li
                                     a(href="#", ng-click="opened && SetScale(1.2);", role="menuitem") Scale(1.2)
 
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Shapes
+                                | 図形
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") Box
+                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") 四角
                                 li
-                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") Oval
+                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") 楕円
                                 li
-                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") Bezier
+                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") 曲線
                                 li
-                                    a(href="#", ng-click="opened && AddText();", role="menuitem") Text
+                                    a(href="#", ng-click="opened && AddText();", role="menuitem") テキスト
                                 li
-                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") Image
+                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") イメージ
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") ToTop
+                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") 最前面
                                 li
-                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") ToBottom
+                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") 最背面
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Lock();", role="menuitem") Lock
+                                    a(href="#", ng-click="opened && Lock();", role="menuitem") 固定
                                 li
-                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") UnLockAll
+                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") 固定を全て解除
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Group();", role="menuitem") Group
+                                    a(href="#", ng-click="opened && Group();", role="menuitem") グループ
                                 li
-                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") Ungroup
+                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") グループ解除
                                 //li
                                     a(href="#", ng-click="hoge1();") hoge
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Download
+                                | ダウンロード
                             ul.dropdown-menu(role="menu")
                                 li
                                     a(href="", ng-click="opened && PrintPDF();", role="menuitem") PDF

@@ -33,7 +33,8 @@ gulp.task('copy', ['clean'], () => {
             'public/favicons/**/*',
             'public/systems/common/shape_edit/image/*',
             'server/systems/common/shape_edit/image/*',
-            'public/systems/resources/**/*',
+            'public/systems/resources/files/**/*',
+            'public/systems/files/files/**/*',
             'views/**/*.pug',
             'package.json',
             'bower.json',
@@ -45,7 +46,7 @@ gulp.task('copy', ['clean'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('imgcpy',['copy'], () => {
+gulp.task('imgcpy', ['copy'], () => {
 
     return gulp.src(
         [
@@ -64,7 +65,7 @@ gulp.task('imgcpy',['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('csscpy',['copy'], () => {
+gulp.task('csscpy', ['copy'], () => {
 
     return gulp.src(
         [
@@ -80,7 +81,7 @@ gulp.task('csscpy',['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('scriptcpy',['copy'], () => {
+gulp.task('scriptcpy', ['copy'], () => {
 
     var banner = [
         '/*',
@@ -110,7 +111,6 @@ gulp.task('scriptcpy',['copy'], () => {
         ],
         {base: '..'}
     )
-
         .pipe(license(banner))
         .pipe(gulp.dest('product'));
 });
@@ -119,7 +119,7 @@ gulp.task('debug build', ['imgcpy', 'csscpy', 'scriptcpy'], () => {
     console.log('debug build done');
 });
 
-gulp.task('imgmin',['copy'], () => {
+gulp.task('imgmin', ['copy'], () => {
 
     return gulp.src(
         [
@@ -139,7 +139,7 @@ gulp.task('imgmin',['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('cssmin',['copy'], () => {
+gulp.task('cssmin', ['copy'], () => {
 
     return gulp.src(
         [
@@ -156,7 +156,7 @@ gulp.task('cssmin',['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('scriptmin',['copy'], () => {
+gulp.task('scriptmin', ['copy'], () => {
 
     var banner = [
         '/*',

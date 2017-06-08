@@ -19,12 +19,18 @@ export namespace ImagePageRouter {
 
     const config: any = share.config;
     const services_config = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts;
 
     const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
-        response.render("services/images/index", {config:config, user: request.user, message: "Files", status: 200, fonts:webfonts});
+        response.render("services/images/index", {
+            config: config,
+            user: request.user,
+            message: "Files",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/dialogs/image_create_dialog', [exception.page_guard, auth.page_valid, (request: any, response: any, next: any) => {

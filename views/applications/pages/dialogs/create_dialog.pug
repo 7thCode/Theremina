@@ -16,13 +16,24 @@
                                     span.error-message(ng-message="required") #{messages.required}
                                     span.error-message(ng-message="maxlength") #{messages.long}
                                 input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
-                        .col-xs-2
+                        //.col-xs-2
                             .form-group
                                 label(for="name") タイプ(type)
                                 span(ng-messages="validate.type.$error")
                                 input.form-control.no-zoom#type(ng-model="type", type="number", name='type', min="0", max="1000")
+
+
                     .row
-                        .col-xs-12
+                        .col-xs-6
+                            .form-group
+                                label(for="type") タイプ
+                                span(ng-messages="validate.type.$error")
+                                    span.error-message(ng-message="required") #{messages.required}
+                                select.form-control.no-zoom#type(ng-model="type" required)
+                                    option(value="20") page
+                                    option(value="21") template
+
+                        .col-xs-6
                             .form-group
                                 label(for="mimetype") mimetype
                                 span(ng-messages="validate.mimetype.$error")
@@ -31,6 +42,7 @@
                                     option text/html
                                     option text/css
                                     option text/javascript
+                                    option application/json
 
         .row
             .col-xs-12

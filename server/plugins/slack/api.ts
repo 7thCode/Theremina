@@ -13,9 +13,11 @@ export namespace SlackApiRouter {
 
     const core = require(process.cwd() + "/core");
     const share: any = core.share;
-
-    const SlackModule: any = require(share.Server("plugins/slack/controllers/slack_controller"));
-    const slack: any = new SlackModule.Slack();
+    const plugins_config = share.plugins_config;
+    if (plugins_config.slack) {
+        const SlackModule: any = require(share.Server("plugins/slack/controllers/slack_controller"));
+        const slack: any = new SlackModule.Slack();
+    }
 
 }
 

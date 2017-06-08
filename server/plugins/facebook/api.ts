@@ -16,16 +16,17 @@ export namespace FacebookApiRouter {
 
     const core = require(process.cwd() + '/core');
     const share: any = core.share;
-    const exception: any = core.exception;
+    const plugins_config = share.plugins_config;
+    if (plugins_config.facebook) {
+        const exception: any = core.exception;
 
-    const FacebookModule: any = require(share.Server("plugins/facebook/controllers/facebook_controller"));
-    const facebook: any = new FacebookModule.Facebook;
+        const FacebookModule: any = require(share.Server("plugins/facebook/controllers/facebook_controller"));
+        const facebook: any = new FacebookModule.Facebook;
 
-    router.get("/webhook/", [exception.exception, facebook.bot_hook]);
-    router.post("/webhook/", [exception.exception,jsonParser, facebook.bot_push]);
-
-    //router.get("/push/:message", [exception.exception, line.bot_push]);
-
+        router.get("/webhook/", [exception.exception, facebook.bot_hook]);
+        router.post("/webhook/", [exception.exception, jsonParser, facebook.bot_push]);
+        //router.get("/push/:message", [exception.exception, line.bot_push]);
+    }
 }
 
 module.exports = FacebookApiRouter.router;

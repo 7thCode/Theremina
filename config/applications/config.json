@@ -1,8 +1,10 @@
 {
   "initresources": [],
+
   "redirect":{
-    "/": "/site/000000000000000000000000/verb_index/a?o={%22skip%22:0,%22limit%22:4}"
+    "/": "/site/000000000000000000000000/index.html/a?o={%22skip%22:0,%22limit%22:4}"
   },
+
   "services": [
     {
       "url": "/",

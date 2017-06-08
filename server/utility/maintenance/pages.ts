@@ -17,7 +17,7 @@ export namespace MaintenancePageRouter {
     const webfonts:any[] = services_config.webfonts;
 
     router.get("/", [(request: any, response: any): void => {
-        response.render("utility/installer/index", {user: null, message: "Installer", status: 200, fonts:webfonts});
+        response.render("utility/meintenance/index", {user: null, message: "Maintenance", status: 503, fonts:webfonts});
     }]);
 }
 

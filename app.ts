@@ -38,6 +38,7 @@ if (config_seed) {
         const core = require(process.cwd() + '/core');
         const share: any = core.share;
         const config: any = share.config;
+        const logger:any = share.logger;
 
         app.use("/", require("./server/utility/installer/api"));
         app.use("/", require("./server/utility/installer/pages"));
@@ -169,37 +170,52 @@ if (config_seed) {
         app.use(passport.session());
         //passport
 
-        let load_module_sync = (root) => {
-            try {
-                let list = fs.readdirSync(root);
-                if (list) {
-                    _.forEach(list, (name) => {
-                        let stat = fs.lstatSync(root + name);
-                        if (stat.isDirectory()) {
-                            if (name != "common") {
-                                if (name != "front") {
-                                    if (name.substr(1,1) != "_") {
-                                        try {
-                                            app.use("/" + name, require(root + name + "/api"));
-                                            app.use("/" + name, require(root + name + "/pages"));
-                                        } catch (e) {
-                                            console.log(e);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            } catch (e) {
-                console.log(e);
+        /*
+         let load_module_sync = (root) => {
+         try {
+         let list = fs.readdirSync(root);
+         if (list) {
+         _.forEach(list, (name) => {
+         let stat = fs.lstatSync(root + name);
+         if (stat.isDirectory()) {
+         if (name != "common") {
+         if (name != "front") {
+         if (name.substr(1,1) != "_") {
+         try {
+         app.use("/" + name, require(root + name + "/api"));
+         app.use("/" + name, require(root + name + "/pages"));
+         } catch (e) {
+         console.log(e);
+         }
+         }
+         }
+         }
+         }
+         });
+         }
+         } catch (e) {
+         console.log(e);
+         }
+         };
+
+         //    load_module_sync("./server/systems/");
+         //    load_module_sync("./server/services/");
+         //    load_module_sync("./server/plugins/");
+         //    load_module_sync("./server/applications/");
+         */
+
+        let load_module = (root:string,config:any):void => {
+            if (config.modules) {
+                config.modules.forEach((module) => {
+                    let path = root + module.path;
+                    let name = module.name;
+                    app.use("/" + name, require(path + name + "/api"));
+                    app.use("/" + name, require(path + name + "/pages"));
+                });
             }
         };
 
-        load_module_sync("./server/systems/");
-        load_module_sync("./server/services/");
-        load_module_sync("./server/plugins/");
-        load_module_sync("./server/applications/");
+        load_module("./server", config);
 
         // root
         if (applications_config.services) {
@@ -317,6 +333,13 @@ if (config_seed) {
         resource.create_init_resources(services_config.initresources);
         resource.create_init_resources(plugins_config.initresources);
         resource.create_init_resources(applications_config.initresources);
+
+
+        //services
+        const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
+        const form: any = new FormsController.Form();
+        form.create_init_forms(services_config.initforms);
+        //services
 
         // DAV
         if (config.dav) {

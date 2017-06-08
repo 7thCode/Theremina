@@ -46,25 +46,31 @@ export namespace ArticleModule {
          * @returns none
          */
         public create_article(request: any, response: any): void {
-            if (request.body.name.indexOf(':') == -1) {
+            if (request.body.name) {
                 let article: any = new ArticleModel();
                 article.userid = Article.userid(request);
                 article.name = request.body.name;
                 article.type = request.body.type;
                 article.content = request.body.content;
-                _.forEach(article.content, (content: any, key): void => {
-                    if (content.type == "quoted") {//単純記事はエスケープ
-                        if (typeof content.value === 'string') {
-                            article.content[key].value = validator.escape(content.value);
+                if (article.name.indexOf('/') == -1) {
+                    _.forEach(article.content, (content: any, key): void => {
+                        if (content.type == "quoted") {//単純記事はエスケープ
+                            if (typeof content.value === 'string') {
+                                article.content[key].value = validator.escape(content.value);
+                            } else {
+                                article.content[key].value = content.value;
+                            }
                         }
-                    }
-                });
-                article.open = true;
-                Wrapper.Save(response, 1000, article, (response: any, object: any): void => {
-                    Wrapper.SendSuccess(response, object);
-                });
+                    });
+                    article.open = true;
+                    Wrapper.Save(response, 1000, article, (response: any, object: any): void => {
+                        Wrapper.SendSuccess(response, object);
+                    });
+                } else {
+                    Wrapper.SendError(response, 3, "article name must not contain '/'",  {code:3, message:"article name must not contain '/'"});
+                }
             } else {
-                Wrapper.SendError(response, 3, "article name must not contain ':'", {});
+                Wrapper.SendError(response, 3, "no article name", {code:3, message:"no article name"});
             }
         }
 
@@ -84,6 +90,8 @@ export namespace ArticleModule {
                         if (content.type == "quoted") {//単純記事はエスケープ
                             if (typeof content.value === 'string') {
                                 article.content[key].value = validator.escape(content.value);
+                            } else {
+                                article.content[key].value = content.value;
                             }
                         }
                     });
@@ -92,7 +100,7 @@ export namespace ArticleModule {
                         Wrapper.SendSuccess(response, object);
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found",  {code:2, message:"not found"});
                 }
             });
         }
@@ -112,7 +120,7 @@ export namespace ArticleModule {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -140,7 +148,7 @@ export namespace ArticleModule {
                 if (article) {
                     Wrapper.SendSuccess(response, article);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -152,8 +160,12 @@ export namespace ArticleModule {
          */
         public get_article_query_query(request: any, response: any): void {
             let userid = Article.userid(request);
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let option: any = JSON.parse(decodeURIComponent(request.params.option));
+            //      let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //      let option: any = JSON.parse(decodeURIComponent(request.params.option));
+
+            let query: any = Wrapper.Decode(request.params.query);
+            let option: any = Wrapper.Decode(request.params.option);
+
             Wrapper.Find(response, 1500, ArticleModel, {$and: [{userid: userid}, {type: 0}, query]}, {}, option, (response: any, articles: any): any => {
 
                 _.forEach(articles, (article) => {
@@ -170,8 +182,12 @@ export namespace ArticleModule {
          * @returns none
          */
         public get_article_query_query_json(request: any, response: any): void {
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let option: any = JSON.parse(decodeURIComponent(request.params.option));
+            //       let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //       let option: any = JSON.parse(decodeURIComponent(request.params.option));
+
+            let query: any = Wrapper.Decode(request.params.query);
+            let option: any = Wrapper.Decode(request.params.option);
+
             Wrapper.Find(response, 1400, ArticleModel, query, {}, option, (response: any, articles: any): any => {
                 Wrapper.SendSuccess(response, articles);
             });
@@ -184,7 +200,9 @@ export namespace ArticleModule {
          */
         public get_article_count(request: any, response: any): void {
             let userid = Article.userid(request);
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //          let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            let query: any = Wrapper.Decode(request.params.query);
+
             Wrapper.Count(response, 2800, ArticleModel, {$and: [{userid: userid}, {type: 0}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
@@ -198,11 +216,11 @@ export namespace ArticleModule {
         public render_object(request: any, response: any): void {
             let doc: any = request.body.content;
             if (doc) {
-                resource.render(request.params.userid, request.params.page_name, doc, [doc], (error: any, result: string)=>{
+                resource.render(request.params.userid, request.params.page_name, doc, [doc], (error: any, result: string) => {
                     Wrapper.SendSuccess(response, result);
                 });
             } else {
-                Wrapper.SendError(response, 2, "", {});
+                Wrapper.SendError(response, 2, "", {code:2, message:""});
             }
         }
 
@@ -214,25 +232,25 @@ export namespace ArticleModule {
         public render_fragment(request: any, response: any): void {
             let doc: any = request.body.content;
             if (doc) {
-                resource.render_fragment(request.params.userid, request.params.page_name, doc, [doc], request.query, (error: any, result: string)=>{
+                resource.render_fragment(request.params.userid, request.params.page_name, doc, [doc], request.query, (error: any, result: string) => {
                     Wrapper.SendSuccess(response, result);
                 });
             } else {
-                Wrapper.SendError(response, 2, "", {});
+                Wrapper.SendError(response, 2, "", {code:2, message:""});
             }
         }
 
         public render_articles(request: any, response: any): void {
             ArticleModel.findOne({$and: [{$and: [{name: request.params.article_name}, {userid: request.params.userid}, {open: true}]}]}).then((doc: any): void => {
                 if (doc) {
-                    resource.render(request.params.userid, request.params.page_name, doc, [doc._doc], request.query, (error: any, result: string)=>{
+                    resource.render(request.params.userid, request.params.page_name, doc, [doc._doc], request.query, (error: any, result: string) => {
                         Wrapper.SendSuccess(response, result);
                     });
                 } else {
-                    Wrapper.SendError(response, 2, "", {});
+                    Wrapper.SendError(response, 2, "", {code:2, message:""});
                 }
             }).catch((error: any): void => {
-                Wrapper.SendError(response, 3, "", {});
+                Wrapper.SendError(response, 3, "", {code:2, message:""});
             });
         }
 
@@ -264,7 +282,7 @@ export namespace ArticleModule {
          * @returns none
          */
         // series query -> to parallel query (page, article)
-        public render_resource(userid: string, page_name: string, article_name: string,query:any, callback: (error: any, result: string) => void): void {
+        public render_resource(userid: string, page_name: string, article_name: string, query: any, callback: (error: any, result: string) => void): void {
             ArticleModel.findOne({$and: [{$and: [{name: article_name}, {userid: userid}, {open: true}]}]}).then((doc: any): void => {
                 if (doc) {
                     resource.render(userid, page_name, doc, [doc._doc], query, callback);
@@ -284,36 +302,27 @@ export namespace ArticleModule {
          * @param callback
          * @returns none
          */
-        public render_resources(userid: string, page_name: string,article_name: string, query_field: any, callback: (error: any, result: string) => void): void {
+        public render_resources(userid: string, page_name: string, article_name: string, query_field: any, callback: (error: any, result: string) => void): void {
 
             let query = {};
             if (query_field.q) {
-                try {
-                    query = JSON.parse(query_field.q);
-                } catch (e) {
-                }
+                query = Wrapper.Parse(query_field.q);
             }
 
             let order = {};
             if (query_field.o) {
-                try {
-                    order = JSON.parse(query_field.o);
-                } catch (e) {
-                }
+                order = Wrapper.Parse(query_field.o);
             }
 
             let sort = {};
             if (query_field.s) {
-                try {
-                    sort = {sort: JSON.parse(query_field.s)};
-                } catch (e) {
-                }
+                sort = {sort: Wrapper.Parse(query_field.s)};
             }
 
-            ArticleModel.find({$and: [{$and: [query, {userid: userid}, {open: true}]}]},{},sort).then((docs: any): void => {
+            ArticleModel.find({$and: [{$and: [query, {userid: userid}, {open: true}]}]}, {}, sort).then((docs: any): void => {
                 ArticleModel.findOne({$and: [{$and: [{name: article_name}, {userid: userid}, {open: true}]}]}).then((doc: any): void => {
                     if (doc) {
-                        resource.render(userid, page_name,doc, docs, callback);
+                        resource.render(userid, page_name, doc, docs, callback);
                     } else {
                         callback({code: 20000, message: ""}, null);
                     }

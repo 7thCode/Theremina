@@ -22,19 +22,24 @@ export namespace LayoutsApiRouter {
     const layout: any = new LayoutsModule.Layout();
 
     // for template
-    router.post("/template/create", [exception.exception, exception.guard, exception.authenticate,auth.is_system, layout.create_template]);
+
+    router.get("/template/svg/:name", [layout.get_template_svg]);
+
+    router.post("/template/create", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.create_template]);
     router.get("/template/query/:query/:option", [layout.get_template_query]);
     router.get("/template/count/:query", [layout.get_template_count]);
     router.post("/template/svg", [layout.layout_svg]);
     router.post("/template/pdf", [layout.layout_pdf]);
 
     router.get("/template/:id", [layout.get_template]);
-    router.put("/template/:id", [exception.exception, exception.guard, exception.authenticate,auth.is_system, layout.put_template]);
-    router.delete("/template/:id", [exception.exception, exception.guard, exception.authenticate,auth.is_system, layout.delete_template]);
+    router.put("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.put_template]);
+    router.delete("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.delete_template]);
 
-    router.get("/template/svg/:name", [layout.get_template_svg]);
+
 
     // for layout
+    router.get("/layout/svg/:name", [layout.get_layout_svg]);
+
     router.post("/layout/create", [exception.exception, exception.guard, exception.authenticate, layout.create_layout]);
     router.get("/layout/query/:query/:option", [layout.get_layout_query]);
     router.get("/layout/count/:query", [layout.get_layout_count]);
@@ -45,7 +50,7 @@ export namespace LayoutsApiRouter {
     router.put("/layout/:id", [exception.exception, exception.guard, exception.authenticate, layout.put_layout]);
     router.delete("/layout/:id", [exception.exception, exception.guard, exception.authenticate, layout.delete_layout]);
 
-    router.get("/layout/svg/:name", [layout.get_layout_svg]);
+
 
     router.get("/download/pdf", [layout.download_pdf]);
     router.get("/download/svg", [layout.download_svg]);

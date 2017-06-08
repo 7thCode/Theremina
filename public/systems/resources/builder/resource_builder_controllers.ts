@@ -56,8 +56,8 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
 
                 let session = _ace.getSession();
 
-          //      let beautify = _ace.require("ace/ext/beautify"); // get reference to extension
-          //      beautify.beautify(session);
+                //      let beautify = _ace.require("ace/ext/beautify"); // get reference to extension
+                //      beautify.beautify(session);
 
                 editor.$blockScrolling = Infinity;
                 editor.setOptions({
@@ -70,8 +70,8 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
 
                 editor.container.addEventListener("drop", function (event) {
 
-            //        let innerHTML = event.dataTransfer.getData('text/html');
-            //        let hoge = 1;
+                    //        let innerHTML = event.dataTransfer.getData('text/html');
+                    //        let hoge = 1;
 
                 });
 
@@ -229,7 +229,7 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         };
 
         let Query = (): any => {
-            ResourceBuilderService.query = {type:{$lt:10}};
+            ResourceBuilderService.query = {type: {$lt: 10}};
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
                     $scope.templates = result;
@@ -310,7 +310,7 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
 
         let Query = (): any => {
             progress(true);
-            ResourceBuilderService.SetQuery(null);
+            ResourceBuilderService.InitQuery(null);
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
                     $scope.pages = result;
@@ -321,9 +321,9 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
 
         let Find = (name: string): any => {
             progress(true);
-            ResourceBuilderService.SetQuery(null);
+            ResourceBuilderService.InitQuery(null);
             if (name) {
-                ResourceBuilderService.SetQuery({name: {$regex: name}});
+                ResourceBuilderService.AddQuery({name: {$regex: name}});
             }
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {

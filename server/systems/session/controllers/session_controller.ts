@@ -37,7 +37,7 @@ export namespace SessionModule {
                 };
                 Wrapper.SendSuccess(response, result);
             } else {
-                Wrapper.SendError(response, 2, "not found", {});
+                Wrapper.SendError(response, 2, "not found", {code:2, message:"not found"});
             }
         }
 
@@ -56,7 +56,7 @@ export namespace SessionModule {
                 request.session.save();
                 Wrapper.SendSuccess(response, user.data);
             } else {
-                Wrapper.SendError(response, 2, "not found", {});
+                Wrapper.SendError(response, 2, "not found", {code:2, message:"not found"});
             }
         }
     }

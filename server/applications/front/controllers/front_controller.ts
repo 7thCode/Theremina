@@ -9,33 +9,32 @@
 export namespace FrontModule {
 
     const _: _.LoDashStatic = require('lodash');
-    const fs = require('graceful-fs');
+    const fs: any = require('graceful-fs');
 
     const path: any = require('path');
 
-    const mongodb = require('mongodb');
+    const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = require('q').Promise;
 
-    const archiver = require('archiver');
+    const archiver: any = require('archiver');
 
-    const core = require(process.cwd() + '/core');
+    const core: any = require(process.cwd() + '/core');
     const share: any = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
+    const config: any = share.config;
+    const applications_config: any = share.applications_config;
+    const Wrapper: any = share.Wrapper;
+    const logger: any = share.logger;
 
 //    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
 //    const resource = new ResourcesModule.Resource;
 
- //   const HtmlEditModule: any = require(share.Server("systems/common/html_edit/html_edit"));
     const HtmlEditModule: any = require(share.Server("systems/common/html_edit/html_edit"));
-
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
-
     const ArticleModel: any = require(share.Models("services/articles/article"));
-
-    const validator = require('validator');
+    const AssetModel: any = require(share.Models("plugins/asset/asset"));
+    const validator: any = require('validator');
+    const url: any = require('url');
 
     export class Pages {
 
@@ -62,7 +61,6 @@ export namespace FrontModule {
          * @returns none
          */
         public render(userid: string, name: string, record: any, records: any[], query: any, order: any, callback: (error: any, result: any) => void): void {
-
             ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
                 if (doc) {
                     let content = doc.content;
@@ -98,6 +96,27 @@ export namespace FrontModule {
 
         /**
          * @param userid
+         * @param name
+         * @param record
+         * @param records
+         * @param callback
+         * @returns none
+         */
+        public no_render(userid: string, name: string, callback: (error: any, result: any) => void): void {
+            ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
+                if (doc) {
+                    let content = doc.content;
+                    callback(null, content);
+                } else {
+                    callback({code: 10000, message: ""}, null);
+                }
+            }).catch((error: any): void => {
+                callback(error, null);
+            });
+        }
+
+        /**
+         * @param userid
          * @param page_name
          * @param article_name
          * @param query
@@ -105,11 +124,10 @@ export namespace FrontModule {
          * @returns none
          */
         public render_pages(userid: string, page_name: string, article_name: string, query_field: any, callback: (error: any, result: string) => void): void {
-
             let query = {};
             if (query_field.q) {
                 try {
-                   let native_query = JSON.parse(query_field.q);
+                    let native_query = JSON.parse(query_field.q);
                     Object.keys(native_query).forEach((key) => {
                         query["content." + key + ".value"] = native_query[key];
                     });
@@ -134,8 +152,8 @@ export namespace FrontModule {
             }
 
             if (article_name) {
-                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type:0}]}, {}, sort).then((docs: any): void => {
-                    ArticleModel.findOne({$and: [{name: article_name}, {userid: userid}, {open: true}, {type:0}]}).then((doc: any): void => {
+                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type: 0}]}, {}, sort).then((docs: any): void => {
+                    ArticleModel.findOne({$and: [{name: article_name}, {userid: userid}, {open: true}, {type: 0}]}).then((doc: any): void => {
                         this.render(userid, page_name, doc, docs, query, order, callback);
                     }).catch((error: any): void => {
                         callback(error, null);
@@ -144,7 +162,7 @@ export namespace FrontModule {
                     callback(error, null);
                 });
             } else {
-                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type:0}]}, {}, sort).then((docs: any): void => {
+                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type: 0}]}, {}, sort).then((docs: any): void => {
                     this.render(userid, page_name, null, docs, query, order, callback);
                 }).catch((error: any): void => {
                     callback(error, null);
@@ -332,9 +350,68 @@ export namespace FrontModule {
                 }
             });
         }
+
+        /**
+         *  let userid = Pages.userid(request);
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public create_init_user_resources(user: any): void {
+
+            ResourceModel.find({$and: [{userid: config.systems.userid}, {$and: [{type: {$gte: 20}}, {type: {$lt: 30}}]}]}, {}, {}).then((docs: any): void => {
+                _.forEach(docs, (doc) => {
+                    let name: string = doc.name;
+                    let userid = user.userid;
+                    let type: string = doc.type;
+                    let content: any = doc.content;
+                    ResourceModel.findOne({$and: [{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                        if (!found) {
+                            let page: any = new ResourceModel();
+                            page.userid = userid;
+                            page.name = name;
+                            page.type = type;
+                            page.content = content;
+                            page.open = true;
+                            page.save().then(() => {
+
+                            }).catch((): void => {
+
+                            });
+                        }
+                    });
+                });
+            })
+
+        }
     }
 
     const MailerModule: any = require('../../../systems/common/mailer');
+
+    export class Asset {
+
+        constructor() {
+
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public create(request: any, response: any): void {
+            let article: any = new AssetModel();
+            article.userid = config.systems.userid;  // Article.userid(request);
+            let objectid: any = new mongoose.Types.ObjectId;
+            article.name = objectid.toString();
+            article.type = 10002;
+            article.content = request.body.content;
+            article.open = true;
+            Wrapper.Save(response, 1000, article, (response: any, object: any): void => {
+                Wrapper.SendSuccess(response, object);
+            });
+        }
+    }
 
     export class Mailer {
 
@@ -350,40 +427,108 @@ export namespace FrontModule {
          * @returns none
          */
         public send(request: any, response: any): void {
+            const inquiry_mail: string = "inquiry_mail.html";
+            const thanks_mail: string = "thanks_mail.html";
+            const mail_type: number = 20;
+            const report_title: string = "お問い合わせいただきました";
+            const thanks_title: string = "ありがとうございます";
+            const done_message: string = "お問い合わせありがとうございます";
 
-            let mailer = null;
-            switch (config.mailer.type) {
-                case "gmail":
-                    mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
-                    break;
-                case "mailgun":
-                    mailer = new MailerModule.MailGun(config.mailer.setting, config.mailer.account);
-                    break;
-                default:
-            }
-
-            let name = request.body.content.name;
-            let email = request.body.content.email;
-            let phone = request.body.content.phone;
-            let message = request.body.content.message;
-
-            let m = name + "(email:" + email + " tel:" + phone + ")様から問い合わせがありました。¥n" + message;
-
-            mailer.send("oda.mikio@gmail.com", "お問い合わせいただきました", m, (error: any) => {
-                if (!error) {
-                    mailer.send(email, "ありがとうございます", "承りました", (error: any) => {
-                        if (!error) {
-                            Wrapper.SendSuccess(response, {code: 0, message: ""});
-                        } else {
-                            Wrapper.SendError(response, 200, error.message, error);
-                        }
-                    });
-                } else {
-                    Wrapper.SendError(response, 200, error.message, error);
+            let referer = request.headers.referer;
+            if (referer) {
+                let mailer = null;
+                switch (config.mailer.type) {
+                    case "gmail":
+                        mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+                        break;
+                    case "mailgun":
+                        mailer = new MailerModule.MailGun(config.mailer.setting, config.mailer.account);
+                        break;
+                    default:
                 }
-            });
-        }
+                let referer_url = url.parse(referer);
+                let path = referer_url.pathname;
+                let separated_path = path.split("/");
+                let userid = separated_path[2];
+                if (userid) {
+                    if (request.body.content) {
+                        if (request.body.content.thanks) {
+                            if (request.body.content.report) {
+                                let thanks_to = request.body.content.thanks;
+                                let report_to = request.body.content.report;
 
+                                let content = {};
+                                Object.keys(request.body.content).forEach((key) => {
+                                    content[key] = {"value": request.body.content[key], "type": "quoted"};
+                                });
+                                ResourceModel.findOne({$and: [{userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                    if (record) {
+                                        let scanner = new HtmlEditModule.Scanner("", {});
+                                        scanner.ScanHtml(record.content.resource, {
+                                            create: "",
+                                            modify: "",
+                                            content: content
+                                        }, [], 0, (error: any, doc: any) => {
+                                            if (!error) {
+                                                mailer.send(report_to, report_title, doc, (error: any) => {
+                                                    if (!error) {
+                                                        ResourceModel.findOne({$and: [{userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                                            if (record) {
+                                                                let scanner = new HtmlEditModule.Scanner("", {});
+                                                                scanner.ScanHtml(record.content.resource, {
+                                                                    create: "",
+                                                                    modify: "",
+                                                                    content: content
+                                                                }, [], 0, (error: any, doc: any) => {
+                                                                    if (!error) {
+                                                                        mailer.send(thanks_to, thanks_title, doc, (error: any) => {
+                                                                            if (!error) {
+                                                                                Wrapper.SendSuccess(response, {
+                                                                                    code: 0,
+                                                                                    message: done_message
+                                                                                });
+                                                                            } else {
+                                                                                Wrapper.SendError(response, 500, error.message, error);
+                                                                            }
+                                                                        });
+                                                                    } else {
+                                                                        Wrapper.SendError(response, 300, error.message, error);
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                Wrapper.SendError(response, 400, "record not found.", {});
+                                                            }
+                                                        });
+                                                    } else {
+                                                        Wrapper.SendError(response, 300, error.message, error);
+                                                    }
+                                                });
+                                            } else {
+                                                Wrapper.SendError(response, 200, error.message, error);
+                                            }
+                                        }).catch((error: any): void => {
+                                            Wrapper.SendFatal(response, 100, error.message, error);
+                                        });
+                                    } else {
+                                        Wrapper.SendError(response, 200, "record not found.", {});
+                                    }
+                                });
+                            } else {
+                                Wrapper.SendError(response, 200, "report_to not found.", {});
+                            }
+                        } else {
+                            Wrapper.SendError(response, 200, "thanks_to not found.", {});
+                        }
+                    } else {
+                        Wrapper.SendError(response, 200, "content not found.", {});
+                    }
+                } else {
+                    Wrapper.SendError(response, 200, "userid not found.", {});
+                }
+            } else {
+                Wrapper.SendError(response, 200, "referer not found.", {});
+            }
+        }
     }
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
@@ -394,10 +539,15 @@ export namespace FrontModule {
             return request.user.userid;
         }
 
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
         public get_member(request: any, response: any): void {
             let userid = Members.userid(request);
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query,{userid:userid}]};
+            let query2 = {$and: [query, {userid: userid}]};
 
             Wrapper.FindOne(response, 1000, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -408,10 +558,15 @@ export namespace FrontModule {
             });
         }
 
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
         public put_member(request: any, response: any): void {
             let userid = Members.userid(request);
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query,{userid:userid}]};
+            let query2 = {$and: [query, {userid: userid}]};
 
             Wrapper.FindOne(response, 1100, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -436,7 +591,7 @@ export namespace FrontModule {
             let userid = Members.userid(request);
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let query2 = {$and: [query,{userid:userid}]};
+            let query2 = {$and: [query, {userid: userid}]};
 
             Wrapper.Find(response, 5000, LocalAccount, query2, {}, option, (response: any, accounts: any): any => {
                 Wrapper.SendSuccess(response, accounts);
@@ -445,7 +600,6 @@ export namespace FrontModule {
         }
 
         /**
-         *
          * @param request
          * @param response
          * @returns none
@@ -453,7 +607,7 @@ export namespace FrontModule {
         public get_member_count(request: any, response: any): void {
             let userid = Members.userid(request);
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let query2 = {$and: [query,{userid:userid}]};
+            let query2 = {$and: [query, {userid: userid}]};
 
             Wrapper.Count(response, 2800, LocalAccount, query2, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
@@ -461,7 +615,6 @@ export namespace FrontModule {
         }
 
         /**
-         *
          * @param request
          * @param response
          * @returns none
@@ -482,7 +635,6 @@ export namespace FrontModule {
         }
 
     }
-
 
 }
 

@@ -188,7 +188,7 @@ namespace ShapeEdit {
                 family += delimmiter + "'" + name + "'";
                 delimmiter = ",";
             });
-            return this.style + " " + this.variant + " " + this.weight + " " + this.size + 'px ' + family + delimmiter + this.keyword ;
+            return this.style + " " + this.variant + " " + this.weight + " " + this.size + 'px ' + family + delimmiter + this.keyword;
         }
 
         public Serialize(): string {
@@ -370,11 +370,9 @@ namespace ShapeEdit {
                 if (!this._haserror) {
                     try {
                         result = context.createPattern(this.image, "repeat");
-                    }
-                    catch (e) {
-                        let a = 1;
-                    }
+                    } catch (e) {
 
+                    }
                 }
             }
             return result;
@@ -388,7 +386,6 @@ namespace ShapeEdit {
                     this.image.crossOrigin = 'Anonymous';
                     this.image.onload = (e: any): void => {
                         this._haserror = false;
-
                         callback();
                     };
                     this.image.onerror = (e: any): void => {
@@ -578,9 +575,8 @@ namespace ShapeEdit {
                 if (!this.haserror) {
                     try {
                         result = context.createPattern(this.image, "repeat");
-                    }
-                    catch (e) {
-                        let a = 1;
+                    } catch (e) {
+
                     }
                 }
             }
@@ -643,9 +639,16 @@ namespace ShapeEdit {
             });
             textwidth += "]";
 
-            let text: string = "";
-            if (this.text) {
-                text = this.text.replace(/\r?\n/g, "\\n");
+            let text: string;
+            switch (typeof this.text) {
+                case "undefined":
+                    text = "";
+                    break;
+                case "string":
+                    text = this.text.replace(/\r?\n/g, "\\n");
+                    break;
+                default:
+                    text = this.text;
             }
 
             return '{"type":"' + this.type + '", "text":"' + text + '", "textwidth":' + textwidth + ', "path":"' + this.path +
@@ -2778,8 +2781,8 @@ namespace ShapeEdit {
             return result;
         }
 
-        private FitText(textContent: string, textwidth: number[], hint: number): {line; length}[] {//Fontの幅から行オーバーフローを判定し、改行
-            let result: {line; length}[] = [];
+        private FitText(textContent: string, textwidth: number[], hint: number): { line; length }[] {//Fontの幅から行オーバーフローを判定し、改行
+            let result: { line; length }[] = [];
             let linewidth: number = 0;
             let line: string = "";
             let prevchar: PrevChar = PrevChar.normal;
@@ -2846,6 +2849,7 @@ namespace ShapeEdit {
 
                 context.fillStyle = this.property.FillStyle(context);
                 //this.property.font.size = (this.property.font.size);
+
 
                 context.font = this.property.font.Value();
 
@@ -4081,7 +4085,7 @@ namespace ShapeEdit {
             this.shapes.SetParent(null);
         }
 
-        public Free():void {
+        public Free(): void {
             super.Free();
         }
 
@@ -4089,7 +4093,7 @@ namespace ShapeEdit {
             this.selectrect = new ShapeEdit.Rectangle(x, y, 0, 0);
         }
 
-        private LassoSelect(x: number, y: number):void {
+        private LassoSelect(x: number, y: number): void {
             if (this.selectrect) {
                 this.selectrect.size._w = x - this.selectrect.location.x;
                 this.selectrect.size._h = y - this.selectrect.location.y;
@@ -4106,7 +4110,7 @@ namespace ShapeEdit {
                 } finally {
                     context.restore();
                 }
-                this.shapes.Shapes().forEach((shape: BaseShape):void => {
+                this.shapes.Shapes().forEach((shape: BaseShape): void => {
                     if (!shape.IsLocked()) {
                         if (shape.Intersection(this.selectrect)) {
                             shape.Select();
@@ -4118,11 +4122,11 @@ namespace ShapeEdit {
             }
         }
 
-        private EndSelect():void {
+        private EndSelect(): void {
             this.selectrect = null;
         }
 
-        private ClosePath():void {
+        private ClosePath(): void {
             this.handlers.Exec('new', this.newshape, null);
             this.Add(this.newshape);
             this.newshape = null;

@@ -37,11 +37,7 @@ export namespace RewritingModule {
 
 
         public rewritingQuery(request: any, response: any) {
-
-            console.log(JSON.parse(decodeURIComponent(request.params.path)));
-     //       logger.trace("begin get_rewriting_query");
-
-            let path = JSON.parse(decodeURIComponent(request.params.path));
+            let path: any = Wrapper.Decode(request.params.path);
             let result = [];
             let strage_string = file_utility.readfileSync("./persistent/systems/storege.json");
             let storage_objects = JSON.parse(strage_string);

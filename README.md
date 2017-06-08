@@ -196,6 +196,7 @@
               #access_log   logs/host.access.log  main
       
               location / {
+                        proxy_buffering off;
                         proxy_pass アドレス(http://128.199.232.217:20000など)
                         proxy_http_version 1.1;
                         proxy_set_header Upgrade $http_upgrade;
@@ -220,6 +221,7 @@
               #access_log  logs/host.access.log  main;
       
               location / {
+                  proxy_buffering off;
                   proxy_pass http://localhost:30000;
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;

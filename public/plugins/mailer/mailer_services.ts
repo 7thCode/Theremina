@@ -45,8 +45,9 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
 
         this.SetQuery = (query) => {
             this.option.skip = 0;
+            this.query = {};
             if (query) {
-                this.query = {};
+                this.query = query;
             }
         };
 
@@ -157,8 +158,9 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
 
         this.SetQuery = (query) => {
             this.option.skip = 0;
+            this.query = {};
             if (query) {
-                this.query = {};
+                this.query = query;
             }
         };
 
@@ -250,6 +252,6 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
             });
         };
 
-        init();
+        this.Init();
 
     }]);

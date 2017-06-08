@@ -50,7 +50,6 @@ FrontApplication.config(['$compileProvider', '$httpProvider',
         $httpProvider.defaults.headers.common['If-Modified-Since'] = 'Thu, 01 Jun 1970 00:00:00 GMT'; //マイクロソフトのバグ対応！！！
     }]);
 
-
 FrontApplication.config(['$sceDelegateProvider',function($sceDelegateProvider:any):void {
     $sceDelegateProvider.resourceUrlWhitelist(['**']);
 }]);

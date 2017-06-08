@@ -35,6 +35,7 @@ AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCou
     function (Account:any, AccountQuery: any, AccountCount: any, CollectionService: any): void {
 
         this.SetQuery = (query) => {
+            this.option.skip = 0;
             this.query = {};
             if (query) {
                 this.query = query;

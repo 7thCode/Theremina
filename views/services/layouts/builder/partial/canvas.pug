@@ -1,12 +1,16 @@
 .box.box-primary
     .box-header.with-border
         .h6.box-title Canvas
-
-        //.well.well-sm(layout="word-wrap:break-all;") https://#{domain}/layouts/render/{{userid}}/{{name}}
-
-        .box-tools.pull-right
-            button.btn.btn-box-tool(type='button', data-widget='collapse')
-                i.fa.fa-minus
+        div(ng-show="opened")
+            .row
+                .col-xs-1
+                    a.btn.btn-warning.pull-left(href='${config.protocol}://${config.domain}/layouts/render/{{userid}}/{{name}}' target="_blank" type="button", aria-label="") Open
+                .col-xs-10
+                    .well.well-sm(layout="word-wrap:break-all;") #{config.protocol}://#{config.domain}/layouts/render/{{userid}}/{{name}}
+                .col-xs-1
+                    .box-tools.pull-right
+                        button.btn.btn-box-tool(type='button', data-widget='collapse')
+                            i.fa.fa-minus
     .box-body
         div#wrapper(style="height:65vh;background-color:#dddddd; overflow:scroll;")
             canvas#canvas(crossorigin="anonymous", ng-show="opened", style="position:absolute;background-color:#ffffff;")

@@ -29,29 +29,89 @@ export namespace ResourcesModule {
             return request.user.userid;
         }
 
+        static namespace(name: string): string {
+            let result = "";
+            if (name) {
+                let names = name.split(":");
+                let delimmiter = "";
+                names.forEach((name, index) => {
+                    if (index < (names.length - 1)) {
+                        result += delimmiter + name;
+                        delimmiter = ":";
+                    }
+                })
+            }
+            return result;
+        }
+
+        static localname(name: string): string {
+            let result = "";
+            if (name) {
+                let names = name.split(":");
+                names.forEach((name, index) => {
+                    if (index == (names.length - 1)) {
+                        result = name;
+                    }
+                })
+            }
+            return result;
+        }
+
         /**
          * @param initresources
          * @returns none
          */
-        public create_init_resources(initresources: any[]): void {
-            _.forEach(initresources, (resource) => {
-                let name: string = resource.name;
-                let userid = resource.userid;
-                let type: string = resource.type;
-                let content: any = resource.content;
-                Wrapper.FindOne(null, 1000, ResourceModel, {$and: [{userid: userid}, {type: type}, {name: name}]}, (response: any, page: any): void => {
-                    if (!page) {
-                        let page: any = new ResourceModel();
-                        page.userid = userid;
-                        page.name = name;
-                        page.type = type;
-                        page.content = content;
-                        page.open = true;
-                        page.save().then(() => {
-                        }).catch((): void => {
-                        });
+        public create_init_resources(initresources:any[]): void {
+
+            let save = (doc: any): any => {
+                return new Promise((resolve: any, reject: any): void => {
+                    let path = process.cwd() + '/public/systems/resources/files/';
+                    let filename = path + '/' + doc.path + '/' + doc.name;
+                    let namespace: string = Resource.namespace(doc.name);
+                    let localname: string = Resource.localname(doc.name);
+                    let userid = doc.userid;
+                    let type: string = doc.type;
+                    let content: any = doc.content;
+                    let query = {};
+                    if (config.structured) {
+                        query = {$and: [{userid: userid}, {type: type}, {namespace: namespace}, {name: localname}]};
+                    } else {
+                        query = {$and: [{userid: userid}, {type: type},  {name: localname}]};
                     }
-                });
+
+                    Wrapper.FindOne(null, 1000, ResourceModel, query, (response: any, page: any): void => {
+                        if (!page) {
+                            let page: any = new ResourceModel();
+                            page.userid = userid;
+                            page.namespace = namespace;
+                            page.name = localname;
+                            page.type = type;
+                            let resource = "";
+                            try {
+                                fs.statSync(filename);
+                                resource = fs.readFileSync(filename, 'utf-8');
+                            } catch (e) {
+
+                            }
+                            page.content = {type:content.type,resource:resource};
+                            page.open = true;
+                            page.save().then(() => {
+                                resolve({});
+                            }).catch((error): void => {
+                                reject(error);
+                            });
+                        }
+                    });
+                })
+            };
+
+            let docs = initresources;
+            Promise.all(docs.map((doc: any): void => {
+                return save(doc);
+            })).then((results: any[]): void => {
+
+            }).catch((error: any): void => {
+
             });
         }
 
@@ -61,29 +121,42 @@ export namespace ResourcesModule {
          * @returns none
          */
         public create_resource(request: any, response: any): void {
-            if (request.body.name.indexOf(':') == -1) {
+            if (request.body.name) {
                 const number: number = 1000;
                 let userid = Resource.userid(request);
-                let name = request.body.name;
+                let namespace:string = Resource.namespace(request.body.name);
+                let localname: string = Resource.localname(request.body.name);
                 let type = request.body.type;
                 let content = request.body.content;
-                Wrapper.FindOne(response, number, ResourceModel, {$and: [{name: name}, {type: type}, {userid: userid}]}, (response: any, exists: any): void => {
-                    if (!exists) {
-                        let resource: any = new ResourceModel();
-                        resource.userid = userid;
-                        resource.name = name;
-                        resource.type = type;
-                        resource.content = content;
-                        resource.open = true;
-                        Wrapper.Save(response, number, resource, (response: any, object: any): void => {
-                            Wrapper.SendSuccess(response, object);
-                        });
-                    } else {
-                        Wrapper.SendWarn(response, 1, "already", {});
-                    }
-                });
+                if (localname.indexOf('/') == -1) {
+                    Wrapper.FindOne(response, number, ResourceModel, {$and: [{name: localname},{namespace:namespace}, {type: type}, {userid: userid}]}, (response: any, exists: any): void => {
+                        if (!exists) {
+                            let resource: any = new ResourceModel();
+                            resource.userid = userid;
+                            resource.namespace = namespace;
+                            resource.name = localname;
+                            resource.type = type;
+
+                            let page = "";
+                            if (content.resource) {
+                                page = content.resource;
+                            }
+
+                            resource.content = {resource : page, type : content.type};
+                            //       resource.content = content;
+                            resource.open = true;
+                            Wrapper.Save(response, number, resource, (response: any, object: any): void => {
+                                Wrapper.SendSuccess(response, object);
+                            });
+                        } else {
+                            Wrapper.SendWarn(response, 1, "already", {code:1, message: "already"});
+                        }
+                    });
+                } else {
+                    Wrapper.SendError(response, 3, "resource name must not contain ':'", {code:3, message: "resource name must not contain ':'"});
+                }
             } else {
-                Wrapper.SendError(response, 3, "resource name must not contain ':'", {});
+                Wrapper.SendError(response, 2, "no form name", {code:2, message: "no form name"});
             }
         }
 
@@ -104,7 +177,7 @@ export namespace ResourcesModule {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -124,7 +197,7 @@ export namespace ResourcesModule {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -142,7 +215,7 @@ export namespace ResourcesModule {
                 if (page) {
                     Wrapper.SendSuccess(response, page);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -168,8 +241,12 @@ export namespace ResourcesModule {
         public get_resource_query(request: any, response: any): void {
             const number: number = 1400;
             let userid = Resource.userid(request);
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let option: any = JSON.parse(decodeURIComponent(request.params.option));
+            //  let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //  let option: any = JSON.parse(decodeURIComponent(request.params.option));
+
+            let query: any = Wrapper.Decode(request.params.query);
+            let option: any = Wrapper.Decode(request.params.option);
+
             Wrapper.Find(response, number, ResourceModel, {$and: [{userid: userid}, query]}, {}, option, (response: any, pages: any): any => {
 
                 _.forEach(pages, (page) => {
@@ -191,7 +268,9 @@ export namespace ResourcesModule {
         public get_resource_count(request: any, response: any): void {
             const number: number = 2800;
             //let userid = Resource.userid(request);
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            let query: any = Wrapper.Decode(request.params.query);
+
             Wrapper.Count(response, number, ResourceModel, query, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
@@ -207,8 +286,18 @@ export namespace ResourcesModule {
          */
         public render(userid: string, name: string, record: any, records: any[], query: any, callback: (error: any, result: any) => void): void {
 
+            let namespace:string = Resource.namespace(name);
+            let localname: string = Resource.localname(name);
+
+            let _query = {};
+            if (config.structured) {
+                _query = {$and: [{name: localname}, {namespace: namespace}, {userid: userid}]};
+            } else {
+                _query = {$and: [{name: localname}, {userid: userid}]};
+            }
+
             let order = {};
-            ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
+            ResourceModel.findOne(_query).then((doc: any): void => {
                 if (doc) {
                     let content = doc.content;
                     if (records) {
@@ -253,8 +342,18 @@ export namespace ResourcesModule {
          */
         public render_fragment(userid: string, name: string, record: any, records: any[], query: any, callback: (error: any, result: any) => void): void {
 
+            let namespace:string = Resource.namespace(name);
+            let localname: string = Resource.localname(name);
+
+            let _query = {};
+            if (config.structured) {
+                _query = {$and: [{name: localname}, {namespace: namespace}, {userid: userid}]};
+            } else {
+                _query = {$and: [{name: localname}, {userid: userid}]};
+            }
+
             let order = {};
-            ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
+            ResourceModel.findOne(_query).then((doc: any): void => {
                 if (doc) {
                     let content = doc.content;
                     if (records) {

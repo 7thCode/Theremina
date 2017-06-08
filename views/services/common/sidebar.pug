@@ -69,10 +69,13 @@ aside.main-sidebar(ng-controller='LoginController')
                         span.pull-right-container
                             i.fa.fa-angle-left.pull-right
                     ul.treeview-menu
-                        li
-                            a(href='/mailer' data-toggle="tooltip" data-placement="bottom" title="Mailer")
-                                i.fa.fa-eye
-                                span Mailer
+                        each module in config.modules
+                            if module.type == "optional"
+                                if module.description.display
+                                    li
+                                        a(href='/' + module.name data-toggle="tooltip" data-placement="bottom" title='${module.description.display}')
+                                            i.fa.fa-eye
+                                            span #{module.description.display}
 
                 li.treeview
                     a(href='#')
@@ -128,7 +131,7 @@ aside.main-sidebar(ng-controller='LoginController')
                             i.fa.fa-key.fa-fw
                             span Password
                 li
-                    a(href="/" data-toggle="tooltip" data-placement="bottom" title="Front")
+                    a(href="/front" data-toggle="tooltip" data-placement="bottom" title="Front")
                         i.fa.fa-coffee.fa-fw
                         span  Front
 
@@ -150,7 +153,7 @@ aside.main-sidebar(ng-controller='LoginController')
         else
             .user-panel
                 .pull-left.image
-                    img.img-circle(src="systems/resources/files/blank.png", style="width:5rem;height:5rem;", alt='')
+                    img.img-circle(src="systems/files/files/blank.png", style="width:5rem;height:5rem;", alt='')
 
             ul.sidebar-menu
 
@@ -168,8 +171,3 @@ aside.main-sidebar(ng-controller='LoginController')
                         a(href="#", ng-click="showRegisterDialog({})" data-toggle="tooltip" data-placement="bottom" title="Regist")
                             i.fa.fa-user-plus.fa-fw
                             span Regist
-
-                //li
-                    a(href="#", ng-click="showRegisterDialog({userid:'123'})" data-toggle="tooltip" data-placement="bottom" title="Regist")
-                        i.fa.fa-user-plus.fa-fw
-                        span Regist

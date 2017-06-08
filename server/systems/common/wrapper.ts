@@ -34,7 +34,7 @@ export namespace Promised {
             try {
                 callback(req, res);
             } catch (e) {
-                this.SendFatal(res, 100000, e.message, e);
+                this.SendFatal(res, e.code, e.message, e);
             }
         }
 
@@ -43,7 +43,7 @@ export namespace Promised {
                 res = this.BasicHeader(res, "");
                 callback(req, res);
             } else {
-                this.SendError(res, 1, "", {});
+                this.SendError(res, 1, "", {code: 1, message: ""});
             }
         }
 
@@ -52,10 +52,10 @@ export namespace Promised {
                 if (req.isAuthenticated()) {
                     callback(req, res);
                 } else {
-                    this.SendError(res, 1, "", {});
+                    this.SendError(res, 1, "", {code: 1, message: ""});
                 }
             } else {
-                this.SendError(res, 1, "", {});
+                this.SendError(res, 1, "", {code: 1, message: ""});
             }
         }
 
@@ -63,7 +63,7 @@ export namespace Promised {
             model.findById(id).then((object: any): void => {
                 callback(res, object);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -71,7 +71,7 @@ export namespace Promised {
             model.findOne(query).then((doc: any): void => {
                 callback(res, doc);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -79,7 +79,7 @@ export namespace Promised {
             model.find(query, fields, option).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -87,7 +87,7 @@ export namespace Promised {
             model.count(query).then((count) => {
                 callback(response, count);
             }).catch((error) => {
-                this.SendError(response, code + 100, "", error);
+                this.SendError(response, error.code, error.message, error);
             });
         }
 
@@ -95,7 +95,7 @@ export namespace Promised {
             model.findAndModify(query, sort, update, options).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -103,7 +103,7 @@ export namespace Promised {
             instance.save().then(() => {
                 callback(res, instance);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -111,7 +111,7 @@ export namespace Promised {
             model.findOneAndUpdate(query, update, {upsert: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -119,7 +119,7 @@ export namespace Promised {
             model.update(query, update, {upsert: true, multi: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -127,15 +127,15 @@ export namespace Promised {
             instance.remove().then(() => {
                 callback(res);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Delete(res: any, code: number, model: any,query:any, callback: (res: any) => void): void {
+        public Delete(res: any, code: number, model: any, query: any, callback: (res: any) => void): void {
             model.remove(query).then(() => {
                 callback(res);
             }).catch((error: any): void => {
-                this.SendError(res, code + 100, "", error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
@@ -143,7 +143,7 @@ export namespace Promised {
             if (condition) {
                 callback(res);
             } else {
-                this.SendWarn(res, code + 100, "", {});
+                this.SendWarn(res, code + 100, "", {code: code + 100, message: ""});
             }
         }
 
@@ -188,11 +188,28 @@ export namespace Promised {
             }
         }
 
-        //    public SendSuccessList(response: any, code: number, object: any): void {
-        //        if (response) {
-        //           response.jsonp(new result(code, "", object));
-        //        }
-        //    }
+        public Decode(data: string): any {
+            let result = {};
+            if (data) {
+                let decode_data: string = decodeURIComponent(data);
+                try {
+                    result = JSON.parse(decode_data);
+                } catch (e) {
+                }
+            }
+            return result;
+        };
+
+        public Parse(data: string): any {
+            let result = {};
+            if (data) {
+                try {
+                    result = JSON.parse(data);
+                } catch (e) {
+                }
+            }
+            return result;
+        };
     }
 }
 

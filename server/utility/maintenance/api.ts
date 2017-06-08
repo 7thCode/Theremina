@@ -11,11 +11,11 @@ export namespace MaintenanceApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const InstallerModule: any = require("./controllers/maintenance_controller");
-    const installer: any = new InstallerModule.Installer();
+    const MaintenanceModule: any = require("./controllers/maintenance_controller");
+    const Maintenance: any = new MaintenanceModule.Installer();
 
-    router.get('/install', [installer.read]);
-    router.put('/install', [installer.write]);
+//    router.get('/install', [installer.read]);
+//    router.put('/install', [installer.write]);
 
 }
 

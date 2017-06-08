@@ -37,6 +37,9 @@ export namespace SettingApiRouter {
     router.get('/setting/system', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_system]);
     router.put('/setting/system', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.write_system]);
 
+    router.get('/setting/modules', [exception.exception, exception.guard, exception.authenticate, setting.read_modules]);
+
+
 }
 
 module.exports = SettingApiRouter.router;

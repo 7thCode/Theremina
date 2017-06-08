@@ -51,7 +51,9 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "YahooServices",
     "PublicKeyServices",
     "MailerControllers",
-    "MailerServices"
+    "MailerServices",
+    "RobotControllers",
+    "RobotServices"
 ]);
 
 BackOfficeApplication.run(['$rootScope',

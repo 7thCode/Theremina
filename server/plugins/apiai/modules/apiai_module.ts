@@ -27,11 +27,11 @@ export namespace ApiAiModule {
 
         }
 
-        public inquiry(sessionId: any, ask: string, callback: (eror,result) => void): void {
+        public inquiry(sessionId: any, ask: string, callback: (eror, result) => void): void {
             return ai.textRequest(ask, {
                 sessionId: sessionId
             }).then((result) => {
-                callback(null,result);
+                callback(null, result);
                 /*     switch (response.result.source) {
                  case "agent":
                  callback(response.result.fulfillment.speech);
@@ -43,7 +43,7 @@ export namespace ApiAiModule {
                  }
                  */
             }).catch((error) => {
-                callback(error,null);
+                callback(error, null);
             });
         }
     }

@@ -8,21 +8,38 @@ module.exports = exports = function UserDataPlugin(schema: any, options: any) {
 
     schema.add({userid: String});
     schema.add({content: Object});
+    schema.add({namespace: String});
     schema.add({name: String});
     schema.add({open: Boolean});
     schema.add({type: Number});
+    schema.add({status: Number});
+    schema.add({version: Number});
 
-    schema.index({name: 1});
+    // schema.index({name: 1});
+
+    schema.index({namespace: 1,name: 1, userid: 1, type: 1, version: 1}, {unique: true, index: true});
 
     schema.pre('save', function (next: any) {
         if (!this.userid) {
             this.userid = "";
+        }
+        if (!this.namespace) {
+            this.namespace = "";
         }
         if (!this.name) {
             this.name = "";
         }
         if (!this.type) {
             this.type = 0;
+        }
+        if (!this.open) {
+            this.open = true;
+        }
+        if (!this.status) {
+            this.status = 1;
+        }
+        if (!this.version) {
+            this.version = 1;
         }
         if (!this.content) {
             this.content = {};

@@ -52,7 +52,9 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     'ResourcePlayerServices',
     'ResourcePlayerControllers',
     "MailerControllers",
-    "MailerServices"
+    "MailerServices",
+    "RobotControllers",
+    "RobotServices"
 ]);
 
 BackOfficeApplication.run(['$rootScope',

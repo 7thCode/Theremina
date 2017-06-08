@@ -1,3 +1,9 @@
+/**!
+ Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ This software is released under the MIT License.
+ //opensource.org/licenses/mit-license.php
+ */
+
 "use strict";
 
 export namespace PageRouter {
@@ -28,14 +34,13 @@ export namespace PageRouter {
 
     const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
 
-
     router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         response.redirect(302, applications_config.redirect["/"]);
     }]);
 
     router.get("/front", [analysis.page_view, (request: any, response: any): void => {
         response.render("applications/front/index", {
-            config:config,
+            config: config,
             user: request.user,
             message: "Welcome",
             status: 200,
@@ -85,14 +90,20 @@ export namespace PageRouter {
     }]);
 
     router.get("/robots.txt", [(request: any, response: any): void => {
-        let robots = "User-agent: *\n\nSitemap: http://" + config.domain + "/sitemap.xml";
+        let robots = "User-agent: *\n\nSitemap: " + config.protocol + "://" + config.domain + "/sitemap.xml";
         response.set('Content-Type', 'text/plain');
         response.send(robots);
     }]);
 
     //self
     router.get("/self", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/self/index", {config:config,user: request.user, message: "Self", status: 200, fonts: webfonts});
+        response.render("applications/self/index", {
+            config: config,
+            user: request.user,
+            message: "Self",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/dialogs/save_done_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
@@ -102,7 +113,7 @@ export namespace PageRouter {
     //start
     router.get("/start", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("applications/start/index", {
-            config:config,
+            config: config,
             user: request.user,
             message: "Data",
             status: 200,
@@ -113,7 +124,13 @@ export namespace PageRouter {
 
     //data
     router.get("/data", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/data/index", {config:config, user: request.user, message: "Data", status: 200, fonts: webfonts});
+        response.render("applications/data/index", {
+            config: config,
+            user: request.user,
+            message: "Data",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/dialogs/self_update_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
@@ -143,8 +160,7 @@ export namespace PageRouter {
     //pages
     router.get("/pages", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("applications/pages/index", {
-            config:config,
-            domain: config.domain,
+            config: config,
             user: request.user,
             message: "Pages",
             status: 200,
@@ -155,7 +171,7 @@ export namespace PageRouter {
     //photo
     router.get("/photo", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("applications/photo/index", {
-            config:config,
+            config: config,
             user: request.user,
             message: "Data",
             status: 200,
@@ -165,7 +181,7 @@ export namespace PageRouter {
 
     router.get("/signup", [analysis.page_view, (request: any, response: any): void => {
         response.render("applications/signup/index", {
-            config:config,
+            config: config,
             user: request.user,
             message: "Welcome",
             status: 200,
@@ -176,8 +192,7 @@ export namespace PageRouter {
     //SVG
     router.get("/svg", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("applications/svg/index", {
-            config:config,
-            domain: config.domain,
+            config: config,
             user: request.user,
             message: "SVG",
             status: 200,
@@ -204,7 +219,13 @@ export namespace PageRouter {
 
     // Members
     router.get("/members", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
-        response.render("applications/members/index", {config:config, user: request.user, message: "Accounts", status: 200, fonts:webfonts});
+        response.render("applications/members/index", {
+            config: config,
+            user: request.user,
+            message: "Accounts",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/members/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (request: any, response: any, next: any) => {
@@ -232,21 +253,50 @@ export namespace PageRouter {
                 response.writeHead(200, {'Content-Type': result.type});
                 response.write(result.resource);
                 response.end();
-          //      response.send(result.resource);
             } else {
                 switch (error.code) {
                     case 10000:
-                        response.status(404).render('error', {
-                            status: 404,
-                            message: "page not found...",
-                            url: request.url
+                        pages.render(request.params.userid, "error.html", {
+                            create: "",
+                            modify: "",
+                            content: {
+                                code: {"value": 404, "type": "quoted"},
+                                message: {"value": "page not found", "type": "quoted"}
+                            }
+                        }, [], {}, {}, (error, result) => {
+                            if (!error) {
+                                response.writeHead(404, {'Content-Type': result.type});
+                                response.write(result.resource);
+                                response.end();
+                            } else {
+                                response.status(500).render('error', {
+                                    status: 500,
+                                    message: error.message,
+                                    url: request.url
+                                });
+                            }
                         });
                         break;
                     case 20000:
-                        response.status(404).render('error', {
-                            status: 404,
-                            message: "article not found...",
-                            url: request.url
+                        pages.render(request.params.userid, "error.html", {
+                            create: "",
+                            modify: "",
+                            content: {
+                                code: {"value": 404, "type": "quoted"},
+                                message: {"value": "article not found", "type": "quoted"}
+                            }
+                        }, [], {}, {}, (error, result) => {
+                            if (!error) {
+                                response.writeHead(404, {'Content-Type': result.type});
+                                response.write(result.resource);
+                                response.end();
+                            } else {
+                                response.status(500).render('error', {
+                                    status: 500,
+                                    message: error.message,
+                                    url: request.url
+                                });
+                            }
                         });
                         break;
                     default:
@@ -262,8 +312,67 @@ export namespace PageRouter {
                 response.writeHead(200, {'Content-Type': result.type});
                 response.write(result.resource);
                 response.end();
+            } else {
+                switch (error.code) {
+                    case 10000:
+                        //page not found
+                        pages.render(request.params.userid, "error.html", {
+                            create: "",
+                            modify: "",
+                            content: {
+                                code: {"value": 404, "type": "quoted"},
+                                message: {"value": "page not found", "type": "quoted"}
+                            }
+                        }, [], {}, {}, (error, result) => {
+                            if (!error) {
+                                response.writeHead(404, {'Content-Type': result.type});
+                                response.write(result.resource);
+                                response.end();
+                            } else {
+                                response.status(500).render('error', {
+                                    status: 500,
+                                    message: error.message,
+                                    url: request.url
+                                });
+                            }
+                        });
+                        break;
+                    case 20000:
+                        //article not found
+                        pages.render(request.params.userid, "error.html", {
+                            create: "",
+                            modify: "",
+                            content: {
+                                code: {"value": 404, "type": "quoted"},
+                                message: {"value": "article not found", "type": "quoted"}
+                            }
+                        }, [], {}, {}, (error, result) => {
+                            if (!error) {
+                                response.writeHead(404, {'Content-Type': result.type});
+                                response.write(result.resource);
+                                response.end();
+                            } else {
+                                response.status(500).render('error', {
+                                    status: 500,
+                                    message: error.message,
+                                    url: request.url
+                                });
+                            }
+                        });
+                        break;
+                    default:
+                        response.status(500).render('error', {status: 500, message: error.message, url: request.url});
+                }
+            }
+        });
+    }]);
 
-         //       response.send(result.resource);
+    router.get("/rawpage/:userid/:page_name", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        pages.no_render(request.params.userid, request.params.page_name, (error: any, result: any): void => {
+            if (!error) {
+                response.writeHead(200, {'Content-Type': result.type});
+                response.write(result.resource);
+                response.end();
             } else {
                 switch (error.code) {
                     case 10000:
@@ -286,11 +395,6 @@ export namespace PageRouter {
             }
         });
     }]);
-
-
-
-
-
 
 }
 

@@ -48,8 +48,9 @@ ResourcePlayerServices.service('ResourcePlayerService', ["HtmlEdit", "ResourceCr
 
         this.SetQuery = (query) => {
             this.option.skip = 0;
+            this.query = {key: ""};
             if (query) {
-                this.query = {key: ""};
+                this.query = query;
             }
         };
 

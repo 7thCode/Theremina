@@ -18,7 +18,7 @@ export namespace ArticlePageRouter {
 
     const config: any = share.config;
     const services_config = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts;
 
     const ArticleModule: any = require(share.Server("services/articles/controllers/article_controller"));
     const article: any = new ArticleModule.Article;
@@ -29,7 +29,13 @@ export namespace ArticlePageRouter {
     const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
 
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
-        response.render("services/articles/index", {config:config, user: request.user, message: "Articles", status: 200, fonts:webfonts});
+        response.render("services/articles/index", {
+            config: config,
+            user: request.user,
+            message: "Articles",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (request: any, response: any, next: any) => {
@@ -41,17 +47,25 @@ export namespace ArticlePageRouter {
     }]);
 
     // localhost:8000/articles/render/000000000000000000000000/test1/あ
-    router.get("/form/:userid/:page_name/:article_name", [exception.page_catch,analysis.page_view, (request: any, response: any): void => {
+    router.get("/form/:userid/:page_name/:article_name", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         article.render_form(request.params.userid, request.params.page_name, request.params.article_name, (error: any, result: string): void => {
             if (!error) {
-                response.render("services/forms/render", {html: result, fonts:webfonts});
+                response.render("services/forms/render", {html: result, fonts: webfonts});
             } else {
                 switch (error.code) {
                     case 10000:
-                        response.status(404).render('error', {status: 404, message: "page not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "page not found...",
+                            url: request.url
+                        });
                         break;
                     case 20000:
-                        response.status(404).render('error', {status: 404, message: "article not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "article not found...",
+                            url: request.url
+                        });
                         break;
                     default:
                         response.status(500).render('error', {status: 500, message: error.message, url: request.url});
@@ -68,10 +82,18 @@ export namespace ArticlePageRouter {
             } else {
                 switch (error.code) {
                     case 10000:
-                        response.status(404).render('error', {status: 404, message: "page not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "page not found...",
+                            url: request.url
+                        });
                         break;
                     case 20000:
-                        response.status(404).render('error', {status: 404, message: "article not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "article not found...",
+                            url: request.url
+                        });
                         break;
                     default:
                         response.status(500).render('error', {status: 500, message: error.message, url: request.url});
@@ -88,10 +110,18 @@ export namespace ArticlePageRouter {
             } else {
                 switch (error.code) {
                     case 10000:
-                        response.status(404).render('error', {status: 404, message: "page not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "page not found...",
+                            url: request.url
+                        });
                         break;
                     case 20000:
-                        response.status(404).render('error', {status: 404, message: "article not found...", url: request.url});
+                        response.status(404).render('error', {
+                            status: 404,
+                            message: "article not found...",
+                            url: request.url
+                        });
                         break;
                     default:
                         response.status(500).render('error', {status: 500, message: error.message, url: request.url});

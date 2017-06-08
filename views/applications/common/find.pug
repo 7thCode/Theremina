@@ -1,0 +1,35 @@
+.box.box-info
+    .box-header.with-border
+        .box-tools.pull-right
+            button.btn.btn-box-tool(type='button', data-widget='collapse')
+                i.fa.fa-minus
+    .box-body
+        .row
+            .col-xs-12
+                include ../../systems/common/next_prev
+
+        .row
+            .col-xs-4
+                .form-group
+                    label(for="type") resourcetype
+                    select.form-control.no-zoom#type(ng-model="type" ng-change="FindType(type);")
+                        option(value="") all
+                        option(value="20") page
+                        option(value="21") template
+            .col-xs-4
+                .form-group
+                    label(for="mimetype") mimetype
+                    select.form-control.no-zoom#mimetype(ng-model="mimetype" ng-change="FindMime(mimetype);")
+                        option(value="") all
+                        option(value="text/html") text/html
+                        option(value="text/css") text/css
+                        option(value="text/javascript") text/javascript
+                        option(value="application/json") application/json
+            .col-xs-4
+                .form-group
+                    label(for="content") content
+                    input.form-control.no-zoom#content(ng-model="content", type="text", name='content' ng-change="FindResource(content);")
+
+
+
+

@@ -57,8 +57,11 @@ export namespace BeaconModule {
          */
         public get_beacon(request: any, response: any, next: any): void {
             try {
-
-                let token: any = JSON.parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
+                let token: any = {};
+                try {
+                    token = JSON.parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
+                } catch (e) {
+                }
 
                 let conn = Beacon.connect(config.db.user);
 
@@ -112,8 +115,6 @@ export namespace BeaconModule {
                 next();
             }
         }
-
-
     }
 }
 

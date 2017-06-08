@@ -32,7 +32,7 @@ export namespace AccountModule {
                 if (account) {
                     Wrapper.SendSuccess(response, account.local);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -47,7 +47,7 @@ export namespace AccountModule {
                         Wrapper.SendSuccess(response, object.local);
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -61,11 +61,15 @@ export namespace AccountModule {
         public get_account_query_query(request: any, response: any): void {
             let self: any = request.user;
 
-                let query: any = JSON.parse(decodeURIComponent(request.params.query));
-                let option: any = JSON.parse(decodeURIComponent(request.params.option));
-                Wrapper.Find(response, 5000, LocalAccount, query, {}, option, (response: any, accounts: any): any => {
-                    Wrapper.SendSuccess(response, accounts);
-                });
+            //     let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //     let option: any = JSON.parse(decodeURIComponent(request.params.option));
+
+            let query: any = Wrapper.Decode(request.params.query);
+            let option: any = Wrapper.Decode(request.params.option);
+
+            Wrapper.Find(response, 5000, LocalAccount, query, {}, option, (response: any, accounts: any): any => {
+                Wrapper.SendSuccess(response, accounts);
+            });
 
         }
 
@@ -76,7 +80,9 @@ export namespace AccountModule {
          * @returns none
          */
         public get_account_count(request: any, response: any): void {
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            //       let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            let query: any = Wrapper.Decode(request.params.query);
+
             Wrapper.Count(response, 2800, LocalAccount, query, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
@@ -96,7 +102,7 @@ export namespace AccountModule {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }

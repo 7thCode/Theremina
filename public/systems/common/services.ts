@@ -293,109 +293,114 @@ Services.directive('draggablepane', ['$document', ($document: any): any => {
 
                 name = attribute.draggablepane;
 
-                if (name) {
-                    let start_x: number;
-                    let start_y: number;
-                    let clicked_x: number;
-                    let clicked_y: number;
-                    let location_x: string;
-                    let location_y: string;
 
-                    let left = localStorage.getItem(name + '_left');
-                    if (left) {
-                        location_x = left;
+                let start_x: number;
+                let start_y: number;
+                let clicked_x: number;
+                let clicked_y: number;
+                let location_x: string;
+                let location_y: string;
+
+
+                let left = localStorage.getItem(name + '_left');
+                if (left) {
+                    location_x = left;
+                } else {
+                    location_x = element[0].style.left;
+                }
+
+                let top = localStorage.getItem(name + '_top');
+                if (top) {
+                    location_y = top;
+                } else {
+                    location_y = element[0].style.top;
+                }
+
+                element.css({
+                    width: element[0].style.width,
+                    height: element[0].style.height,
+                    top: location_y,
+                    left: location_x
+                });
+
+                element.bind('mousedown', ($event: any): boolean => {
+                    let result = false;
+
+                    start_x = element.prop('offsetLeft');
+                    start_y = element.prop('offsetTop');
+                    clicked_x = $event.clientX;
+                    clicked_y = $event.clientY;
+
+                    let handle_y = clicked_y - start_y;
+                    if (handle_y < 30) {
+                        $document.bind('mousemove', mousemove);
+                        $document.bind('mouseup', mouseup);
                     } else {
-                        location_x = element[0].style.left;
+                        result = true;
                     }
+                    return result;
+                });
 
-                    let top = localStorage.getItem(name + '_top');
-                    if (top) {
-                        location_y = top;
-                    } else {
-                        location_y = element[0].style.top;
+                let mousemove: ($event: any) => boolean = ($event: any): boolean => {
+
+                    let target = angular.element("#draggable_area");
+
+                    if (target) {
+                        let target_x_min = target[0].offsetLeft;
+                        let target_y_min = target[0].offsetTop;
+                        let target_width = target[0].offsetWidth;
+                        let target_height = target[0].offsetHeight;
+                        let target_x_max = target_x_min + target_width;
+                        let target_y_max = target_y_min + target_height;
+
+
+                        let delta_x: number = $event.clientX - clicked_x;
+                        let delta_y: number = $event.clientY - clicked_y;
+                        let position_x = start_x + delta_x;
+                        let position_y = start_y + delta_y;
+
+                        if (position_x < target_x_min) {
+                            position_x = target_x_min;
+                        }
+                        if (position_y < target_y_min) {
+                            position_y = target_y_min;
+                        }
+
+                        if (position_x > target_x_max) {
+                            position_x = target_x_max;
+                        }
+                        if (position_y > target_y_max) {
+                            position_y = target_y_max;
+                        }
+
+                        location_x = position_x + "px";
+                        location_y = position_y + "px";
                     }
 
                     element.css({
-                        width: element[0].style.width,
-                        height: element[0].style.height,
                         top: location_y,
                         left: location_x
                     });
 
-                    element.bind('mousedown', ($event: any): boolean => {
-                        let result = false;
+                    return false;
+                };
 
-                        start_x = element.prop('offsetLeft');
-                        start_y = element.prop('offsetTop');
-                        clicked_x = $event.clientX;
-                        clicked_y = $event.clientY;
+                let mouseup: () => void = (): void => {
 
-                        let handle_y = clicked_y - start_y;
-                        if (handle_y < 30) {
-                            $document.bind('mousemove', mousemove);
-                            $document.bind('mouseup', mouseup);
-                        } else {
-                            result = true;
-                        }
-                        return result;
-                    });
+                    if (('localStorage' in window) && (window.localStorage !== null)) {
 
-                    let mousemove: ($event: any) => boolean = ($event: any): boolean => {
-
-                        let target = angular.element("#draggable_area");
-
-                        if (target) {
-                            let target_x_min = target[0].offsetLeft;
-                            let target_y_min = target[0].offsetTop;
-                            let target_width = target[0].offsetWidth;
-                            let target_height = target[0].offsetHeight;
-                            let target_x_max = target_x_min + target_width;
-                            let target_y_max = target_y_min + target_height;
-
-
-                            let delta_x: number = $event.clientX - clicked_x;
-                            let delta_y: number = $event.clientY - clicked_y;
-                            let position_x = start_x + delta_x;
-                            let position_y = start_y + delta_y;
-
-                            if (position_x < target_x_min) {
-                                position_x = target_x_min;
-                            }
-                            if (position_y < target_y_min) {
-                                position_y = target_y_min;
-                            }
-
-                            if (position_x > target_x_max) {
-                                position_x = target_x_max;
-                            }
-                            if (position_y > target_y_max) {
-                                position_y = target_y_max;
-                            }
-
-                            location_x = position_x + "px";
-                            location_y = position_y + "px";
-                        }
-
-                        element.css({
-                            top: location_y,
-                            left: location_x
-                        });
-
-                        return false;
-                    };
-
-                    let mouseup: () => void = (): void => {
-
-                        if (('localStorage' in window) && (window.localStorage !== null)) {
+                        if (name) {
                             localStorage.setItem(name + '_left', location_x);
                             localStorage.setItem(name + '_top', location_y);
                         }
 
-                        $document.unbind('mousemove', mousemove);
-                        $document.unbind('mouseup', mouseup);
                     }
 
+                    $document.unbind('mousemove', mousemove);
+                    $document.unbind('mouseup', mouseup);
                 }
+
+
             }
         }
     };
@@ -412,3 +417,307 @@ Services.filter('length', [(): any => {
         return result;
     };
 }]);
+
+
+
+Services.provider('HtmlEdit', [function (): void {
+
+    this.$get = () => {
+        return {
+            toHtml: (object: any, init: string): string => {
+                return HtmlEdit.Render.toHtml(object, init);
+            },
+            fromHtml: (html: string, callback: (errors, doc) => void): void => {
+                HtmlEdit.Render.fromHtml(html, callback);
+            },
+        }
+    }
+
+}
+]);
+
+// ShapeEditProvider
+Services.provider('ShapeEdit', [function ():void {
+
+    let _self:any = this;
+
+    _self.Handlers = new ShapeEdit.EventHandlers();
+    _self.Plugins = new ShapeEdit.Plugins();
+
+    _self.pagesize = 25;
+
+    _self.query = {};
+    _self.option = {limit: _self.pagesize, skip: 0};
+    _self.count = 0;
+
+    _self.IsOpen = false;
+
+    _self.input = {};
+
+    _self.ratio = 1;
+
+    _self.scale = 1;
+
+    _self.object = null;
+
+    this.configure = (options) => {
+        _self.Wrapper = <HTMLCanvasElement>document.getElementById(options.wrapper);
+        _self.CanvasElement = <HTMLCanvasElement>document.getElementById(options.canvas);
+        if (_self.CanvasElement) {
+            _self.CanvasElement.width = options.width;
+            _self.CanvasElement.height = options.height;
+            _self.Canvas = new ShapeEdit.Canvas(_self.CanvasElement, _self.Handlers, _self.Plugins, null, true);
+            //this.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.CanvasElement.width, _self.CanvasElement.height);
+        }
+    };
+
+    this.adjust = (element: any, outerwidth: number, outerheight: number, innerwidth: number, innerheight: number, scale:number): void => {
+        element.width = innerwidth;
+        element.height = innerheight;
+        element.style.marginLeft = ((outerwidth - innerwidth) / 2) + "px";
+        element.style.marginRight = ((outerwidth - innerwidth) / 2) + "px";
+        element.style.marginTop = ((outerheight - innerheight) / 2) + "px";
+        element.style.marginBottom = ((outerheight - innerheight) / 2) + "px";
+
+        let width:number = (outerwidth / innerwidth);
+        let height:number = (outerheight / innerheight);
+        _self.ratio = Math.min(width, height) * scale * 0.9;
+        element.style.transform = "scale(" + _self.ratio  + ")";
+    };
+
+    this.$get = () => {
+        return {
+            Canvas: _self.Canvas,
+            Wrapper: _self.Wrapper,
+            CanvasElement: _self.CanvasElement,
+            RGBAColor: ShapeEdit.RGBAColor,
+            Font: ShapeEdit.Font,
+            ShapeProperty: ShapeEdit.ShapeProperty,
+            Rectangle: ShapeEdit.Rectangle,
+            Text: ShapeEdit.Text,
+            Box: ShapeEdit.Box,
+            Oval: ShapeEdit.Oval,
+            Bezier: ShapeEdit.Bezier,
+            ImageRect: ShapeEdit.ImageRect,
+            Location: ShapeEdit.Location,
+            Mode: ShapeEdit.Mode,
+            IsOpen: _self.IsOpen,
+            Input: _self.input,
+            Ratio: _self.ratio,
+            Scale: _self.scale,
+
+            Serialize: () => {
+                return ShapeEdit.Canvas.Serialize(_self.Canvas);
+            },
+
+            Load: (value: any) => {
+                _self.object = {};
+                try {
+                    _self.object = JSON.parse(value);
+                } catch (e) {
+
+                }
+                _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
+                ShapeEdit.Canvas.Load(_self.Canvas, _self.object, _self.Handlers);
+                _self.IsOpen = true;
+                _self.Canvas.Draw();
+                //    _self.Canvas.Animate();
+            },
+
+            Save: (): any => {
+                return ShapeEdit.Canvas.Save(_self.Canvas);
+            },
+
+            Clear: () => {
+                _self.IsOpen = false;
+            },
+
+            GetScale: (): number => {
+                return _self.scale;
+            },
+
+            SetScale: (scale: number): void => {
+                _self.scale = scale;
+                _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
+                _self.Canvas.Draw();
+                //     _self.Canvas.Animate();
+            },
+
+            ToTop: () => {
+                _self.Canvas.ToTop();
+            },
+
+            ToBottom: () => {
+                _self.Canvas.ToBottom();
+            },
+
+            Selected: (): any => {
+                _self.Canvas.Selected();
+            },
+
+            Add: (shape: any): void => {
+                _self.Canvas.Add(shape);
+            },
+
+            DeleteSelected: (): void => {
+                _self.Canvas.DeleteSelected();
+            },
+            Lock: (): void => {
+                _self.Canvas.Lock();
+            },
+            UnLockAll: (): void => {
+                _self.Canvas.UnLockAll();
+            },
+            Group: (): void => {
+                _self.Canvas.Group();
+            },
+            Ungroup: (): void => {
+                _self.Canvas.Ungroup();
+            },
+            Copy: (): void => {
+                _self.Canvas.Copy();
+            },
+            Paste: (): void => {
+                _self.Canvas.Paste();
+            },
+            SetCurrentFillColor: (color: any): void => {
+                _self.Canvas.SetCurrentFillColor(color);
+            },
+            CurrentFillColor: (): any => {
+                return _self.Canvas.CurrentFillColor();
+            },
+            SetCurrentStrokeColor: (color): void => {
+                _self.Canvas.SetCurrentStrokeColor(color);
+            },
+            CurrentStrokeColor: (): any => {
+                return _self.Canvas.CurrentStrokeColor();
+            },
+            SetCurrentStrokeWidth: (width): void => {
+                _self.Canvas.SetCurrentStrokeWidth(width);
+            },
+            CurrentStrokeWidth: (): number => {
+                return _self.Canvas.CurrentStrokeWidth();
+            },
+            SetCurrentFontStyle: (style: string): void => {
+                _self.Canvas.SetCurrentFontStyle(style);
+            },
+            CurrentFontStyle: (): string => {
+                return _self.Canvas.CurrentFontStyle();
+            },
+            SetCurrentFontVariant(variant: string): void {
+                _self.Canvas.SetCurrentFontVariant(variant);
+            },
+            CurrentFontVariant: (): string => {
+                return _self.Canvas.CurrentFontVariant();
+            },
+            SetCurrentFontWeight: (weight: string): void => {
+                _self.Canvas.SetCurrentFontWeight(weight);
+            },
+            CurrentFontWeight: (): string => {
+                return _self.Canvas.CurrentFontWeight();
+            },
+            SetCurrentFontSize: (size): void => {
+                _self.Canvas.SetCurrentFontSize(size);
+            },
+            CurrentFontSize: (): number => {
+                return _self.Canvas.CurrentFontSize();
+            },
+            SetCurrentFontKeyword: (keyword): void => {
+                _self.Canvas.SetCurrentFontKeyword(keyword);
+            },
+            CurrentFontKeyword: (): string => {
+                return _self.Canvas.CurrentFontKeyword();
+            },
+            SetCurrentFontFamily: (family: string[]): void => {
+                _self.Canvas.SetCurrentFontFamily(family);
+            },
+            CurrentFontFamily: (): string[] => {
+                return _self.Canvas.CurrentFontFamily();
+            },
+            SetCurrentPath: (path: string): void => {
+                _self.Canvas.SetCurrentPath(path);
+            },
+            CurrentPath: (): string => {
+                return _self.Canvas.CurrentPath();
+            },
+            SetCurrentAlign: (align: string): void => {
+                _self.Canvas.SetCurrentAlign(align);
+            },
+            CurrentAlign: (): string => {
+                return _self.Canvas.CurrentAlign();
+            },
+            SetCurrentText: (text: string): void => {
+                _self.Canvas.SetCurrentText(text);
+            },
+            CurrentText: (): string => {
+                return _self.Canvas.CurrentText();
+            },
+            CurrentType: (): string => {
+                return _self.Canvas.CurrentType();
+            },
+            SetCurrentShapesAlign: (align: number): void => {
+                _self.Canvas.SetCurrentShapesAlign(align);
+            },
+            DeselectAll: (): void => {
+                _self.Canvas.DeselectAll();
+            },
+            SelectedCount: (): number => {
+                return _self.Canvas.SelectedCount();
+            },
+            onTick: (callback: (shape: ShapeEdit.BaseShape, context: any) => any) => {
+                _self.Plugins.on("tick", callback);
+            },
+            onDraw: (callback: (shape: ShapeEdit.BaseShape, context: any) => void) => {
+                _self.Plugins.on("draw", callback);
+            },
+            onNew: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+                _self.Handlers.on("new", callback);
+            },
+            onDelete: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+                _self.Handlers.on("delete", callback);
+            },
+            onSelect: (callback: (shape: ShapeEdit.BaseShape, context: any)=> void) => {
+                _self.Handlers.on("select", callback);
+            },
+            onDeselect: (callback: (shape: ShapeEdit.BaseShape, context: any)=> void) => {
+                _self.Handlers.on("deselect", callback);
+            },
+            onMove: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+                _self.Handlers.on("move", callback);
+            },
+            onResize: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+                _self.Handlers.on("resize", callback);
+            },
+            onDeformation: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+                _self.Handlers.on("deformation", callback);
+            },
+            onChange: (callback: ()=> void) => {
+                _self.Handlers.on("change", callback);
+            },
+            onKeydown: (callback: (shape: ShapeEdit.BaseShape, e: any)=> void) => {
+                _self.Handlers.on("keydown", callback);
+            },
+            onDrop: (callback: (shape: ShapeEdit.BaseShape, e: any)=> void) => {
+                _self.Handlers.on("drop", callback);
+            },
+            onResizeWindow: (callback: (wrapper:any, inner:any) => void):void => {
+                let resizeTimer:any;
+                let interval:number = Math.floor(1000 / 60 * 10);
+                window.addEventListener('resize', (event:any):void => {
+                    if (resizeTimer !== false) {
+                        clearTimeout(resizeTimer);
+                    }
+                    resizeTimer = setTimeout(():void => {
+                        if (_self.object) {
+                            callback(_self.Wrapper, _self.object);
+                            _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
+                            _self.Canvas.Draw();
+                            //      _self.Canvas.Animate();
+                        }
+                    }, interval);
+                });
+            }
+        }
+    }
+}
+]);

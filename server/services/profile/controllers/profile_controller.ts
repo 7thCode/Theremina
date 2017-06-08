@@ -56,7 +56,7 @@ export namespace ProfileModule {
             const number: number = 110000;
             Wrapper.FindOne(response, number, LocalAccount, {username: request.user.username}, (response: any, self: any): void => {
                 if (self) {
-                     let validate_result = validator.validate(request.body.local, account_local_schema);
+                    let validate_result = validator.validate(request.body.local, account_local_schema);
                     if (validate_result.errors.length === 0) {
                         self.local = request.body.local;
                         self.open = true;
@@ -67,7 +67,7 @@ export namespace ProfileModule {
                         Wrapper.SendError(response, 3, "not valid", validate_result);
                     }
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }
@@ -81,9 +81,15 @@ export namespace ProfileModule {
             const number: number = 111000;
             Wrapper.FindOne(response, number, LocalAccount, {username: request.user.username}, (response: any, self: any): void => {
                 if (self) {
-                    Wrapper.SendSuccess(response, {provider: self.provider, type: self.type, username: self.username, userid: self.userid, local: self.local});
+                    Wrapper.SendSuccess(response, {
+                        provider: self.provider,
+                        type: self.type,
+                        username: self.username,
+                        userid: self.userid,
+                        local: self.local
+                    });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
                 }
             });
         }

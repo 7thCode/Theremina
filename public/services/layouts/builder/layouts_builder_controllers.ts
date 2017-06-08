@@ -279,7 +279,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                         TemplateService.current_layout = null;
                         progress(false);
                         ShapeEdit.Clear();
-                        $scope.opened = true;
+                        $scope.opened = false;
                     }, error_handler);
                 }, (): void => {
                 });
@@ -544,7 +544,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         let AddImage = (): void => {
             var obj = {
                 rectangle: new ShapeEdit.Rectangle(200, 200, 200, 200),
-                property: new ShapeEdit.ShapeProperty(ShapeEdit.Canvas, '', [], '/systems/resources/files/blank.png', new ShapeEdit.RGBAColor(0, 0, 0, 1), new ShapeEdit.RGBAColor(80, 80, 80, 1), 1, new ShapeEdit.Font("normal", "normal", "normal", 18, "sans-serif", []), "left", "miter", {
+                property: new ShapeEdit.ShapeProperty(ShapeEdit.Canvas, '', [], '/systems/files/files/blank.png', new ShapeEdit.RGBAColor(0, 0, 0, 1), new ShapeEdit.RGBAColor(80, 80, 80, 1), 1, new ShapeEdit.Font("normal", "normal", "normal", 18, "sans-serif", []), "left", "miter", {
                     "category": "",
                     "type": ""
                 })

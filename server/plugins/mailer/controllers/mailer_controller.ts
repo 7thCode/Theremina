@@ -21,7 +21,7 @@ export namespace MailerModule {
     const Wrapper = share.Wrapper;
     const logger = share.logger;
 
-    const ArticleModel: any = require(share.Models("services/articles/article"));
+    const AssetModel: any = require(share.Models("plugins/asset/asset"));
 
     const MailerModule: any = require('../../../systems/common/mailer');
 
@@ -75,7 +75,7 @@ export namespace MailerModule {
                     content["html"] = "<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>" + html + "</body></html>";
                     content["subject"] = subject;
 
-                    let article: any = new ArticleModel();
+                    let article: any = new AssetModel();
                     article.userid = config.systems.userid;
                     let objectid: any = new mongoose.Types.ObjectId;
                     article.name = objectid.toString();
@@ -86,7 +86,7 @@ export namespace MailerModule {
                         Wrapper.SendSuccess(response, {code: 0, message: ""});
                     });
                 } else {
-                    Wrapper.SendError(response, 200, error.message, error);
+                    Wrapper.SendError(response, error.code, error.message, error);
                 }
             });
         }
@@ -100,7 +100,7 @@ export namespace MailerModule {
             content["html"] = mail.body.html;
             content["subject"] = mail.body.subject;
 
-            let article: any = new ArticleModel();
+            let article: any = new AssetModel();
             article.userid = config.systems.userid;
             let objectid: any = new mongoose.Types.ObjectId;
             article.name = objectid.toString();
@@ -119,9 +119,13 @@ export namespace MailerModule {
          */
         public get_mail_query_query(request: any, response: any): void {
             let userid = Mailer.userid(request);
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            Wrapper.Find(response, 1400, ArticleModel, {$and: [{userid: config.systems.userid}, query]}, {}, option, (response: any, mails: any): any => {
+         //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
+         //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
+
+            let query: any = Wrapper.Decode(request.params.query);
+            let option: any = Wrapper.Decode(request.params.option);
+
+            Wrapper.Find(response, 1400, AssetModel, {$and: [{userid: config.systems.userid}, query]}, {}, option, (response: any, mails: any): any => {
 
                 //      _.forEach(mails, (article) => {
                 //          article.content = null;
@@ -137,12 +141,14 @@ export namespace MailerModule {
          * @returns none
          */
         public get_mail_count(request: any, response: any): void {
-            let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            Wrapper.Count(response, 2800, ArticleModel, {$and: [{userid: config.systems.userid}, query]}, (response: any, count: any): any => {
+ //           let query: any = JSON.parse(decodeURIComponent(request.params.query));
+
+            let query: any = Wrapper.Decode(request.params.query);
+
+            Wrapper.Count(response, 2800, AssetModel, {$and: [{userid: config.systems.userid}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
         }
-
 
         /**
          * @param request
@@ -151,11 +157,11 @@ export namespace MailerModule {
          */
         public get_mail(request: any, response: any): void {
             let id = request.params.id;
-            Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
+            Wrapper.FindOne(response, 1400, AssetModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
                 if (mail) {
                     Wrapper.SendSuccess(response, mail);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message: "not found"});
                 }
             });
         }
@@ -167,13 +173,13 @@ export namespace MailerModule {
          */
         public delete_mail(request: any, response: any): void {
             let id = request.params.id;
-            Wrapper.FindOne(response, 1300, ArticleModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
+            Wrapper.FindOne(response, 1300, AssetModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
                 if (mail) {
                     Wrapper.Remove(response, 1200, mail, (response: any): void => {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {});
+                    Wrapper.SendWarn(response, 2, "not found", {code:2, message: "not found"});
                 }
             });
         }

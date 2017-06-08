@@ -21,15 +21,15 @@ export namespace FormApiRouter {
     const FormsModule = require(share.Server("services/forms/controllers/forms_controller"));
     const form = new FormsModule.Form;
 
-    router.post("/api/create", [exception.exception, exception.guard, exception.authenticate,auth.is_system, form.create_form]);
+    router.post("/api/create", [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.create_form]);
     router.get("/api/query/:query/:option", [form.get_form_query]);
     router.get('/api/count/:query', [form.get_form_count]);
 
     router.get("/api/:id", [form.get_form]);
-    router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate,auth.is_system, form.put_form]);
-    router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate,auth.is_system, form.delete_form]);
+    router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.put_form]);
+    router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.delete_form]);
 
-    router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate,auth.is_system, form.delete_own]);
+    router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.delete_own]);
 }
 
 module.exports = FormApiRouter.router;

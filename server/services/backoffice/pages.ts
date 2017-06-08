@@ -19,12 +19,18 @@ export namespace BackOfficePageRouter {
 
     const config = share.config;
     const services_config = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts;
 
     const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
 
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, auth.page_is_system, (request: any, response: any): void => {
-        response.render("services/backoffice/index", {config: config, user: request.user, message: "BackOffice", status: 200, fonts:webfonts});
+        response.render("services/backoffice/index", {
+            config: config,
+            user: request.user,
+            message: "BackOffice",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
 }

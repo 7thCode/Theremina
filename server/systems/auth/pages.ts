@@ -19,9 +19,9 @@ export namespace AuthPageRouter {
 
     const webfonts: any[] = services_config.webfonts;
 
-    let message:any = config.messages.auth_dialogs;
+    let message: any = config.messages.auth_dialogs;
     if (applications_config.messages) {
-         message = applications_config.messages.auth_dialogs;
+        message = applications_config.messages.auth_dialogs;
     }
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));

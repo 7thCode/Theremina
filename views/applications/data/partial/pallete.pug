@@ -16,9 +16,9 @@
                 i.fa.fa-trash
                 span.hidden-xs.hidden-sm Delete
 
-    .box-body
+    .box-body(style="height:70vh;")
         div(style="display:flex;flex-direction:row;flex-wrap:nowrap;")
-            div(style="flex:1;padding5px;height:30rem;overflow:scroll;")
+            div(style="flex:1;padding5px;height:60rem;overflow:scroll;")
                 table.table.table-striped(ng-cloak)
                     tr(ng-repeat="article in articles")
                         td(ng-class="{selected: hover  || ArticleSelected(article._id)}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectArticle(article._id);")

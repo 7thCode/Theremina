@@ -51,7 +51,7 @@ export namespace AuthApiRouter {
 
     // line
     router.get('/line', passport.authenticate('line'));
-    router.get('/line/callback', passport.authenticate('line', { failureRedirect: '/'}), auth.auth_line_callback);
+    router.get('/line/callback', passport.authenticate('line', {failureRedirect: '/'}), auth.auth_line_callback);
 
 
 }

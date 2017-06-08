@@ -32,7 +32,7 @@ export namespace FormPageRouter {
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("services/forms/player/index", {
-            config:config,
+            config: config,
             user: request.user,
             message: "Pages",
             status: 200,
@@ -42,7 +42,7 @@ export namespace FormPageRouter {
 
     router.get("/builder", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("services/forms/builder/index", {
-            config:config,
+            config: config,
             domain: share.config.domain,
             user: request.user,
             message: "Pages",
@@ -108,7 +108,7 @@ export namespace FormPageRouter {
     }]);
 
     // localhost:8000/forms/render/000000000000000000000000/test1
-    router.get("/render/:userid/:name", [exception.page_catch,analysis.page_view, (request: any, response: any): void => {
+    router.get("/render/:userid/:name", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         form.render(request.params.userid, request.params.name, {}, (error: any, result: string): void => {
             if (!error) {
                 response.render("services/forms/render", {html: result, fonts: webfonts});

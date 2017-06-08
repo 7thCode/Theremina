@@ -48,34 +48,34 @@ export namespace LineModule {
                         break;
                     default:
                 }
-/*
-                ai.textRequest(event.message.text, {
-                    sessionId: sessionId
-                }).then( (response) => {
-                    switch (response.result.source) {
-                        case "agent":
-                            text = response.result.fulfillment.speech;
-                            break;
-                        case "domains":
-                            text = response.result.source.action;
-                            break;
-                        default:
-                    }
-                }).then( (response) =>  {
-                    return line.client.replyMessage({
-                        replyToken: event.replyToken,
-                        messages: [{
-                            type: 'text',
-                            text: text
-                        }]
-                    });
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                /*
+                 ai.textRequest(event.message.text, {
+                 sessionId: sessionId
+                 }).then( (response) => {
+                 switch (response.result.source) {
+                 case "agent":
+                 text = response.result.fulfillment.speech;
+                 break;
+                 case "domains":
+                 text = response.result.source.action;
+                 break;
+                 default:
+                 }
+                 }).then( (response) =>  {
+                 return line.client.replyMessage({
+                 replyToken: event.replyToken,
+                 messages: [{
+                 type: 'text',
+                 text: text
+                 }]
+                 });
+                 }).catch(function (error) {
+                 console.log(error);
+                 });
 
-                */
+                 */
                 let promise = ai.inquiry(sessionId, event.message.text, (response) => {
-                  text = response;
+                    text = response;
                 });
 
                 promise.then((response) => {
@@ -118,5 +118,3 @@ export namespace LineModule {
 }
 
 module.exports = LineModule;
-
-

@@ -30,7 +30,13 @@ export namespace PageRouter {
     const ArticleModel: any = require(share.Models("services/articles/article"));
 
     router.get("/", [analysis.page_view, (request: any, response: any): void => {
-        response.render("services/front/index", {config: config, user: request.user, message: "Welcome", status: 200, fonts: webfonts});
+        response.render("services/front/index", {
+            config: config,
+            user: request.user,
+            message: "Welcome",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get("/sitemap.xml", [(request: any, response: any): void => {
@@ -80,7 +86,7 @@ export namespace PageRouter {
         response.send(robots);
     }]);
 
-    router.get("/test", [ (request: any, response: any): void => {
+    router.get("/test", [(request: any, response: any): void => {
         response.render("test", {user: request.user, message: "Welcome", status: 200});
     }]);
 

@@ -18,3 +18,15 @@ YahooServices.service('ZipService', ["$http",
             });
         };
     }]);
+
+
+YahooServices.service('ZipService2', ["$http",
+    function ($http): void {
+        this.Zip = (zip_code, callback: (error: any, result: any) => void): void => {
+            $http.jsonp('https://map.yahooapis.jp/search/zip/V1/zipCodeSearch?output=json&query='+ zip_code +'&appid=dj0zaiZpPURPNXRydGRpZFZhaSZzPWNvbnN1bWVyc2VjcmV0Jng9ZGU-', {callback: 'JSONP_CALLBACK'}).then(function (response) {
+                callback(null, response.data);
+            }).catch(function (data) {
+                callback(data, null);
+            });
+        };
+    }]);

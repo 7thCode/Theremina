@@ -9,11 +9,11 @@ div
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .form-group
-                        label.h6(for="title") Title
+                        label.h6(for="layoutname") Title
                         span(ng-messages="validate.title.$error")
                             span.error-message(ng-message="required") #{messages.required}
                             span.error-message(ng-message="maxlength") #{messages.long}
-                        input.form-control.no-zoom#title(ng-model="title", type="text", name='title', required, ng-maxlength="50")
+                        input.form-control.no-zoom#layoutname(ng-model="title", type="text", name='title', required, ng-maxlength="50")
             .col-xs-12
                 include ../../../../systems/common/error_message
 

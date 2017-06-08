@@ -35,6 +35,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
     function (GroupMember:any, GroupMemberQuery: any, GroupMemberCount: any, CollectionService: any): void {
 
         this.SetQuery = (query) => {
+            this.option.skip = 0;
             this.query = {};
             if (query) {
                 this.query = query;

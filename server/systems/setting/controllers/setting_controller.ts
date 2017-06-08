@@ -175,6 +175,19 @@ export namespace SettingModule {
             });
         }
 
+        /**
+         *
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public read_modules(request: any, response: any): void {
+            let string = file_utility.readfileSync(share.Config("systems/config.json"));
+            let setting: any = JSON.parse(string);
+            Wrapper.If(response, 1000, setting.modules, (response: any): void => {
+                Wrapper.SendSuccess(response, setting.modules);
+            });
+        };
 
     }
 }

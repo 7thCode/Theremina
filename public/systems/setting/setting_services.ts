@@ -56,10 +56,18 @@ namespace Setting {
             });
         }]);
 
+
+    SettingServices.factory('ModulesSetting', ['$resource',
+        ($resource): angular.resource.IResource<any> => {
+            return $resource('/setting/setting/modules', {}, {
+                get: {method: 'GET'}
+            });
+        }]);
+
     SettingServices.service('BackupService', ['Backup',
         function (Backup): void {
 
-            this.Put = ( callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+            this.Put = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
                 let data = new Backup();
                 data.$put({}, (result: any): void => {
                     if (result) {
@@ -201,8 +209,8 @@ namespace Setting {
 
         }]);
 
-    SettingServices.service('SystemSettingService', ['SystemSetting',
-        function (SystemSetting: any): void {
+    SettingServices.service('SystemSettingService', ['SystemSetting', 'ModulesSetting',
+        function (SystemSetting: any, ModulesSetting: any): void {
 
             this.Get = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
                 SystemSetting.get({}, (result: any): void => {
@@ -222,6 +230,20 @@ namespace Setting {
                 let data = new SystemSetting();
                 data.setting = setting;
                 data.$put({}, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
+                    } else {
+                        error(10000, "network error");
+                    }
+                });
+            };
+
+            this.Modules = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                ModulesSetting.get({}, (result: any): void => {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);

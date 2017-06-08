@@ -37,7 +37,11 @@ export namespace ExceptionModule {
             try {
                 next();
             } catch (e) {
-                response.status(500).render('error', {status: 500, message: "Internal Server Error...", url: request.url});
+                response.status(500).render('error', {
+                    status: 500,
+                    message: "Internal Server Error...",
+                    url: request.url
+                });
             }
         }
 
@@ -53,7 +57,11 @@ export namespace ExceptionModule {
                     response.status(403).render('error', {status: 403, message: "Forbidden...", url: request.url});
                 }
             } catch (e) {
-                response.status(500).render('error', {status: 500, message: "Internal Server Error...", url: request.url});
+                response.status(500).render('error', {
+                    status: 500,
+                    message: "Internal Server Error...",
+                    url: request.url
+                });
             }
         }
     }

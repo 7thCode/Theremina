@@ -18,7 +18,7 @@ export namespace LayoutsPageRouter {
 
     const config: any = share.config;
     const services_config = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts;
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 
@@ -26,18 +26,30 @@ export namespace LayoutsPageRouter {
 
     /* GET home page. */
     router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, result: any, next: any): void => {
-        result.render('services/layouts/player/index', {config:config, domain: share.config.domain, user: request.user, message: "Layouts", status: 200, fonts:webfonts});
+        result.render('services/layouts/player/index', {
+            config: config,
+            user: request.user,
+            message: "Layouts",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
     router.get('/builder', [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, result: any, next: any): void => {
-        result.render('services/layouts/builder/index', {config:config, domain: share.config.domain, user: request.user, message: "Layouts", status: 200, fonts:webfonts});
+        result.render('services/layouts/builder/index', {
+            config: config,
+            user: request.user,
+            message: "Layouts",
+            status: 200,
+            fonts: webfonts
+        });
     }]);
 
-    router.get('/player/dialogs/create_dialog', [exception.page_guard, auth.page_valid,  auth.page_is_system, (req: any, result: any, next: any) => {
+    router.get('/player/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
         result.render('services/layouts/player/dialogs/create_dialog', {messages: dialog_message});
     }]);
 
-    router.get('/player/dialogs/open_dialog', [exception.page_guard, auth.page_valid,  auth.page_is_system,(req: any, result: any, next: any) => {
+    router.get('/player/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
         result.render('services/layouts/player/dialogs/open_dialog', {messages: dialog_message});
     }]);
 
@@ -65,7 +77,7 @@ export namespace LayoutsPageRouter {
         result.render('services/layouts/builder/dialogs/delete_confirm_dialog', {messages: dialog_message});
     }]);
 
-    router.get("/render/:userid/:name", [exception.page_catch,(request: any, response: any): void => {
+    router.get("/render/:userid/:name", [exception.page_catch, (request: any, response: any): void => {
         LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
     }]);
 

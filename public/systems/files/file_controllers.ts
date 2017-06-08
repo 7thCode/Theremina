@@ -125,6 +125,9 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
 
             $q.all(promises).then(function (result) {
                 progress(false);
+                files.forEach((file) => {
+                    file.cancel();
+                });
                 Draw();
             }).finally(() => {
             });
@@ -139,6 +142,7 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
 
             modalInstance.result.then((answer: any): void => { // Answer
                 FileService.Delete(filename, 0, (result: any) => {
+                    $scope.files = [];
                     Draw();
                 }, error_handler);
             }, (): void => { // Error

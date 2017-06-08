@@ -86,7 +86,7 @@ ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQ
         };
 
         let init = () => {
-            this.pagesize = 10;
+            this.pagesize = 30;
 
             this.option = {sort: {create: -1}, limit: this.pagesize, skip: 0};
             this.SetQuery(null);
@@ -316,6 +316,6 @@ ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQ
             });
         };
 
-        init();
+        this.Init();
 
     }]);

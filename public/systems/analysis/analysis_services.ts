@@ -35,6 +35,7 @@ AnalysisServices.service('AnalysisService', [ "Analysis", "AnalysisQuery", "Anal
     function (Analysis: any, AnalysisQuery: any, AnalysisCount: any): void {
 
         this.SetQuery = (query) => {
+            this.option.skip = 0;
             this.query = {};
             if (query) {
                 this.query = query;

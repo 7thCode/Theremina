@@ -30,28 +30,28 @@ FileServices.filter('icon', [(): any => {
         let result = "";
         switch (mimetype) {
             case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                result = "/systems/resources/files/xls.svg";
+                result = "/systems/resources/files/icon/xls.svg";
                 break;
             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                result = "/systems/resources/files/doc.svg";
+                result = "/systems/resources/files/icon/doc.svg";
                 break;
             case "application/pdf":
-                result = "/systems/resources/files/pdf.svg";
+                result = "/systems/resources/files/icon/pdf.svg";
                 break;
             case "text/plain":
-                result = "/systems/resources/files/txt.svg";
+                result = "/systems/resources/files/icon/txt.svg";
                 break;
             case "text/css":
-                result = "/systems/resources/files/css.svg";
+                result = "/systems/resources/files/icon/css.svg";
                 break;
             case "text/javascript":
-                result = "/systems/resources/files/js.svg";
+                result = "/systems/resources/files/icon/js.svg";
                 break;
             case "text/html":
-                result = "/systems/resources/files/html.svg";
+                result = "/systems/resources/files/icon/html.svg";
                 break;
             default:
-                result = "/systems/resources/files/default.svg";
+                result = "/systems/resources/files/icon/default.svg";
         }
         return result;
     };

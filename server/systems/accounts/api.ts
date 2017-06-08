@@ -21,12 +21,12 @@ export namespace AccountApiRouter {
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception;
 
-    router.get("/api/:username", [exception.exception, exception.guard, exception.authenticate,auth.is_system, accounts.get_account]);
-    router.put("/api/:username", [exception.exception, exception.guard, exception.authenticate,auth.is_system, accounts.put_account]);
+    router.get("/api/:username", [exception.exception, exception.guard, exception.authenticate, auth.is_system, accounts.get_account]);
+    router.put("/api/:username", [exception.exception, exception.guard, exception.authenticate, auth.is_system, accounts.put_account]);
 
     router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, accounts.get_account_query_query]);
     router.get('/api/count/:query', [exception.exception, exception.guard, exception.authenticate, accounts.get_account_count]);
-    router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate,auth.is_system, accounts.delete_own]);
+    router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, auth.is_system, accounts.delete_own]);
 }
 
 module.exports = AccountApiRouter.router;

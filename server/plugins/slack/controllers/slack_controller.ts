@@ -38,17 +38,17 @@ export namespace SlackModule {
                 }
             });
 
-            controller.hears('', ['direct_message', 'direct_mention', 'mention'],  (bot, message) => {
+            controller.hears('', ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
                 bot.startConversation(
                     message,
-                    function(err, convo) {
+                    function (err, convo) {
                         convo.say('やあ!');
                         convo.say('おしゃべりしよ!');
 
                         convo.ask(
                             '元気?',
-                            function(response, convo) {
-                                convo.say( response.text + "なのね!");
+                            function (response, convo) {
+                                convo.say(response.text + "なのね!");
                                 convo.next();
                             });
                     });

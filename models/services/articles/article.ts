@@ -23,5 +23,18 @@ export namespace ArticleModule {
     Article.plugin(timestamp);
     Article.plugin(userdata, {});
 
+    Article.method("GetContent", function (name: string): void {
+        return this.content[name];
+    });
+
+    Article.method("SetContent", function (name: string, value: any, type: string = "quoted"): void {
+
+        if (!this.content) {
+            this.content = {};
+        }
+
+        this.content[name] = {value: value, type: type};
+    });
+
     module.exports = mongoose.model('Article', Article);
 }

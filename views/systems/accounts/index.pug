@@ -22,12 +22,12 @@ block content
                                     .ellipsis(style="width:30%;") username
                                     .ellipsis(style="width:30%;") nickname
                                     .ellipsis(style="width:30%;") create
-                                    .ellipsis(style="width:10%;") create
+                                    .ellipsis(style="width:10%;") show
                             .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
                                 .flex-row(ng-repeat="account in accounts" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
-                                    .ellipsis(style="width:30%;") {{account.username}}
-                                    .ellipsis(style="width:30%;") {{account.local.nickname}}
-                                    .ellipsis(style="width:30%;") {{account.create | date: short}}
+                                    .ellipsis(style="width:30%;user-select: text;") {{account.username}}
+                                    .ellipsis(style="width:30%;user-select: text;") {{account.local.nickname}}
+                                    .ellipsis(style="width:30%;user-select: text;") {{account.create | date: short}}
                                     td(style="width:10%;")
                                         .box-tools.pull-right
                                             button.btn.btn-box-tool(type='button', ng-click="Open(account);")

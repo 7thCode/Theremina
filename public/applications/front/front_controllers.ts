@@ -66,14 +66,7 @@ FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$
                 }
                 ProfileService.Put({
                     nickname: dialog_scope.nickname,
-                    address: dialog_scope.address,
-                    city: dialog_scope.city,
-                    street: dialog_scope.street,
-                    category: dialog_scope.category,
-                    group: dialog_scope.group,
-                    zip: dialog_scope.zip,
-                    mails: mails,
-                    magazine: {send: dialog_scope.magazine}
+                    mails: mails
                 }, (result: any): void => {
 
                 }, error_handler);
@@ -894,6 +887,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         let document = null;
         let inner_peview = false;
         let preview_window = null;
+        let local_query = [];
 
         let Draw = (text) => {
             switch (ResourceBuilderService.current.content.type) {
@@ -910,38 +904,62 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
         let Query = (): any => {
             progress(true);
-            ResourceBuilderService.SetQuery(null, 20, 36);
-            ResourceBuilderService.Query((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                    ResourceBuilderService.SetQuery(null, 3, 36);
-                    ResourceBuilderService.Query((result: any): void => {
-                        if (result) {
-                            $scope.templates = result;
-                        }
-                        progress(false);
-                    }, error_handler);
-                }
-            }, error_handler);
-        };
-
-        let Find = (name: string): any => {
-            progress(true);
-            ResourceBuilderService.SetQuery(null, 20, 36);
-            if (name) {
-                ResourceBuilderService.SetQuery({name: {$regex: name}}, 20, 36);
+            let query_string = localStorage.getItem("pages_query");
+            if (query_string) {
+                ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
             }
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
                     $scope.pages = result;
+                    localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
                 }
                 progress(false);
             }, error_handler);
+        };
 
+        let _Find = (key: string, value: any): any => {
+            progress(true);
+            ResourceBuilderService.RemoveQuery(key);
+            if (value) {
+                let query = {};
+                query[key] = value;
+                ResourceBuilderService.AddQuery(query);
+            }
+            ResourceBuilderService.Query((result: any): void => {
+                if (result) {
+                    $scope.pages = result;
+                    localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
+                }
+                progress(false);
+            }, error_handler);
+        };
+
+        $scope.find_name = localStorage.getItem("pages_find_name");
+        let Find = (name: string): any => {
+            _Find("name", {$regex: name});
+            localStorage.setItem("pages_find_name", name);
+        };
+
+        $scope.type = localStorage.getItem("pages_find_type");
+        let FindType = (type: number): any => {
+            _Find("type", type);
+            localStorage.setItem("pages_find_type", "" + type);
+        };
+
+        $scope.mimetype = localStorage.getItem("pages_find_mime");
+        let FindMime = (mime: string): any => {
+            _Find("content.type", mime);
+            localStorage.setItem("pages_find_mime", mime);
+        };
+
+        $scope.content = localStorage.getItem("pages_find_resource");
+        let FindResource = (value: string): any => {
+            _Find("content.resource", {$regex: value});
+            localStorage.setItem("pages_find_resource", value);
         };
 
         let Count = (): void => {
-            ResourceBuilderService.SetQuery(null, 20, 36);
+      //      ResourceBuilderService.InitQuery(null, 20, 36);
             ResourceBuilderService.Count((result: any): void => {
                 if (result) {
                     $scope.count = result;
@@ -951,7 +969,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
         let Next = (): void => {
             progress(true);
-            ResourceBuilderService.SetQuery(null, 20, 36);
+      //      ResourceBuilderService.InitQuery(null, 20, 36);
             ResourceBuilderService.Next((result: any): void => {
                 if (result) {
                     $scope.pages = result;
@@ -1083,8 +1101,9 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                     });
 
                     modalInstance.result.then((answer: any): void => { // Answer
-                        Query();
+                        deferred.resolve(true);
                     }, (): void => { // Error
+                        deferred.reject(false);
                     });
 
                 };
@@ -1095,6 +1114,10 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
             $q.all(promises).then((result) => {
                 progress(false);
+                files.forEach((file) => {
+                    file.cancel();
+                });
+                Query();
             }).finally(() => {
             });
         };
@@ -1223,6 +1246,10 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         $scope.Next = Next;
         $scope.Prev = Prev;
         $scope.Find = Find;
+        $scope.FindType = FindType;
+        $scope.FindMime = FindMime;
+        $scope.FindResource = FindResource;
+
         $scope.Close = Close;
 
         $scope.CreatePages = CreatePages;
@@ -1312,7 +1339,7 @@ FrontControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$ui
 
         let Query = (): any => {
             progress(true);
-            ResourceBuilderService.SetQuery(null, 20);
+            ResourceBuilderService.InitQuery(null, 20);
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
                     $scope.pages = result;
@@ -1323,9 +1350,11 @@ FrontControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$ui
 
         let Find = (name: string): any => {
             progress(true);
-            ResourceBuilderService.SetQuery(null, 20);
+            ResourceBuilderService.InitQuery(null, 20);
             if (name) {
-                ResourceBuilderService.SetQuery({name: {$regex: name}}, 20);
+                ResourceBuilderService.AddQuery({name: {$regex: name}});
+
+                //            ResourceBuilderService.SetQuery({name: {$regex: name}}, 20);
             }
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
@@ -1558,7 +1587,8 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
          });
          };
          */
-        let createPhoto = (files: any, width: number, height: number): void => {
+
+        let createPhoto = (files: any): void => {
             progress(true);
             let promises = [];
             _.forEach(files, (local_file) => {
@@ -1619,6 +1649,9 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
             });
 
             $q.all(promises).then((result) => {
+                files.forEach((file) => {
+                    file.cancel();
+                });
                 progress(false);
                 Draw();
             }).finally(() => {
@@ -2013,9 +2046,10 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             });
 
             modalRegist.result.then((layout): void => {
+                $scope.opened = true;
                 $scope.name = layout.name;
                 $scope.userid = layout.userid;
-                $scope.opened = true;
+
             }, (): void => {
             });
 
@@ -2067,7 +2101,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                         TemplateService.current_layout = null;
                         progress(false);
                         ShapeEdit.Clear();
-                        $scope.opened = true;
+                        $scope.opened = false;
                     }, error_handler);
                 }, (): void => {
                 });
@@ -2332,7 +2366,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         let AddImage = (): void => {
             var obj = {
                 rectangle: new ShapeEdit.Rectangle(200, 200, 200, 200),
-                property: new ShapeEdit.ShapeProperty(ShapeEdit.Canvas, '', [], '/systems/resources/files/blank.png', new ShapeEdit.RGBAColor(0, 0, 0, 1), new ShapeEdit.RGBAColor(80, 80, 80, 1), 1, new ShapeEdit.Font("normal", "normal", "normal", 18, "sans-serif", []), "left", "miter", {
+                property: new ShapeEdit.ShapeProperty(ShapeEdit.Canvas, '', [], '/systems/files/files/blank.png', new ShapeEdit.RGBAColor(0, 0, 0, 1), new ShapeEdit.RGBAColor(80, 80, 80, 1), 1, new ShapeEdit.Font("normal", "normal", "normal", 18, "sans-serif", []), "left", "miter", {
                     "category": "",
                     "type": ""
                 })

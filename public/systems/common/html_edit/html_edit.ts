@@ -16,14 +16,15 @@ if (server) {
 
 namespace HtmlEdit {
 
-    interface article { create: any, modify: any, content: any }
+    interface article { create: any, modify: any, content: any
+    }
 
     export class Scanner {
 
-        private order:any;
-        private userid:string;
+        private order: any;
+        private userid: string;
 
-        constructor(userid:string, order:any) {
+        constructor(userid: string, order: any) {
             this.userid = userid;
             this.order = order;
         }
@@ -102,124 +103,277 @@ namespace HtmlEdit {
                 }
                 return "" + result;
             };
+            /*
+             if (format_string) {
+             _.forEach(format_string.split("|"), (fragment:string):void => {
+             if (fragment[0] == "{") {
+             if (fragment[fragment.length - 1] == "}") {
+             try {
+             switch (fragment) {
+             case "{count}":
+             result += "" + count;
+             break;
+             case "{pages}":
+             try {
+             let pages = 0;
+             try {
+             if (("skip" in this.order) && ("limit" in this.order)) {
+             pages = Math.ceil(count / this.order.limit);
+             }
+             } catch (e) {
+             this.exception(e);
+             }
+             result += "" + pages;
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{page}":
+             try {
+             let page = 1;
+             try {
+             if (("skip" in this.order) && ("limit" in this.order)) {
+             if (this.order.skip) {
+             page = (this.order.skip / this.order.limit) + 1;
+             }
+             }
+             } catch (e) {
+             this.exception(e);
+             }
+             result += "" + page;
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{prev}":
+             try {
+             let start = 0;
+             try {
+             if (("skip" in this.order) && ("limit" in this.order)) {
+             start = this.order.skip - this.order.limit;
+             if (start < 0) {
+             start = 0;
+             }
+             }
+             } catch (e) {
+             this.exception(e);
+             }
+             result += "" + start;
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{next}":
+             try {
+             let start = 0;
+             try {
+             if (("skip" in this.order) && ("limit" in this.order)) {
+             start = this.order.skip + this.order.limit;
+             }
+             } catch (e) {
+             this.exception(e);
+             }
+             result += "" + start;
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{create}" :
+             try {
+             result += new Intl.DateTimeFormat().format(values.create);
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{modify}" :
+             try {
+             result += new Intl.DateTimeFormat().format(values.modify);
+             } catch (e) {
+             this.exception(e);
+             }
+             break;
+             case "{userid}" :
+             result += this.userid;
+             break;
+             case "{name}" :
+             result += values.name;
+             break;
+             default:
+             let format = {};
+             try {
+             format = JSON.parse(fragment);
+             } catch (e) {
+             }
+             result += tell_format(values.content, format);
+             }
+             } catch (e) {
+             result += fragment;
+             this.exception(e);
+             }
+             } else {
+             result += fragment;
+             }
+             } else {
+             result += fragment;
+             }
 
-            if (format_string) {
-
-                _.forEach(format_string.split("|"), (fragment) => {
-                    if (fragment[0] == "{") {
+             });
+             }
+             */
+            let eval_fragment = (fragment) => {
+                let result = {eval:false,value:fragment};
+                if (fragment) {
+                    if (fragment[0] == "{" || fragment[1] == "{") {
                         if (fragment[fragment.length - 1] == "}") {
-                            try {
-                                switch (fragment) {
-                                    case "{count}":
-                                        result += "" + count;
-                                        break;
-                                    case "{pages}":
+                            switch (fragment) {
+                                case "|{count}":
+                                case "{count}":
+                                    result = {eval:false,value: count};
+                                    break;
+                                case "|{pages}":
+                                case "{pages}":
+                                    try {
+                                        let pages = 0;
                                         try {
-                                            let pages = 0;
-                                            try {
-                                                if (("skip" in this.order) && ("limit" in this.order)) {
-                                                    pages = Math.ceil(count / this.order.limit);
-                                                }
-                                            } catch (e) {
-                                                this.exception(e);
+                                            if (("skip" in this.order) && ("limit" in this.order)) {
+                                                pages = Math.ceil(count / this.order.limit);
                                             }
-                                            result += "" + pages;
                                         } catch (e) {
                                             this.exception(e);
                                         }
-                                        break;
-                                    case "{page}":
+                                        result = {eval:true,value: pages};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{page}":
+                                case "{page}":
+                                    try {
+                                        let page = 1;
                                         try {
-                                            let page = 1;
-                                            try {
-                                                if (("skip" in this.order) && ("limit" in this.order)) {
-                                                    if (this.order.skip) {
-                                                        page = (this.order.skip / this.order.limit) + 1;
-                                                    }
+                                            if (("skip" in this.order) && ("limit" in this.order)) {
+                                                if (this.order.skip) {
+                                                    page = (this.order.skip / this.order.limit) + 1;
                                                 }
-                                            } catch (e) {
-                                                this.exception(e);
                                             }
-                                            result += "" + page;
                                         } catch (e) {
                                             this.exception(e);
                                         }
-                                        break;
-                                    case "{prev}":
+                                        result = {eval:true,value: page};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{prev}":
+                                case "{prev}":
+                                    try {
+                                        let start = 0;
                                         try {
-                                            let start = 0;
-                                            try {
-                                                if (("skip" in this.order) && ("limit" in this.order)) {
-                                                    start = this.order.skip - this.order.limit;
-                                                    if (start < 0) {
-                                                        start = 0;
-                                                    }
+                                            if (("skip" in this.order) && ("limit" in this.order)) {
+                                                start = this.order.skip - this.order.limit;
+                                                if (start < 0) {
+                                                    start = 0;
                                                 }
-                                            } catch (e) {
-                                                this.exception(e);
                                             }
-                                            result += "" + start;
                                         } catch (e) {
                                             this.exception(e);
                                         }
-                                        break;
-                                    case "{next}":
+                                        result = {eval:true,value: start};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{next}":
+                                case "{next}":
+                                    try {
+                                        let start = 0;
                                         try {
-                                            let start = 0;
-                                            try {
-                                                if (("skip" in this.order) && ("limit" in this.order)) {
-                                                    start = this.order.skip + this.order.limit;
-                                                }
-                                            } catch (e) {
-                                                this.exception(e);
+                                            if (("skip" in this.order) && ("limit" in this.order)) {
+                                                start = this.order.skip + this.order.limit;
                                             }
-                                            result += "" + start;
                                         } catch (e) {
                                             this.exception(e);
                                         }
-                                        break;
-                                    case "{create}" :
-                                        try {
-                                            result += new Intl.DateTimeFormat().format(values.create);
-                                        } catch (e) {
-                                            this.exception(e);
+                                        result = {eval:true,value: start};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{create}":
+                                case "{create}" :
+                                    try {
+                                        result = {eval:true,value: new Intl.DateTimeFormat().format(values.create)};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{modify}":
+                                case "{modify}" :
+                                    try {
+                                        result = {eval:true,value: new Intl.DateTimeFormat().format(values.modify)};
+                                    } catch (e) {
+                                        this.exception(e);
+                                    }
+                                    break;
+                                case "|{userid}" :
+                                case "{userid}" :
+                                    result = {eval:true,value:this.userid};
+                                    break;
+                                case "|{name}" :
+                                case "{name}" :
+                                    result = {eval:true,value:values.name};
+                                    break;
+                                default:
+                                    let format = {};
+                                    try {
+                                        if (fragment[0] != "{") {
+                                            fragment = fragment.slice(1);
                                         }
-                                        break;
-                                    case "{modify}" :
-                                        try {
-                                            result += new Intl.DateTimeFormat().format(values.modify);
-                                        } catch (e) {
-                                            this.exception(e);
-                                        }
-                                        break;
-                                    case "{userid}" :
-                                        result += this.userid;
-                                        break;
-                                    case "{name}" :
-                                        result += values.name;
-                                        break;
-                                    default:
-                                        result += tell_format(values.content, JSON.parse(fragment));
-                                }
-                            } catch (e) {
-                                result += fragment;
-                                this.exception(e);
+                                        format = JSON.parse(fragment);
+                                        result = {eval:true,value:tell_format(values.content, format)};
+                                    } catch (e) {
+                                    }
                             }
-                        } else {
-                            result += fragment;
                         }
-                    } else {
-                        result += fragment;
                     }
+                }
+                return result;
+            };
+
+            let fragments = [];
+            let current = "";
+            if (format_string) {
+                _.forEach(format_string, (char:string):void => {
+                    switch (char) {
+                        case "|":
+                            fragments.push(current);
+                            current = "";
+                        default:
+                            current += char;
+                    }
+                });
+                fragments.push(current);
+
+                let evaled = false;
+                fragments.forEach((fragment) => {
+                    if (evaled) {
+                        if (fragment[0] == "|") {
+                            fragment = fragment.slice(1);
+                        }
+                        evaled = false;
+                    }
+                    let _fragment = eval_fragment(fragment);
+                    evaled = _fragment.eval;
+                    result += _fragment.value;
                 });
             }
             return result;
         };
 
         private ScanElement(node: any, record: article, records: article[], index: number): string {
-            let result:string = "";
+            let result: string = "";
 
-            let target:article = records[index];
+            let target: article = records[index];
             if (!target) {
                 target = record;
             }
@@ -228,7 +382,14 @@ namespace HtmlEdit {
             _.forEach(node.attributes, (value: any): void => {
                 result += " ";
                 let attributevalue = "";
-                attributevalue = this.Format(target, value.nodeValue, records.length);
+
+                if (record) {
+                    attributevalue = this.Format(record, value.nodeValue, records.length);
+                } else {
+                    attributevalue = this.Format(records[index], value.nodeValue, records.length);
+                }
+
+                //  attributevalue = this.Format(target, value.nodeValue, records.length);
                 result += value.localName + "=\"" + attributevalue + "\"";
                 result += " ";
             });
@@ -244,7 +405,7 @@ namespace HtmlEdit {
         }
 
         private ScanText(node: any, record: article, records: article[], index: number): string {
-            let result:string = "";
+            let result: string = "";
             if (record) {
                 result = this.Format(record, node.data, records.length);
             } else {
@@ -255,14 +416,44 @@ namespace HtmlEdit {
 
         private ScanNode(node: any, record: article, records: article[], index: number): string {
 
-            let result:string = "";
+            let result: string = "";
             let filtered: article[] = records;
+            let sorted: article[] = records;
             if (node.attributes) {
+
                 if (node.attributes.filter) {
                     filtered = [];
                     try {
-                        let filter = JSON.parse(node.attributes.filter.nodeValue);
-                        records.forEach((record) => {
+                        let filter = {};
+                        try {
+                            filter = JSON.parse(node.attributes.filter.nodeValue);
+                        } catch (e) {
+                        }
+
+                        if (node.attributes.sorter) {
+                            let sorter: any = {};
+                            try {
+                                sorter = JSON.parse(node.attributes.sorter.nodeValue);
+                            } catch (e) {
+                            }
+
+                            if (sorter.field) {
+                                let content_fields = [];
+                                sorter.field.forEach((field) => {
+                                    switch (field) {
+                                        case "create":
+                                            content_fields.push(field);
+                                            break;
+                                        default:
+                                            content_fields.push("content." + field + ".value");
+                                    }
+                                });
+
+                                sorted = _.orderBy(records, content_fields, sorter.order);
+                            }
+                        }
+
+                        sorted.forEach((record) => {
                             let found = false;
                             Object.keys(filter).forEach((key) => {
                                 found = (record.content[key].value == filter[key]);
@@ -277,7 +468,7 @@ namespace HtmlEdit {
                 }
             }
 
-            let skipper = (index:number,skip:number,limit:number, callback:()=> void) => {
+            let skipper = (index: number, skip: number, limit: number, callback: () => void) => {
                 if (index >= skip) {
                     if (limit == 0) {
                         callback();
@@ -313,7 +504,6 @@ namespace HtmlEdit {
                         }
                             break;
                         case "if":
-
                             break;
                         default:
                             result = this.ScanElement(node, record, records, index);
@@ -377,7 +567,6 @@ namespace HtmlEdit {
             );
         }
     }
-
 
     export class Render {
 
@@ -472,17 +661,21 @@ namespace HtmlEdit {
                                         result += values.name;
                                         break;
                                     default:
-                                        result += tell_format(values.content, JSON.parse(fragment));
+                                        let format = {};
+                                        try {
+                                            format = JSON.parse(fragment);
+                                        } catch (e) {
+                                        }
+                                        result += tell_format(values.content, format);
                                 }
-                            }
-                            catch (e) {
-                                result += fragment;
+                            } catch (e) {
+                                result += "|" + fragment + "|";
                             }
                         } else {
-                            result += fragment;
+                            result += "|" + fragment + "|";
                         }
                     } else {
-                        result += fragment;
+                        result += "|" + fragment + "|";
                     }
                 });
             }

@@ -303,7 +303,7 @@
  */
 
 
-ScanHtml
+//ScanHtml
 
 /*
 const root_path = process.cwd();
@@ -317,3 +317,43 @@ let promise = ai.inquiry("1000", "解析って英語でなんて言うの？", (
   let  text = response;
 });
 */
+
+
+
+var Excel = require("exceljs");
+
+var workbook = new Excel.Workbook();
+var worksheet = workbook.addWorksheet("My Sheet");
+
+worksheet.columns = [
+    // セル入力値、キー、セル幅
+    { header: 'Id', key: 'id', width: 10 },
+    { header: 'Name', key: 'name', width: 32 },
+    { header: 'D.O.B.', key: 'DOB', width: 10 }
+];
+
+// ３通りの列取得方法
+var idCol = worksheet.getColumn('id');
+var nameCol = worksheet.getColumn('B');
+var dobCol = worksheet.getColumn(3);
+
+// C1にDate of Birth、C2にA.K.A. D.O.B.
+dobCol.header = ['Date of Birth', 'A.K.A. D.O.B.'];
+
+// セル幅指定
+dobCol.width = 50;
+
+// 直接セル名を指定して値を代入
+worksheet.getCell('C3').value = "555";
+
+// 文字の色を変える
+worksheet.getCell('C2').font = {color: { argb: 'FF00FF00' } };
+
+// セルを塗りつぶす（塗りつぶせないセルもある・・・　なぜ？）
+worksheet.getCell('C3').fill = {
+    type: 'pattern',
+    pattern:'solid',
+    fgColor:{argb:'12345678'}
+};
+
+workbook.xlsx.writeFile('sample.xlsx');

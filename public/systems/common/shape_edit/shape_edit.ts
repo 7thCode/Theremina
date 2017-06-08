@@ -643,9 +643,16 @@ namespace ShapeEdit {
             });
             textwidth += "]";
 
-            let text: string = "";
-            if (this.text) {
-                text = this.text.replace(/\r?\n/g, "\\n");
+            let text: string;
+            switch (typeof this.text) {
+                case "undefined":
+                    text = "";
+                    break;
+                case "string":
+                    text = this.text.replace(/\r?\n/g, "\\n");
+                    break;
+                default:
+                    text = this.text;
             }
 
             return '{"type":"' + this.type + '", "text":"' + text + '", "textwidth":' + textwidth + ', "path":"' + this.path +
@@ -693,9 +700,9 @@ namespace ShapeEdit {
         private _controlPoint1: Location;
 
         public set x(value: number) {
-          if (!isNaN(value)) {
-              this._x = value;
-          }
+            if (!isNaN(value)) {
+                this._x = value;
+            }
         }
 
         public get x(): number {
@@ -2852,7 +2859,7 @@ namespace ShapeEdit {
 
                 let hoge = this.property.font.Value();
 
-             //   context.font = "normal normal normal 100px 'Nico Moji',sans-serif";
+                //   context.font = "normal normal normal 100px 'Nico Moji',sans-serif";
 
                 context.textAlign = "left";
                 this.DrawText(1, (line, x, y) => {
