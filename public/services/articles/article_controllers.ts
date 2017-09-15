@@ -23,7 +23,22 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         window.addEventListener('beforeunload', (e) => {
@@ -32,11 +47,6 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             }
         }, false);
 
-      //  $document.on('drop dragover', (e: any): void => {
-      //      e.stopPropagation();
-      //      e.preventDefault();
-      //  });
-
         Socket.on("client", (data: any): void => {
             let notifier: any = new NotifierModule.Notifier();
             notifier.Pass(data);
@@ -44,11 +54,12 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
 
         let Notify = (message: string): void => {
             Socket.emit("server", {value: message}, () => {
-                let hoge = 1;
+      //          let hoge = 1;
             });
         };
 
-        //   ArticleService.option = {sort: {create: -1}, limit: this.pagesize, skip: 0};
+        ArticleService.option.skip = 0;
+  //      ArticleService.option.limit = 40;//{sort: {create: -1}, limit: this.pagesize, skip: 0};
 
         FormPlayerService.$scope = $scope;
         FormPlayerService.$compile = $compile;
@@ -80,14 +91,18 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
          */
         let Map: (present: any) => void = (present: any): void => {
 
-            function unescapeHTML(str) {
-                var div = document.createElement("div");
-                div.innerHTML = str.replace(/</g,"&lt;")
-                    .replace(/>/g,"&gt;")
-                    .replace(/ /g, "&nbsp;")
-                    .replace(/\r/g, "&#13;")
-                    .replace(/\n/g, "&#10;");
-                return div.textContent || div.innerText;
+            function unescapeHTML(value:any):any {
+                let result = value;
+                if (typeof value == "string") {
+                    let div = document.createElement("div");
+                    div.innerHTML = value.replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/ /g, "&nbsp;")
+                        .replace(/\r/g, "&#13;")
+                        .replace(/\n/g, "&#10;");
+                    result = div.textContent || div.innerText;
+                }
+                return result;
             }
 
             let page = FormPlayerService.current_page;
@@ -115,12 +130,9 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
          elementのlabelを名前として、その値をresultに。
          */
         let Reduce: () => void = (): any => {
-            let result = {};
-            if (ArticleService.current_article) {
-                result = ArticleService.current_article.content;
-                if (!result) {
-                    result = {};
-                }
+            let result = {};// ArticleService.current_article.content;
+            if (!result) {
+                result = {};
             }
             let page = FormPlayerService.current_page;
             _.forEach(page, (control): void => {
@@ -129,8 +141,9 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                     if (attributes) {
                         let name = attributes["ng-model"];
                         if (name) {
-                            let type: string = "";
                             if ($scope[name]) {
+                                let type: string = "";
+                                let value = $scope[name];
                                 switch (element.type) {
                                     case "field":
                                     case "select":
@@ -153,8 +166,11 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                                         break;
                                     default:
                                         type = "quoted";
+                                        if (Array.isArray(value)) {
+                                            type = "array";
+                                        }
                                 }
-                                result[element.label] = {type: type, value: $scope[name]}; // todo
+                                result[element.label] = {type: type, value: value}; // todo
                             }
                         }
                     }
@@ -271,6 +287,7 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             if (newValue) {
                 ArticleService.SetQuery({name: {$regex: newValue}});
             }
+
             Draw(() => {
             });
         };
@@ -298,6 +315,8 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -308,6 +327,8 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -344,6 +365,8 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             ArticleService.Query((value: any): void => {
                 $scope.articles = value;
                 callback();
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
             }, error_handler);
         };
 
@@ -354,7 +377,6 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                 });
             });
         };
-
 
         $scope.opened = false;
         //    $scope.Notify = Notify;

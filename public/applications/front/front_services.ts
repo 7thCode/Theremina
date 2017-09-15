@@ -9,7 +9,7 @@
 let FrontServices: angular.IModule = angular.module('FrontServices', []);
 
 FrontServices.factory('GroupMember', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/members/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -18,14 +18,14 @@ FrontServices.factory('GroupMember', ['$resource',
     }]);
 
 FrontServices.factory('GroupMemberQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/members/api/query/:query/:option', {query: '@query', option: '@option'}, {
             query: {method: 'GET'}
         });
     }]);
 
 FrontServices.factory('GroupMemberCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/members/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -43,11 +43,8 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         };
 
         let init = () => {
-            this.pagesize = 25;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
-
         };
 
         this.Init = () => {
@@ -64,18 +61,18 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
 
         this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
         this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -86,7 +83,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -115,3 +112,58 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
 
         this.Init();
     }]);
+
+FrontServices.factory('UploadData', ['$resource',
+    ($resource: any): any => {
+        return $resource('/api/upload/:name', {name: '@name'}, {
+            put: {method: 'PUT'}
+        });
+    }]);
+
+FrontServices.service('DataService', ['UploadData',
+    function (UploadData: any): void {
+
+        this.Upload = (url: string, filename: string, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+            let data = new UploadData();
+            data.url = url;
+            data.$put({name: filename}, (result: any): void => {
+                if (result) {
+                    if (result.code === 0) {
+                        callback(result.value);
+                    } else {
+                        error(result.code, result.message);
+                    }
+                } else {
+                    error(10000, "network error");
+                }
+            });
+        }
+    }]);
+
+
+FrontServices.factory('BuildSite', ['$resource',
+    ($resource: any): any => {
+        return $resource('/api/buildsite/:name', {name:"@name"}, {});
+    }]);
+
+FrontServices.service('SiteService', ['BuildSite',
+    function (BuildSite: any): void {
+
+        this.Build = (name:string, callback:(result: any) => void, error: (code: number, message: string) => void):void => {
+            let site = new BuildSite();
+            site.name = name;
+            site.$save({}, (result: any): void => {
+                if (result) {
+                    if (result.code === 0) {
+                        callback(null);
+                    } else {
+                        error(result.code, result.message);
+                    }
+                } else {
+                    error(10000, "network error");
+                }
+            });
+        };
+
+    }]);
+

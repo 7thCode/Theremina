@@ -2,7 +2,7 @@ extends ../../../backoffice_layout
 
 block content
     section.content-header
-        .h5.text-gray Player
+        .h5.text-gray #{message.player}
     section.content(ng-controller="FormPlayerController")
         include partial/navbar
         include partial/form

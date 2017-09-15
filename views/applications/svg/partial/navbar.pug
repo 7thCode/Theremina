@@ -1,64 +1,64 @@
-nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="navigation")
-        .container-fluid.noto
+nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
+        .container-fluid
             .navbar-header
                 button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
                     span.sr-only Toggle navigation
                     span.icon-bar
                     span.icon-bar
                     span.icon-bar
-                a.navbar-brand.page-scroll(href="/", ng-click="go('/')") イラスト
+                a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav
                     if user
                         li.dropdown
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | ファイル
+                                | #{message.file}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="Create();", role="menuitem") 作成
+                                    a(href="#", ng-click="Create();", role="menuitem") #{message.create}
                                 li
-                                    a(href="", ng-click="Open();", role="menuitem") 開く...
+                                    a(href="", ng-click="Open();", role="menuitem") #{message.open}
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && Update();", role="menuitem") 保存
+                                    a(href="", ng-click="opened && Update();", role="menuitem") #{message.save}
                                 li.divider
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && UpdateAs();", role="menuitem") 名前をつけて保存...
+                                    a(href="", ng-click="opened && UpdateAs();", role="menuitem") #{message.saveas}
                                 li.divider
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && Delete();", role="menuitem") 削除
+                                    a(href="", ng-click="opened && Delete();", role="menuitem") #{message.delete}
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | 編集
+                                | #{message.edit}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && Copy();", role="menuitem") コピー
+                                    a(href="#", ng-click="opened && Copy();", role="menuitem") #{message.copy}
                                 li
-                                    a(href="#", ng-click="opened && Paste();", role="menuitem") ペースト
+                                    a(href="#", ng-click="opened && Paste();", role="menuitem") #{message.paste}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && DeleteSelected();", role="menuitem") 削除
+                                    a(href="#", ng-click="opened && DeleteSelected();", role="menuitem") #{message.delete}
 
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | 配置
+                                | #{message.align}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") 上辺を重ねる
+                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") #{message.align_top}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") 右辺を重ねる
+                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") #{message.align_right}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") 下辺を重ねる
+                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") #{message.align_bottom}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") 左辺を重ねる
+                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") #{message.align_left}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") 上辺に合わせる
+                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") #{message.contact_top}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") 右辺に合わせる
+                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") #{message.contact_right}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") 下辺に合わせる
+                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") #{message.contact_bottom}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") 左辺に合わせる
+                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") #{message.contact_left}
                                 //li.divider
                                 //li
                                     a(href="#", ng-click="opened && SetScale(1);", role="menuitem") Scale(1)
@@ -67,42 +67,42 @@ nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="
 
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | 図形
+                                | #{message.figure}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") 四角
+                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") #{message.rect}
                                 li
-                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") 楕円
+                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") #{message.oval}
                                 li
-                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") 曲線
+                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") #{message.curve}
                                 li
-                                    a(href="#", ng-click="opened && AddText();", role="menuitem") テキスト
+                                    a(href="#", ng-click="opened && AddText();", role="menuitem") #{message.text}
                                 li
-                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") イメージ
+                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") #{message.image}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") 最前面
+                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") #{message.front}
                                 li
-                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") 最背面
+                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") #{message.back}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Lock();", role="menuitem") 固定
+                                    a(href="#", ng-click="opened && Lock();", role="menuitem") #{message.lock}
                                 li
-                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") 固定を全て解除
+                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") #{message.unlockall}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Group();", role="menuitem") グループ
+                                    a(href="#", ng-click="opened && Group();", role="menuitem") #{message.group}
                                 li
-                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") グループ解除
+                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") #{message.ungroup}
                                 //li
                                     a(href="#", ng-click="hoge1();") hoge
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | ダウンロード
+                                | #{message.download}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="", ng-click="opened && PrintPDF();", role="menuitem") PDF
+                                    a(href="", ng-click="opened && PrintPDF();", role="menuitem") #{message.pdf}
                                 li
-                                    a(href="", ng-click="opened && PrintSVG();", role="menuitem") SVG
+                                    a(href="", ng-click="opened && PrintSVG();", role="menuitem") #{message.svg}
                                 li
-                                    a(href="", ng-click="opened && PrintPNG();", role="menuitem") PNG
+                                    a(href="", ng-click="opened && PrintPNG();", role="menuitem") #{message.png}

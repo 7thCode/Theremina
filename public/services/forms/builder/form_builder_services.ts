@@ -7,16 +7,15 @@
 "use strict";
 //import {version} from "punycode";
 
-
 let FormBuilderServices: angular.IModule = angular.module('FormBuilderServices', []);
 
 FormBuilderServices.factory('FormCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/create', {}, {});
     }]);
 
 FormBuilderServices.factory('Form', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -25,14 +24,14 @@ FormBuilderServices.factory('Form', ['$resource',
     }]);
 
 FormBuilderServices.factory('FormQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/forms/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 FormBuilderServices.factory('FormCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -56,9 +55,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
         };
 
         let init = () => {
-            this.pagesize = 10;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
 
             this.current_page = null;
@@ -122,11 +119,12 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
 
             if (!element.attributes) {
                 element.attributes = {};
-            } else {
-                if (element.attributes.style) {
-                    //              element.attributes.style['cursor'] = 'crosshair';
-                }
             }
+            //else {
+        //        if (element.attributes.style) {
+                    //              element.attributes.style['cursor'] = 'crosshair';
+        //        }
+         //   }
             let result = flatten_collection(element.attributes, {'ng-click': click_handler(element.id)});
             return result;
         };
@@ -281,7 +279,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
 
         this.ChildCount = (id: string): number => {
             let numbers:number[] = [0];
-            let children:any[] = angular.element("#" + id).children();
+            let children:any = angular.element("#" + id).children();
             _.forEach(children, (element:any):void => {
                 let number:number = this.idToNo(element.id);
                 numbers.push(number);
@@ -398,7 +396,6 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
 
         this.SetEditMode = (mode: boolean, callback: (selected: any) => void): void => {
             this.Deselect(callback);
-            //     this.edit_mode = mode;
             this.Draw();
         };
 
@@ -435,20 +432,20 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
             });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -459,7 +456,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -980,70 +977,6 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
 
             return new_field;
         };
-        /*
-         this.HtmlElement = (label: string, validator: any): any => {
-         let parent_id: any = FormBuilderService.ParentId("root");
-         let id = FormBuilderService.CreateId("root");
-
-         let attribute = (id, val) => {
-
-         let result = {class: "form-control no-zoom", "ng-model": id, type: "text", name: id, style: {}};
-
-         return result;
-         };
-
-         let new_field: any = {
-         kind: "control",
-         type: "html",
-         id: id,
-         value: validator,
-         elements: [
-         {
-         type: "div",
-         id: id,
-         parent: parent_id,
-         editable: true,
-
-         label: "",
-         attributes: {class: "form-group", style: {}},
-         contents: [],
-         events: {}
-         },
-         {
-         type: "label",
-         id: id + "_fieldlabel",
-         parent: id,
-
-         label: "",
-         attributes: {for: id + "_fieldinput"},
-         contents: label,
-         events: {}
-         },
-         {
-         type: "span",
-         id: id + "_fielderrors",
-         parent: id,
-
-         label: "",
-         attributes: {"ng-messages": "validate." + id + ".$error"},
-         contents: [],
-         events: {}
-         },
-         {
-         type: "textarea",
-         id: id + "_textarea",
-         parent: id,
-         label: label,
-         attributes: attribute(id, validator),
-         //attributes: {class: "form-control no-zoom", "ng-model": id, type: "text", name: id, style: {},"ng-maxlength": "2000", "ng-minlength": "1", required: "true"},
-         contents: [],
-         events: {}
-         }
-         ]
-         };
-         return new_field;
-         };
-         */
 
         this.HtmlElement = (label: string, validator: any): any => {
             let parent_id: any = FormBuilderService.ParentId("root");
@@ -1150,9 +1083,14 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             return new_field;
         };
 
-        this.Select = (label: string, property: any): any => {
+        this.Select = (label: string, validator: any): any => {
             let parent_id = FormBuilderService.ParentId("root");
             let id = FormBuilderService.CreateId("root");
+
+            let attributes:any = {class:"form-control select-control", "ng-model": id, style: {"font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)"}};
+            if (validator.required) {
+                attributes = {class:"form-control select-control", "ng-model": id, required: validator.required.value, style: {"font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)"}};
+            }
 
             let new_field = {
                 kind: "control",
@@ -1166,7 +1104,17 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                         editable: true,
 
                         label: "",
-                        attributes: {class: "checkbox", style: {}},
+                        attributes: {class: "", style: {}},
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "span",
+                        id: id + "_selecterrors",
+                        parent: id,
+
+                        label: "",
+                        attributes: {"ng-messages": "validate." + id + ".$error"},
                         contents: [],
                         events: {}
                     },
@@ -1176,12 +1124,29 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                         parent: id,
 
                         label: label,
-                        attributes: {class:"form-control select-control", "ng-model": id, required: property.required.value, style: {"font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)"}},
-                        contents: property.contents,
+                        attributes: attributes,
+                        contents: validator.contents,
                         events: {}
                     }
                 ]
             };
+
+            if (validator.required) {
+                let required = {
+                    type: "span",
+                    id: id + "_fielderror_required",
+                    parent: id + "_fielderrors",
+
+                    label: "",
+                    attributes: {
+                        "ng-message": "required", class: "error-message"
+                    }
+                    ,
+                    contents: validator.required.message,
+                    events: {}
+                };
+                new_field.elements.push(required);
+            }
 
             return new_field;
         };

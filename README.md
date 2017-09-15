@@ -128,6 +128,7 @@
     > AUTH zz0101
     > FLUSHALL
 ##pm2
+    see http://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/
 #####Install      
     sudo npm install pm2 -g
     sudo pm2 startup ubuntu
@@ -140,7 +141,33 @@
       .
       .
     sudo pm2 list
-            
+#####メモリー（GC) 
+    > sudo pm2 start app.js --node-args="--optimize_for_size --max_old_space_size=920 --gc_interval=100"       
+#####Cluster
+
+    cluster.json(例)
+    
+        {
+          "apps" : [
+          {
+            "name"        : "app",
+            "script"      : "app.js",
+            "instances"  : 2,
+            "exec_mode"  : "cluster_mode",
+            "args"        : [],
+            "node_args"   : "--optimize_for_size --max_old_space_size=720 --gc_interval=100",
+            "env": {
+              "NODE_ENV": "development"
+            },
+            "env_production" : {
+              "NODE_ENV": "production"
+            }
+          }
+          ]
+        }
+
+
+    > sudo pm2 start cluster.json --env production
 #linuxエトセトラ
 ##ユーザ
 #####USER追加
@@ -160,6 +187,8 @@
 ##シンボリックリンク(ショートカットっぽいの)    
 #####作成
     ln -s
+    
+    
 ##ドメイン(Nginx)
 
 ####最新版インストール
@@ -190,6 +219,7 @@
       sudo nano xxx.vvv.jp.conf
 
       server {
+              client_max_body_size 50M;
               listen        80;
               server_name   ドメイン(xxx.netなど);
               #return 301   https://$host$request_uri;
@@ -208,6 +238,7 @@
       Let's EncryptでHTTPSならば        
               
       server {
+              client_max_body_size 50M;
               listen 443 ssl;
               
               (nginxが1.9.6以上ならば)
@@ -321,17 +352,21 @@
     > cd certbot
     > wget https://dl.eff.org/certbot-auto
     > chmod a+x certbot-auto
+    > sudo service nginx stop
     > ./certbot-auto
         エラー出たら
     > ./certbot-auto certonly
+    > sudo service nginx start
 
     
     実行
     
     > cd ~
     > cd ceartbot
+    > sudo service nginx stop
     > ./certbot-auto certonly --no-self-upgrade -n --standalone  --agree-tos --email oda.mikio@gmail.com -d www.aaa.com
-
+    > sudo service nginx start
+    
     -nginxってのが使える？使うと楽？
     
     
@@ -343,7 +378,6 @@
     > ./certbot-auto renew -q --no-self-upgrade
     > sudo service nginx start
     
-   
     証明書の取得時に使用したオプションは
     
     /etc/letsencrypt/renewal/${DOMAIN}.conf

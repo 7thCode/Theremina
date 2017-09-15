@@ -2,12 +2,16 @@
 
 let gulp = require('gulp');
 let fs = require('fs');
-let license = require('gulp-header');
+
 let rimraf = require('rimraf');
 let imagemin = require('gulp-imagemin');
 let cssmin = require('gulp-cssmin');
-let uglify = require('gulp-uglify');
 
+let license = require('gulp-header');
+let uglifyjs = require('uglify-es');
+let composer = require('gulp-uglify/composer');
+let pump = require('pump');
+let minify = composer(uglifyjs, console);
 
 gulp.task('clean', (cb) => {
     rimraf('./product/blog0', cb);
@@ -39,7 +43,8 @@ gulp.task('copy', ['clean'], () => {
             'package.json',
             'bower.json',
             'htdigest',
-            '.bowerrc'
+            '.bowerrc',
+            'cluster.json'
         ],
         {base: '..'}
     )
@@ -83,7 +88,7 @@ gulp.task('csscpy', ['copy'], () => {
 
 gulp.task('scriptcpy', ['copy'], () => {
 
-    var banner = [
+    let banner = [
         '/*',
         ' Copyright (c) 2016 7thCode.',
         ' Version: 1.0.0',
@@ -107,7 +112,7 @@ gulp.task('scriptcpy', ['copy'], () => {
             'public/systems/**/*.js',
             'server/**/*.js',
             'app.js',
-            'core.js'
+            'gs.js'
         ],
         {base: '..'}
     )
@@ -119,7 +124,7 @@ gulp.task('debug build', ['imgcpy', 'csscpy', 'scriptcpy'], () => {
     console.log('debug build done');
 });
 
-gulp.task('imgmin', ['copy'], () => {
+gulp.task('imgmin', [], () => {
 
     return gulp.src(
         [
@@ -139,7 +144,7 @@ gulp.task('imgmin', ['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('cssmin', ['copy'], () => {
+gulp.task('cssmin', [], () => {
 
     return gulp.src(
         [
@@ -156,11 +161,13 @@ gulp.task('cssmin', ['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('scriptmin', ['copy'], () => {
+gulp.task('scriptmin', [], (cb) => {
 
-    var banner = [
+    let options = {};
+
+    let banner = [
         '/*',
-        ' Copyright (c) 2016 7thCode.',
+        ' Copyright (c) 2017 7thCode.',
         ' Version: 1.0.0',
         ' Author: 7thCode.',
         ' License: MIT',
@@ -170,44 +177,36 @@ gulp.task('scriptmin', ['copy'], () => {
         ''
     ].join('\n');
 
-    return gulp.src(
-        [
-            'models/**/*.js',
-            'public/*.js',
-            'public/js/**/*.js',
-            'public/utility/**/*.js',
-            'public/applications/**/*.js',
-            'public/services/**/*.js',
-            'public/plugins/**/*.js',
-            'public/systems/**/*.js',
-            'server/**/*.js',
-            'app.js',
-            'core.js'
+    pump([
+            gulp.src(
+                [
+                    'models/**/*.js',
+                    'public/*.js',
+                    'public/js/**/*.js',
+                    'public/utility/**/*.js',
+                    'public/applications/**/*.js',
+                    'public/plugins/**/*.js',
+                    'public/services/**/*.js',
+                    'public/systems/**/*.js',
+                    'server/**/*.js',
+                    'app.js',
+                    'gs.js'
+                ],
+                {base: '..'}
+            ),
+            minify(options),
+            license(banner),
+            gulp.dest('product')
         ],
-        {base: '..'}
-    )
-        .pipe(uglify({preserveComments: 'some'}))
-        .pipe(license(banner))
-        .pipe(gulp.dest('product'));
+        cb
+    );
+
 });
 
-gulp.task('production', ['imgmin', 'cssmin', 'scriptmin'], () => {
+gulp.task('production', ['copy', 'imgmin', 'cssmin', 'scriptmin'], () => {
     console.log('production done');
 });
 
 gulp.task('default', ['production'], () => {
     console.log('default done');
 });
-
-//gulp.task("typedoc", function() {
-//    return gulp
-//        .src(["./**/*.ts"])
-//        .pipe(typedoc({
-//            target: "es5",
-//            includeDeclarations: false,
-//            out: "product/document",
-//            name: "chintai2",
-//            ignoreCompilerErrors: true,
-//            version: true,
-//        }));
-//});

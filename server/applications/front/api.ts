@@ -11,7 +11,7 @@ export namespace ApiRouter {
     const express: any = require("express");
     export const router = express.Router();
 
-    const core = require(process.cwd() + "/core");
+    const core = require(process.cwd() + "/gs");
     const share: any = core.share;
     const event: any = share.Event;
 
@@ -22,15 +22,17 @@ export namespace ApiRouter {
     const pages: any = new FrontModule.Pages;
     const mailer: any = new FrontModule.Mailer;
     const asset: any = new FrontModule.Asset;
+    const pictures: any = new FrontModule.Pictures;
 
-    const FileModule: any = require(share.Server("systems/files/controllers/file_controller"));
-    const file: any = new FileModule.Files();
+    router.get('/:userid/doc/img/:name', pictures.get_photo);
 
-    router.get('/photos/api/:userid/:name', file.get_file_name);
+    router.put('/api/upload/:name', [exception.exception, exception.authenticate,pages.put_all]);
+    router.get('/api/download', [exception.exception, exception.authenticate, pages.get_all]);
 
-    router.get('/api/download', pages.get_all);
     router.post('/api/mailsend', mailer.send);
     router.post('/api/createasset', asset.create);
+
+    router.post('/api/buildsite/:name', pages.build);
 
     const members: any = new FrontModule.Members;
 
@@ -40,8 +42,9 @@ export namespace ApiRouter {
     router.get('/members/api/count/:query', [exception.exception, exception.guard, exception.authenticate, members.get_member_count]);
     router.delete('/members/api/own', [exception.exception, exception.guard, exception.authenticate, members.delete_own]);
 
-    event.emitter.on('register', (param:any):void => {
+    event.emitter.on('register', (param: any): void => {
         pages.create_init_user_resources(param.user);
+        pages.create_init_user_articles(param.user);
     });
 
 }

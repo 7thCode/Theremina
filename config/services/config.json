@@ -1,653 +1,1694 @@
 {
-  "initresources": [],
-  "initforms": [
+ "modules": [
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "articles",
+   "description": {
+    "display": "Articles"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "backoffice",
+   "description": {
+    "display": "Backoffice"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "forms",
+   "description": {
+    "display": "Forms"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "groups",
+   "description": {
+    "display": "Groups"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "images",
+   "description": {
+    "display": "Images"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "layouts",
+   "description": {
+    "display": "Layouts"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "profile",
+   "description": {
+    "display": "Profile"
+   }
+  }
+ ],
+ "initusers": [],
+ "initfiles": [],
+ "initresources": [],
+ "initforms": [
+  {
+   "type": 1,
+   "userid": "000000000000000000000000",
+   "name": "blog",
+   "content": [
     {
-      "type": 1,
-      "userid": "000000000000000000000000",
-      "name": "verb",
-      "content": [
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_1\");",
-                "style": {},
-                "class": "checkbox"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_1",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": [
-                "top1",
-                "top2",
-                "top3",
-                "article1",
-                "article2",
-                "article3",
-                "news1",
-                "news2",
-                "news3",
-                "work1",
-                "work2",
-                "work3",
-                "member1",
-                "member2",
-                "member3",
-                "etc1",
-                "etc2",
-                "etc3",
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f"
-              ],
-              "attributes": {
-                "ng-click": "edit($event,\"root_1_select\");",
-                "style": {
-                  "border-color": "rgba(120,120,120,0.1)",
-                  "border-style": "solid",
-                  "border-width": "2px",
-                  "font-size": "12px"
-                },
-                "required": true,
-                "ng-model": "root_1",
-                "class": "form-control select-control"
-              },
-              "label": "type",
-              "parent": "root_1",
-              "id": "root_1_select",
-              "type": "select"
-            }
-          ],
-          "id": "root_1",
-          "type": "select",
-          "kind": "control"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_1\");",
+        "style": {},
+        "class": "checkbox"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_1",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": [
+        "top",
+        "title",
+        "hero",
+        "article",
+        "picture",
+        "news",
+        "work",
+        "product",
+        "member",
+        "etc",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g"
+       ],
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_select\");",
+        "style": {
+         "border-color": "rgba(120,120,120,0.1)",
+         "border-style": "solid",
+         "border-width": "2px",
+         "font-size": "12px"
         },
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_2\");",
-                "style": {},
-                "class": "form-group"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_2",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": "klass",
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fieldlabel\");",
-                "class": "field-label",
-                "for": "root_2_fieldinput"
-              },
-              "label": "",
-              "parent": "root_2",
-              "id": "root_2_fieldlabel",
-              "type": "label"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fielderrors\");",
-                "ng-messages": "validate.root_2.$error"
-              },
-              "label": "",
-              "parent": "root_2",
-              "id": "root_2_fielderrors",
-              "type": "span"
-            },
-            {
-              "events": {
-                "onChange": ""
-              },
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fieldinput\");",
-                "style": {},
-                "name": "root_2",
-                "type": "text",
-                "ng-model": "root_2",
-                "class": "form-control no-zoom field-control"
-              },
-              "label": "klass",
-              "parent": "root_2",
-              "id": "root_2_fieldinput",
-              "type": "input"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fielderror_min\");",
-                "class": "error-message",
-                "ng-message": "minlength"
-              },
-              "label": "",
-              "parent": "root_2_fielderrors",
-              "id": "root_2_fielderror_min",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fielderror_max\");",
-                "class": "error-message",
-                "ng-message": "maxlength"
-              },
-              "label": "",
-              "parent": "root_2_fielderrors",
-              "id": "root_2_fielderror_max",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fielderror_pattern\");",
-                "class": "error-message",
-                "ng-message": "pattern"
-              },
-              "label": "",
-              "parent": "root_2_fielderrors",
-              "id": "root_2_fielderror_pattern",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_2_fielderror_required\");",
-                "class": "error-message",
-                "ng-message": "required"
-              },
-              "label": "",
-              "parent": "root_2_fielderrors",
-              "id": "root_2_fielderror_required",
-              "type": "span"
-            }
-          ],
-          "value": {
-            "required": {
-              "message": "",
-              "value": false
-            },
-            "pattern": {
-              "message": "",
-              "value": ""
-            },
-            "max": {
-              "message": "",
-              "value": 100
-            },
-            "min": {
-              "message": "",
-              "value": 5
-            }
-          },
-          "id": "root_2",
-          "type": "field",
-          "kind": "control"
+        "required": true,
+        "ng-model": "root_1",
+        "class": "form-control select-control"
+       },
+       "label": "type",
+       "parent": "root_1",
+       "id": "root_1_select",
+       "type": "select"
+      }
+     ],
+     "id": "root_1",
+     "type": "select",
+     "kind": "control"
+    },
+    {
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_2",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "klass",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_2_fieldinput"
+       },
+       "label": "",
+       "parent": "root_2",
+       "id": "root_2_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderrors\");",
+        "ng-messages": "validate.root_2.$error"
+       },
+       "label": "",
+       "parent": "root_2",
+       "id": "root_2_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fieldinput\");",
+        "style": {},
+        "name": "root_2",
+        "type": "text",
+        "ng-model": "root_2",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "klass",
+       "parent": "root_2",
+       "id": "root_2_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_2",
+     "type": "field",
+     "kind": "control"
+    },
+    {
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_3",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "link",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_3_fieldinput"
+       },
+       "label": "",
+       "parent": "root_3",
+       "id": "root_3_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderrors\");",
+        "ng-messages": "validate.root_3.$error"
+       },
+       "label": "",
+       "parent": "root_3",
+       "id": "root_3_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fieldinput\");",
+        "style": {},
+        "name": "root_3",
+        "type": "text",
+        "ng-model": "root_3",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "link",
+       "parent": "root_3",
+       "id": "root_3_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_3",
+     "type": "field",
+     "kind": "control"
+    },
+    {
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_4\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_4",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "image",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_imglabel\");",
+        "for": "root_4_imginput"
+       },
+       "label": "",
+       "parent": "root_4",
+       "id": "root_4_imglabel",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_img\");",
+        "style": {
+         "width": "197px",
+         "height": "148px",
+         "border": "1px"
         },
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_3\");",
-                "style": {},
-                "class": "form-group"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_3",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": "link",
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fieldlabel\");",
-                "class": "field-label",
-                "for": "root_3_fieldinput"
-              },
-              "label": "",
-              "parent": "root_3",
-              "id": "root_3_fieldlabel",
-              "type": "label"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fielderrors\");",
-                "ng-messages": "validate.root_3.$error"
-              },
-              "label": "",
-              "parent": "root_3",
-              "id": "root_3_fielderrors",
-              "type": "span"
-            },
-            {
-              "events": {
-                "onChange": ""
-              },
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fieldinput\");",
-                "style": {},
-                "name": "root_3",
-                "type": "text",
-                "ng-model": "root_3",
-                "class": "form-control no-zoom field-control"
-              },
-              "label": "link",
-              "parent": "root_3",
-              "id": "root_3_fieldinput",
-              "type": "input"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fielderror_min\");",
-                "class": "error-message",
-                "ng-message": "minlength"
-              },
-              "label": "",
-              "parent": "root_3_fielderrors",
-              "id": "root_3_fielderror_min",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fielderror_max\");",
-                "class": "error-message",
-                "ng-message": "maxlength"
-              },
-              "label": "",
-              "parent": "root_3_fielderrors",
-              "id": "root_3_fielderror_max",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fielderror_pattern\");",
-                "class": "error-message",
-                "ng-message": "pattern"
-              },
-              "label": "",
-              "parent": "root_3_fielderrors",
-              "id": "root_3_fielderror_pattern",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_3_fielderror_required\");",
-                "class": "error-message",
-                "ng-message": "required"
-              },
-              "label": "",
-              "parent": "root_3_fielderrors",
-              "id": "root_3_fielderror_required",
-              "type": "span"
-            }
-          ],
-          "value": {
-            "required": {
-              "message": "",
-              "value": false
-            },
-            "pattern": {
-              "message": "",
-              "value": ""
-            },
-            "max": {
-              "message": "",
-              "value": 100
-            },
-            "min": {
-              "message": "",
-              "value": 5
-            }
-          },
-          "id": "root_3",
-          "type": "field",
-          "kind": "control"
-        },
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_4\");",
-                "style": {},
-                "class": "form-group"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_4",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": "image",
-              "attributes": {
-                "ng-click": "edit($event,\"root_4_imglabel\");",
-                "for": "root_4_imginput"
-              },
-              "label": "",
-              "parent": "root_4",
-              "id": "root_4_imglabel",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_4_img\");",
-                "style": {
-                  "width": "197px",
-                  "height": "148px",
-                  "border": "1px"
-                },
-                "name": "root_4_imginput",
-                "ng-model": "root_4",
-                "ng-drop-success": "onDrop($data,$event,\"root_4\")",
-                "ng-drop": "true",
-                "ng-src": "{{root_4}}",
-                "class": "image image-control"
-              },
-              "label": "image",
-              "parent": "root_4",
-              "id": "root_4_img",
-              "type": "img"
-            }
-          ],
-          "value": {},
-          "id": "root_4",
-          "type": "img",
-          "kind": "control"
-        },
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_5\");",
-                "style": {},
-                "class": "form-group"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_5",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": "title",
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fieldlabel\");",
-                "class": "field-label",
-                "for": "root_5_fieldinput"
-              },
-              "label": "",
-              "parent": "root_5",
-              "id": "root_5_fieldlabel",
-              "type": "label"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fielderrors\");",
-                "ng-messages": "validate.root_5.$error"
-              },
-              "label": "",
-              "parent": "root_5",
-              "id": "root_5_fielderrors",
-              "type": "span"
-            },
-            {
-              "events": {
-                "onChange": ""
-              },
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fieldinput\");",
-                "style": {},
-                "name": "root_5",
-                "type": "text",
-                "ng-model": "root_5",
-                "class": "form-control no-zoom field-control"
-              },
-              "label": "title",
-              "parent": "root_5",
-              "id": "root_5_fieldinput",
-              "type": "input"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fielderror_min\");",
-                "class": "error-message",
-                "ng-message": "minlength"
-              },
-              "label": "",
-              "parent": "root_5_fielderrors",
-              "id": "root_5_fielderror_min",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fielderror_max\");",
-                "class": "error-message",
-                "ng-message": "maxlength"
-              },
-              "label": "",
-              "parent": "root_5_fielderrors",
-              "id": "root_5_fielderror_max",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fielderror_pattern\");",
-                "class": "error-message",
-                "ng-message": "pattern"
-              },
-              "label": "",
-              "parent": "root_5_fielderrors",
-              "id": "root_5_fielderror_pattern",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": "",
-              "attributes": {
-                "ng-click": "edit($event,\"root_5_fielderror_required\");",
-                "class": "error-message",
-                "ng-message": "required"
-              },
-              "label": "",
-              "parent": "root_5_fielderrors",
-              "id": "root_5_fielderror_required",
-              "type": "span"
-            }
-          ],
-          "value": {
-            "required": {
-              "message": "",
-              "value": false
-            },
-            "pattern": {
-              "message": "",
-              "value": ""
-            },
-            "max": {
-              "message": "",
-              "value": 100
-            },
-            "min": {
-              "message": "",
-              "value": 5
-            }
-          },
-          "id": "root_5",
-          "type": "field",
-          "kind": "control"
-        },
-        {
-          "elements": [
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_6\");",
-                "style": {},
-                "class": "form-group"
-              },
-              "label": "",
-              "editable": true,
-              "parent": "root",
-              "id": "root_6",
-              "type": "div"
-            },
-            {
-              "events": {},
-              "contents": "desc",
-              "attributes": {
-                "ng-click": "edit($event,\"root_6_fieldlabel\");",
-                "for": "root_6_fieldinput"
-              },
-              "label": "",
-              "parent": "root_6",
-              "id": "root_6_fieldlabel",
-              "type": "label"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_6_fielderrors\");",
-                "ng-messages": "validate.root_6.$error"
-              },
-              "label": "",
-              "parent": "root_6",
-              "id": "root_6_fielderrors",
-              "type": "span"
-            },
-            {
-              "events": {},
-              "contents": [],
-              "attributes": {
-                "ng-click": "edit($event,\"root_6_edit\");",
-                "style": {},
-                "type": "text",
-                "ng-model": "root_6",
-                "text-angular": "true",
-                "class": ""
-              },
-              "label": "desc",
-              "parent": "root_6",
-              "id": "root_6_edit",
-              "type": "div"
-            }
-          ],
-          "value": {
-            "required": {
-              "message": "",
-              "value": false
-            },
-            "max": {
-              "message": "",
-              "value": 100
-            },
-            "min": {
-              "message": "",
-              "value": 5
-            }
-          },
-          "id": "root_6",
-          "type": "html",
-          "kind": "control"
-        }
-      ]
+        "name": "root_4_imginput",
+        "ng-model": "root_4",
+        "ng-drop-success": "onDrop($data,$event,\"root_4\")",
+        "ng-drop": "true",
+        "ng-src": "{{root_4}}",
+        "class": "image image-control"
+       },
+       "label": "image",
+       "parent": "root_4",
+       "id": "root_4_img",
+       "type": "img"
+      }
+     ],
+     "value": {},
+     "id": "root_4",
+     "type": "img",
+     "kind": "control"
+    },
+    {
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_5",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "title",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_5_fieldinput"
+       },
+       "label": "",
+       "parent": "root_5",
+       "id": "root_5_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderrors\");",
+        "ng-messages": "validate.root_5.$error"
+       },
+       "label": "",
+       "parent": "root_5",
+       "id": "root_5_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fieldinput\");",
+        "style": {},
+        "name": "root_5",
+        "type": "text",
+        "ng-model": "root_5",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "title",
+       "parent": "root_5",
+       "id": "root_5_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_5",
+     "type": "field",
+     "kind": "control"
+    },
+    {
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_6",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "desc",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fieldlabel\");",
+        "for": "root_6_fieldinput"
+       },
+       "label": "",
+       "parent": "root_6",
+       "id": "root_6_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderrors\");",
+        "ng-messages": "validate.root_6.$error"
+       },
+       "label": "",
+       "parent": "root_6",
+       "id": "root_6_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_edit\");",
+        "style": {},
+        "type": "text",
+        "ng-model": "root_6",
+        "text-angular": "true",
+        "class": ""
+       },
+       "label": "desc",
+       "parent": "root_6",
+       "id": "root_6_edit",
+       "type": "div"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_6",
+     "type": "html",
+     "kind": "control"
     }
-  ],
-  "webfonts": [
+   ]
+  },
+  {
+   "type": 1,
+   "userid": "000000000000000000000000",
+   "name": "free",
+   "content": [
     {
-      "name": "Sawarabi Mincho",
-      "url": "https://fonts.googleapis.com/earlyaccess/sawarabimincho.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_1\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_1",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "type",
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_1_fieldinput"
+       },
+       "label": "",
+       "parent": "root_1",
+       "id": "root_1_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fielderrors\");",
+        "ng-messages": "validate.root_1.$error"
+       },
+       "label": "",
+       "parent": "root_1",
+       "id": "root_1_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fieldinput\");",
+        "required": false,
+        "style": {},
+        "name": "root_1",
+        "type": "text",
+        "ng-model": "root_1",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "type",
+       "parent": "root_1",
+       "id": "root_1_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_1_fielderrors",
+       "id": "root_1_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_1_fielderrors",
+       "id": "root_1_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_1_fielderrors",
+       "id": "root_1_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "必須です",
+       "attributes": {
+        "ng-click": "edit($event,\"root_1_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_1_fielderrors",
+       "id": "root_1_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "必須です",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_1",
+     "type": "field",
+     "kind": "control"
     },
     {
-      "name": "Sawarabi Gothic",
-      "url": "https://fonts.googleapis.com/earlyaccess/sawarabigothic.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_2",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "number",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fieldlabel\");",
+        "class": "number-label",
+        "for": "root_2_fieldinput"
+       },
+       "label": "",
+       "parent": "root_2",
+       "id": "root_2_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderrors\");",
+        "ng-messages": "validate.root_2.$error"
+       },
+       "label": "",
+       "parent": "root_2",
+       "id": "root_2_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fieldinput\");",
+        "style": {},
+        "name": "root_2",
+        "type": "number",
+        "ng-model": "root_2",
+        "class": "form-control no-zoom number-control"
+       },
+       "label": "number",
+       "parent": "root_2",
+       "id": "root_2_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_2_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_2_fielderrors",
+       "id": "root_2_fielderror_max",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "step": {
+       "message": "",
+       "value": 1
+      },
+      "max": {
+       "message": "",
+       "value": 1000
+      },
+      "min": {
+       "message": "",
+       "value": 0
+      }
+     },
+     "id": "root_2",
+     "type": "number",
+     "kind": "control"
     },
     {
-      "name": "Mplus 1p",
-      "url": "https://fonts.googleapis.com/earlyaccess/mplus1p.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_3",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "id",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_3_fieldinput"
+       },
+       "label": "",
+       "parent": "root_3",
+       "id": "root_3_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderrors\");",
+        "ng-messages": "validate.root_3.$error"
+       },
+       "label": "",
+       "parent": "root_3",
+       "id": "root_3_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fieldinput\");",
+        "style": {},
+        "name": "root_3",
+        "type": "text",
+        "ng-model": "root_3",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "id",
+       "parent": "root_3",
+       "id": "root_3_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_3_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_3_fielderrors",
+       "id": "root_3_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_3",
+     "type": "field",
+     "kind": "control"
     },
     {
-      "name": "Rounded Mplus 1c",
-      "url": "https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_4\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_4",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "class",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_4_fieldinput"
+       },
+       "label": "",
+       "parent": "root_4",
+       "id": "root_4_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fielderrors\");",
+        "ng-messages": "validate.root_4.$error"
+       },
+       "label": "",
+       "parent": "root_4",
+       "id": "root_4_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fieldinput\");",
+        "style": {},
+        "name": "root_4",
+        "type": "text",
+        "ng-model": "root_4",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "class",
+       "parent": "root_4",
+       "id": "root_4_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_4_fielderrors",
+       "id": "root_4_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_4_fielderrors",
+       "id": "root_4_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_4_fielderrors",
+       "id": "root_4_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_4_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_4_fielderrors",
+       "id": "root_4_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_4",
+     "type": "field",
+     "kind": "control"
     },
     {
-      "name": "Hannari",
-      "url": "https://fonts.googleapis.com/earlyaccess/hannari.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_5",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "title",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_5_fieldinput"
+       },
+       "label": "",
+       "parent": "root_5",
+       "id": "root_5_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderrors\");",
+        "ng-messages": "validate.root_5.$error"
+       },
+       "label": "",
+       "parent": "root_5",
+       "id": "root_5_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fieldinput\");",
+        "style": {},
+        "name": "root_5",
+        "type": "text",
+        "ng-model": "root_5",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "title",
+       "parent": "root_5",
+       "id": "root_5_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_5_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_5_fielderrors",
+       "id": "root_5_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_5",
+     "type": "field",
+     "kind": "control"
     },
     {
-      "name": "Kokoro",
-      "url": "https://fonts.googleapis.com/earlyaccess/kokoro.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_6",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "link",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fieldlabel\");",
+        "class": "field-label",
+        "for": "root_6_fieldinput"
+       },
+       "label": "",
+       "parent": "root_6",
+       "id": "root_6_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderrors\");",
+        "ng-messages": "validate.root_6.$error"
+       },
+       "label": "",
+       "parent": "root_6",
+       "id": "root_6_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {
+        "onChange": ""
+       },
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fieldinput\");",
+        "style": {},
+        "name": "root_6",
+        "type": "text",
+        "ng-model": "root_6",
+        "class": "form-control no-zoom field-control"
+       },
+       "label": "link",
+       "parent": "root_6",
+       "id": "root_6_fieldinput",
+       "type": "input"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderror_min\");",
+        "class": "error-message",
+        "ng-message": "minlength"
+       },
+       "label": "",
+       "parent": "root_6_fielderrors",
+       "id": "root_6_fielderror_min",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderror_max\");",
+        "class": "error-message",
+        "ng-message": "maxlength"
+       },
+       "label": "",
+       "parent": "root_6_fielderrors",
+       "id": "root_6_fielderror_max",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderror_pattern\");",
+        "class": "error-message",
+        "ng-message": "pattern"
+       },
+       "label": "",
+       "parent": "root_6_fielderrors",
+       "id": "root_6_fielderror_pattern",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": "",
+       "attributes": {
+        "ng-click": "edit($event,\"root_6_fielderror_required\");",
+        "class": "error-message",
+        "ng-message": "required"
+       },
+       "label": "",
+       "parent": "root_6_fielderrors",
+       "id": "root_6_fielderror_required",
+       "type": "span"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "pattern": {
+       "message": "",
+       "value": ""
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_6",
+     "type": "field",
+     "kind": "control"
     },
     {
-      "name": "Nikukyu",
-      "url": "https://fonts.googleapis.com/earlyaccess/nikukyu.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_7\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_7",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "img",
+       "attributes": {
+        "ng-click": "edit($event,\"root_7_imglabel\");",
+        "for": "root_7_imginput"
+       },
+       "label": "",
+       "parent": "root_7",
+       "id": "root_7_imglabel",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_7_img\");",
+        "style": {
+         "width": "197px",
+         "height": "148px",
+         "border": "1px"
+        },
+        "name": "root_7_imginput",
+        "ng-model": "root_7",
+        "ng-drop-success": "onDrop($data,$event,\"root_7\")",
+        "ng-drop": "true",
+        "ng-src": "{{root_7}}",
+        "class": "image image-control"
+       },
+       "label": "img",
+       "parent": "root_7",
+       "id": "root_7_img",
+       "type": "img"
+      }
+     ],
+     "value": {},
+     "id": "root_7",
+     "type": "img",
+     "kind": "control"
     },
     {
-      "name": "Nico Moji",
-      "url": "https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_8\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_8",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "desc",
+       "attributes": {
+        "ng-click": "edit($event,\"root_8_fieldlabel\");",
+        "for": "root_8_fieldinput"
+       },
+       "label": "",
+       "parent": "root_8",
+       "id": "root_8_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_8_fielderrors\");",
+        "ng-messages": "validate.root_8.$error"
+       },
+       "label": "",
+       "parent": "root_8",
+       "id": "root_8_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_8_edit\");",
+        "style": {},
+        "type": "text",
+        "ng-model": "root_8",
+        "text-angular": "true",
+        "class": ""
+       },
+       "label": "desc",
+       "parent": "root_8",
+       "id": "root_8_edit",
+       "type": "div"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_8",
+     "type": "html",
+     "kind": "control"
     },
     {
-      "name": "Noto Sans Japanese",
-      "url": "https://fonts.googleapis.com/earlyaccess/notosansjapanese.css"
-    },
-    {
-      "name": "Pinyon Script",
-      "url": "https://fonts.googleapis.com/css?family=Pinyon+Script"
+     "elements": [
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_9\");",
+        "style": {},
+        "class": "form-group"
+       },
+       "label": "",
+       "editable": true,
+       "parent": "root",
+       "id": "root_9",
+       "type": "div"
+      },
+      {
+       "events": {},
+       "contents": "main",
+       "attributes": {
+        "ng-click": "edit($event,\"root_9_fieldlabel\");",
+        "for": "root_9_fieldinput"
+       },
+       "label": "",
+       "parent": "root_9",
+       "id": "root_9_fieldlabel",
+       "type": "label"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_9_fielderrors\");",
+        "ng-messages": "validate.root_9.$error"
+       },
+       "label": "",
+       "parent": "root_9",
+       "id": "root_9_fielderrors",
+       "type": "span"
+      },
+      {
+       "events": {},
+       "contents": [],
+       "attributes": {
+        "ng-click": "edit($event,\"root_9_edit\");",
+        "style": {},
+        "type": "text",
+        "ng-model": "root_9",
+        "text-angular": "true",
+        "class": ""
+       },
+       "label": "main",
+       "parent": "root_9",
+       "id": "root_9_edit",
+       "type": "div"
+      }
+     ],
+     "value": {
+      "required": {
+       "message": "",
+       "value": false
+      },
+      "max": {
+       "message": "",
+       "value": 100
+      },
+      "min": {
+       "message": "",
+       "value": 5
+      }
+     },
+     "id": "root_9",
+     "type": "html",
+     "kind": "control"
     }
-  ]
+   ]
+  }
+ ],
+ "webfonts": [
+  {
+   "name": "Sawarabi Mincho",
+   "url": "https://fonts.googleapis.com/earlyaccess/sawarabimincho.css"
+  },
+  {
+   "name": "Sawarabi Gothic",
+   "url": "https://fonts.googleapis.com/earlyaccess/sawarabigothic.css"
+  },
+  {
+   "name": "Mplus 1p",
+   "url": "https://fonts.googleapis.com/earlyaccess/mplus1p.css"
+  },
+  {
+   "name": "Rounded Mplus 1c",
+   "url": "https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css"
+  },
+  {
+   "name": "Hannari",
+   "url": "https://fonts.googleapis.com/earlyaccess/hannari.css"
+  },
+  {
+   "name": "Kokoro",
+   "url": "https://fonts.googleapis.com/earlyaccess/kokoro.css"
+  },
+  {
+   "name": "Nikukyu",
+   "url": "https://fonts.googleapis.com/earlyaccess/nikukyu.css"
+  },
+  {
+   "name": "Nico Moji",
+   "url": "https://fonts.googleapis.com/earlyaccess/nicomoji.css"
+  },
+  {
+   "name": "Noto Sans Japanese",
+   "url": "https://fonts.googleapis.com/earlyaccess/notosansjapanese.css"
+  },
+  {
+   "name": "Pinyon Script",
+   "url": "https://fonts.googleapis.com/css?family=Pinyon+Script"
+  }
+ ]
 }

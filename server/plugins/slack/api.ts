@@ -11,7 +11,7 @@ export namespace SlackApiRouter {
     const express: any = require("express");
     export const router = express.Router();
 
-    const core = require(process.cwd() + "/core");
+    const core = require(process.cwd() + "/gs");
     const share: any = core.share;
     const plugins_config = share.plugins_config;
     if (plugins_config.slack) {

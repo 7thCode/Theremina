@@ -24,7 +24,6 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "BackOfficeControllers",
     'FileServices',
     'FileControllers',
-    "RewritingControllers",
     "AuthServices",
     'AuthControllers',
     "GroupControllers",
@@ -54,7 +53,9 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "MailerControllers",
     "MailerServices",
     "RobotControllers",
-    "RobotServices"
+    "RobotServices",
+    "GoogleServices",
+    "GoogleControllers"
 ]);
 
 BackOfficeApplication.run(['$rootScope',
@@ -103,3 +104,14 @@ BackOfficeApplication.filter('limit', [():any => {
         return result;
     };
 }]);
+
+BackOfficeApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
+    ($scope: any, $uibModalInstance: any, items: any): void => {
+
+        $scope.message = items;
+
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
+
+    }]);

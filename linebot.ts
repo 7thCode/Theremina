@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express');
 const line = require('node-line-bot-api');
 const bodyParser = require('body-parser');

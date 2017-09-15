@@ -12,7 +12,7 @@ export namespace SlackModule {
 
     const Botkit = require('botkit');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config = share.config;
     const Wrapper = share.Wrapper;

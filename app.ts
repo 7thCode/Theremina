@@ -35,7 +35,7 @@ if (config_seed) {
 
         app.use(express.static(path.join(__dirname, 'public')));
 
-        const core = require(process.cwd() + '/core');
+        const core = require(process.cwd() + '/gs');
         const share: any = core.share;
         const config: any = share.config;
         const logger:any = share.logger;
@@ -58,13 +58,13 @@ if (config_seed) {
         const morgan = require('morgan');
         morgan.format("original", "[:date] :method :url :status :response-time ms");
 
-        const compression = require('compression');
 
-        const Q: any = require('q');
+        //const Q: any = require('q');
         const _ = require("lodash");
 
         const mongoose: any = require("mongoose");
-        mongoose.Promise = Q.Promise;
+       // mongoose.Promise = Q.Promise;
+        mongoose.Promise = global.Promise;
 
         const favicon = require('serve-favicon');
 
@@ -88,10 +88,43 @@ if (config_seed) {
         app.use(helmet());
         app.use(helmet.hidePoweredBy({setTo: 'JSF/1.2'})); // Impersonation
         // helmet
+/*
+        const minifyhtml = require('express-minify-html');
+        app.use(minifyhtml({
+            override:      true,
+            exception_url: false,
+            htmlMinifier: {
+                removeComments:            true,
+                collapseWhitespace:        true,
+                collapseBooleanAttributes: true,
+                removeAttributeQuotes:     true,
+                removeEmptyAttributes:     false,
+                minifyJS:                  false
+            }
+        }));
+*/
 
-        // compression result
-        app.use(compression());
-        // compression result
+        const core = require(process.cwd() + '/gs');
+        const share: any = core.share;
+        const config: any = share.config;
+        const Cipher: any = share.Cipher;
+        const event: any = share.Event;
+
+        if (config.compression) {
+
+            // compression result
+            const compression = require('compression');
+            app.use(compression());
+            // compression result
+
+            let minify = require('express-minify');
+            let uglifyjs = require('uglify-es');
+            app.use(minify({
+                uglifyJsModule: uglifyjs,
+                sassMatch: false,
+                coffeeScriptMatch: false
+            }));
+        }
 
         //passport
         const session = require('express-session');
@@ -107,17 +140,24 @@ if (config_seed) {
         app.use(cookieParser());
         // result settings
 
-        const core = require(process.cwd() + '/core');
-        const share: any = core.share;
-        const config: any = share.config;
-        const Cipher: any = share.Cipher;
-        const event: any = share.Event;
-
         const services_config = share.services_config;
         const plugins_config = share.plugins_config;
         const applications_config = share.applications_config;
 
         const logger = share.logger;
+
+        if (config.status !== 'production') {
+            app.use(morgan('original', {immediate: true}));
+        } else {
+            const rotatestream = require('logrotate-stream');
+            app.use(morgan('combined', {
+                stream: rotatestream({
+                    file: __dirname + '/logs/access.log',
+                    size: '100k',
+                    keep: 3
+                })
+            }));
+        }
 
         app.use(express.static(path.join(__dirname, 'public')));
 
@@ -132,7 +172,7 @@ if (config_seed) {
 
         const MongoStore = require('connect-mongo')(session);
 
-        const options = {server: {socketOptions: {connectTimeoutMS: 1000000}}};
+        const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
 
         if (config.db.user) {
             mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
@@ -140,14 +180,14 @@ if (config_seed) {
             mongoose.connect("mongodb://" + config.db.address + "/" + config.db.name, options);
         }
 
-        process.on('uncaughtException', (error: any): void => {
-            console.log(error);
-            logger.error('Stop.   ' + error);
-        });
+   //     process.on('uncaughtException', (error: any): void => {
+   //         console.log(error);
+   //         logger.error('Stop.   ' + error);
+   //     });
 
-        process.on('exit', (code: number): void => {
-            logger.info('Stop.   ' + code);
-        });
+     //   process.on('exit', (code: number): void => {
+     //       logger.info('Stop.   ' + code);
+     //   });
 
         app.use(session({
             name: config.sessionname,
@@ -170,52 +210,21 @@ if (config_seed) {
         app.use(passport.session());
         //passport
 
-        /*
-         let load_module_sync = (root) => {
-         try {
-         let list = fs.readdirSync(root);
-         if (list) {
-         _.forEach(list, (name) => {
-         let stat = fs.lstatSync(root + name);
-         if (stat.isDirectory()) {
-         if (name != "common") {
-         if (name != "front") {
-         if (name.substr(1,1) != "_") {
-         try {
-         app.use("/" + name, require(root + name + "/api"));
-         app.use("/" + name, require(root + name + "/pages"));
-         } catch (e) {
-         console.log(e);
-         }
-         }
-         }
-         }
-         }
-         });
-         }
-         } catch (e) {
-         console.log(e);
-         }
-         };
-
-         //    load_module_sync("./server/systems/");
-         //    load_module_sync("./server/services/");
-         //    load_module_sync("./server/plugins/");
-         //    load_module_sync("./server/applications/");
-         */
-
-        let load_module = (root:string,config:any):void => {
-            if (config.modules) {
-                config.modules.forEach((module) => {
-                    let path = root + module.path;
-                    let name = module.name;
-                    app.use("/" + name, require(path + name + "/api"));
-                    app.use("/" + name, require(path + name + "/pages"));
-                });
-            }
+        let load_module = (root:string,modules:any):void => {
+                if (modules) {
+                    modules.forEach((module) => {
+                        let path = root + module.path;
+                        let name = module.name;
+                        app.use("/" + name, require(path + name + "/api"));
+                        app.use("/" + name, require(path + name + "/pages"));
+                    });
+                }
         };
 
-        load_module("./server", config);
+        load_module("./server", config.modules);
+        load_module("./server", services_config.modules);
+        load_module("./server", plugins_config.modules);
+        load_module("./server", applications_config.modules);
 
         // root
         if (applications_config.services) {
@@ -230,19 +239,6 @@ if (config_seed) {
                     share.Command.Backup(config.db);
                 }
             });
-        }
-
-        if (process.env.NODE_ENV !== 'production') {
-            app.use(morgan('original', {immediate: true}));
-        } else {
-            const rotatestream = require('logrotate-stream');
-            app.use(morgan('combined', {
-                stream: rotatestream({
-                    file: __dirname + '/logs/access.log',
-                    size: '100k',
-                    keep: 3
-                })
-            }));
         }
 
         // passport
@@ -322,18 +318,32 @@ if (config_seed) {
         // passport
 
         const auth: any = core.auth;
-        auth.create_init_user();
-        //auth.create_init_page();
+        auth.create_init_user(config.initusers);
+        auth.create_init_user(services_config.initusers);
+        auth.create_init_user(plugins_config.initusers);
+        auth.create_init_user(applications_config.initusers);
 
         const file: any = core.file;
-        file.create_init_files();
+        file.create_init_files(config.initfiles, (error, result) => {
+            file.create_init_files(services_config.initfiles, (error, result) => {
+                file.create_init_files(plugins_config.initfiles, (error, result) => {
+                    file.create_init_files(applications_config.initfiles, (error, result) => {
+
+                    });
+                });
+            });
+        });
 
         const resource: any = core.resource;
-        resource.create_init_resources(config.initresources);
-        resource.create_init_resources(services_config.initresources);
-        resource.create_init_resources(plugins_config.initresources);
-        resource.create_init_resources(applications_config.initresources);
+        resource.create_init_resources(config.initresources, (error, result) => {
+            resource.create_init_resources(services_config.initresources,(error, result) => {
+                resource.create_init_resources(plugins_config.initresources,(error, result) => {
+                    resource.create_init_resources(applications_config.initresources,(error, result) => {
 
+                    });
+                });
+            });
+        });
 
         //services
         const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
@@ -342,18 +352,18 @@ if (config_seed) {
         //services
 
         // DAV
-        if (config.dav) {
-            let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
-            let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
-            let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
-            jsDAV.createServer({
-                node: path.join(__dirname, 'public'),
-                locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
-                authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
-                realm: "jsdavtest"
-            }, 8001);
-            require('cozy-jsdav-fork/lib/CalDAV/plugin');
-        }
+    // //   if (config.dav) {
+     //       let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
+     //       let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
+     //       let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
+     //       jsDAV.createServer({
+     //           node: path.join(__dirname, 'public'),
+     //           locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
+     //           authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
+     //           realm: "jsdavtest"
+     //       }, 8001);
+     //       require('cozy-jsdav-fork/lib/CalDAV/plugin');
+     //   }
         // DAV
 
         // Slack Bot
@@ -380,7 +390,7 @@ if (config_seed) {
          */
         // Slack Bot
 
-        event.emitter.on('mail', (mail) => {
+        event.emitter.on('mail', (mail):void => {
             //       let a = mail;
         });
 
@@ -392,7 +402,7 @@ if (config_seed) {
                 (error) => {
                     let a = error;
                 },
-                (message, body) => {
+                (message, body):void => {
                     let a = message;
                     let subject = body.subject;
                     let text = body.text;
@@ -427,7 +437,21 @@ if (config_seed) {
             });
         });
 
-        event.emitter.on('socket', (data) => {
+        process.on('SIGINT', () :void => { // for pm2 cluster.
+            logger.info('Stop by SIGINT.');
+            process.exit( 0);
+        });
+
+        process.on('message', (msg) :void => {  // for pm2 cluster on windows.
+            if (msg == 'shutdown') {
+                logger.info('Stop by shutdown.');
+                setTimeout(function() {
+                    process.exit(0);
+                }, 1500);
+            }
+        });
+
+        event.emitter.on('socket', (data):void => {
 
         });
 
@@ -435,10 +459,6 @@ if (config_seed) {
         let Socket = require('./server/systems/common/sio');
         let io = new Socket.IO(server);
         io.wait(config, event);
-
-        //   event.emitter.on('auth', (param) => {
-        //      io.emit(param);
-        //  });
 
     };
 
@@ -457,7 +477,7 @@ if (config_seed) {
         app.use(express.static(path.join(__dirname, 'public')));
 
 
-        const core = require(process.cwd() + '/core');
+        const core = require(process.cwd() + '/gs');
         const share: any = core.share;
         const config: any = share.config;
 
@@ -546,6 +566,9 @@ function Serve(config, app: any): any {
             ? 'pipe ' + addr
             : 'port ' + addr.port;
         debug('Listening on ' + bind);
+
+        process.send = process.send || function () {};  // for pm2 cluster.
+        process.send('ready');
     }
 
     return server;

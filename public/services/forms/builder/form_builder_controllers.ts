@@ -89,8 +89,8 @@ const key_escape = /^(?!.*(\"|\\|\/|\.)).+$/;
 const tag_escape = /^(?!.*\u3040-\u30ff).+$/;
 const class_escape = /^(?!.*\u3040-\u30ff).+$/;
 
-FormBuilderControllers.controller('FormBuilderController', ["$scope","$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
-    function ($scope: any,$document:any, $log: any, $compile: any, $uibModal: any, FormBuilderService: any, ElementsService: any): void {
+FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
+    function ($scope: any, $document: any, $log: any, $compile: any, $uibModal: any, FormBuilderService: any, ElementsService: any): void {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -114,6 +114,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
         window.addEventListener('beforeunload', (e) => {
             if ($scope.opened) {
                 e.returnValue = '';
+                return '';
             }
         }, false);
 
@@ -133,7 +134,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
         });
 
         let editor = null;
-        $scope.aceLoaded =  (_editor:any):void => {
+        $scope.aceLoaded = (_editor: any): void => {
             editor = _editor;
             editor.setTheme("ace/theme/chrome");
             $scope.theme = 'chrome';
@@ -147,16 +148,16 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
         };
 
-        $scope.aceChanged =  (e:any):void => {
+        $scope.aceChanged = (e: any): void => {
             redraw_select();
         };
 
-        let changeElementContents = (contents:any): void => {
+        let changeElementContents = (contents: any): void => {
             $scope.contents = contents;
             redraw_select();
         };
 
-        let absolute_position = (target_element: any): {left: number, top: number} => {
+        let absolute_position = (target_element: any): { left: number, top: number } => {
             let left = 0;
             let top = 0;
             let element = target_element;
@@ -205,16 +206,16 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
         };
 
         let ElementOpen = (id: any): void => {
-           let element = FormBuilderService.Find(id);
-           if (element.length == 1) {
-               let modalRegist: any = $uibModal.open({
-                   controller: 'FormBuilderEditElementDialogController',
-                   templateUrl: '/forms/dialogs/elements/edit_element_dialog',
-                   resolve: {
-                       items: element[0]
-                   }
-               });
-           }
+            let element = FormBuilderService.Find(id);
+            if (element.length == 1) {
+                let modalRegist: any = $uibModal.open({
+                    controller: 'FormBuilderEditElementDialogController',
+                    templateUrl: '/forms/dialogs/elements/edit_element_dialog',
+                    resolve: {
+                        items: element[0]
+                    }
+                });
+            }
         };
 
         let ElementSelect = (id: any): void => {
@@ -298,7 +299,10 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
 
             modalRegist.result.then((dialog_scope): void => {
-                let new_tag = ElementsService.Tag(dialog_scope.tag, {class: "a", style: {"border-style": "solid", "border-color": "black", "border-width": "1px;"}});
+                let new_tag = ElementsService.Tag(dialog_scope.tag, {
+                    class: "a",
+                    style: {"border-style": "solid", "border-color": "black", "border-width": "1px;"}
+                });
                 FormBuilderService.AddElement(new_tag);
             }, (): void => {
             });
@@ -408,7 +412,11 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
 
             modalRegist.result.then((dialog_scope): void => {
-                let validator = {min: {value: dialog_scope.min.value, message: dialog_scope.min.message}, max: {value: dialog_scope.max.value, message: dialog_scope.max.message}, required: {value: dialog_scope.required.value, message: dialog_scope.required.message}};
+                let validator = {
+                    min: {value: dialog_scope.min.value, message: dialog_scope.min.message},
+                    max: {value: dialog_scope.max.value, message: dialog_scope.max.message},
+                    required: {value: dialog_scope.required.value, message: dialog_scope.required.message}
+                };
                 FormBuilderService.AddElement(ElementsService.TextArea(dialog_scope.key, validator));
             }, (): void => {
             });
@@ -425,7 +433,11 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
 
             modalRegist.result.then((dialog_scope): void => {
-                let validator = {min: {value: dialog_scope.min.value, message: ""}, max: {value: dialog_scope.max.value, message: ""}, step: {value: dialog_scope.step.value, message: ""}};
+                let validator = {
+                    min: {value: dialog_scope.min.value, message: ""},
+                    max: {value: dialog_scope.max.value, message: ""},
+                    step: {value: dialog_scope.step.value, message: ""}
+                };
                 FormBuilderService.AddElement(ElementsService.Number(dialog_scope.key, validator));
             }, (): void => {
             });
@@ -442,7 +454,11 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
 
             modalRegist.result.then((dialog_scope): void => {
-                let validator = {min: {value: dialog_scope.min.value, message: dialog_scope.min.message}, max: {value: dialog_scope.max.value, message: dialog_scope.max.message}, required: {value: dialog_scope.required.value, message: dialog_scope.required.message}};
+                let validator = {
+                    min: {value: dialog_scope.min.value, message: dialog_scope.min.message},
+                    max: {value: dialog_scope.max.value, message: dialog_scope.max.message},
+                    required: {value: dialog_scope.required.value, message: dialog_scope.required.message}
+                };
                 FormBuilderService.AddElement(ElementsService.HtmlElement(dialog_scope.key, validator));
             }, (): void => {
             });
@@ -476,12 +492,11 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
             });
 
             modalRegist.result.then((dialog_scope): void => {
-               let required = false;
-               if (dialog_scope.requiredmessage) {
-                   required = true;
-               }
-                let property = {contents: dialog_scope.contents, required: {value: required, message: dialog_scope.requiredmessage}};
-                FormBuilderService.AddElement(ElementsService.Select(dialog_scope.key, property));
+                let validator: any = {contents: dialog_scope.contents};
+                if (dialog_scope.required) {
+                    validator = {contents: dialog_scope.contents, required: {value: true, message: dialog_scope.required.message}};
+                }
+                FormBuilderService.AddElement(ElementsService.Select(dialog_scope.key, validator));
             }, (): void => {
             });
         };
@@ -708,7 +723,16 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope","$document"
                         parent: id,
 
                         label: id + "button",
-                        attributes: {class: "form-control", "ng-model": id, type: "text", name: id, style: {"font-size": "32px"}, "ng-maxlength": "50", "ng-minlength": "0", required: "true"},
+                        attributes: {
+                            class: "form-control",
+                            "ng-model": id,
+                            type: "text",
+                            name: id,
+                            style: {"font-size": "32px"},
+                            "ng-maxlength": "50",
+                            "ng-minlength": "0",
+                            required: "true"
+                        },
                         contents: [],
                         events: {onChange: ""}
                     }
@@ -1385,6 +1409,8 @@ FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', 
                 if (result) {
                     $scope.pages = result;
                 }
+                FormBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -1399,6 +1425,8 @@ FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', 
                 if (result) {
                     $scope.pages = result;
                 }
+                FormBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -1417,6 +1445,8 @@ FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', 
                 if (result) {
                     $scope.pages = result;
                 }
+                FormBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -1427,6 +1457,8 @@ FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', 
                 if (result) {
                     $scope.pages = result;
                 }
+                FormBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -1483,8 +1515,8 @@ FormBuilderControllers.controller('FormBuilderDeleteConfirmController', ['$scope
     }]);
 
 
-FormBuilderControllers.controller('FormBuilderEditElementDialogController', ['$scope', '$uibModal','$uibModalInstance','FormBuilderService', 'items',
-    ($scope: any,$uibModal, $uibModalInstance: any,FormBuilderService:any, items: any): void => {
+FormBuilderControllers.controller('FormBuilderEditElementDialogController', ['$scope', '$uibModal', '$uibModalInstance', 'FormBuilderService', 'items',
+    ($scope: any, $uibModal, $uibModalInstance: any, FormBuilderService: any, items: any): void => {
 
         $scope.control = items;
 
@@ -1499,7 +1531,6 @@ FormBuilderControllers.controller('FormBuilderEditElementDialogController', ['$s
         $scope.answer = (): void => {
             $uibModalInstance.close({});
         };
-
 
 
         $scope.ElementOpen = (id: any): void => {
@@ -1517,13 +1548,13 @@ FormBuilderControllers.controller('FormBuilderEditElementDialogController', ['$s
             }
 
 
-          /*      let modalRegist: any = $uibModal.open({
-                    controller: 'FormBuilderEditElementDialogController',
-                    templateUrl: '/forms/dialogs/elements/edit_element_dialog',
-                    resolve: {
-                        items: null
-                    }
-                }); */
+            /*      let modalRegist: any = $uibModal.open({
+             controller: 'FormBuilderEditElementDialogController',
+             templateUrl: '/forms/dialogs/elements/edit_element_dialog',
+             resolve: {
+             items: null
+             }
+             }); */
         };
 
     }]);

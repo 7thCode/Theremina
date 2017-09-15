@@ -11,23 +11,23 @@ export namespace BackOfficePageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const auth: any = core.auth;
     const exception: any = core.exception;
     const analysis: any = core.analysis;
 
     const config = share.config;
+    let message = config.message;
+
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
-
-    const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
 
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, auth.page_is_system, (request: any, response: any): void => {
         response.render("services/backoffice/index", {
             config: config,
             user: request.user,
-            message: "BackOffice",
+            message: message,
             status: 200,
             fonts: webfonts
         });

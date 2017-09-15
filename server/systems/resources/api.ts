@@ -4,8 +4,6 @@
  //opensource.org/licenses/mit-license.php
  */
 
-
-
 "use strict";
 
 export namespace ResourceApiRouter {
@@ -13,7 +11,7 @@ export namespace ResourceApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 

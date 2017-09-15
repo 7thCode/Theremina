@@ -11,7 +11,7 @@ export namespace ImageApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
@@ -20,7 +20,7 @@ export namespace ImageApiRouter {
     const FileModule: any = require(share.Server("systems/files/controllers/file_controller"));
     const file: any = new FileModule.Files();
 
-    router.get('/api/:userid/:name', file.get_file_name);
+    router.get('/api/:userid/:name', file.get_file);
 
 }
 

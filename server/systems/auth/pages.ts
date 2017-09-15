@@ -14,15 +14,9 @@ export namespace AuthPageRouter {
     const share = require('../common/share');
     const config = share.config;
 
-    const services_config = share.services_config;
     const applications_config = share.applications_config;
 
-    const webfonts: any[] = services_config.webfonts;
-
-    let message: any = config.messages.auth_dialogs;
-    if (applications_config.messages) {
-        message = applications_config.messages.auth_dialogs;
-    }
+    let message = config.message;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     const auth: any = new AuthController.Auth;
@@ -31,33 +25,31 @@ export namespace AuthPageRouter {
     const exception: any = new ExceptionController.Exception;
 
     router.get('/dialogs/registerdialog', [exception.page_catch, (request: any, response: any): void => {
-        response.render('systems/auth/dialogs/registerdialog', {messages: message.regist_dialog});
+        response.render('systems/auth/dialogs/registerdialog', {config: config, message: message});
     }]);
 
     router.get("/dialogs/registerconfirmdialog", [exception.page_catch, (request: any, response: any): void => {
-        response.render("systems/auth/dialogs/registerconfirmdialog", {messages: message.regist_confirm_dialog});
+        response.render("systems/auth/dialogs/registerconfirmdialog", {config: config, message: message});
     }]);
 
     router.get('/dialogs/memberdialog', [exception.page_guard, (request: any, response: any): void => {
-        response.render('systems/auth/dialogs/memberdialog', {messages: message.member_dialog});
+        response.render('systems/auth/dialogs/memberdialog', {config: config, message: message});
     }]);
 
     router.get("/dialogs/memberconfirmdialog", [exception.page_guard, (request: any, response: any): void => {
-        response.render("systems/auth/dialogs/memberconfirmdialog", {messages: message.member_confirm_dialog});
+        response.render("systems/auth/dialogs/memberconfirmdialog", {config: config, message: message});
     }]);
 
     router.get("/dialogs/logindialog", [exception.page_catch, (request: any, response: any): void => {
-        response.render("systems/auth/dialogs/logindialog", {
-            config: config, messages: message.login_dialog
-        });
+        response.render("systems/auth/dialogs/logindialog", {config: config, message: message});
     }]);
 
     router.get("/dialogs/passworddialog", [exception.page_catch, (request: any, response: any): void => {
-        response.render("systems/auth/dialogs/passworddialog", {user: request.user, messages: message.password_dialog});
+        response.render("systems/auth/dialogs/passworddialog", {user: request.user, message: message});
     }]);
 
     router.get("/dialogs/passwordconfirmdialog", [exception.page_catch, (request: any, response: any): void => {
-        response.render("systems/auth/dialogs/passwordconfirmdialog", {messages: message.password_confirm_dialog});
+        response.render("systems/auth/dialogs/passwordconfirmdialog", {config: config, message: message});
     }]);
 
 }

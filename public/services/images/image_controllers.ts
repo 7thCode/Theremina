@@ -40,14 +40,24 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
         };
 
-    //    $document.on('drop dragover', (e) => {
-    //        e.stopPropagation();
-    //        e.preventDefault();
-    //    });
-
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
+        };
+/*
         let to_mime: (filename: string) => string = (filename: string): string => {
             let mime: string = "";
             let nameparts: string[] = filename.split(".");
@@ -93,7 +103,7 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
             }
             return mime;
         };
-
+*/
         let Type = (mimetype): string => {
             let result = "";
             let nameparts: string[] = mimetype.split("/");
@@ -108,6 +118,8 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
             }, error_handler);
         };
 
@@ -125,6 +137,8 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -135,6 +149,8 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

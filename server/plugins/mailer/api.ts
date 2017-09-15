@@ -11,7 +11,7 @@ export namespace MailerApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const event: any = share.Event;
 
@@ -29,14 +29,6 @@ export namespace MailerApiRouter {
 
     event.emitter.on('mail', (mail) => {
         mailer.receive(mail);
-
-
-    //    const emitter = require('socket.io-emitter')("redis.host:6379");
-    //    emitter.auth("zz0101", () => {
-    //        emitter.emit('client', 'broadcasting');
-    //    })
-
-
     });
 
 }

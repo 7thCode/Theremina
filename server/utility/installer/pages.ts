@@ -13,11 +13,15 @@ export namespace InstallerPageRouter {
 
     const share = require(process.cwd() + '/server/systems/common/share');
 
+    const config = share.config;
     const services_config = share.services_config;
     const webfonts:any[] = services_config.webfonts;
 
+    let message = config.message;
+
+
     router.get("/", [(request: any, response: any): void => {
-        response.render("utility/installer/index", {user: null, message: "Installer", status: 200, fonts:webfonts});
+        response.render("utility/installer/index", {user: null, message: message, status: 200, fonts:webfonts});
     }]);
 }
 

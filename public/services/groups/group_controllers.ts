@@ -33,6 +33,8 @@ GroupControllers.controller('GroupController', ['$scope','$document', '$log', "$
         let Draw = () => {
             GroupService.Query((data) => {
                 $scope.groups = data;
+                GroupService.Over((hasnext) => {$scope.over = !hasnext;});
+                GroupService.Under((hasprev) => {$scope.under = !hasprev;});
             }, error_handler);
         };
 
@@ -124,6 +126,8 @@ GroupControllers.controller('GroupController', ['$scope','$document', '$log', "$
                 if (result) {
                     $scope.groups = result;
                 }
+                GroupService.Over((hasnext) => {$scope.over = !hasnext;});
+                GroupService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -134,6 +138,8 @@ GroupControllers.controller('GroupController', ['$scope','$document', '$log', "$
                 if (result) {
                     $scope.groups = result;
                 }
+                GroupService.Over((hasnext) => {$scope.over = !hasnext;});
+                GroupService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -143,6 +149,8 @@ GroupControllers.controller('GroupController', ['$scope','$document', '$log', "$
             if (name) {
                 GroupService.query = {name: {$regex: name}};
             }
+            GroupService.Over((hasnext) => {$scope.over = !hasnext;});
+            GroupService.Under((hasprev) => {$scope.under = !hasprev;});
             Draw();
         };
 

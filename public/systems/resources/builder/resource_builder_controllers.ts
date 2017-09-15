@@ -28,6 +28,7 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         window.addEventListener('beforeunload', (e) => {
             if (!editor.session.getUndoManager().isClean()) {
                 e.returnValue = '';
+                return '';
             }
         }, false);
 
@@ -70,9 +71,6 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
 
                 editor.container.addEventListener("drop", function (event) {
 
-                    //        let innerHTML = event.dataTransfer.getData('text/html');
-                    //        let hoge = 1;
-
                 });
 
             },
@@ -100,22 +98,22 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         };
 
         let OpenPreview = () => {
-            $scope.inner_preview = inner_peview;
-            if (inner_peview) {
-                let preview = window.document.getElementById("view");
-                document = preview.contentDocument;
-            } else {
-                preview_window = window.open("", "", "width=1024,height=800");
-                document = preview_window.document;
-            }
+      //      $scope.inner_preview = inner_peview;
+      //      if (inner_peview) {
+      //          let preview = window.document.getElementById("view");
+      //          document = preview.contentDocument;
+      //      } else {
+      //          preview_window = window.open("", "", "width=1024,height=800");
+      //          document = preview_window.document;
+      //      }
 
-            Draw(ResourceBuilderService.current.content.resource);
+      //      Draw(ResourceBuilderService.current.content.resource);
         };
 
         let ClosePreview = () => {
-            if (preview_window) {
-                document = preview_window.close();
-            }
+      //      if (preview_window) {
+      //          document = preview_window.close();
+      //      }
         };
 
         let Create = (): void => {
@@ -244,7 +242,7 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         $scope.Update = Update;
         $scope.Delete = Delete;
 
-        $scope.OpenPreview = OpenPreview;
+        //$scope.OpenPreview = OpenPreview;
 
         Query();
 
@@ -315,6 +313,8 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                ResourceBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -329,6 +329,8 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                ResourceBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -347,6 +349,8 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                ResourceBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -357,6 +361,8 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {$scope.over = !hasnext;});
+                ResourceBuilderService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

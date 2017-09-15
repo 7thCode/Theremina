@@ -27,6 +27,7 @@ export namespace AccountApiRouter {
     router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, accounts.get_account_query_query]);
     router.get('/api/count/:query', [exception.exception, exception.guard, exception.authenticate, accounts.get_account_count]);
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, auth.is_system, accounts.delete_own]);
+
 }
 
 module.exports = AccountApiRouter.router;

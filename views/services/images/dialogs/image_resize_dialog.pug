@@ -1,41 +1,57 @@
 div
     .modal-header
-        span.h5.modal-title Resize
+        span.modal-title #{message.deformation}
         span.pull-right
-            button.btn.btn-box-tool(type='button',ng-click='cancel()')
+            button.btn.btn-xs.btn-box-tool(type='button', ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+        div.h5 {{name}}
+    .modal-body
         .row
             .col-xs-12
                 .row
-                    .col-xs-6
+                    .col-xs-4
                         .box.box-info
                             .box-body
                                 .row.ng-form(name="validate")
                                     .col-xs-12
                                         .form-group
-                                            label.h6(for="ratio") Size Ratio
-                                            input.form-control.no-zoom#ratio(name="ratio" type="number" min=0.001 max=10 ng-model='ratio', ng-change="RatioChange();", required, placeholder="Ratio")
+                                            label.control-label(for="ratio") #{message.sizeratio}
+                                            input.form-control.no-zoom#ratio(name="ratio" type="number" min=5 max=200 step=5 ng-model='ratio', ng-change="SizeChange();", required, placeholder="Ratio")
                                     .col-xs-12
                                         .form-group
-                                            label.h6(for="aspect") W/H Ratio
-                                            input.form-control.no-zoom#aspect(name="aspect" type="number" min=0.001 max=10 ng-model='aspect', ng-change="RatioChange();" required placeholder="W/H")
-                    .col-xs-6
-                        .box.box-info
+                                            label.control-label(for="aspect") #{message.aspect}
+                                            input.form-control.no-zoom#aspect(name="aspect" type="number" min=0.1 max=10.0 step=0.1 ng-model='aspect', ng-change="SizeChange();" required placeholder="W/H")
+                                    .col-xs-12
+                                        .form-group
+                                            label.control-label(for="brightness") #{message.brightness}
+                                            input.form-control.no-zoom#brightness(name="brightness" type="number" min=-255 max=255 step=1 ng-model='brightness', ng-change="SizeChange();" required placeholder="brightness")
+
+                    .col-xs-8
+                        .box.box-success
                             .box-body
                                 .row
-                                    .col-xs-4.col-xs-offset-4(style="font-size:2rem;") W: {{width}}
-                                    .col-xs-4.col-xs-offset-4(style="font-size:2rem;") H: {{height}}
+                                    .col-xs-4.col-xs-offset-2.h7 W: {{width| number:0}}
+                                    .col-xs-4.h7 H: {{height| number:0}}
                                 .row
-                                    .col-xs-12
-                                        img.img-responsive(ng-src="{{image}}")
-
+                                    .col-xs-12(style="position: relative;height:300px;")
+                                        img.img-responsive(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
+        .row
+            .col-xs-12
+                .progress(ng-show="progress")
+                    .progress-bar.progress-bar-striped.active(role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%")
+        .row
             .col-xs-12
                 include ../../../systems/common/error_message
     .modal-footer
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") Cancel
-                    button.btn.btn-info(type="button", ng-click='no();',ng-disabled="progress", aria-label="") No Resize
-                    button.btn.btn-primary(type="button" ,ng-click='answer();',ng-disabled="progress || validate.$invalid", aria-label="") Resize
+                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") #{message.cancel}
+                    //button.btn.btn-info(type="button", ng-click='no();', ng-disabled="progress || deformation", aria-label="") No Deformation
+                    button.btn.btn-primary(type="button", ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}
+
+                    button.btn.btn-info(type="button", ng-click='Rotate(1);', ng-disabled="progress || validate.$invalid", aria-label="")
+                        i.fa.fa-rotate-right
+                // button.btn.btn-info(type="button", ng-click='Rotate(-1);', ng-disabled="progress || validate.$invalid", aria-label="")
+                //     i.fa.fa-rotate-right
+

@@ -1,13 +1,13 @@
 .box.box-danger.pallete-shadow.pallete-background(draggablepane="attribute",style="width:auto;height:auto;left:240px;top:500px;")
     .box-header.with-border
-        .h6 Attribute
+        .h6 #{message.attribute}
         .box-tools.pull-right
-            button.btn.btn-box-tool(type='button', data-widget='collapse')
+            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                 i.fa.fa-minus
     .box-body
         .row
             .col-xs-6
-                div Name:{{name}}
+                div #{message.name}:{{name}}
             .col-xs-6
                 div(ng-bind="newid")
         .row
@@ -18,19 +18,15 @@
                             .box.box-warning
                                 .box-body
                                     div(ng-show="selected_element_type == 'select'")
-                                        label(for="element_contents") element_contents
+                                        label.control-label(for="element_contents") #{message.element_contents}
                                         chips(ng-model='tab.element_contents',style="height: 36px;", ng-change="contents_update(tab.element_contents);")
                                             chip-tmpl
                                                 .default-chip {{chip}}
                                                     span.fa.fa-times(remove-chip='')
                                             input#element_contents(name="element_contents",style="background-color:transparent;" chip-control)
 
-                                    //label(for="element_contents") content
-                                    //textarea.form-control.no-zoom#element_contents(type="text", ng-model="tab.element_contents", ng-change="contents_update(tab.element_contents);")
                                     div(ng-show="selected_element_type != 'select'")
                                         .pad
-                                            //textarea.textarea(ng-model="tab.element_contents", ng-change="contents_update(tab.element_contents);", style="width: 100%; height: 200px; font-size: 1.4vw; line-height: 18px; border: 1px solid #dddddd; padding: 10px;")
-                                            //div.textarea(ui-ace="aceOption", ng-model='tab.element_contents', style="height: 200px;")
                                             div(ui-ace="{useWrapMode : true,mode: 'html',onLoad: aceLoaded,onChange: aceChanged}", ng-model='tab.element_contents', style="height: 200px;", ng-change="changeElementContents(tab.element_contents)")
 
                         uib-tab(id="Attributes",heading="Attributes" role='tabpanel')
@@ -42,7 +38,7 @@
                                         tr(ng-repeat="(key,value) in attributes")
                                             td
                                                 button.btn.btn-xs.btn-danger.pull-right(ng-click="remove_attribute(key);", ng-disabled="key == 'style' || key == 'ng-click' ") x
-                                                label(style="font-size:0.4vw;") {{key}}
+                                                label.control-label(style="font-size:0.4vw;") {{key}}
                                                 input.form-control.no-zoom(type="text", ng-model="value", ng-change="attribute_value_update(key,value);", ng-disabled="key == 'style' || key == 'ng-click' ")
 
                         uib-tab(id="Style",heading="Style" role='tabpanel')
@@ -54,5 +50,5 @@
                                         tr(ng-repeat="(key,value) in items")
                                             td
                                                 button.btn.btn-xs.btn-danger.pull-right(ng-click="remove_style(key);", ng-disabled="key == 'cursor'") x
-                                                label(style="font-size:0.4vw;") {{key}}
+                                                label.control-label(style="font-size:0.4vw;") {{key}}
                                                 input.form-control.no-zoom(type="text" ng-model="value" ng-change="style_value_update(key,value);", ng-disabled="key == 'cursor'")

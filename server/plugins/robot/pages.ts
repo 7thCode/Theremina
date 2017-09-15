@@ -11,7 +11,7 @@ export namespace RobotPageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const auth: any = core.auth;
     const share: any = core.share;
     const exception: any = core.exception;
@@ -20,11 +20,13 @@ export namespace RobotPageRouter {
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
+    let message = config.message;
+
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
         response.render("plugins/robot/index", {
             config: config,
             user: request.user,
-            message: "Robot",
+            message: message,
             status: 200,
             fonts: webfonts
         });

@@ -25,7 +25,6 @@ namespace Install {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
-                window.alert(message);
             };
 
             let Draw = (): void => {

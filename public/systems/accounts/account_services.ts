@@ -9,7 +9,7 @@
 let AccountServices: angular.IModule = angular.module('AccountServices', []);
 
 AccountServices.factory('Account', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/accounts/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -18,14 +18,14 @@ AccountServices.factory('Account', ['$resource',
     }]);
 
 AccountServices.factory('AccountQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/accounts/api/query/:query/:option', {query: '@query', option: '@option'}, {
             query: {method: 'GET'}
         });
     }]);
 
 AccountServices.factory('AccountCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/accounts/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -43,11 +43,8 @@ AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCou
         };
 
         let init = () => {
-            this.pagesize = 25;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
-
         };
 
         this.Init = () => {
@@ -62,20 +59,20 @@ AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCou
             CollectionService.Count(AccountCount, this.query, callback, error);
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -86,7 +83,7 @@ AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCou
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

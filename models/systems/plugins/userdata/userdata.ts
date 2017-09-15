@@ -17,8 +17,6 @@ module.exports = exports = function UserDataPlugin(schema: any, options: any) {
 
     // schema.index({name: 1});
 
-    schema.index({namespace: 1,name: 1, userid: 1, type: 1, version: 1}, {unique: true, index: true});
-
     schema.pre('save', function (next: any) {
         if (!this.userid) {
             this.userid = "";

@@ -12,7 +12,7 @@ export namespace ApiAiModule {
 
     const apiai = require('apiai-promise');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config = share.config;
     const Wrapper = share.Wrapper;

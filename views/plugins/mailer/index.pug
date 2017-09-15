@@ -1,15 +1,13 @@
 extends ../../backoffice_layout
 
 block content
-    section.content-header
-        .h5.text-gray Mailer
     section.content(ng-controller="MailerController")
         include partial/navbar
         .box.box-info
             .box-header.with-border
                 div
                     .box-tools.pull-right
-                        button.btn.btn-sm.btn-box-tool(type='button', data-widget='collapse')
+                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                             i.fa.fa-minus
             .box-body
                 .row
@@ -17,7 +15,7 @@ block content
                         button.btn.btn-danger(type="button", ng-click='SendMail();' aria-label="" style="margin:10px;") Create Mail...
                     .col-xs-12
                         .input-group(style="margin:0 10px;")
-                            span.input-group-addon find
+                            span.input-group-addon #{message.find}
                             input.form-control.no-zoom(ng-model='send_find_name', name="send_find_name", type='text', ng-maxlength="30", placeholder='Name', ng-change="SendFind(send_find_name);")
                             span.input-group-btn
                                 button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="SendNext()", ng-disabled="over")
@@ -47,7 +45,7 @@ block content
                                             i.fa.fa-trash(style="font-size:12px;color:#d9534f;")
                     .col-xs-12
                         .input-group(style="margin:0 10px;")
-                            span.input-group-addon find
+                            span.input-group-addon #{message.find}
                             input.form-control.no-zoom(ng-model='receive_find_name', name="receive_find_name", type='text', ng-maxlength="30", placeholder='Name', ng-change="ReceiveFind(receive_find_name);")
                             span.input-group-btn
                                 button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="ReceiveNext()", ng-disabled="over")

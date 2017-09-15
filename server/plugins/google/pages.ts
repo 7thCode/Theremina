@@ -11,13 +11,22 @@ export namespace GooglePageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const auth: any = core.auth;
     const share: any = core.share;
+    const exception: any = core.exception;
+
+    const config: any = share.config;
+    let message = config.message;
+
+    const services_config = share.services_config;
+    const webfonts:any[] = services_config.webfonts;
     const plugins_config = share.plugins_config;
+
     if (plugins_config.google_api) {
         const GoogleModule: any = require(share.Server("plugins/google/controllers/google_controller"));
-        const google: any = new GoogleModule.Google(plugins_config.google_api.calendar);
+        const calendar: any = new GoogleModule.Calendar(plugins_config.google_api.calendar);
+
 
         //step1
         router.get('/auth', (request: any, response: any): void => {
@@ -25,9 +34,9 @@ export namespace GooglePageRouter {
             if (user) {
                 if (user.tokens) {
                     let tokens = user.tokens.google_calendar_token;
-                    google.authorize(tokens, (client: any, tokens: any): void => {
+                    calendar.authorize(tokens, (client: any, tokens: any): void => {
                         if (client) {
-                            google.analytics(client, (error: any, result: string): void => {
+                            calendar.analytics(client, (error: any, result: string): void => {
                                 if (!error) {
                                     response.send(result);
                                 } else {
@@ -47,7 +56,7 @@ export namespace GooglePageRouter {
                         }
                     });
                 } else {
-                    let url: string = google.authorize_url(['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar', "https://www.googleapis.com/auth/analytics.readonly"]);
+                    let url: string = calendar.authorize_url(['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar', "https://www.googleapis.com/auth/analytics.readonly"]);
                     response.redirect(url);
                 }
             } else {
@@ -58,13 +67,13 @@ export namespace GooglePageRouter {
         //step2
         router.get('/callback', (request: any, response: any): void => {
             let code = request.query.code;
-            google.authorize_callback(code, (client: any, tokens: any): void => {
+            calendar.authorize_callback(code, (client: any, tokens: any): void => {
                 if (client) {
                     let user = request.session.req.user;
                     if (user) {
                         user.tokens = {google_calendar_token: tokens};
                         request.session.save();
-                        google.analytics(client, (error: any, result: string): void => {
+                        calendar.analytics(client, (error: any, result: string): void => {
                             if (!error) {
                                 response.send(JSON.stringify(result));
                             } else {
@@ -83,6 +92,16 @@ export namespace GooglePageRouter {
                 }
             });
         });
+
+        router.get('/', [exception.page_guard, auth.page_valid, (request: any, response: any, next: any) => {
+            response.render("plugins/google/index", {
+                config: config,
+                user: request.user,
+                message: message,
+                status: 200,
+                fonts: webfonts
+            });
+        }]);
     }
 
 }

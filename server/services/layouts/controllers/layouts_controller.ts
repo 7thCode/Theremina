@@ -13,7 +13,7 @@ export namespace LayoutsModule {
 
     const mongoose = require('mongoose');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config = share.config;
     const Wrapper = share.Wrapper;
@@ -422,16 +422,19 @@ export namespace LayoutsModule {
                 let document = Wrapper.Parse(layout.content.text);
 
                 let servercanvas = new ServerModule.StubCanvas(document.width, document.height);
-                fs.mkdir(tmp_path, () => {
+                let original_mask = process.umask(0);
+                fs.mkdir(tmp_path,'0777', () => {
                     let adaptor = new AdaptorModule.SVGAdaptor(document.width, document.height, true, webfonts);
                     let canvas: ShapeEdit.Canvas = new ShapeEditModule.Canvas(servercanvas, null, plugins, adaptor, false);
                     ShapeEditModule.Canvas.Load(canvas, document, handlers);
                     canvas.ToSVG((error: any): void => {
                         if (!error) {
                             fs.writeFile(tmp_path + tmp_file, adaptor.Write(), (error) => {
+                                process.umask(original_mask);
                                 Wrapper.SendSuccess(response, {});
                             });
                         } else {
+                            process.umask(original_mask);
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
@@ -458,7 +461,8 @@ export namespace LayoutsModule {
                 let document = Wrapper.Parse(layout.content.text);
 
                 let servercanvas = new ServerModule.StubCanvas(document.width, document.height);
-                fs.mkdir(tmp_path, () => {
+                let original_mask = process.umask(0);
+                fs.mkdir(tmp_path,'0777', () => {
                     //{size: 'A4', margin: 0, layout: 'portrait'}
                     let adaptor = new AdaptorModule.PDFAdaptor(tmp_path, format);
                     let canvas: ShapeEdit.Canvas = new ShapeEditModule.Canvas(servercanvas, null, plugins, adaptor, false);
@@ -468,10 +472,12 @@ export namespace LayoutsModule {
                             let writer = fs.createWriteStream(tmp_path + tmp_file);
                             doc.pipe(writer);
                             writer.on('finish', (): void => {
+                                process.umask(original_mask);
                                 Wrapper.SendSuccess(response, {});
                             });
                             doc.end();
                         } else {
+                            process.umask(original_mask);
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });

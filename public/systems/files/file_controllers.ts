@@ -53,13 +53,23 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
         };
 
-    //    $document.on('drop dragover', (e) => {
-    //        e.stopPropagation();
-    //        e.preventDefault();
-    //    });
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
+        };
 
         let Type = (mimetype): string => {
             let result = "";
@@ -75,6 +85,8 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
             }, error_handler);
         };
 
@@ -92,6 +104,8 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -102,6 +116,8 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {$scope.over = !hasnext;});
+                FileService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -157,6 +173,17 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
             Draw();
         };
 
+        let Upload = (files: any): void => {
+            progress(true);
+            let fileReader: any = new FileReader();
+            fileReader.onload = (event: any): void => {
+                FileService.Upload(event.target.result, files[0].name, (result: any) => {
+                    progress(false);
+                }, error_handler);
+            };
+            fileReader.readAsDataURL(files[0].file);
+        };
+
         $scope.Type = Type;
         $scope.Count = Count;
         $scope.Next = Next;
@@ -164,6 +191,7 @@ FileControllers.controller('FileController', ['$scope', '$uibModal', '$q', '$doc
         $scope.createFile = createFile;
         $scope.deleteFile = deleteFile;
         $scope.Find = Find;
+        $scope.Upload = Upload;
 
         Draw();
     }]);

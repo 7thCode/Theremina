@@ -6,11 +6,11 @@
 
 "use strict";
 
-// Socket.IO
-const socketio = require('socket.io');
-const _ = require("lodash");
-
 export namespace Socket {
+
+    // Socket.IO
+    const socketio = require('socket.io');
+    const _ = require("lodash");
 
     export class IO {
 
@@ -23,7 +23,7 @@ export namespace Socket {
         }
 
         public wait(event):void {
-            //sio.set('transports', ['websocket']);
+
             this.sio.sockets.on('connection', (socket) => {
 
                 this.socket = socket;

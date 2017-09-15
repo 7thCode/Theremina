@@ -11,7 +11,7 @@ namespace AuthServicesModule {
     let AuthServices: angular.IModule = angular.module('AuthServices', []);
 
     AuthServices.factory('Profile', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/profile/api', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'},
@@ -19,35 +19,35 @@ namespace AuthServicesModule {
         }]);
 
     AuthServices.factory('Register', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/auth/local/register', {}, {
                 regist: {method: 'POST'}
             });
         }]);
 
     AuthServices.factory('Member', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/auth/local/member', {}, {
                 regist: {method: 'POST'}
             });
         }]);
 
     AuthServices.factory('Login', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/auth/local/login', {}, {
                 login: {method: 'POST'}
             });
         }]);
 
     AuthServices.factory('Password', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/auth/local/password', {}, {
                 change: {method: 'POST'}
             });
         }]);
 
     AuthServices.factory('Logout', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/auth/logout', {}, {
                 logout: {method: 'POST'}
             });

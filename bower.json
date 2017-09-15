@@ -1,6 +1,6 @@
 {
   "name": "base",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "authors": [
     "<oda.mikio@gmail.com>"
   ],
@@ -23,7 +23,7 @@
     "angular-resource": "~1.6.1",
     "angular-sanitize": "^1.6.1",
     "angular-i18n": "^1.6.1",
-    "angular-bootstrap": "^2.0.0",
+    "angular-bootstrap": "^2.5.0",
     "font-awesome": "^4.6.3",
     "bootstrap": "^3.3.7",
     "angulartics": "^1.1.2",
@@ -40,6 +40,7 @@
     "imagehover.css": "*",
     "angular-loading-bar": "^0.9.0",
     "cryptico": "*",
-    "textAngular": "^1.5.16"
+    "textAngular": "^1.5.16",
+    "js-load-image-bower": "^2.6.1"
   }
 }

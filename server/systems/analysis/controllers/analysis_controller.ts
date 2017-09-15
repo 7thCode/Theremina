@@ -14,7 +14,6 @@ export namespace AnalysisModule {
     const config = share.config;
     const Wrapper = share.Wrapper;
     const Memory = share.Memory;
-    //  const logger = share.logger;
 
     const QueueModel: any = require(share.Models("systems/queues/queue"));
 

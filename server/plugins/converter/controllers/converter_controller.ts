@@ -9,11 +9,11 @@
 export namespace ConverterModule {
 
     const fs = require('graceful-fs');
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     const mongoose = require('mongoose');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
     const Wrapper = share.Wrapper;
@@ -73,8 +73,10 @@ export namespace ConverterModule {
                 let filename = request.params.filename;
                 let tmp_path = '/tmp/' + request.sessionID;
                 let tmp_file = '/' + filename;
-                fs.mkdir(tmp_path, () => {
+                let original_mask = process.umask(0);
+                fs.mkdir(tmp_path,'0777', () => {
                     workbook.xlsx.writeFile(tmp_path + tmp_file).then(function () {
+                        process.umask(original_mask);
                         Wrapper.SendSuccess(response, {});
                     });
                 });

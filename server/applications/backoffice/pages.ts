@@ -11,7 +11,7 @@ export namespace BackofficePageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const auth: any = core.auth;
     const exception: any = core.exception;
@@ -20,12 +20,10 @@ export namespace BackofficePageRouter {
     const services_config = share.services_config;
     const webfonts:any[] = services_config.webfonts;
 
-    // router.get("/",[exception.page_guard, auth.page_valid, auth.page_is_system, (request:any, response:any):void => {
-    //     response.render("services/backoffice/index", {user: request.user, message: "BackOffice", status: 200});
-    // }]);
+    let message = config.message;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
-        response.render("services/backoffice/index", {config:config, user: request.user, message: "BackOffice", status: 200, fonts:webfonts});
+        response.render("services/backoffice/index", {config:config, user: request.user, message: message, status: 200, fonts:webfonts});
     }]);
 }
 

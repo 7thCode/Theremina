@@ -23,7 +23,22 @@ MailerControllers.controller('MailerController', ['$scope', '$document', '$log',
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         window.addEventListener('beforeunload', (e) => {
@@ -292,7 +307,6 @@ MailerControllers.controller('SendMailDialogController', ['$scope', '$log', '$ui
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
         };
 
         $scope.sender = items.sender;
@@ -302,17 +316,17 @@ MailerControllers.controller('SendMailDialogController', ['$scope', '$log', '$ui
         let formname =  items.formname;
         let article =  items.article;
 
+        /*
         if ((userid + formname) != "") {
             ArticleService.RenderFragment(userid, formname, article, (result: any): void => {
                 $scope.$evalAsync(   // $apply
                     function ($scope) {
                         $scope.doc = result.resource;
-
-                        // $scope.doc = '<DIV><DIV style="background:#e8e8e8;text-align:center;"  align="center" ><DIV style="margin:0 auto;padding:30px 0 15px;width:540px;" > <DIV style="background:#ffffff;border-radius:4px;border:1px solid #d4d4d4;font-size:14px;margin:0 auto;text-align:left;width:540px;"  align="left" > <DIV style="color:#222;margin:0 auto;padding:40px 0;width:460px;" ><TABLE><TBODY><TR><TD>件名：【○○おまかせネット】ご紹介企業様の選定結果について。</TD></TR><TR><TD></TD></TR><TR><TD>○○様</TD></TR><TR><TD></TD></TR><TR><TD>お世話になっております。</TD></TR><TR><TD>おまかせネット受付窓口の○○と申します。</TD></TR><TR><TD></TD></TR><TR><TD>先日は、「○○おまかせネット」にお問い合わせいただきまして、誠にありがとうございました。</TD></TR><TR><TD>本日は、ご紹介企業様の選定結果をご連絡させていただきました。</TD></TR><TR><TD></TD></TR><TR><TD>お問い合わせ内容を基に、○○様にサービスをご提供いただける企業様をお探しいたしましたが、</TD></TR><TR><TD>弊社と提携している企業様では、エリアや条件などの問題で、</TD></TR><TR><TD>ご紹介できる企業様を見つけることができませんでした。</TD></TR><TR><TD></TD></TR><TR><TD>企業様の選定にお時間をいただきましたが、</TD></TR><TR><TD>このような結果となり、○○様のお力になれず申し訳ございません。</TD></TR><TR><TD></TD></TR><TR><TD>弊社では、引き続きお客様に喜んでいただけるサービスを提供できるよう</TD></TR><TR><TD>サービスの向上に努めてまいります。</TD></TR><TR><TD></TD></TR><TR><TD>またの機会がございましたら、</TD></TR><TR><TD>弊社サービスを何卒よろしくお願い申し上げます。</TD></TR> </TBODY></TABLE></DIV></DIV></DIV></DIV></DIV>';
                     }
                 );
             }, error_handler);
         }
+        */
 
         $scope.hide = (): void => {
             $uibModalInstance.close();

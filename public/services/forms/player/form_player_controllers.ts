@@ -194,7 +194,6 @@ FormPlayerControllers.controller('FormPlayerCreateDialogController', ['$scope', 
 
     }]);
 
-
 FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'FormPlayerService',
     ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, FormPlayerService: any): void => {
 
@@ -217,6 +216,8 @@ FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$
             FormPlayerService.SetQuery(null);
             FormPlayerService.Query((value: any): void => {
                 $scope.pages = value;
+                FormPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -231,6 +232,8 @@ FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$
                 if (result) {
                     $scope.pages = result;
                 }
+                FormPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -241,6 +244,8 @@ FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$
                 if (result) {
                     $scope.pages = result;
                 }
+                FormPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -251,6 +256,8 @@ FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$
                 if (result) {
                     $scope.pages = result;
                 }
+                FormPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                FormPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

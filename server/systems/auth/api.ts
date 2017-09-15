@@ -48,11 +48,9 @@ export namespace AuthApiRouter {
     router.get('/instagram', passport.authenticate("instagram"));
     router.get('/instagram/callback', passport.authenticate("instagram", {failureRedirect: '/'}), auth.auth_instagram_callback);
 
-
     // line
     router.get('/line', passport.authenticate('line'));
     router.get('/line/callback', passport.authenticate('line', {failureRedirect: '/'}), auth.auth_line_callback);
-
 
 }
 

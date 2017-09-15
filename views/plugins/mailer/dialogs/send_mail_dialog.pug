@@ -4,7 +4,7 @@ div
         span.pull-right
             button.btn.btn-xs.btn-box-tool(type='button',ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
@@ -21,7 +21,7 @@ div
                             .col-xs-12
                                 label.h6(for="subject") subject
                                 span(ng-messages="validate.subject.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
+                                    span.error-message(ng-message="required") #{message.required}
                                 input.form-control.no-zoom#subject(ng-model="subject", type="text", name='subject', required)
 
                             .col-xs-12

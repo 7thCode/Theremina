@@ -7,7 +7,7 @@
 "use strict";
 
 let Application: any = angular.module('Application', [
-    'ngMessages', "ngResource", 'ngAnimate','ngSanitize',
+    'ngMessages', "ngResource", 'ngAnimate','ngSanitize','ui.bootstrap',
     'Services',
     "Controllers"
 ]);

@@ -10,8 +10,8 @@ namespace Setting {
 
     let SettingControllers: angular.IModule = angular.module('SettingControllers', ["ngResource"]);
 
-    SettingControllers.controller('SettingController', ['$scope', '$document', '$log', 'ApplicationSettingService', 'PluginsSettingService', 'ServicesSettingService', 'SystemSettingService', 'BackupService', 'RestoreService',
-        ($scope: any, $document: any, $log: any, ApplicationSettingService: any, PluginsSettingService: any, ServicesSettingService: any, SystemSettingService: any, BackupService: any, RestoreService: any): void => {
+    SettingControllers.controller('SettingController', ['$scope', '$document', '$log', '$uibModal', 'ApplicationSettingService', 'PluginsSettingService', 'ServicesSettingService', 'SystemSettingService', 'BackupService', 'RestoreService',
+        ($scope: any, $document: any, $log: any, $uibModal: any, ApplicationSettingService: any, PluginsSettingService: any, ServicesSettingService: any, SystemSettingService: any, BackupService: any, RestoreService: any): void => {
 
             let progress = (value: any): void => {
                 $scope.$emit('progress', value);
@@ -25,7 +25,22 @@ namespace Setting {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
-                window.alert(message);
+                alert(message);
+            };
+
+            let alert = (message): void => {
+                let modalInstance: any = $uibModal.open({
+                    controller: 'AlertDialogController',
+                    templateUrl: '/common/dialogs/alert_dialog',
+                    resolve: {
+                        items: (): any => {
+                            return message;
+                        }
+                    }
+                });
+                modalInstance.result.then((answer: any): void => {
+                }, (): void => {
+                });
             };
 
             $document.on('drop dragover', (e: any): void => {
@@ -34,17 +49,36 @@ namespace Setting {
             });
 
             let Backup = (): void => {
-                progress(true);
-                BackupService.Put((result): void => {
-                    progress(false);
-                },error_handler);
+                let modalRegist: any = $uibModal.open({
+                    controller: 'BackupConfirmController',
+                    templateUrl: '/setting/dialogs/backup_confirm_dialog',
+                    resolve: {
+                        items: (): any => {
+                            return null;
+                        }
+                    }
+                });
+
+                modalRegist.result.then((content): void => {
+                }, (): void => {
+                });
             };
 
             let Restore = (): void => {
-                progress(true);
-                RestoreService.Put((result): void => {
-                    progress(false);
-                },error_handler);
+                let modalRegist: any = $uibModal.open({
+                    controller: 'RestoreConfirmController',
+                    templateUrl: '/setting/dialogs/restore_confirm_dialog',
+                    resolve: {
+                        items: (): any => {
+                            return null;
+                        }
+                    }
+                });
+
+                modalRegist.result.then((content): void => {
+                }, (): void => {
+                });
+
             };
 
             let Draw = (): void => {
@@ -101,4 +135,77 @@ namespace Setting {
             Draw();
 
         }]);
+
+    SettingControllers.controller('BackupConfirmController', ['$scope', '$log', '$uibModalInstance', 'items', 'BackupService',
+        ($scope: any, $log: any, $uibModalInstance: any, items: any, BackupService: any): void => {
+
+            let progress = (value: any): void => {
+                $scope.$emit('progress', value);
+            };
+
+            $scope.$on('progress', (event: any, value: any): void => {
+                $scope.progress = value;
+            });
+
+            let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+                progress(false);
+                $scope.message = message;
+                $log.error(message);
+            };
+
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.answer = (): void => {
+                progress(true);
+                BackupService.Put((result): void => {
+                    progress(false);
+                    $uibModalInstance.close({});
+                }, error_handler);
+            };
+
+        }]);
+
+    SettingControllers.controller('RestoreConfirmController', ['$scope', '$log', '$uibModalInstance', 'items', 'RestoreService',
+        ($scope: any, $log: any, $uibModalInstance: any, items: any, RestoreService: any): void => {
+
+            let progress = (value: any): void => {
+                $scope.$emit('progress', value);
+            };
+
+            $scope.$on('progress', (event: any, value: any): void => {
+                $scope.progress = value;
+            });
+
+            let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+                progress(false);
+                $scope.message = message;
+                $log.error(message);
+                window.alert(message);
+            };
+
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.answer = (): void => {
+                progress(true);
+                RestoreService.Put($scope.password,(result): void => {
+                    progress(false);
+                    $uibModalInstance.close({});
+                }, error_handler);
+            };
+
+        }]);
 }
+
+

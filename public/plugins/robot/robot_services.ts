@@ -9,7 +9,7 @@
 let RobotServices = angular.module('RobotServices', []);
 
 RobotServices.factory('Robot', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/robot/api/xpath/:url/:path', {url: "@url", path: "@path"}, {});
     }]);
 

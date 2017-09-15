@@ -1,18 +1,18 @@
 div
     .modal-header
-        span.h5.modal-title Chips
-    .modal-body.noto
+        span.h5.modal-title #{message.chips}
+    .modal-body
         .row.row-padded
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
                         .col-xs-12
                             .form-group
-                                label(for="name") Key
+                                label(for="name") #{message.key}
                                 span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") 必須です
-                                    span.error-message(ng-message="maxlength") もう少し短く
-                                    span.error-message(ng-message="pattern") その文字を含むことはできません
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                    span.error-message(ng-message="pattern") #{message.invalid}
                                 input.form-control.no-zoom#name(tabindex="1" ng-model="key", type="text", name='title', required, ng-maxlength="50", ng-pattern="key_escape")
 
             .col-xs-12.text-center
@@ -22,5 +22,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

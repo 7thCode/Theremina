@@ -9,12 +9,12 @@
 let LayoutServices: angular.IModule = angular.module('LayoutServices', []);
 
 LayoutServices.factory('LayoutCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/layout/create', {}, {});
     }]);
 
 LayoutServices.factory('Layout', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/layout/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -23,24 +23,24 @@ LayoutServices.factory('Layout', ['$resource',
     }]);
 
 LayoutServices.factory('LayoutPDF', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/layout/pdf', {}, {});
     }]);
 
 LayoutServices.factory('LayoutSVG', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/layout/svg', {}, {});
     }]);
 
 LayoutServices.factory('LayoutQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/layouts/layout/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 LayoutServices.factory('LayoutCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/layout/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -58,9 +58,7 @@ LayoutServices.service('LayoutService', [ '$log', "LayoutCreate", "Layout", 'Lay
         };
 
         let init = () => {
-            this.pagesize = 12;
-
-            this.option = {sort: {modify: -1}, limit: this.pagesize, skip: 0};
+            this.option = {sort: {modify: -1}, limit: 40, skip: 0};
             this.SetQuery(null);
 
             this.count = 0;
@@ -122,20 +120,20 @@ LayoutServices.service('LayoutService', [ '$log', "LayoutCreate", "Layout", 'Lay
             });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -146,7 +144,7 @@ LayoutServices.service('LayoutService', [ '$log', "LayoutCreate", "Layout", 'Lay
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

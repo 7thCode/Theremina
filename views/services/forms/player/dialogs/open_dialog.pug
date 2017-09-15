@@ -1,15 +1,8 @@
 div
     .modal-header
-        span.h5.modal-title Forms
-
+        span.h5.modal-title #{message.form}
         include ../../../../systems/common/next_prev
-        //span.pull-right
-            button.btn.btn-info(style="border-radius:6px 0 0 6px;", ng-click="Next()")
-                i.fa.fa-chevron-down
-            button.btn.btn-default(style="border-radius:0 6px 6px 0;",ng-click="Prev()")
-                i.fa.fa-chevron-up
-
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12
                 table.table.table-striped(ng-cloak)
@@ -24,4 +17,4 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}

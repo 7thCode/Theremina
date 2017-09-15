@@ -1,46 +1,46 @@
 div
     .modal-header
-        span.h5.modal-title #{messages.title}
+        span.h5.modal-title #{message.registdialogtitle}
         span.pull-right
-            button.btn.btn-box-tool(tabindex="7" type='button',ng-click='cancel()')
+            button.btn.btn-box-tool(tabindex="7" type='button', ng-click='cancel()')
                 i.fa.fa-times
     .modal-body
         ng-form(name="validate", ng-submit="answer(items)")
             .row
                 .col-xs-10.col-xs-offset-1
                     .form-group
-                        label.h6(for="nickname") #{messages.nickname_field}
+                        label.control-label(for="nickname") #{message.nickname_field}
                         span(ng-messages="validate.displayName.$error")
-                            span.error-message(ng-message="required") #{messages.required}
-                            span.error-message(ng-message="maxlength") #{messages.long}
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#nickname(tabindex="1" ng-model='items.displayName', type='text', name='displayName', placeholder='xxxxxxx', required, ng-maxlength="30")
 
                 .col-xs-10.col-xs-offset-1
                     .form-group
-                        label.h6(for="mailaddress") #{messages.mail_field}
+                        label.control-label(for="mailaddress") #{message.mail_field}
                         span(ng-messages="validate.username.$error")
-                            span.error-message(ng-message="required") #{messages.required}
-                            span.error-message(ng-message="pattern") #{messages.mail}
-                            span.error-message(ng-message="maxlength") #{messages.long}
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="pattern") #{message.invalid_mail_format}
+                            span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#mailaddress(tabindex="2" ng-model='items.username', type='email', name='username', placeholder='xxxxxxx@domain.net', required, ng-maxlength="255", ng-pattern="/^[a-z0-9-._.+]+@[a-z0-9-]+(\.[a-z0-9-]+)*$/i")
 
                 .col-xs-10.col-xs-offset-1
                     .form-group
-                        label.h6(for="password") #{messages.password_field}
+                        label.control-label(for="password") #{message.password_field}
                         span(ng-messages="validate.password.$error")
-                            span.error-message(ng-message="required") #{messages.required}
-                            span.error-message(ng-message="minlength") #{messages.short}
-                            span.error-message(ng-message="maxlength") #{messages.long}
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="minlength") #{message.short}
+                            span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#password(tabindex="3" ng-model="items.password", type="password", name="password", placeholder='4字以上30字以下', required, ng-minlength="4", ng-maxlength="255")
 
                 .col-xs-10.col-xs-offset-1
                     .form-group
-                        label.h6(for="retypepassword") #{messages.re_password_field}
+                        label.control-label(for="retypepassword") #{message.re_password_field}
                         span(ng-messages="validate.retypepassword.$error")
-                            span.error-message(ng-message="required") #{messages.required}
-                            span.error-message(ng-message="compareTo") #{messages.password_missmatch}
-                            span.error-message(ng-message="minlength") #{messages.short}
-                            span.error-message(ng-message="maxlength") #{messages.long}
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="compareTo") #{message.password_missmatch}
+                            span.error-message(ng-message="minlength") #{message.short}
+                            span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#retypepassword(tabindex="4" ng-model="items.retypepassword", compare-to="items.password", type="password", name="retypepassword", placeholder='Retype Password', required, ng-minlength="4", ng-maxlength="255")
 
             .row
@@ -54,5 +54,6 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-primary(tabindex="5" type="button", ng-click='answer(items);validate.$dirty = false;', ng-disabled="progress || validate.$invalid", aria-label="") #{messages.ok}
-                    button.btn.btn-warning(tabindex="6" type="button", ng-click='cancel()', aria-label="") #{messages.cancel}
+                    button.btn.btn-warning(tabindex="5" type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(tabindex="6" type="button", ng-click='answer(items);validate.$dirty = false;', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}
+

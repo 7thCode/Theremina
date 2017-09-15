@@ -2,7 +2,7 @@ extends ../../../backoffice_layout
 
 block content
     section.content-header
-        .h5.text-gray Player
+        .h5.text-gray #{message.player}
     section.content(ng-controller="PlayerController")
         include ./partial/navbar
         ng-form(name="validate")
@@ -15,5 +15,3 @@ block content
                         include ./partial/article
                     .col-xs-9
                         include ./partial/canvas
-            //div
-                include ./partial/dynamic

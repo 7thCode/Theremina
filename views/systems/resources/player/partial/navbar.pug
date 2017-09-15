@@ -1,27 +1,27 @@
-nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="navigation")
-        .container-fluid.noto
+nav.navbar.navbar-fixed-top.navbar-default(role="navigation")
+        .container-fluid
             .navbar-header
                 button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
                     span.sr-only Toggle navigation
                     span.icon-bar
                     span.icon-bar
                     span.icon-bar
-                a.navbar-brand.page-scroll(href="/", ng-click="go('/')") Resource
+                a.navbar-brand.page-scroll.brand-font(href="/", ng-click="go('/')") #{message.resource}
                     //i.ion-ios-analytics-outline(style="text-align:center;") #{type}
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav
                     if user
                         li.dropdown
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Resource
+                                | #{message.resource}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="", ng-click="Open();", role="menuitem") Open...
+                                    a(href="", ng-click="Open();", role="menuitem") #{message.open}
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Article
+                                | #{message.article}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="", ng-click="CreateArticle();", role="menuitem") Create...
+                                    a(href="", ng-click="CreateArticle();", role="menuitem") #{message.create}
                                 li
-                                    a(href="", ng-click="SaveArticle();", role="menuitem") Save
+                                    a(href="", ng-click="SaveArticle();", role="menuitem") #{message.save}

@@ -21,11 +21,13 @@ export namespace AnalysisPageRouter {
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
+    let message = config.message;
+
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("systems/analysis/index", {
             config: config,
             user: request.user,
-            message: "Analysis",
+            message: message,
             status: 200,
             fonts: webfonts
         });

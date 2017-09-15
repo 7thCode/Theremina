@@ -8,12 +8,12 @@
 
 export namespace RobotModule {
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
     const config = share.config;

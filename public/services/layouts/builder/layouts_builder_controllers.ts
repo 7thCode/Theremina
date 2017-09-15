@@ -27,6 +27,22 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
             progress(false);
             $scope.message = message;
             $log.error(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -36,7 +52,10 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         window.addEventListener('beforeunload', (event:any) => {
             if ($scope.opened) {
-                event.returnValue = '';
+                if (ShapeEdit.IsDirty()) {
+                    event.returnValue = '';
+                    return '';
+                }
             }
         }, false);
 
@@ -54,7 +73,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 delete ShapeEdit.Input[id];
             });
         };
-
+/*
         WebFont.load({
             google: {
                 families: ['Pacifico::latin']
@@ -83,16 +102,16 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 let a = 1;
             }
         });
-
+*/
         let Font_Display: () => void = (): void => {
-            $scope.fontfills = ShapeEdit.Canvas.CurrentFillColor().RGB();
-            $scope.fontsize = ShapeEdit.Canvas.CurrentFontSize();
-            $scope.FontKeyword = ShapeEdit.Canvas.CurrentFontKeyword();
-            $scope.FontWeight = ShapeEdit.Canvas.CurrentFontWeight();
-            $scope.FontVariant = ShapeEdit.Canvas.CurrentFontVariant();
-            $scope.FontStyle = ShapeEdit.Canvas.CurrentFontStyle();
-            $scope.FontFamily = ShapeEdit.Canvas.CurrentFontFamily()[0];
-            $scope.path = ShapeEdit.Canvas.CurrentPath();
+            $scope.fontfills = ShapeEdit.CurrentFillColor().RGB();
+            $scope.fontsize = ShapeEdit.CurrentFontSize();
+            $scope.FontKeyword = ShapeEdit.CurrentFontKeyword();
+            $scope.FontWeight = ShapeEdit.CurrentFontWeight();
+            $scope.FontVariant = ShapeEdit.CurrentFontVariant();
+            $scope.FontStyle = ShapeEdit.CurrentFontStyle();
+            $scope.FontFamily = ShapeEdit.CurrentFontFamily()[0];
+            $scope.path = ShapeEdit.CurrentPath();
         };
 
         let Select: (shape: any) => void = (shape: any): void => {
@@ -147,9 +166,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         };
 
         let changeText = (): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentText($scope.text);
-            }
+            ShapeEdit.SetCurrentText($scope.text);
         };
 
         let IsOpen = (): boolean => {
@@ -161,39 +178,39 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         };
 
         let ToTop = () => {
-            ShapeEdit.Canvas.ToTop();
+            ShapeEdit.ToTop();
         };
 
         let ToBottom = () => {
-            ShapeEdit.Canvas.ToBottom();
+            ShapeEdit.ToBottom();
         };
 
         let Lock = () => {
-            ShapeEdit.Canvas.Lock();
+            ShapeEdit.Lock();
         };
 
         let UnLockAll = () => {
-            ShapeEdit.Canvas.UnLockAll();
+            ShapeEdit.UnLockAll();
         };
 
         let Group = () => {
-            ShapeEdit.Canvas.Group();
+            ShapeEdit.Group();
         };
 
         let Ungroup = () => {
-            ShapeEdit.Canvas.Ungroup();
+            ShapeEdit.Ungroup();
         };
 
         let Copy = () => {
-            ShapeEdit.Canvas.Copy();
+            ShapeEdit.Copy();
         };
 
         let Paste = () => {
-            ShapeEdit.Canvas.Paste();
+            ShapeEdit.Paste();
         };
 
         let SetAlign = (align:number) => {
-            ShapeEdit.Canvas.SetCurrentShapesAlign(align);
+            ShapeEdit.SetCurrentShapesAlign(align);
         };
 
         let Create = (): void => {
@@ -289,7 +306,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         let PrintPNG = () => {
             let width, height;
 
-            ShapeEdit.Canvas.Snap();
+            ShapeEdit.Snap();
 
             switch (TemplateService.format.layout) {
                 case "portrait":
@@ -328,13 +345,13 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         let ChangeEditMode = (mode: string): void => {
             switch (mode) {
                 case 'move':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.move);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.move);
                     break;
                 case 'draw':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.draw);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.draw);
                     break;
                 case 'bezierdraw':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.bezierdraw);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.bezierdraw);
                     break;
                 default:
                     break;
@@ -342,71 +359,71 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         };
 
         let changeLocationX = (x: number): void => {
-            let loc = ShapeEdit.Canvas.CurrentLocation();
+            let loc = ShapeEdit.CurrentLocation();
             loc.x = x;
-            ShapeEdit.Canvas.SetCurrentLocation(loc);
+            ShapeEdit.SetCurrentLocation(loc);
         };
 
         let changeLocationY = (y: number): void => {
-            let loc = ShapeEdit.Canvas.CurrentLocation();
+            let loc = ShapeEdit.CurrentLocation();
             loc.y = y;
-            ShapeEdit.Canvas.SetCurrentLocation(loc);
+            ShapeEdit.SetCurrentLocation(loc);
         };
 
         let changeSizeW = (w: number): void => {
-            let size = ShapeEdit.Canvas.CurrentSize();
+            let size = ShapeEdit.CurrentSize();
             size.w = w;
-            ShapeEdit.Canvas.SetCurrentSize(size);
+            ShapeEdit.SetCurrentSize(size);
         };
 
         let changeSizeH = (h: number): void => {
-            let size = ShapeEdit.Canvas.CurrentSize();
+            let size = ShapeEdit.CurrentSize();
             size.h = h;
-            ShapeEdit.Canvas.SetCurrentSize(size);
+            ShapeEdit.SetCurrentSize(size);
         };
 
         let strokewidthChange = (stroke: number): void => {
             let color: ShapeEdit.RGBAColor = null;
-                ShapeEdit.Canvas.SetCurrentStrokeWidth(stroke);
+                ShapeEdit.SetCurrentStrokeWidth(stroke);
         };
 
         let pathChange = (path: string): void => {
-            ShapeEdit.Canvas.SetCurrentPath(path);
+            ShapeEdit.SetCurrentPath(path);
         };
 
         let changeFontStyle = (fontstyle: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontStyle(fontstyle);
+
+                ShapeEdit.SetCurrentFontStyle(fontstyle);
                 Font_Display();
-            }
+
         };
 
         // 太さ   normal、bold、lighter、bolder、または100〜900の9段階
         let changeFontWeigt = (fontweight: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontWeight(fontweight);
+
+                ShapeEdit.SetCurrentFontWeight(fontweight);
                 Font_Display();
-            }
+
         };
 
         // font names
         let changeFontAlign = (FontAlign: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentAlign(FontAlign);
+
+                ShapeEdit.SetCurrentAlign(FontAlign);
                 Font_Display();
-            }
+
         };
 
         let fontsizeChange = (fontsize: number): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontSize(fontsize);
+
+                ShapeEdit.SetCurrentFontSize(fontsize);
                 Font_Display();
-            }
+
         };
 
         let labelChange = (label, index) => {
             if (label) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].label = label;
                 }
@@ -415,7 +432,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let modeChange = (mode, index) => {
             if (mode) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].mode = mode;
                 }
@@ -424,7 +441,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let typeChange = (type, index) => {
             if (type) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].type = type;
                 }
@@ -433,7 +450,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let requiredChange = (required, index) => {
             if (required) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate.required = (required == "true");
                 }
@@ -442,7 +459,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let maxlengthChange = (maxlength, index) => {
             if (maxlength) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate["ng-maxlength"] = Number(maxlength);
                 }
@@ -451,7 +468,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let minlengthChange = (minlength, index) => {
             if (minlength) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate["ng-minlength"] = Number(minlength);
                 }
@@ -460,7 +477,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let optionsChange = (options, index) => {
             if (options) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].options = options;
                 }
@@ -469,7 +486,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let onChangeChange = (onChange, index) => {
             if (onChange) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].events = {onChange: onChange};
                 }
@@ -478,7 +495,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
         let lookupChange = (lookup, index) => {
             if (lookup) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].lookup = lookup;
                 }
@@ -494,7 +511,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 })
             };
             var text = new ShapeEdit.Text(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(text);
+            ShapeEdit.Add(text);
         };
 
         let AddBox = (): void => {
@@ -506,7 +523,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 })
             };
             var box = new ShapeEdit.Box(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(box);
+            ShapeEdit.Add(box);
         };
 
         let AddOval = (): void => {
@@ -518,7 +535,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 })
             };
             var rect = new ShapeEdit.Oval(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(rect);
+            ShapeEdit.Add(rect);
         };
 
         let AddBezier = (): void => {
@@ -538,7 +555,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
 
             context.ResizeRectangle();
 
-            ShapeEdit.Canvas.Add(context);
+            ShapeEdit.Add(context);
         };
 
         let AddImage = (): void => {
@@ -550,15 +567,15 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                 })
             };
             var image = new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(image);
+            ShapeEdit.Add(image);
         };
 
         let DeleteSelected = (): void => {
-            ShapeEdit.Canvas.DeleteSelected();
+            ShapeEdit.DeleteSelected();
         };
 
         let SelectedCount = (): number => {
-            return ShapeEdit.Canvas.SelectedCount();
+            return ShapeEdit.SelectedCount();
         };
 
         ShapeEdit.onTick((shape: ShapeEdit.BaseShape, context: any): any => {
@@ -634,7 +651,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
         ShapeEdit.onSelect((shape: ShapeEdit.BaseShape, context: any): void => {
             // for inPlace text input
 
-            if (ShapeEdit.Canvas.SelectedCount() === 1) {
+            if (ShapeEdit.SelectedCount() === 1) {
                 if (shape.Parent().IsRoot()) {
 
                     switch (shape.type) {
@@ -766,7 +783,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                             })
                         };
 
-                        ShapeEdit.Canvas.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
+                        ShapeEdit.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
                     };
                     image.onerror = (): void => {                           // URLがイメージとしてロード不可能
                     };
@@ -791,7 +808,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
                                     "type": "meter"
                                 })
                             };
-                            ShapeEdit.Canvas.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
+                            ShapeEdit.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
                         };
                         img.src = ex.target.result;
                     };
@@ -860,7 +877,7 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
             if (color_string) {
                 let color: ShapeEdit.RGBAColor = new ShapeEdit.RGBAColor(0, 0, 0, 1);
                 color.SetRGB(color_string);
-                ShapeEdit.Canvas.SetCurrentFillColor(color);
+                ShapeEdit.SetCurrentFillColor(color);
                 Font_Display();
             }
         });
@@ -869,35 +886,35 @@ BuilderControllers.controller('BuilderController', ["$scope", '$document', '$log
             if (color_string) {
                 let color: ShapeEdit.RGBAColor = new ShapeEdit.RGBAColor(0, 0, 0, 0);
                 color.SetRGB(color_string);
-                ShapeEdit.Canvas.SetCurrentStrokeColor(color);
+                ShapeEdit.SetCurrentStrokeColor(color);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontVariant', (FontVariant): void => {
             if (FontVariant) {
-                ShapeEdit.Canvas.SetCurrentFontVariant(FontVariant);
+                ShapeEdit.SetCurrentFontVariant(FontVariant);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontWeight', (fontweight: string): void => {
             if (fontweight) {
-                ShapeEdit.Canvas.SetCurrentFontWeight(fontweight);
+                ShapeEdit.SetCurrentFontWeight(fontweight);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontKeyword', (FontKeyword: string): void => {
             if (FontKeyword) {
-                ShapeEdit.Canvas.SetCurrentFontKeyword(FontKeyword);
+                ShapeEdit.SetCurrentFontKeyword(FontKeyword);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontFamily', (FontFamily: string): void => {
             if (FontFamily) {
-                ShapeEdit.Canvas.SetCurrentFontFamily([FontFamily]);
+                ShapeEdit.SetCurrentFontFamily([FontFamily]);
                 Font_Display();
             }
         });
@@ -1053,6 +1070,8 @@ BuilderControllers.controller('BuilderOpenDialogController', ['$scope', '$log', 
         let Query: () => any = (): any => {
             TemplateService.Query((value: any): void => {
                 $scope.layouts = value;
+                TemplateService.Over((hasnext) => {$scope.over = !hasnext;});
+                TemplateService.Under((hasprev) => {$scope.under = !hasprev;});
             }, error_handler);
         };
 
@@ -1063,6 +1082,8 @@ BuilderControllers.controller('BuilderOpenDialogController', ['$scope', '$log', 
                 if (result) {
                     $scope.layouts = result;
                 }
+                TemplateService.Over((hasnext) => {$scope.over = !hasnext;});
+                TemplateService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
 
@@ -1074,7 +1095,8 @@ BuilderControllers.controller('BuilderOpenDialogController', ['$scope', '$log', 
                 if (result) {
                     $scope.layouts = result;
                 }
-
+                TemplateService.Over((hasnext) => {$scope.over = !hasnext;});
+                TemplateService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

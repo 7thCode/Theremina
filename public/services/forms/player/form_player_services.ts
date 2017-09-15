@@ -9,12 +9,12 @@
 let FormPlayerServices: angular.IModule = angular.module('FormPlayerServices', []);
 
 FormPlayerServices.factory('FormCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/create', {}, {});
     }]);
 
 FormPlayerServices.factory('Form', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -23,14 +23,14 @@ FormPlayerServices.factory('Form', ['$resource',
     }]);
 
 FormPlayerServices.factory('FormQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/forms/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 FormPlayerServices.factory('FormCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/forms/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -55,10 +55,7 @@ FormPlayerServices.service('FormPlayerService', ["HtmlEdit", "FormCreate", "Form
         };
 
         let init = () => {
-
-            this.pagesize = 10;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
 
             this.current_page = null;
@@ -439,20 +436,20 @@ FormPlayerServices.service('FormPlayerService', ["HtmlEdit", "FormCreate", "Form
             });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -463,7 +460,7 @@ FormPlayerServices.service('FormPlayerService', ["HtmlEdit", "FormCreate", "Form
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

@@ -414,10 +414,10 @@
                                                                 </h2>
                                                                 <div style="text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;margin-bottom:0;color:#FFFFFF;line-height:135%;">
 
-                                                                    <div>from:|{"name": "thanks", "type": "string"}|</div>
-                                                                    <div>name:|{"name": "name", "type": "string"}|</div>
-                                                                    <div>phone:|{"name": "phone", "type": "string"}|</div>
-                                                                    <div>message:|{"name": "message", "type": "string"}|</div>
+                                                                    <ds:div>from:|{content.thanks}|</ds:div>
+                                                                    <ds:div>name:|{content.name}|</ds:div>
+                                                                    <ds:div>phone:|{content.phone}|</ds:div>
+                                                                    <ds:div>message:|{content.message}|</ds:div>
 
                                                                 </div>
                                                             </td>
@@ -478,7 +478,7 @@
                                                     <table border="0" cellpadding="0" cellspacing="0" width="50%" class="emailButton" style="background-color: #007d1c;">
                                                         <tr>
                                                             <td align="center" valign="middle" class="buttonContent" style="padding-top:15px;padding-bottom:15px;padding-right:15px;padding-left:15px;">
-                                                                <a style="color:#FFFFFF;text-decoration:none;font-family:Helvetica,Arial,sans-serif;font-size:20px;line-height:135%;" href='{"name": "link", "type": "string"}' target="_blank">Confirmation</a>
+                                                                <a style="color:#FFFFFF;text-decoration:none;font-family:Helvetica,Arial,sans-serif;font-size:20px;line-height:135%;" ds:href='{link}' target="_blank">Confirmation</a>
                                                             </td>
                                                         </tr>
                                                     </table>

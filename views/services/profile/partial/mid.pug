@@ -3,7 +3,7 @@
         .row
             .col-xs-12
                 .box-tools.pull-right
-                    button.btn.btn-box-tool(type='button', data-widget='collapse')
+                    button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                         i.fa.fa-minus
         .box-title
             span(style="color:#888888") username:
@@ -19,7 +19,7 @@
             ng-form(name="validate")
                 .row
                     .col-xs-2
-                        label Profile
+                        label #{message.profile}
                         div(flow-init)
                             .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="CreateProfilePicture($files);")
                             div(flow-drop)
@@ -28,7 +28,7 @@
                     .col-xs-12
                         .row(style="margin-top:3rem")
                             .col-xs-2.col-xs-offset-5
-                                button.btn.btn-primary#save(style="width:100%",type="button" ,ng-click='Save();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") Save
+                                button.btn.btn-primary#save(style="width:100%",type="button" ,ng-click='Save();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.save}
 
                     //.col-xs-12
                         button.btn.btn-danger#help(style="width:100%",type="button" ,ng-click='to(0)', aria-label="") Help

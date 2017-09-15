@@ -14,7 +14,7 @@ const server = (typeof window === 'undefined');
 namespace Adaptor {
 
     if (server) {
-        var _: _.LoDashStatic = require('lodash');
+        var _ = require('lodash');
         var ShapeEdit: any = require("./shape_edit");
         var PDFDocument = require('pdfkit');
         var http = require('http');

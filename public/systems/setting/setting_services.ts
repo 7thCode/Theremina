@@ -11,21 +11,21 @@ namespace Setting {
     let SettingServices: angular.IModule = angular.module('SettingServices', []);
 
     SettingServices.factory('Backup', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/command/backup', {}, {
                 put: {method: 'PUT'}
             });
         }]);
 
     SettingServices.factory('Restore', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/command/restore', {}, {
                 put: {method: 'PUT'}
             });
         }]);
 
     SettingServices.factory('ApplicationSetting', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/setting/application', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'}
@@ -33,7 +33,7 @@ namespace Setting {
         }]);
 
     SettingServices.factory('PluginsSetting', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/setting/plugins', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'}
@@ -41,7 +41,7 @@ namespace Setting {
         }]);
 
     SettingServices.factory('ServicesSetting', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/setting/services', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'}
@@ -49,7 +49,7 @@ namespace Setting {
         }]);
 
     SettingServices.factory('SystemSetting', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/setting/system', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'}
@@ -58,7 +58,7 @@ namespace Setting {
 
 
     SettingServices.factory('ModulesSetting', ['$resource',
-        ($resource): angular.resource.IResource<any> => {
+        ($resource): any => {
             return $resource('/setting/setting/modules', {}, {
                 get: {method: 'GET'}
             });
@@ -87,8 +87,9 @@ namespace Setting {
     SettingServices.service('RestoreService', ['Restore',
         function (Restore): void {
 
-            this.Put = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+            this.Put = (password:string, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
                 let data = new Restore();
+                data.password = password;
                 data.$put({}, (result: any): void => {
                     if (result) {
                         if (result.code === 0) {

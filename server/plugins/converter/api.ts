@@ -11,9 +11,8 @@ export namespace ConverterApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const exception: any = core.exception;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     const auth: any = new AuthController.Auth();
@@ -22,11 +21,7 @@ export namespace ConverterApiRouter {
     const excel: any = new ConverterModule.Excel();
     const downloader: any = new ConverterModule.Downloader();
 
-   // router.get("/api/account/excel/:filename",exception.exception, exception.guard, exception.authenticate, auth.is_system, [excel.account]);
-
     router.get("/api/account/excel/:filename", [excel.account]);
-
-  //  router.get("/api/download/:filename",exception.exception, exception.guard, exception.authenticate, [downloader.download]);
 
     router.get("/api/download/:filename", [downloader.download]);
 

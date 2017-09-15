@@ -9,17 +9,11 @@
 export namespace InterceptorModule {
 
     const _ = require("lodash");
-    //const jsdom = require("node-jsdom");
-
-   // const Persistent: any = require("./persistent");
-   /// const map = new Persistent.Map('./config/persistent/storege.json');
 
     const share = require(process.cwd() + '/server/systems/common/share');
 
     const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
     const analysis: any = new AnalysisModule.Analysis;
-
-   // map.Load();
 
     export const Handler = (request: any, response: any,next:any): any => {
         return {
@@ -32,14 +26,6 @@ export namespace InterceptorModule {
                 return result;
             },
             intercept: (html: string, send: any): void => {
-
-
-
-
-
-
-
-
                 analysis.page_view(request, response, next);
             }
         };

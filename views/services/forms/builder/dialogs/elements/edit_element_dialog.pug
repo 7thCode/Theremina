@@ -1,7 +1,7 @@
 div
     .modal-header
-        span.h5.modal-title Field
-    .modal-body.noto
+        span.h5.modal-title #{message.field}
+    .modal-body
         .row.row-padded
             .col-xs-6
                 div {{control.kind}}
@@ -25,5 +25,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button", ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button", ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

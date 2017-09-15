@@ -9,19 +9,19 @@
 let TemplateServices: angular.IModule = angular.module('TemplateServices', []);
 
 TemplateServices.factory('TemplateCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
     }]);
 
 TemplateServices.factory('TemplateCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/create', {}, {});
     }]);
 
 TemplateServices.factory('Template', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -30,24 +30,24 @@ TemplateServices.factory('Template', ['$resource',
     }]);
 
 TemplateServices.factory('TemplatePDF', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/pdf', {}, {});
     }]);
 
 TemplateServices.factory('TemplateSVG', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/svg', {}, {});
     }]);
 
 TemplateServices.factory('TemplateQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/layouts/template/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 TemplateServices.factory('TemplateCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/layouts/template/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -66,10 +66,7 @@ TemplateServices.service('TemplateService', [ '$log', "TemplateCreate", "Templat
 
         let init = () => {
             this.current_layout = null;
-
-            this.pagesize = 25;
-
-            this.option = {sort: {modify: -1}, limit: this.pagesize, skip: 0};
+            this.option = {sort: {modify: -1}, limit: 40, skip: 0};
             this.SetQuery(null);
 
             this.count = 0;
@@ -132,20 +129,20 @@ TemplateServices.service('TemplateService', [ '$log', "TemplateCreate", "Templat
                 });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -156,7 +153,7 @@ TemplateServices.service('TemplateService', [ '$log', "TemplateCreate", "Templat
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

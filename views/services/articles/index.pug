@@ -1,8 +1,6 @@
 extends ../../backoffice_layout
 
 block content
-    section.content-header
-        .h5.text-gray Articles
     section.content(ng-controller="ArticleController")
         include ./partial/navbar
         div#draggable_area
@@ -16,20 +14,20 @@ block content
                             .h6 page: {{current_page.name}}
                             .h6 article: {{current_article.name}}
                             .box-tools.pull-right
-                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                                     i.fa.fa-minus
                         .box-body
-                            ng-form(name="validate",ng-show="opened")
+                            ng-form(name="validate", ng-show="opened")
                                 .row
                                     .col-xs-12
                                         button.btn.btn-info.pull-right(ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
                                             i.fa.fa-cloud
-                                            span.hidden-xs.hidden-sm Save
+                                            span.hidden-xs.hidden-sm #{message.save}
                                 .row
                                     .col-xs-12
                                         #root
                         .box-footer.clearfix
                             div(ng-bind="message")
         div
-                include partial/pallete
-                include partial/images
+            include partial/pallete
+            include partial/images

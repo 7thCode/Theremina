@@ -1,22 +1,17 @@
 extends ../../backoffice_layout
 
 block content
-    section.content-header
-        .h5.text-gray Groups
     section.content(ng-controller="GroupController")
         include partial/navbar
         .box.box-info
             .box-header.with-border
-                div
-                    .box-tools.pull-right
-                        button.btn.btn-box-tool(type='button', data-widget='collapse')
-                            i.fa.fa-minus
-                //div
-                    .box-tools.pull-right
-                        button.btn.btn-box-tool(ng-click="Create();")
-                            i.fa.fa-2x.fa-plus-circle.text-primary
-
-                include ../../systems/common/next_prev
+                .row
+                    .col-xs-12
+                        .box-tools.pull-right
+                            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                                i.fa.fa-minus
+                    .col-xs-12
+                        include ../../systems/common/next_prev
             .box-body
                 .row
                     .col-xs-12

@@ -4,7 +4,7 @@ div
         span.pull-right
             button.btn.btn-xs.btn-box-tool(type='button',ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
@@ -13,8 +13,8 @@ div
                             .form-group
                                 label.h6(for="name") Name
                                 span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="name", type="text", name='name', required, ng-maxlength="50")
         .row
             .col-xs-12
@@ -23,5 +23,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

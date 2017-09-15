@@ -8,12 +8,12 @@
 
 export namespace BeaconModule {
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
     const config = share.config;
@@ -29,10 +29,11 @@ export namespace BeaconModule {
 
         static connect(user): any {
             let result = null;
+            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
             if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
             } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
             }
             return result;
         }
@@ -77,11 +78,15 @@ export namespace BeaconModule {
                                                 if (item) {
                                                     let readstream = gfs.createReadStream({_id: item._id});
                                                     if (readstream) {
-                                                        response.setHeader('Content-Type', item.metadata.type);
-                                                        readstream.pipe(response);
+                                                        response.setHeader("Content-Type", item.metadata.type);
+                                                        response.setHeader("Cache-Control", "no-cache");
                                                         readstream.on('close', (file: any): void => {
                                                             conn.db.close();
                                                         });
+                                                        readstream.on('error', (error: any): void => {
+                                                            conn.db.close();
+                                                        });
+                                                        readstream.pipe(response);
                                                     } else {
                                                         conn.db.close();
                                                         next();

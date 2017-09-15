@@ -23,7 +23,22 @@ ResourcePlayerControllers.controller('ResourcePlayerController', ["$scope","$doc
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -209,7 +224,22 @@ ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$sc
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         let Query = (): any => {
@@ -217,6 +247,8 @@ ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$sc
             HtmlPlayerService.query = {};
             HtmlPlayerService.Query((value: any): void => {
                 $scope.pages = value;
+                HtmlPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                HtmlPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -231,6 +263,8 @@ ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$sc
                 if (result) {
                     $scope.pages = result;
                 }
+                HtmlPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                HtmlPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -241,6 +275,8 @@ ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$sc
                 if (result) {
                     $scope.pages = result;
                 }
+                HtmlPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                HtmlPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -251,6 +287,8 @@ ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$sc
                 if (result) {
                     $scope.pages = result;
                 }
+                HtmlPlayerService.Over((hasnext) => {$scope.over = !hasnext;});
+                HtmlPlayerService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

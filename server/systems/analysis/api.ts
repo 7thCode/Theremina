@@ -26,7 +26,6 @@ export namespace AnalysisApiRouter {
     router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, auth.is_system, analysis.get_queue_query]);
     router.get('/api/count/:query', [exception.exception, exception.guard, exception.authenticate, auth.is_system, analysis.get_queue_count]);
 
-
 }
 
 module.exports = AnalysisApiRouter.router;

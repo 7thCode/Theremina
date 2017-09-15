@@ -8,167 +8,55 @@
 
 export namespace FrontModule {
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
     const fs: any = require('graceful-fs');
+
+    const Grid = require('gridfs-stream');
 
     const path: any = require('path');
 
     const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
-    mongoose.Promise = require('q').Promise;
+    mongoose.Promise = global.Promise;
 
     const archiver: any = require('archiver');
 
-    const core: any = require(process.cwd() + '/core');
+    const sharp = require("sharp");
+
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const applications_config: any = share.applications_config;
     const Wrapper: any = share.Wrapper;
-    const logger: any = share.logger;
 
-//    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-//    const resource = new ResourcesModule.Resource;
-
-    const HtmlEditModule: any = require(share.Server("systems/common/html_edit/html_edit"));
+    const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
+    const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
+    const LocalAccount: any = require(share.Models("systems/accounts/account"));
     const ArticleModel: any = require(share.Models("services/articles/article"));
     const AssetModel: any = require(share.Models("plugins/asset/asset"));
     const validator: any = require('validator');
     const url: any = require('url');
 
+    // type 20   page
+    // type 21   stamp
+    // type 30   template(system only)
+
     export class Pages {
 
         static connect(user): any {
             let result = null;
+            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
             if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name,options);
             } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name,options);
             }
             return result;
         }
 
         static userid(request): string {
             return request.user.userid;
-        }
-
-        /**
-         * @param userid
-         * @param name
-         * @param record
-         * @param records
-         * @param callback
-         * @returns none
-         */
-        public render(userid: string, name: string, record: any, records: any[], query: any, order: any, callback: (error: any, result: any) => void): void {
-            ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
-                if (doc) {
-                    let content = doc.content;
-
-                    switch (content.type) {
-                        case "text/html":
-                            let scanner = new HtmlEditModule.Scanner(userid, order);
-                            scanner.ScanHtml(content.resource, record, records, 0, (error: any, resource: any): void => {
-                                if (!error) {
-                                    content.resource = resource;
-                                    callback(null, content);
-                                } else {
-                                    callback(error, null);
-                                }
-                            });
-                            break;
-                        case "text/css":
-                        case "text/javascript":
-                            callback(null, content);
-                            break;
-                        default:
-                            callback(null, content);
-                            break;
-                    }
-
-                } else {
-                    callback({code: 10000, message: ""}, null);
-                }
-            }).catch((error: any): void => {
-                callback(error, null);
-            });
-        }
-
-        /**
-         * @param userid
-         * @param name
-         * @param record
-         * @param records
-         * @param callback
-         * @returns none
-         */
-        public no_render(userid: string, name: string, callback: (error: any, result: any) => void): void {
-            ResourceModel.findOne({$and: [{name: name}, {userid: userid}]}).then((doc: any): void => {
-                if (doc) {
-                    let content = doc.content;
-                    callback(null, content);
-                } else {
-                    callback({code: 10000, message: ""}, null);
-                }
-            }).catch((error: any): void => {
-                callback(error, null);
-            });
-        }
-
-        /**
-         * @param userid
-         * @param page_name
-         * @param article_name
-         * @param query
-         * @param callback
-         * @returns none
-         */
-        public render_pages(userid: string, page_name: string, article_name: string, query_field: any, callback: (error: any, result: string) => void): void {
-            let query = {};
-            if (query_field.q) {
-                try {
-                    let native_query = JSON.parse(query_field.q);
-                    Object.keys(native_query).forEach((key) => {
-                        query["content." + key + ".value"] = native_query[key];
-                    });
-                } catch (e) {
-                }
-            }
-
-            let order = {skip: 0};
-            if (query_field.o) {
-                try {
-                    order = JSON.parse(query_field.o);
-                } catch (e) {
-                }
-            }
-
-            let sort = {};
-            if (query_field.s) {
-                try {
-                    sort = {sort: JSON.parse(query_field.s)};
-                } catch (e) {
-                }
-            }
-
-            if (article_name) {
-                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type: 0}]}, {}, sort).then((docs: any): void => {
-                    ArticleModel.findOne({$and: [{name: article_name}, {userid: userid}, {open: true}, {type: 0}]}).then((doc: any): void => {
-                        this.render(userid, page_name, doc, docs, query, order, callback);
-                    }).catch((error: any): void => {
-                        callback(error, null);
-                    });
-                }).catch((error: any): void => {
-                    callback(error, null);
-                });
-            } else {
-                ArticleModel.find({$and: [query, {userid: userid}, {open: true}, {type: 0}]}, {}, sort).then((docs: any): void => {
-                    this.render(userid, page_name, null, docs, query, order, callback);
-                }).catch((error: any): void => {
-                    callback(error, null);
-                });
-            }
-
         }
 
         /**
@@ -184,63 +72,60 @@ export namespace FrontModule {
 
             let number: number = 27000;
             let conn = Pages.connect(config.db.user);
-
             if (conn) {
                 conn.once('open', (error: any): void => {
                     if (!error) {
-                        let uri = "mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name;
-                        mongodb.MongoClient.connect(uri, (error, db): void => {
+                        let bucket = new mongodb.GridFSBucket(conn.db, {});
+                        conn.db.collection('fs.files', (error: any, collection: any): void => {
                             if (!error) {
-                                let bucket = new mongodb.GridFSBucket(db, {});
-                                conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                    if (!error) {
-                                        if (collection) {
-                                            collection.find({"metadata.userid": userid}).toArray((error: any, docs: any): void => {
-                                                if (!error) {
-                                                    let promises = [];
-                                                    let save = (doc: any): any => {
-                                                        return new Promise((resolve: any, reject: any): void => {
-                                                            if (doc) {
-                                                                bucket.openDownloadStreamByName(doc.filename)
-                                                                    .pipe(fs.createWriteStream(path.join(tmp_path, doc.filename)))
-                                                                    .on('error', (error): void => {
-                                                                        reject(error);
-                                                                    })
-                                                                    .on('finish', (): void => {
-                                                                        resolve({});
-                                                                    });
-                                                            }
-                                                        });
-                                                    };
+                                if (collection) {
+                                    collection.find({"metadata.userid": userid}).toArray((error: any, docs: any): void => {
+                                        if (!error) {
+                                            let save = (doc: any): any => {
+                                                return new Promise((resolve: any, reject: any): void => {
+                                                    if (doc) {
+                                                        bucket.openDownloadStreamByName(doc.filename)
+                                                            .pipe(fs.createWriteStream(path.join(tmp_path, doc.filename)))
+                                                            .on('error', (error): void => {
+                                                                reject(error);
+                                                            })
+                                                            .on('finish', (): void => {
+                                                                resolve({});
+                                                            });
+                                                    }
+                                                });
+                                            };
 
-                                                    Promise.all(docs.map((doc: any): void => {
-                                                        return save(doc);
-                                                    })).then((results: any[]): void => {
-                                                        callback(null);
-                                                        conn.db.close();
-                                                    }).catch((error: any): void => {
-                                                        callback(error);
-                                                        conn.db.close();
-                                                    });
-
-                                                } else {
-                                                    callback({code: number + 100, message: error.message});
-                                                    conn.db.close();
-                                                }
+                                            Promise.all(docs.map((doc: any): void => {
+                                                return save(doc);
+                                            })).then((results: any[]): void => {
+                                                callback(null);
+                                                conn.db.close();
+                                            }).catch((error: any): void => {
+                                                callback(error);
+                                                conn.db.close();
                                             });
+
                                         } else {
-                                            callback({code: number + 20, message: "gfs error"});
+                                            callback({code: error.code, message: error.message});
                                             conn.db.close();
                                         }
-                                    } else {
-                                        callback({code: number + 100, message: error.message});
-                                        conn.db.close();
-                                    }
-                                });
+                                    });
+                                } else {
+                                    callback({code: number + 20, message: "gfs error"});
+                                    conn.db.close();
+                                }
+                            } else {
+                                callback({code: error.code, message: error.message});
+                                conn.db.close();
                             }
                         });
+                    } else {
+                        callback({code: error.code, message: error.message});
                     }
                 });
+            } else {
+                callback({code: number + 40, message: "db error"});
             }
         }
 
@@ -286,6 +171,7 @@ export namespace FrontModule {
          * @returns none
          */
         static zip(work: string, target: string, callback: (error) => void) {
+
             let zip_file_name = work + "/" + target + ".zip";
             let archive = archiver.create('zip', {});
             let output = fs.createWriteStream(zip_file_name);
@@ -306,6 +192,7 @@ export namespace FrontModule {
             archive.pipe(output);
             archive.glob("data/*");
             archive.finalize();
+
         }
 
         /**
@@ -333,25 +220,46 @@ export namespace FrontModule {
                                                                 if (!error) {
                                                                     let exec = require('child_process').exec;
                                                                     exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
-
+                                                                        //        Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                                     });
+                                                                } else {
+                                                                    Wrapper.SendError(response, error.code, error.message, error);
                                                                 }
                                                             });
+                                                        } else {
+                                                            Wrapper.SendError(response, error.code, error.message, error);
                                                         }
                                                     });
+                                                } else {
+                                                    Wrapper.SendError(response, error.code, error.message, error);
                                                 }
                                             });
+                                        } else {
+                                            Wrapper.SendError(response, error.code, error.message, error);
                                         }
                                     });
+                                } else {
+                                    Wrapper.SendError(response, error.code, error.message, error);
                                 }
                             });
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
                 }
             });
         }
 
+        public put_all(request: any, response: any): void {
+
+
+        }
+
         /**
+         * ユーザ登録時に作成されるデフォルトリソース。
+         * ユーザ登録時、システムのリソースをコピー。
          *  let userid = Pages.userid(request);
          * @param request
          * @param response
@@ -375,13 +283,258 @@ export namespace FrontModule {
                             page.open = true;
                             page.save().then(() => {
 
-                            }).catch((): void => {
+                            }).catch((e): void => {
 
                             });
                         }
                     });
                 });
             })
+
+        }
+
+        /**
+         * ユーザ登録時に作成されるデフォルトアーティクル。
+         * ユーザ登録時、システムのアーティクルをコピー。
+         *  let userid = Pages.userid(request);
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public create_init_user_articles(user: any): void {
+
+            ArticleModel.find({userid: config.systems.userid}, {}, {}).then((docs: any): void => {
+                _.forEach(docs, (doc) => {
+                    let name: string = doc.name;
+                    let userid = user.userid;
+                    let type: string = doc.type;
+                    let content: any = doc.content;
+                    ArticleModel.findOne({$and: [{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                        if (!found) {
+                            let page: any = new ArticleModel();
+                            page.userid = userid;
+                            page.name = name;
+                            page.type = type;
+                            page.content = content;
+                            page.open = true;
+                            page.save().then(() => {
+                                let a = 1;
+                            }).catch((e): void => {
+                                let error = e;
+                            });
+                        }
+                    });
+                });
+            })
+
+        }
+
+        /**
+         * @param userid
+         * @param name
+         * @param record
+         * @param records
+         * @param callback
+         * @returns none
+         */
+        public build(request: any, response: any): void {
+            let userid = Pages.userid(request);
+            let name = request.params.name;
+
+            let sites = {
+                "paper": {
+                    "resources": [
+                        {type: "resource", original: "paper-index.html", target: "index.html"},
+                        {type: "resource", original: "paper-contact.html", target: "contact.html"},
+                        {type: "resource", original: "paper-about.html", target: "about.html"},
+                        {type: "resource", original: "paper-blog.html", target: "blog.html"},
+                        {type: "resource", original: "paper-main.js", target: "main.js"},
+                        {type: "resource", original: "paper-style.css", target: "style.css"}
+                    ]
+                },
+                "shape": {
+                    "resources": [
+                        {type: "resource", original: "shape-index.html", target: "index.html"},
+                        {type: "resource", original: "shape-work.html", target: "work.html"},
+                        {type: "resource", original: "shape-services.html", target: "services.html"},
+                        {type: "resource", original: "shape-contact.html", target: "contact.html"},
+                        {type: "resource", original: "shape-blog.html", target: "blog.html"},
+                        {type: "resource", original: "shape-about.html", target: "about.html"},
+                        {type: "resource", original: "shape-main.js", target: "main.js"},
+                        {
+                            type: "resource",
+                            original: "shape-magnific-popup-options.js",
+                            target: "magnific-popup-options.js"
+                        },
+                        {type: "resource", original: "shape-style.css", target: "style.css"}
+                    ]
+                }
+
+            };
+
+            let site = sites[name];
+
+            let resources = site.resources;
+            let copy = (resourcename: any): any => {
+
+                let copy_resource = (resolve: any, reject: any): void => {
+                    ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: resourcename.original}, {type: 30}]}, {}, {}).then((doc: any): void => {
+                        if (doc) {
+                            let name: string = resourcename.target;
+                            let content: any = doc.content;
+                            ResourceModel.findOne({$and: [{userid: userid}, {type: 20}, {name: name}]}).then((found: any): void => {
+                                if (!found) {
+                                    let page: any = new ResourceModel();
+                                    page.userid = userid;
+                                    page.name = name;
+                                    page.type = 20;
+                                    page.content = content;
+                                    page.open = true;
+                                    page.save().then((): void => {
+                                        resolve({});
+                                    }).catch((error): void => {
+                                        reject(error);
+                                    });
+                                } else {
+                                    found.remove().then(() => {
+                                        let page: any = new ResourceModel();
+                                        page.userid = userid;
+                                        page.name = name;
+                                        page.type = 20;
+                                        page.content = content;
+                                        page.open = true;
+                                        page.save().then(() => {
+                                            resolve({});
+                                        }).catch((error): void => {
+                                            reject(error);
+                                        });
+                                    }).catch((error: any): void => {
+                                        reject(error);
+                                    });
+                                }
+
+                            });
+                        } else {
+                            resolve({});
+                        }
+                    })
+                };
+
+                let copy_article = (resolve: any, reject: any): void => {
+                    ArticleModel.findOne({$and: [{userid: config.systems.userid}, {name: resourcename.original}]}, {}, {}).then((doc: any): void => {
+                        if (doc) {
+                            let name: string = resourcename.target;
+                            let content: any = doc.content;
+                            ArticleModel.findOne({$and: [{userid: userid}, {name: name}]}).then((found: any): void => {
+                                if (!found) {
+                                    let article: any = new ArticleModel();
+                                    article.userid = userid;
+                                    article.name = name;
+                                    article.type = doc.type;
+                                    article.content = content;
+                                    article.open = true;
+                                    article.save().then((): void => {
+                                        resolve({});
+                                    }).catch((error): void => {
+                                        reject(error);
+                                    });
+                                } else {
+                                    resolve({});
+                                }
+                            });
+                        }
+                    })
+                };
+
+                let copy_file = (resolve: any, reject: any): void => {
+
+                    let name: string = resourcename.target;
+                    let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                    if (gfs) {
+                        let query = {};
+                        if (config.structured) {
+                            query = {$and: [{filename: resourcename.original}, {"metadata.namespace": ""}, {"metadata.userid": config.systems.userid}]};
+                        } else {
+                            query = {$and: [{filename: resourcename.original}, {"metadata.userid": config.systems.userid}]};
+                        }
+
+                        gfs.findOne(query, (error: any, item: any): void => {
+                            if (!error) {
+                                if (item) {
+                                    let readstream = gfs.createReadStream({_id: item._id});
+                                    let writestream = gfs.createWriteStream({
+                                        filename: name,
+                                        contentType: item.contentType,
+                                        metadata: {
+                                            userid: userid,
+                                            username: "",
+                                            key: item.metadata.key,
+                                            type: item.metadata.type,
+                                            namespace: item.metadata.namespace,
+                                            parent: null
+                                        }
+                                    });
+
+                                    if (writestream) {
+                                        writestream.on('close', (file: any): void => {
+                                            resolve(file);
+                                        });
+                                        readstream.on('error', (error: any): void => {
+                                            reject(error);
+                                        });
+                                        readstream.pipe(writestream);
+                                    } else {
+                                        reject({});
+                                    }
+                                } else {
+                                    resolve({}); // continue even if there is no file
+                                }
+                            } else {
+                                reject(error);
+                            }
+                        });
+                    }
+                };
+
+                return new Promise((resolve: any, reject: any): void => {
+                    if (resourcename) {
+                        switch (resourcename.type) {
+                            case "resource":
+                                copy_resource(resolve, reject);
+                                break;
+                            case "article":
+                                copy_article(resolve, reject);
+                                break;
+                            case "file":
+                                copy_file(resolve, reject);
+                                break;
+                            default:
+                        }
+                    }
+                });
+            };
+
+            let conn = Pages.connect(config.db.user);
+            let collection = null;
+            let bucket = null;
+            if (conn) {
+                conn.once('open', (error: any): void => {
+                    if (!error) {
+                        conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            collection = collection;
+                            Promise.all(resources.map((pagename: any): void => {
+                                return copy(pagename);
+                            })).then((results: any[]): void => {
+                                conn.db.close();
+                                Wrapper.SendSuccess(response, {code: 0, message: ""});
+                            }).catch((error: any): void => {
+                                conn.db.close();
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            });
+                        });
+                    }
+                });
+            }
 
         }
     }
@@ -463,23 +616,23 @@ export namespace FrontModule {
                                 });
                                 ResourceModel.findOne({$and: [{userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
-                                        let scanner = new HtmlEditModule.Scanner("", {});
-                                        scanner.ScanHtml(record.content.resource, {
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, null, true, {});
+                                        HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                             create: "",
                                             modify: "",
                                             content: content
-                                        }, [], 0, (error: any, doc: any) => {
+                                        },(error: any, doc: string) => {
                                             if (!error) {
                                                 mailer.send(report_to, report_title, doc, (error: any) => {
                                                     if (!error) {
                                                         ResourceModel.findOne({$and: [{userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
-                                                                let scanner = new HtmlEditModule.Scanner("", {});
-                                                                scanner.ScanHtml(record.content.resource, {
+                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, null, true, {});
+                                                                HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                                                     create: "",
                                                                     modify: "",
                                                                     content: content
-                                                                }, [], 0, (error: any, doc: any) => {
+                                                                },(error: any, doc: string) => {
                                                                     if (!error) {
                                                                         mailer.send(thanks_to, thanks_title, doc, (error: any) => {
                                                                             if (!error) {
@@ -503,11 +656,7 @@ export namespace FrontModule {
                                                         Wrapper.SendError(response, 300, error.message, error);
                                                     }
                                                 });
-                                            } else {
-                                                Wrapper.SendError(response, 200, error.message, error);
                                             }
-                                        }).catch((error: any): void => {
-                                            Wrapper.SendFatal(response, 100, error.message, error);
                                         });
                                     } else {
                                         Wrapper.SendError(response, 200, "record not found.", {});
@@ -530,8 +679,6 @@ export namespace FrontModule {
             }
         }
     }
-
-    const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
     export class Members {
 
@@ -607,9 +754,8 @@ export namespace FrontModule {
         public get_member_count(request: any, response: any): void {
             let userid = Members.userid(request);
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let query2 = {$and: [query, {userid: userid}]};
 
-            Wrapper.Count(response, 2800, LocalAccount, query2, (response: any, count: any): any => {
+            Wrapper.Count(response, 2800, LocalAccount, {$and: [query, {userid: userid}]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
         }
@@ -635,6 +781,199 @@ export namespace FrontModule {
         }
 
     }
+
+    export class Pictures {
+
+        static connect(user): any {
+            let result = null;
+            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
+            if (user) {
+                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
+            } else {
+                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
+            }
+            return result;
+        }
+
+        static namespace(name: string): string {
+            let result = "";
+            if (name) {
+                let names = name.split("#");
+                let delimmiter = "";
+                names.forEach((name, index) => {
+                    if (index < (names.length - 1)) {
+                        result += delimmiter + name;
+                        delimmiter = ":";
+                    }
+                })
+            }
+            return result;
+        }
+
+        static localname(name: string): string {
+            let result = "";
+            if (name) {
+                let names = name.split("#");
+                names.forEach((name, index) => {
+                    if (index == (names.length - 1)) {
+                        result = name;
+                    }
+                })
+            }
+            return result;
+        }
+
+        static userid(request): string {
+            return request.user.userid;
+        }
+
+        static username(request): string {
+            return request.user.username;
+        }
+
+        static result_file(conn, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
+            collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
+                if (!error) {
+                    if (item) {
+                        let readstream = gfs.createReadStream({_id: item._id});
+                        if (readstream) {
+                            response.setHeader("Content-Type", item.metadata.type);
+                            response.setHeader("Cache-Control", "no-cache");
+                            readstream.on('close', (): void => {
+                                conn.db.close();
+                            });
+                            readstream.on('error', (error: any): void => {
+                                conn.db.close();
+                            });
+                            readstream.pipe(response);
+                        } else {
+                            conn.db.close();
+                            next();
+                        }
+                    } else {
+                        not_found();
+                    }
+                } else {
+                    conn.db.close();
+                    next();
+                }
+            });
+        }
+
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
+        public get_photo(request: any, response: any, next: any): void {
+            try {
+                let conn = Pictures.connect(config.db.user);
+                let namespace = Pictures.namespace(request.params.name);
+                let name = Pictures.localname(request.params.name);
+                let userid = request.params.userid;
+                let size = request.query;
+
+                conn.once('open', (error: any): void => {
+                    if (!error) {
+                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        if (gfs) {
+                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                                if (!error) {
+                                    if (collection) {
+
+                                        let query = {};
+                                        if (config.structured) {
+                                            query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                        } else {
+                                            query = {$and: [{filename: name}, {"metadata.userid": userid}]};
+                                        }
+
+                                        collection.findOne(query, (error: any, item: any): void => {
+                                            if (!error) {
+                                                if (item) {
+                                                    let readstream = gfs.createReadStream({_id: item._id});
+                                                    if (readstream) {
+                                                        let type = item.metadata.type;
+                                                        response.setHeader("Content-Type", type);
+                                                        response.setHeader("Cache-Control", config.cache);
+                                                        readstream.on('close', (): void => {
+                                                            conn.db.close();
+                                                        });
+
+                                                        readstream.on('error', (error: any): void => {
+                                                            conn.db.close();
+                                                        });
+
+                                                        try {
+                                                            if (type == "image/jpeg" || type == "image/png" || type == "image/gif") {
+                                                                if (size.w && size.h) {
+                                                                    if (size.l && size.t) {
+                                                                        /*
+                                                                        // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                                                                        let extractor = sharp().extract({
+                                                                            left: parseInt(size.l),
+                                                                            top: parseInt(size.t),
+                                                                            width: parseInt(size.w),
+                                                                            height: parseInt(size.h)
+                                                                        });
+                                                                        readstream = readstream.pipe(extractor);
+                                                                        */
+                                                                    }
+                                                                    let resizer = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
+                                                                    readstream = readstream.pipe(resizer);
+                                                                }
+                                                            }
+                                                            readstream.pipe(response);
+                                                        } catch (e) {
+                                                            // NOT FOUND IMAGE.
+                                                            Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                                conn.db.close();
+                                                                next();
+                                                            });
+                                                        }
+                                                    } else {
+                                                        conn.db.close();
+                                                        next();
+                                                    }
+                                                } else {
+                                                    // NOT FOUND IMAGE.
+                                                    Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                        conn.db.close();
+                                                        next();
+                                                    });
+                                                }
+                                            } else {
+                                                conn.db.close();
+                                                next();
+                                            }
+                                        });
+                                    } else {
+                                        conn.db.close();
+                                        next();
+                                    }
+                                } else {
+                                    conn.db.close();
+                                    next();
+                                }
+                            });
+                        } else {
+                            conn.db.close();
+                            next();
+                        }
+                    } else {
+                        conn.db.close();
+                        next();
+                    }
+                });
+            } catch (e) {
+                next();
+            }
+        }
+
+    }
+
 
 }
 

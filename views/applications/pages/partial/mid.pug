@@ -1,14 +1,13 @@
-.box.box-primary(ng-show="opened")
+.box.box-primary(style="margin-top:12px;" ng-show="opened")
     .box-header.with-border
-        .h6(ng-bind="name")
-        div
-            .row
+        .h7(ng-bind="name")
+        .row
                 .col-xs-1
-                    a.btn.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/site/{{userid}}/{{name}}" target="_blank" type="button", aria-label="") Open
+                    a.btn.btn-sm.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/{{userid}}/doc/{{name}}" target="_blank" type="button", aria-label="") Open
                 .col-xs-10
-                    .well.well-sm(layout="word-wrap:break-all;") #{config.protocol}://#{config.domain}/site/{{userid}}/{{name}}
+                    .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/doc/{{name}}
                 .col-xs-1
-                    button.btn.btn-info(type='button', ng-click="Close();" )
+                    button.btn.btn-sm.btn-info(type='button', ng-click="Close();" )
                         i.fa.fa-times-circle
     .box-body
         .row-fluid(ng-show="inner_preview")
@@ -21,25 +20,24 @@
             .col-xs-12
                 div(ui-ace="aceOption", ng-model='resource', style="height: 70vh;")
 
-.box.box-primary(ng-hide="opened" flow-init)
+.box.box-primary(style="margin-top:12px;" ng-hide="opened" flow-init)
     .box-header.with-border
         div
             .box-tools.pull-right
-                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                     i.fa.fa-minus
         div
             .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="CreatePages($files);")
-                button.btn.btn-box-tool(flow-btn type="file")
-                    i.fa.fa-2x.fa-plus-circle.text-primary
-
+                button.btn.btn-xs.btn-box-tool(flow-btn type="file")
+                    i.fa.fa-plus-circle.text-primary
 
             include ../../../applications/common/find
 
-    .box-body(style="height:auto;min-height:80vh;background-color:#e4e5ff; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title="ファイルをドロップしてください。")
+    .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title="#{message.filedrop}")
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="page in pages")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
-                    a.btn.btn-success.btn-xs(download ng-href="/rawpage/" + '{{page.userid}}' + "/" + '{{page.name}}' target="_blank")
+                    a.btn.btn-success.btn-xs(download ng-href="/" + '{{page.userid}}' + "/direct/" + '{{page.name}}' target="_blank")
                         i.fa.fa-cloud-download
                     div(style="height:8rem;",data-toggle="tooltip" data-placement="top" title="{{page.name}}" , ng-click="Get(page)")
                         img.center-block.thumbnail(ng-src="{{page.content.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")

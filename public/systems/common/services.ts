@@ -41,7 +41,7 @@ Services.factory('Socket', ["$rootScope", ($rootScope: any): any => {
 }]);
 
 Services.factory('Session', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/session/api', {}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -409,15 +409,14 @@ Services.directive('draggablepane', ['$document', ($document: any): any => {
 Services.filter('length', [(): any => {
     return (s: string, limit: number): string => {
         let result = s;
-            if (s) {
-                if (s.length > limit) {
-                    result = s.slice(0, limit) + "...";
-                }
+        if (s) {
+            if (s.length > limit) {
+                result = s.slice(0, limit) + "...";
             }
+        }
         return result;
     };
 }]);
-
 
 
 Services.provider('HtmlEdit', [function (): void {
@@ -437,14 +436,14 @@ Services.provider('HtmlEdit', [function (): void {
 ]);
 
 // ShapeEditProvider
-Services.provider('ShapeEdit', [function ():void {
+Services.provider('ShapeEdit', [function (): void {
 
-    let _self:any = this;
+    let _self: any = this;
 
     _self.Handlers = new ShapeEdit.EventHandlers();
     _self.Plugins = new ShapeEdit.Plugins();
 
-    _self.pagesize = 25;
+    _self.pagesize = 40;
 
     _self.query = {};
     _self.option = {limit: _self.pagesize, skip: 0};
@@ -471,7 +470,7 @@ Services.provider('ShapeEdit', [function ():void {
         }
     };
 
-    this.adjust = (element: any, outerwidth: number, outerheight: number, innerwidth: number, innerheight: number, scale:number): void => {
+    this.adjust = (element: any, outerwidth: number, outerheight: number, innerwidth: number, innerheight: number, scale: number): void => {
         element.width = innerwidth;
         element.height = innerheight;
         element.style.marginLeft = ((outerwidth - innerwidth) / 2) + "px";
@@ -479,10 +478,10 @@ Services.provider('ShapeEdit', [function ():void {
         element.style.marginTop = ((outerheight - innerheight) / 2) + "px";
         element.style.marginBottom = ((outerheight - innerheight) / 2) + "px";
 
-        let width:number = (outerwidth / innerwidth);
-        let height:number = (outerheight / innerheight);
+        let width: number = (outerwidth / innerwidth);
+        let height: number = (outerheight / innerheight);
         _self.ratio = Math.min(width, height) * scale * 0.9;
-        element.style.transform = "scale(" + _self.ratio  + ")";
+        element.style.transform = "scale(" + _self.ratio + ")";
     };
 
     this.$get = () => {
@@ -519,17 +518,29 @@ Services.provider('ShapeEdit', [function ():void {
                 }
                 _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
                 ShapeEdit.Canvas.Load(_self.Canvas, _self.object, _self.Handlers);
+
+
                 _self.IsOpen = true;
+                _self.Canvas.isdirty = false;
                 _self.Canvas.Draw();
                 //    _self.Canvas.Animate();
+            },
+
+
+            IsDirty: (): boolean => {
+                return _self.Canvas.isdirty;
             },
 
             Save: (): any => {
                 return ShapeEdit.Canvas.Save(_self.Canvas);
             },
 
-            Clear: () => {
-                _self.IsOpen = false;
+            Clear: (): void => {
+                _self.IsOpen = true;
+            },
+
+            Draw: (): void => {
+                _self.Canvas.Draw();
             },
 
             GetScale: (): number => {
@@ -543,11 +554,11 @@ Services.provider('ShapeEdit', [function ():void {
                 //     _self.Canvas.Animate();
             },
 
-            ToTop: () => {
+            ToTop: (): void => {
                 _self.Canvas.ToTop();
             },
 
-            ToBottom: () => {
+            ToBottom: (): void => {
                 _self.Canvas.ToBottom();
             },
 
@@ -580,6 +591,24 @@ Services.provider('ShapeEdit', [function ():void {
             Paste: (): void => {
                 _self.Canvas.Paste();
             },
+            Snap: (): void => {
+                _self.Canvas.Snap();
+            },
+            SetMode: (mode: any): void => {
+                _self.Canvas.SetMode(mode);
+            },
+            SetCurrentLocation: (loc: any): void => {
+                _self.Canvas.SetCurrentLocation(loc);
+            },
+            CurrentLocation: (): any => {
+                return _self.Canvas.CurrentLocation();
+            },
+            SetCurrentSize: (size: any): void => {
+                _self.Canvas.SetCurrentSize(size);
+            },
+            CurrentSize: (): any => {
+                return _self.Canvas.CurrentSize();
+            },
             SetCurrentFillColor: (color: any): void => {
                 _self.Canvas.SetCurrentFillColor(color);
             },
@@ -599,7 +628,9 @@ Services.provider('ShapeEdit', [function ():void {
                 return _self.Canvas.CurrentStrokeWidth();
             },
             SetCurrentFontStyle: (style: string): void => {
-                _self.Canvas.SetCurrentFontStyle(style);
+                if (_self.Canvas) {
+                    _self.Canvas.SetCurrentFontStyle(style);
+                }
             },
             CurrentFontStyle: (): string => {
                 return _self.Canvas.CurrentFontStyle();
@@ -611,13 +642,17 @@ Services.provider('ShapeEdit', [function ():void {
                 return _self.Canvas.CurrentFontVariant();
             },
             SetCurrentFontWeight: (weight: string): void => {
-                _self.Canvas.SetCurrentFontWeight(weight);
+                if (_self.Canvas) {
+                    _self.Canvas.SetCurrentFontWeight(weight);
+                }
             },
             CurrentFontWeight: (): string => {
                 return _self.Canvas.CurrentFontWeight();
             },
             SetCurrentFontSize: (size): void => {
-                _self.Canvas.SetCurrentFontSize(size);
+                if (_self.Canvas) {
+                    _self.Canvas.SetCurrentFontSize(size);
+                }
             },
             CurrentFontSize: (): number => {
                 return _self.Canvas.CurrentFontSize();
@@ -641,13 +676,17 @@ Services.provider('ShapeEdit', [function ():void {
                 return _self.Canvas.CurrentPath();
             },
             SetCurrentAlign: (align: string): void => {
-                _self.Canvas.SetCurrentAlign(align);
+                if (_self.Canvas) {
+                    _self.Canvas.SetCurrentAlign(align);
+                }
             },
             CurrentAlign: (): string => {
                 return _self.Canvas.CurrentAlign();
             },
             SetCurrentText: (text: string): void => {
-                _self.Canvas.SetCurrentText(text);
+                if (_self.Canvas) {
+                    _self.Canvas.SetCurrentText(text);
+                }
             },
             CurrentText: (): string => {
                 return _self.Canvas.CurrentText();
@@ -670,44 +709,44 @@ Services.provider('ShapeEdit', [function ():void {
             onDraw: (callback: (shape: ShapeEdit.BaseShape, context: any) => void) => {
                 _self.Plugins.on("draw", callback);
             },
-            onNew: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+            onNew: (callback: (shape: ShapeEdit.BaseShape) => void) => {
                 _self.Handlers.on("new", callback);
             },
-            onDelete: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+            onDelete: (callback: (shape: ShapeEdit.BaseShape) => void) => {
                 _self.Handlers.on("delete", callback);
             },
-            onSelect: (callback: (shape: ShapeEdit.BaseShape, context: any)=> void) => {
+            onSelect: (callback: (shape: ShapeEdit.BaseShape, context: any) => void) => {
                 _self.Handlers.on("select", callback);
             },
-            onDeselect: (callback: (shape: ShapeEdit.BaseShape, context: any)=> void) => {
+            onDeselect: (callback: (shape: ShapeEdit.BaseShape, context: any) => void) => {
                 _self.Handlers.on("deselect", callback);
             },
-            onMove: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+            onMove: (callback: (shape: ShapeEdit.BaseShape) => void) => {
                 _self.Handlers.on("move", callback);
             },
-            onResize: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+            onResize: (callback: (shape: ShapeEdit.BaseShape) => void) => {
                 _self.Handlers.on("resize", callback);
             },
-            onDeformation: (callback: (shape: ShapeEdit.BaseShape)=> void) => {
+            onDeformation: (callback: (shape: ShapeEdit.BaseShape) => void) => {
                 _self.Handlers.on("deformation", callback);
             },
-            onChange: (callback: ()=> void) => {
+            onChange: (callback: () => void) => {
                 _self.Handlers.on("change", callback);
             },
-            onKeydown: (callback: (shape: ShapeEdit.BaseShape, e: any)=> void) => {
+            onKeydown: (callback: (shape: ShapeEdit.BaseShape, e: any) => void) => {
                 _self.Handlers.on("keydown", callback);
             },
-            onDrop: (callback: (shape: ShapeEdit.BaseShape, e: any)=> void) => {
+            onDrop: (callback: (shape: ShapeEdit.BaseShape, e: any) => void) => {
                 _self.Handlers.on("drop", callback);
             },
-            onResizeWindow: (callback: (wrapper:any, inner:any) => void):void => {
-                let resizeTimer:any;
-                let interval:number = Math.floor(1000 / 60 * 10);
-                window.addEventListener('resize', (event:any):void => {
+            onResizeWindow: (callback: (wrapper: any, inner: any) => void): void => {
+                let resizeTimer: any;
+                let interval: number = Math.floor(1000 / 60 * 10);
+                window.addEventListener('resize', (event: any): void => {
                     if (resizeTimer !== false) {
                         clearTimeout(resizeTimer);
                     }
-                    resizeTimer = setTimeout(():void => {
+                    resizeTimer = setTimeout((): void => {
                         if (_self.object) {
                             callback(_self.Wrapper, _self.object);
                             _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);

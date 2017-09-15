@@ -7,6 +7,7 @@
 "use strict";
 
 export namespace EventModule {
+
     const Emitter = require('events');
     export class Event {
         public emitter = null;
@@ -14,6 +15,7 @@ export namespace EventModule {
             this.emitter = new Emitter();
         }
     }
+
 }
 
 module.exports = EventModule;

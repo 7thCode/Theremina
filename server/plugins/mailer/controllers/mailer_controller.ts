@@ -8,18 +8,15 @@
 
 export namespace MailerModule {
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     const mongoose = require('mongoose');
-    const Grid = require('gridfs-stream');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
     const config = share.config;
-    const Cipher = share.Cipher;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const AssetModel: any = require(share.Models("plugins/asset/asset"));
 

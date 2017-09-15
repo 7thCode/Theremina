@@ -11,7 +11,7 @@ export namespace FormApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 

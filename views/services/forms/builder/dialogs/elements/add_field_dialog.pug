@@ -1,66 +1,66 @@
 div
     .modal-header
         span.h5.modal-title Field
-    .modal-body.noto
+    .modal-body
         .row.row-padded
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
                         .col-xs-12
                             .form-group
-                                label(for="name") Key
+                                label(for="name") #{message.key}
                                 span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") 必須です
-                                    span.error-message(ng-message="maxlength") もう少し短く
-                                    span.error-message(ng-message="pattern") その文字を含むことはできません
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                    span.error-message(ng-message="pattern") #{message.invalid}
                                 input.form-control.no-zoom#name(ng-model="key", type="text", name='title', required, ng-maxlength="50", ng-pattern="key_escape")
                     .row
                         .col-xs-8
                             .form-group
-                                label(for="minmessage") Min Message
+                                label(for="minmessage") #{message.min_message}
                                 span(ng-messages="validate.minmessage.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#minmessage(ng-model="min.message", type="text", name='minmessage', ng-maxlength="50")
                         .col-xs-4
                             .form-group
-                                label(for="min") Min
+                                label(for="min") #{message.min}
                                 span(ng-messages="validate.min.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#min(ng-model="min.value", type="number", name='min', ng-maxlength="6")
                     .row
                         .col-xs-8
                             .form-group
-                                label(for="maxmessage") Max Message
+                                label(for="maxmessage") #{message.max_message}
                                 span(ng-messages="validate.maxmessage.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#maxmessage(ng-model="max.message", type="text", name='maxmessage', ng-maxlength="50")
                         .col-xs-4
                             .form-group
-                                label(for="max") Max
+                                label(for="max") #{message.max}
                                 span(ng-messages="validate.max.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#max(ng-model="max.value", type="number", name='max', ng-maxlength="6")
 
                     .row
                         .col-xs-6
                             .form-group
-                                label(for="patternmessage") Pattern Message
+                                label(for="patternmessage") #{message.pattern_message}
                                 span(ng-messages="validate.maxmessage.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#patternmessage(ng-model="pattern.message", type="text", name='pattermmessage', ng-maxlength="50")
                         .col-xs-6
                             .form-group
-                                label(for="pattern") Pattern
+                                label(for="pattern") #{message.pattern}
                                 span(ng-messages="validate.pattern.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#pattern(ng-model="pattern.value", type="text", name='pattern', ng-maxlength="100")
 
                     .row
                         .col-xs-8
                             .form-group
-                                label(for="requiredmessage") Requred Message
+                                label(for="requiredmessage") #{message.requred_message}
                                 span(ng-messages="validate.requiredmessage.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#requiredmessage(ng-model="required.message", type="text", name='requiredmessage', ng-maxlength="50")
 
             .col-xs-12
@@ -70,5 +70,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

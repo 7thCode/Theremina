@@ -32,7 +32,9 @@ let FrontApplication: any = angular.module('FrontApplication', [
     "YahooServices",
     "PublicKeyServices",
     "MailerControllers",
-    "MailerServices"
+    "MailerServices",
+    "GoogleServices",
+    "GoogleControllers"
 ]);
 
 FrontApplication.run(['$rootScope',
@@ -82,4 +84,25 @@ FrontApplication.filter('limit', [():any => {
     };
 }]);
 
+FrontApplication.filter('round', [():any => {
+    return (value: any): string => {
+        let result = value;
+        if (!isNaN(value)) {
+            result = Math.round(value);
+        }
+        return result;
+    };
+}]);
 
+
+
+FrontApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
+    ($scope: any, $uibModalInstance: any, items: any): void => {
+
+        $scope.message = items;
+
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
+
+    }]);

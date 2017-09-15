@@ -11,12 +11,6 @@ export namespace SessionPageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
-    const share: any = core.share;
-    const auth: any = core.auth;
-    const exception: any = core.exception;
-    const analysis: any = core.analysis;
-
 }
 
 module.exports = SessionPageRouter.router;

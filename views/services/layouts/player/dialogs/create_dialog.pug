@@ -7,7 +7,7 @@ div
             button.btn.btn-default(style="border-radius:0 6px 6px 0;",ng-click="Prev()", ng-disabled="progress")
                 i.fa.fa-chevron-up
 
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12
                 ul.nav.nav-pills
@@ -40,10 +40,10 @@ div
             .col-xs-12
                 ng-form(name="validate" ng-show="HasSelectedTemplate()")
                     .form-group
-                        label(for="name") Name
+                        label.control-label(for="name") Name
                         span(ng-messages="validate.name.$error")
-                            span.error-message(ng-message="required") #{messages.required}
-                            span.error-message(ng-message="maxlength") #{messages.long}
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#name(ng-model="name", type="text", name='name', required, ng-maxlength="50")
 
         .row
@@ -53,5 +53,5 @@ div
     .modal-footer
         .row
             .col-xs-12.text-center(style="margin:2rem;")
-                button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="", ng-disabled="progress") Cancel
+                button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="", ng-disabled="progress") #{message.cancel}
                 button.btn.btn-primary(type="button",ng-click="Create()",aria-label="",ng-disabled="progress") Create...

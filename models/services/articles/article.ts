@@ -7,6 +7,7 @@
 "use strict";
 
 export namespace ArticleModule {
+
     const mongoose = require('mongoose');
     const request = require('request-promise');
     const Schema = mongoose.Schema;
@@ -14,14 +15,15 @@ export namespace ArticleModule {
     const userdata: any = require('../../systems/plugins/userdata/userdata');
 
     const Article = new Schema({
-        version: {type: Number, default: 1},
-        status: {type: Number, default: 10},
         from: {type: Date},
         to: {type: Date}
     });
 
     Article.plugin(timestamp);
     Article.plugin(userdata, {});
+
+    Article.index({_id: 1, userid: 1}, {unique: true, index: true});
+    Article.index({name: 1}, {unique: true, index: true});
 
     Article.method("GetContent", function (name: string): void {
         return this.content[name];

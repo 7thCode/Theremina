@@ -7,6 +7,7 @@
 "use strict";
 
 export namespace FileUtility {
+
     const fs: any = require('graceful-fs');
 
     const share = require('./share');

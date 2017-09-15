@@ -9,12 +9,12 @@
 let MailerServices: angular.IModule = angular.module('MailerServices', []);
 
 MailerServices.factory('MailSend', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/mailer/api/send', {}, {});
     }]);
 
 MailerServices.factory('Mail', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/mailer/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -23,7 +23,7 @@ MailerServices.factory('Mail', ['$resource',
     }]);
 
 MailerServices.factory('MailQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/mailer/api/query/:query/:option", {query: '@query', option: '@optopn'},
             {
                 query: {method: 'GET'}
@@ -32,7 +32,7 @@ MailerServices.factory('MailQuery', ['$resource',
     }]);
 
 MailerServices.factory('MailCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/mailer/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -52,8 +52,7 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
         };
 
         let init = () => {
-            this.pagesize = 10;
-            this.option = {sort: {create: -1}, limit: this.pagesize, skip: 0};
+            this.option = {sort: {create: -1}, limit: 40, skip: 0};
             this.SetQuery(null);
             this.current_article = null;
         };
@@ -64,18 +63,18 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
 
         this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
         this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -86,7 +85,7 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -165,8 +164,7 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
         };
 
         let init = () => {
-            this.pagesize = 10;
-            this.option = {sort: {create: -1}, limit: this.pagesize, skip: 0};
+            this.option = {sort: {create: -1}, limit: 40, skip: 0};
             this.SetQuery(null);
             this.current_article = null;
         };
@@ -222,18 +220,18 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
 
         this.Over = (send: boolean, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Count(send, (count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
         this.Under = (send: boolean, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+            callback(this.option.skip > 0);
         };
 
         this.Next = (send: boolean, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over(send, (hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(send, callback, error);
                 } else {
                     callback(null);
@@ -244,7 +242,7 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
         this.Prev = (send: boolean, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under(send, (hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(send, callback, error);
                 } else {
                     callback(null);

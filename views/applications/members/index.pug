@@ -3,12 +3,8 @@ extends ../../layout
 block content
     section.content(ng-controller="MemberController")
         include partial/navbar
-        .box.box-info
+        .box.box-info(style="margin-top:12px;")
             .box-header.with-border
-                div
-                    .box-tools.pull-right
-                        button.btn.btn-sm.btn-box-tool(type='button', data-widget='collapse')
-                            i.fa.fa-minus
                 include ../../systems/common/next_prev
 
             .box-body
@@ -17,10 +13,10 @@ block content
                         div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
                             .flex-column(style="background-color: #eeeeee;height:3.0rem;")
                                 .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
-                                    .ellipsis(style="width:40%;") メールアドレス
-                                    .ellipsis(style="width:40%;") ニックネーム
-                                    .ellipsis(style="width:10%;") 日付
-                                    .ellipsis(style="width:10%;") 見る
+                                    .ellipsis(style="width:40%;") #{message.mail}
+                                    .ellipsis(style="width:40%;") #{message.nickname}
+                                    .ellipsis(style="width:10%;") #{message.date}
+                                    .ellipsis(style="width:10%;") #{message.show}
                             .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
                                 .flex-row(ng-repeat="account in accounts" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
                                     .ellipsis(style="width:40%;") {{account.username}}

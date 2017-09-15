@@ -41,10 +41,11 @@ export namespace FileModule {
 
         static connect(user): any {
             let result = null;
+            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
             if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
             } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name);
+                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name,options);
             }
             return result;
         }
@@ -52,7 +53,7 @@ export namespace FileModule {
         static namespace(name: string): string {
             let result = "";
             if (name) {
-                let names = name.split(":");
+                let names = name.split("#");
                 let delimmiter = "";
                 names.forEach((name, index) => {
                     if (index < (names.length - 1)) {
@@ -67,7 +68,7 @@ export namespace FileModule {
         static localname(name: string): string {
             let result = "";
             if (name) {
-                let names = name.split(":");
+                let names = name.split("#");
                 names.forEach((name, index) => {
                     if (index == (names.length - 1)) {
                         result = name;
@@ -85,13 +86,13 @@ export namespace FileModule {
             return request.user.username;
         }
 
-        static from_local(gfs: any, path_from: string, namespace: string, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
+        static from_local(gfs: any, path_from: string, namespace: string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
                         userid: config.systems.userid,
-                        key: 0,
+                        key: key,
                         type: mimetype,
                         namespace: namespace,
                         parent: null
@@ -100,21 +101,22 @@ export namespace FileModule {
 
                 let readstream = fs.createReadStream(path_from + '/' + name, {encoding: null, bufferSize: 1});
 
-                readstream.pipe(writestream);
-
-                writestream.on('data', function (chunk) {
-
-                });
-
-                writestream.on('end', function (filen) {
-                    callback(null, filen);
-                });
-
-                writestream.on('error', function (error) {
+                readstream.on('error', (error: any): void => {
                     callback(error, null);
                 });
 
+                writestream.on('close', (file: any): void => {
+                    callback(null, file);
+                });
+
+                writestream.on('error', (error: any): void => {
+                    callback(error, null);
+                });
+
+                readstream.pipe(writestream);
+
             } catch (e) {
+                callback(e, null);
             }
         }
 
@@ -125,10 +127,14 @@ export namespace FileModule {
                         let readstream = gfs.createReadStream({_id: item._id});
                         if (readstream) {
                             response.setHeader('Content-Type', item.metadata.type);
-                            readstream.pipe(response);
+                        //    response.setHeader("Cache-Control", "no-cache");
                             readstream.on('close', (): void => {
                                 conn.db.close();
                             });
+                            readstream.on('error', (error: any): void => {
+                                conn.db.close();
+                            });
+                            readstream.pipe(response);
                         } else {
                             conn.db.close();
                             next();
@@ -147,77 +153,96 @@ export namespace FileModule {
          *
          * @returns none
          */
-        public create_init_files(): void {
-            let conn = Files.connect(config.db.user);
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        collection.ensureIndex({
-                                            "filename": 1,
-                                            "metadata.namespace": 1,
-                                            "metadata.userid": 1
-                                        }, (error) => {
-                                            if (!error) {
-                                                let save = (doc: any): any => {
-                                                    return new Promise((resolve: any, reject: any): void => {
-                                                        let path = process.cwd() + '/public/systems/files/files/';
-                                                        let filename = doc.filename;
-                                                        let mimetype = doc.mimetype;
-                                                        let query = {};
-                                                        if (config.structured) {
-                                                            query = {$and: [{filename: filename}, {"metadata.namespace": ""}, {"metadata.userid": config.systems.userid}]};
-                                                        } else {
-                                                            query = {$and: [{filename: filename}, {"metadata.userid": config.systems.userid}]};
-                                                        }
-                                                        collection.findOne(query, (error: any, item: any): void => {
-                                                            if (!error) {
-                                                                if (!item) {
-                                                                    Files.from_local(gfs, path, "", filename, mimetype, (error: any, file: any): void => {
-                                                                        if (!error) {
-                                                                            resolve(file);
-                                                                        } else {
-                                                                            reject(error);
-                                                                        }
-                                                                    });
+        public create_init_files(initfiles: any[], callback: (error, result) => void): void {
+            if (initfiles) {
+                if (initfiles.length > 0) {
+                    let conn = Files.connect(config.db.user);
+                    if (conn) {
+                        conn.once('open', (error: any): void => {
+                            if (!error) {
+                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                                if (gfs) {
+                                    conn.db.collection('fs.files', (error: any, collection: any): void => {
+                                        if (!error) {
+                                            if (collection) {
+                                                collection.ensureIndex({
+                                                    "filename": 1,
+                                                    "metadata.namespace": 1,
+                                                    "metadata.userid": 1
+                                                }, (error) => {
+                                                    if (!error) {
+                                                        let save = (doc: any): any => {
+                                                            return new Promise((resolve: any, reject: any): void => {
+                                                                let path = process.cwd() + doc.path;
+                                                                let filename = doc.name;
+                                                                let mimetype = doc.content.type;
+                                                                let type: number = doc.type;
+                                                                let query = {};
+                                                                if (config.structured) {
+                                                                    query = {$and: [{filename: filename}, {"metadata.namespace": ""}, {"metadata.userid": config.systems.userid}]};
                                                                 } else {
-                                                                    resolve({});
+                                                                    query = {$and: [{filename: filename}, {"metadata.userid": config.systems.userid}]};
                                                                 }
-                                                            } else {
-                                                                reject(error);
-                                                            }
-                                                        });
-                                                    });
-                                                };
+                                                                collection.findOne(query, (error: any, item: any): void => {
+                                                                    if (!error) {
+                                                                        if (!item) {
+                                                                            Files.from_local(gfs, path, "", type, filename, mimetype, (error: any, file: any): void => {
+                                                                                if (!error) {
+                                                                                    resolve(file);
+                                                                                } else {
+                                                                                    reject(error);
+                                                                                }
+                                                                            });
+                                                                        } else {
+                                                                            collection.remove({_id: item._id}, (error, result) => {
+                                                                                if (!error) {
+                                                                                    Files.from_local(gfs, path, "", type, filename, mimetype, (error: any, file: any): void => {
+                                                                                        if (!error) {
+                                                                                            resolve(file);
+                                                                                        } else {
+                                                                                            reject(error);
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    } else {
+                                                                        reject(error);
+                                                                    }
+                                                                });
+                                                            });
+                                                        };
 
-                                                let docs = config.initfiles;
-                                                Promise.all(docs.map((doc: any): void => {
-                                                    return save(doc);
-                                                })).then((results: any[]): void => {
-                                                    conn.db.close();
-                                                }).catch((error: any): void => {
-                                                    conn.db.close();
+                                                        let docs = initfiles;
+                                                        Promise.all(docs.map((doc: any): void => {
+                                                            return save(doc);
+                                                        })).then((results: any[]): void => {
+                                                            conn.db.close();
+                                                            callback(null, results);
+                                                        }).catch((error: any): void => {
+                                                            conn.db.close();
+                                                            callback(error, null);
+                                                        });
+                                                    }
                                                 });
+                                            } else {
+                                                conn.db.close();
                                             }
-                                        });
-                                    } else {
-                                        conn.db.close();
-                                    }
+                                        } else {
+                                            conn.db.close();
+                                        }
+                                    });
                                 } else {
                                     conn.db.close();
                                 }
-                            });
-                        } else {
-                            conn.db.close();
-                        }
-                    } else {
-                        conn.db.close();
+                            } else {
+                                conn.db.close();
+                            }
+                        });
                     }
-                });
+                } else {
+                    callback(null, null);
+                }
             }
         }
 
@@ -231,7 +256,6 @@ export namespace FileModule {
             let number: number = 27000;
             let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
-            //  let username = Files.username(request);
 
             if (conn) {
                 conn.once('open', (error: any): void => {
@@ -241,8 +265,6 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        //         let query: any = JSON.parse(decodeURIComponent(request.params.query));
-                                        //         let option: any = JSON.parse(decodeURIComponent(request.params.option));
 
                                         let query: any = Wrapper.Decode(request.params.query);
                                         let option: any = Wrapper.Decode(request.params.option);
@@ -308,7 +330,6 @@ export namespace FileModule {
             let number: number = 28000;
             let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
-            //let username = Files.username(request);
 
             if (conn) {
                 conn.once('open', (error: any): void => {
@@ -318,7 +339,7 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        //                     let query: any = JSON.parse(decodeURIComponent(request.params.query));
+
                                         let query: any = Wrapper.Decode(request.params.query);
 
                                         collection.find({$and: [query, {"metadata.userid": userid}]}).count((error: any, count: any): void => {
@@ -369,7 +390,7 @@ export namespace FileModule {
          * @param next
          * @returns none
          */
-        public get_file_name(request: any, response: any, next: any): void {
+        public get_file(request: any, response: any, next: any): void {
             try {
                 let conn = Files.connect(config.db.user);
                 let namespace = Files.namespace(request.params.name);
@@ -383,8 +404,6 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        //        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                        //    let query = {$and: [{filename: name},  {"metadata.userid": userid}]};
 
                                         let query = {};
                                         if (config.structured) {
@@ -399,10 +418,14 @@ export namespace FileModule {
                                                     let readstream = gfs.createReadStream({_id: item._id});
                                                     if (readstream) {
                                                         response.setHeader('Content-Type', item.metadata.type);
-                                                        readstream.pipe(response);
+                                               //         response.setHeader("Cache-Control", "no-cache");
                                                         readstream.on('close', (): void => {
                                                             conn.db.close();
                                                         });
+                                                        readstream.on('error', (error: any): void => {
+                                                            conn.db.close();
+                                                        });
+                                                        readstream.pipe(response);
                                                     } else {
                                                         conn.db.close();
                                                         next();
@@ -446,6 +469,98 @@ export namespace FileModule {
          *
          * @param request
          * @param response
+         * @param next
+         * @returns none
+         */
+        public get_file_data_name(request: any, response: any, next: any): void {
+            try {
+                let conn = Files.connect(config.db.user);
+                let namespace = Files.namespace(request.params.name);
+                let name = Files.localname(request.params.name);
+                let userid = Files.userid(request);
+
+                let BinaryToBase64 = (str) => {
+                    return new Buffer(str,'binary').toString('base64');
+                };
+
+                conn.once('open', (error: any): void => {
+                    if (!error) {
+                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        if (gfs) {
+                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                                if (!error) {
+                                    if (collection) {
+
+                                        let query = {};
+                                        if (config.structured) {
+                                            query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                        } else {
+                                            query = {$and: [{filename: name}, {"metadata.userid": userid}]};
+                                        }
+
+                                        collection.findOne(query, (error: any, item: any): void => {
+                                            if (!error) {
+                                                if (item) {
+                                                    let buffer = new Buffer(0);
+                                                    let readstream = gfs.createReadStream({_id: item._id});
+                                                    if (readstream) {
+
+                                                        readstream.on("data", (chunk): void => {
+                                                            buffer = Buffer.concat([buffer,new Buffer(chunk)]);
+                                                        });
+
+                                                        readstream.on('close', (): void => {
+                                                            conn.db.close();
+                                                            let dataurl = "data:" + item.metadata.type + ";base64," + BinaryToBase64(buffer);
+                                                            Wrapper.SendSuccess(response, dataurl);
+                                                        });
+
+                                                        readstream.on('error', (error: any): void => {
+                                                            conn.db.close();
+                                                            Wrapper.SendError(response, error.code, error.message, error);
+                                                        });
+
+                                                    } else {
+                                                        conn.db.close();
+                                                        Wrapper.SendError(response, 10000, "no stream", {code:10000, message:"no stream"});
+                                                    }
+                                                } else {
+                                                    conn.db.close();
+                                                    Wrapper.SendFatal(response, 10000, "no item", {code:10000, message:"no item"});
+                                                }
+                                            } else {
+                                                conn.db.close();
+                                                Wrapper.SendError(response, error.code, error.message, error);
+                                            }
+                                        });
+                                    } else {
+                                        conn.db.close();
+                                        Wrapper.SendFatal(response, 10000, "no collection", {code:10000, message:"no collection"});
+                                    }
+                                } else {
+                                    conn.db.close();
+                                    Wrapper.SendError(response, error.code, error.message, error);
+                                }
+                            });
+                        } else {
+                            conn.db.close();
+                            Wrapper.SendFatal(response, 10000, "no gfs", {code:10000, message:"no gfs"});
+                        }
+                    } else {
+                        conn.db.close();
+                        Wrapper.SendError(response, error.code, error.message, error);
+                    }
+                });
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
+            }
+        }
+
+
+        /**
+         *
+         * @param request
+         * @param response
          * @returns none
          */
         public post_file_name(request: any, response: any): void {
@@ -467,9 +582,6 @@ export namespace FileModule {
                                     conn.db.collection('fs.files', (error: any, collection: any): void => {
                                         if (!error) {
                                             if (collection) {
-                                                //       let query = {$and: [{filename: name}, {"metadata.userid": userid}]};
-                                                //        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-
 
                                                 let query = {};
                                                 if (config.structured) {
@@ -617,8 +729,6 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        //  let query = {$and: [{filename: name}, {"metadata.userid": userid}]};
-                                        //        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
 
                                         let query = {};
                                         if (config.structured) {
@@ -723,90 +833,6 @@ export namespace FileModule {
             }
         }
 
-        /*
-         public put_file_name(request: any, response: any): void {
-         let number: number = 25000;
-         let conn = Files.connect(config.db.user);
-         let name = request.params.name;
-         let key = request.params.key;
-         let userid = Files.userid(request);
-         let username = Files.username(request);
-
-         if (conn) {
-         conn.once('open', (error: any): void => {
-         if (!error) {
-         let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-         if (gfs) {
-         conn.db.collection('fs.files', (error: any, collection: any): void => {
-         if (!error) {
-         if (collection) {
-         collection.findOne({$and: [{filename: name}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
-         if (!error) {
-         if (item) {
-         collection.remove({filename: name, metadata: {userid: userid, type: Files.to_mime(request)}}, () => {
-         let parseDataURL = (dataURL: any): any => {
-         let result = {
-         mediaType: null,
-         encoding: null,
-         isBase64: null,
-         data: null
-         };
-         if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
-         result.mediaType = RegExp.$1 || 'text/plain';
-         result.encoding = RegExp.$3 || 'US-ASCII';
-         result.isBase64 = String(RegExp.$4) === ';base64';
-         result.data = RegExp.$5;
-         }
-         return result;
-         };
-
-         let info = parseDataURL(request.body.url);
-         let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
-         let writestream = gfs.createWriteStream({filename: name,username: username, metadata: {userid: userid, key: key * 1, type: Files.to_mime(request), parent:null}});
-         if (writestream) {
-         writestream.write(chunk);
-         writestream.on('close', (file: any): void => {
-         conn.db.close();
-         Wrapper.SendSuccess(response, file);
-         });
-         writestream.end();
-         } else {
-         conn.db.close();
-         Wrapper.SendFatal(response, number + 40, "stream not open", {});
-         }
-         });
-         } else {
-         conn.db.close();
-         Wrapper.SendWarn(response, number + 1, "not found", {});
-         }
-         } else {
-         conn.db.close();
-         Wrapper.SendError(response, number + 100, error.message, error);
-         }
-         });
-         } else {
-         Wrapper.SendFatal(response, number + 30, "no collection", {});
-         }
-         } else {
-         conn.db.close();
-         Wrapper.SendError(response, number + 100, error.message, error);
-         }
-         });
-         } else {
-         conn.db.close();
-         Wrapper.SendFatal(response, number + 20, "no gfs", {});
-         }
-         } else {
-         conn.db.close();
-         Wrapper.SendError(response, number + 100, error.message, error);
-         }
-         });
-         } else {
-         Wrapper.SendError(response, number + 10, "connection error", {});
-         }
-         }
-         */
-
         /**
          *
          * @param request
@@ -819,9 +845,7 @@ export namespace FileModule {
             let namespace = Files.namespace(request.params.name);
             let name = Files.localname(request.params.name);
 
-            //let key = request.params.key;
             let userid = Files.userid(request);
-            //let username = Files.username(request);
 
             if (conn) {
                 conn.once('open', (error: any): void => {
@@ -831,8 +855,6 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        //let query = {$and: [{filename: name}, {"metadata.userid": userid}]};
-                                        //        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
 
                                         let query = {};
                                         if (config.structured) {
@@ -906,7 +928,6 @@ export namespace FileModule {
             let number: number = 29000;
             let conn: any = Files.connect(config.db.user);
             let userid: string = Files.userid(request);
-            //let username = Files.username(request);
 
             if (conn) {
                 conn.once('open', (error: any): void => {
@@ -957,6 +978,112 @@ export namespace FileModule {
             }
         }
     }
+
+    export class TemporaryFiles {
+
+        constructor() {
+
+        }
+
+        static isExistFile(path:string) {
+            let result = false;
+            try {
+                fs.statSync(path);
+                result = true;
+            }
+            catch (e) {
+            }
+            return result;
+        }
+
+        static MkdirIfNotExist(path:string, callback:(error:any) => void):void {
+            if (!TemporaryFiles.isExistFile(path)) {
+                fs.mkdir(path, '0777', callback);
+            } else {
+                callback(null)
+            }
+        }
+
+        public upload(request: any, response: any): void {
+            let name = request.params.filename;
+            if (name) {
+                if (name.indexOf('/') == -1) {
+                    let parseDataURL = (dataURL: any): any => {
+                        let result = {
+                            mediaType: null,
+                            encoding: null,
+                            isBase64: null,
+                            data: null
+                        };
+                        if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
+                            result.mediaType = RegExp.$1 || 'text/plain';
+                            result.encoding = RegExp.$3 || 'US-ASCII';
+                            result.isBase64 = String(RegExp.$4) === ';base64';
+                            result.data = RegExp.$5;
+                        }
+                        return result;
+                    };
+
+                    let info = parseDataURL(request.body.url);
+                    let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
+
+                    let tmp_path = '/tmp/' + request.sessionID;
+                    let tmp_file = '/' + name;
+                    let original_mask = process.umask(0);
+
+                    TemporaryFiles.MkdirIfNotExist(tmp_path, (error: any): void => {
+                        if (!error) {
+                            fs.writeFile(tmp_path + tmp_file, chunk, (error: any): void => {
+                                if (!error) {
+                                    Wrapper.SendSuccess(response, {});
+                                } else {
+                                    console.log("writeFile : " + error.message);
+                                    Wrapper.SendError(response, error.code, error.message, error);
+                                }
+                            });
+                        } else {
+                            console.log("mkdir : " + error.message);
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                        process.umask(original_mask);
+                    });
+                }
+            }
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public download(request: any, response: any): void {
+
+            let delete_folder_recursive = (path) => {
+                fs.readdirSync(path).forEach((file) => {
+                    let curPath = path + "/" + file;
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                        delete_folder_recursive(curPath);
+                    } else {
+                        fs.unlinkSync(curPath);
+                    }
+                });
+                fs.rmdirSync(path);
+            };
+
+            let tmp_path = '/tmp/' + request.sessionID;
+            let tmp_file = '/' + request.params.filename;//  '/noname.xlsx';
+            response.download(tmp_path + tmp_file, (error: any): void => {
+                if (!error) {
+                    fs.unlink(tmp_path + tmp_file, (error: any): void => {
+                        if (!error) {
+                            delete_folder_recursive(tmp_path);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
 }
 
 module.exports = FileModule;

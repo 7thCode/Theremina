@@ -2,9 +2,9 @@
     .box-header.with-border
         .h6 layout: {{current_layout.name}}
         .h6 article: {{current_article.name}}
-        .well.well-sm(layout="word-wrap:break-all;") #{config.protocol}://#{config.domain}/layouts/render/{{userid}}/{{current_layout.name}}
+        .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/layouts/render/{{userid}}/{{current_layout.name}}
         .box-tools.pull-right
-            button.btn.btn-box-tool(type='button', data-widget='collapse')
+            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                 i.fa.fa-minus
     .box-body
         div#wrapper(style="height:65vh;background-color:#dddddd; overflow:scroll;")

@@ -13,7 +13,8 @@ export namespace AuthModule {
     const fs = require('graceful-fs');
 
     const mongoose: any = require('mongoose');
-    mongoose.Promise = require('q').Promise;
+    //mongoose.Promise = require('q').Promise;
+    mongoose.Promise = global.Promise;
 
     const passport: any = require('passport');
 
@@ -26,6 +27,8 @@ export namespace AuthModule {
     const config = share.config;
     const applications_config = share.applications_config;
 
+    let message = config.message;
+
     const Wrapper: any = share.Wrapper;
     const logger: any = share.logger;
     const Cipher: any = share.Cipher;
@@ -33,7 +36,9 @@ export namespace AuthModule {
 
     const MailerModule: any = require('../../common/mailer');
 
-    const HtmlEditModule: any = require("../../common/html_edit/html_edit");
+    //const HtmlEditModule: any = require("../../common/html_edit/html_edit");
+    const HtmlScannerModule: any = require("../../common/html_scanner/html_scanner");
+    const ScannerBehaviorModule: any = require("../../common/html_scanner/scanner_behavior");
 
     let _mailer = null;
     switch (config.mailer.type) {
@@ -86,65 +91,43 @@ export namespace AuthModule {
 
         }
 
-        public create_init_user(): void {
-            _.forEach(config.initusers, (user) => {
-                let type: string = user.type;
-                let auth: number = user.auth;
-                let username: string = user.username;
-                let userid = user.userid;
-                let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
+        public create_init_user(initusers:any[]): void {
+            if (initusers) {
+                _.forEach(initusers, (user) => {
+                    let type: string = user.type;
+                    let auth: number = user.auth;
+                    let username: string = user.username;
+                    let userid = user.userid;
+                    let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
-                let rootpassword: string = user.password;
-                Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
-                    if (!account) {
+                    let rootpassword: string = user.password;
+                    Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
+                        if (!account) {
 
-                        let content: any = definition.account_content;
-                        content.mails.push(username);
-                        content.nickname = user.displayName;
+                            let content: any = definition.account_content;
+                            content.mails.push(username);
+                            content.nickname = user.displayName;
 
-                        LocalAccount.register(new LocalAccount({
-                                userid: userid,
-                                username: username,
-                                type: type,
-                                auth: auth,
-                                passphrase: passphrase,
-                                publickey: Cipher.PublicKey(passphrase),
-                                local: content
-                            }),
-                            rootpassword,
-                            (error: any) => {
-                                if (error) {
-                                    logger.error(error.message);
-                                }
-                            });
-                    }
+                            LocalAccount.register(new LocalAccount({
+                                    userid: userid,
+                                    username: username,
+                                    type: type,
+                                    auth: auth,
+                                    passphrase: passphrase,
+                                    publickey: Cipher.PublicKey(passphrase),
+                                    local: content
+                                }),
+                                rootpassword,
+                                (error: any) => {
+                                    if (error) {
+                                        logger.error(error.message);
+                                    }
+                                });
+                        }
+                    });
                 });
-            });
+            }
         }
-
-        /*
-         public create_init_page(): void {
-         _.forEach(config.initpages, (page) => {
-         let name: string = page.name;
-         let userid = page.userid;
-         let type: string = page.type;
-         let content: any = page.content;
-         Wrapper.FindOne(null, 1000, ResourceModel, {$and: [{userid: userid}, {type: type}, {name: name}]}, (response: any, page: any): void => {
-         if (!page) {
-         let page: any = new ResourceModel();
-         page.userid = userid;
-         page.name = name;
-         page.type = type;
-         page.content = content;
-         page.open = true;
-         page.save().then(() => {
-         }).catch((): void => {
-         });
-         }
-         });
-         });
-         }
-         */
 
         static auth_event(type: string, param: any): void {
             switch (type) {
@@ -258,6 +241,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
+
         public post_local_register(request: any, response: any): void {
             const number: number = 15000;
             let username: string = request.body.username;
@@ -293,23 +277,20 @@ export namespace AuthModule {
                             let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
-                                    let scanner = new HtmlEditModule.Scanner("", {});
-                                    scanner.ScanHtml(record.content.resource, {
-                                        create: "",
-                                        modify: "",
-                                        content: {
-                                            link: {"value": link, "type": "quoted"},
-                                            beacon: {"value": beacon, "type": "quoted"}
+
+                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, null, true, {});
+                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                        if (!error) {
+                                            _mailer.send(username, message.registconfirmtext, doc, (error: any) => {
+                                                if (!error) {
+                                                    Wrapper.SendSuccess(response, {code: 0, message: ""});
+                                                } else {
+                                                    Wrapper.SendError(response, error.code, error.message, error);
+                                                }
+                                            });
                                         }
-                                    }, [], 0, (error: any, doc: any) => {
-                                        _mailer.send(username, applications_config.messages.mail.regist.subject, doc, (error: any) => {
-                                            if (!error) {
-                                                Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                            } else {
-                                                Wrapper.SendError(response, error.code, error.message, error);
-                                            }
-                                        });
                                     });
+
                                 } else {
                                     Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
                                 }
@@ -321,7 +302,7 @@ export namespace AuthModule {
                             Wrapper.SendFatal(response, e.code, e.message, e);
                         }
                     } else {
-                        Wrapper.SendWarn(response, number + 1, applications_config.messages.errors.usernamealreadyregist, {code:number + 1, message: applications_config.messages.errors.usernamealreadyregist});
+                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code:number + 1, message: message.usernamealreadyregist});
                     }
                 }
             );
@@ -343,8 +324,6 @@ export namespace AuthModule {
                     LocalAccount.findOne({username: token.username}, (error: any, account_data: any): void => {
                         if (!error) {
                             if (!account_data) {
-                                //      let objectid: any = new mongoose.Types.ObjectId; // Create new id
-                                //      let userid: string = objectid.toString();
 
                                 const shasum = crypto.createHash('sha1');
                                 shasum.update(token.username);
@@ -466,23 +445,20 @@ export namespace AuthModule {
                             let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_member_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
-                                    let scanner = new HtmlEditModule.Scanner("", {});
-                                    scanner.ScanHtml(record.content.resource, {
-                                        create: "",
-                                        modify: "",
-                                        content: {
-                                            link: {"value": link, "type": "quoted"},
-                                            beacon: {"value": beacon, "type": "quoted"}
+
+                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, null, true, {});
+                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                        if (!error) {
+                                            _mailer.send(username, message.memberconfirmtext, doc, (error: any) => {
+                                                if (!error) {
+                                                    Wrapper.SendSuccess(response, {code: 0, message: ""});
+                                                } else {
+                                                    Wrapper.SendError(response, error.code, error.message, error);
+                                                }
+                                            });
                                         }
-                                    }, [], 0, (error: any, doc: any) => {
-                                        _mailer.send(username, applications_config.messages.mail.regist.subject, doc, (error: any) => {
-                                            if (!error) {
-                                                Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                            } else {
-                                                Wrapper.SendError(response, error.code, error.message, error);
-                                            }
-                                        });
                                     });
+
                                 } else {
                                     Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
                                 }
@@ -493,7 +469,7 @@ export namespace AuthModule {
                             Wrapper.SendFatal(response, e.code, e.message, e);
                         }
                     } else {
-                        Wrapper.SendWarn(response, number + 1, applications_config.messages.errors.usernamealreadyregist, {code:number + 1, message: applications_config.messages.errors.usernamealreadyregist});
+                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code:number + 1, message: message.usernamealreadyregist});
                     }
                 }
             );
@@ -516,8 +492,6 @@ export namespace AuthModule {
                     LocalAccount.findOne({username: token.username}, (error: any, account_data: any): void => {
                         if (!error) {
                             if (!account_data) {
-                                //        let objectid: any = new mongoose.Types.ObjectId; // Create new id
-                                //        let userid: string = objectid.toString();
 
                                 let content = definition.account_content;
                                 content.mails.push(token.username);
@@ -631,23 +605,20 @@ export namespace AuthModule {
                                 let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                                 ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "username_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                     if (record) {
-                                        let scanner = new HtmlEditModule.Scanner("", {});
-                                        scanner.ScanHtml(record.content.resource, {
-                                            create: "",
-                                            modify: "",
-                                            content: {
-                                                link: {"value": link, "type": "quoted"},
-                                                beacon: {"value": beacon, "type": "quoted"}
+
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid, null, true, {});
+                                        HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                            if (!error) {
+                                                _mailer.send(username, message.usernameconfirmtext, doc, (error: any) => {
+                                                    if (!error) {
+                                                        Wrapper.SendSuccess(response, {code: 0, message: ""});
+                                                    } else {
+                                                        Wrapper.SendError(response, error.code, error.message, error);
+                                                    }
+                                                });
                                             }
-                                        }, [], 0, (error: any, doc: any) => {
-                                            _mailer.send(username, applications_config.messages.mail.regist.subject, doc, (error: any) => {
-                                                if (!error) {
-                                                    Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                                } else {
-                                                    Wrapper.SendError(response, error.code, error.message, error);
-                                                }
-                                            });
                                         });
+
                                     } else {
                                         Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
                                     }
@@ -658,11 +629,11 @@ export namespace AuthModule {
                                 Wrapper.SendFatal(response, e.code, e.message, e);
                             }
                         } else {
-                            Wrapper.SendWarn(response, number + 2, applications_config.messages.errors.usernamealreadyregist, {code:number + 2, message: applications_config.messages.errors.usernamealreadyregist});
+                            Wrapper.SendWarn(response, number + 2, message.usernamealreadyregist, {code:number + 2, message: message.usernamealreadyregist});
                         }
                     });
                 } else {
-                    Wrapper.SendWarn(response, number + 3, applications_config.messages.errors.usernamenotfound, {code:number + 3, message: applications_config.messages.errors.usernamenotfound});
+                    Wrapper.SendWarn(response, number + 3, message.usernamenotfound, {code:number + 3, message: message.usernamenotfound});
                 }
             });
         }
@@ -736,23 +707,20 @@ export namespace AuthModule {
                         let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                         ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "password_mail.html"}, {"type": 12}]}).then((record: any): void => {
                             if (record) {
-                                let scanner = new HtmlEditModule.Scanner("", {});
-                                scanner.ScanHtml(record.content.resource, {
-                                    create: "",
-                                    modify: "",
-                                    content: {
-                                        link: {"value": link, "type": "quoted"},
-                                        beacon: {"value": beacon, "type": "quoted"}
+
+                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, null, true, {});
+                                HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                    if (!error) {
+                                        _mailer.send(username, message.passwordconfirmtext, doc, (error: any) => {
+                                            if (!error) {
+                                                Wrapper.SendSuccess(response, {code: 0, message: ""});
+                                            } else {
+                                                Wrapper.SendError(response, error.code, error.message, error);
+                                            }
+                                        });
                                     }
-                                }, [], 0, (error: any, doc: any) => {
-                                    _mailer.send(username, applications_config.messages.mail.regist.subject, doc, (error: any) => {
-                                        if (!error) {
-                                            Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                        } else {
-                                            Wrapper.SendError(response, error.code, error.message, error);
-                                        }
-                                    });
                                 });
+
                             } else {
                                 Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
                             }
@@ -763,7 +731,7 @@ export namespace AuthModule {
                         Wrapper.SendFatal(response, e.code, e.message, e);
                     }
                 } else {
-                    Wrapper.SendWarn(response, number + 1, applications_config.messages.errors.usernamenotfound, {code:number + 1, message: applications_config.messages.errors.usernamenotfound});
+                    Wrapper.SendWarn(response, number + 1, message.usernamenotfound, {code:number + 1, message: message.usernamenotfound});
                 }
             });
         }
@@ -837,7 +805,7 @@ export namespace AuthModule {
                                     });
                                 });
                             } else {
-                                Wrapper.SendError(response, number + 2, applications_config.messages.errors.wrongusername, {code:number + 2, message:applications_config.messages.errors.wrongusername});
+                                Wrapper.SendError(response, number + 2, message.wrongusername, {code:number + 2, message:message.wrongusername});
                             }
                         } else {
                             Wrapper.SendError(response, error.code, error.message, error);

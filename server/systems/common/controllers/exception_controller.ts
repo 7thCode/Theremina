@@ -9,9 +9,7 @@
 export namespace ExceptionModule {
 
     const share = require(process.cwd() + '/server/systems/common/share');
-    const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     export class Exception {
 

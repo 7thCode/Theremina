@@ -17,6 +17,8 @@ export namespace SettingModule {
     const Wrapper: any = share.Wrapper;
     const config: any = share.config;
 
+    const Cipher: any = share.Cipher;
+
     const file_utility: any = share.Utility;
 
     export class Setting {
@@ -43,11 +45,15 @@ export namespace SettingModule {
          * @returns none
          */
         public restore(request: any, response: any): void {
-            if (config.db) {
-                let result = share.Command.Restore(config.db);
-                Wrapper.SendSuccess(response, result);
-            }else {
-                Wrapper.SendError(response, 2, "not found", {});
+            if (request.body.password) {
+                if (request.body.password == config.db.password) {
+                    if (config.db) {
+                        let result = share.Command.Restore(config.db);
+                        Wrapper.SendSuccess(response, result);
+                    }else {
+                        Wrapper.SendError(response, 2, "not found", {});
+                    }
+                }
             }
         }
 

@@ -13,16 +13,14 @@ export namespace ProfileModule {
     const Validator = require('jsonschema').Validator;
     const validator = new Validator();
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     const mongoose: any = require('mongoose');
-    mongoose.Promise = require('q').Promise;
+    mongoose.Promise = global.Promise;
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const applications_config = share.applications_config;
 

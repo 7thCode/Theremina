@@ -1,20 +1,20 @@
 .modal-content
     .modal-header
-        span.h5.modal-title 作成
+        span.h5.modal-title #{message.create}
         span.pull-right
-            button.btn.btn-box-tool(type='button',ng-click='cancel()')
+            button.btn.btn-box-tool(type='button', ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
                         .col-xs-10
                             .form-group
-                                label(for="name") タイトル(title)
+                                label(for="name") #{message.title}
                                 span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
                         //.col-xs-2
                             .form-group
@@ -24,25 +24,31 @@
 
 
                     .row
-                        .col-xs-6
+                        .col-xs-4
                             .form-group
-                                label(for="type") タイプ
+                                label(for="type") #{message.type}
                                 span(ng-messages="validate.type.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
+                                    span.error-message(ng-message="required") #{message.required}
                                 select.form-control.no-zoom#type(ng-model="type" required)
-                                    option(value="20") page
-                                    option(value="21") template
-
-                        .col-xs-6
+                                    option(value="20") #{message.page}
+                                    option(value="21") #{message.template}
+                                    //option(value="22") #{message.module}
+                        .col-xs-4
                             .form-group
-                                label(for="mimetype") mimetype
-                                span(ng-messages="validate.mimetype.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                select.form-control.no-zoom#mimetype(ng-model="mimetype" required)
+                                label(for="presettype") select type
+                                select.form-control.no-zoom#presettype(ng-model="presettype" ng-change="mimetype = presettype;")
                                     option text/html
                                     option text/css
                                     option text/javascript
                                     option application/json
+                        .col-xs-4
+                            .form-group
+                                label(for="mimetype") #{message.mimetype}
+                                span(ng-messages="validate.mimetype.$error")
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#mimetype(ng-model="mimetype", type="text", name='mimetype', required, ng-maxlength="50")
+
 
         .row
             .col-xs-12
@@ -51,5 +57,5 @@
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}

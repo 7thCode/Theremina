@@ -1,34 +1,33 @@
 div
     .modal-header
-        span.h5.modal-title Add Attribute
+        span.h5.modal-title #{message.add_attribute}
         span.pull-right
-            button.btn.btn-box-tool(type='button',ng-click='cancel()')
+            button.btn.btn-box-tool(type='button', ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row.row-padded
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
                         .col-xs-6
                             .form-group
-                                label(for="name") attribute
+                                label.control-label(for="name") #{message.attribute}
                                 span(ng-messages="validate.name.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
-                                input.form-control.no-zoom#name(tabindex="1" ng-model="dialog.key", type="text", name='name', required, ng-maxlength="50")
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#name(tabindex="1", ng-model="dialog.key", type="text", name='name', required, ng-maxlength="50")
                         .col-xs-6
                             .form-group
-                                label(for="value") value
+                                label.control-label(for="value") #{message.value}
                                 span(ng-messages="validate.value.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
-                                input.form-control.no-zoom#value(tabindex="2" ng-model="dialog.value", type="text", name='value', required, ng-maxlength="50")
-
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#value(tabindex="2", ng-model="dialog.value", type="text", name='value', required, ng-maxlength="50")
             .col-xs-12
                 include ../../../../systems/common/error_message
     .modal-footer
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='dialog.cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(tabindex="3" type="button" ,ng-click='dialog.answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(tabindex="3", type="button", ng-click='dialog.cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(tabindex="4", type="button", ng-click='dialog.answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

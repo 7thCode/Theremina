@@ -1,10 +1,8 @@
 div
     .modal-header
-        span.h5.modal-title Htmls
-
+        span.h5.modal-title #{message.open}
         include ../../../../systems/common/next_prev
-
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12
                 table.table.table-striped(ng-cloak)
@@ -19,4 +17,4 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}

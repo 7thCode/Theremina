@@ -14,7 +14,7 @@ export namespace FacebookApiRouter {
     const bodyParser = require('body-parser');
     const jsonParser = bodyParser.json();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const plugins_config = share.plugins_config;
     if (plugins_config.facebook) {

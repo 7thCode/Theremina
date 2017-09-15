@@ -29,7 +29,22 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -425,12 +440,6 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
             }, error_handler);
         };
 
-  //      let EditClear = () => {
-  //          _.each(ShapeEdit.Input, function (element: any, id: any) {
-  //              ShapeEdit.Wrapper.removeChild(element);
-  //              delete ShapeEdit.Input[id];
-  //          });
-  //      };
 
         let LayoutCount: () => void = (): void => {
             LayoutService.Count((result: any): void => {
@@ -444,6 +453,8 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
                 if (result) {
                     $scope.layouts = result;
                 }
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -583,9 +594,6 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
                         $scope.current_layout = null;
                         ShapeEdit.Clear();
 
-                        //     Count();
-                        //     Query();
-
                         LayoutCount();
                         LayoutList();
 
@@ -652,6 +660,8 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
             } else {
                 ArticleService.query = {};
             }
+            ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+            ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
             ArticleList();
         };
 
@@ -677,6 +687,8 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };
@@ -687,6 +699,8 @@ PlayerControllers.controller('PlayerController', ["$scope",'$document', '$log', 
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {$scope.over = !hasnext;});
+                ArticleService.Under((hasprev) => {$scope.under = !hasprev;});
                 progress(false);
             }, error_handler);
         };

@@ -8,10 +8,7 @@
 
 export namespace MailerModule {
 
-    //  var mailer: any = require('nodemailer');
-    //  var smtpTransport = require('nodemailer-smtp-transport');
-
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
     interface MailSender {
         from: any;

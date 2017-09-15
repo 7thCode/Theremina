@@ -18,7 +18,6 @@ export namespace OfficeModule {
 
         }
 
-
         public test():void {
 
         }

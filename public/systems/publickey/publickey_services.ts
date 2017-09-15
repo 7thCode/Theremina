@@ -11,21 +11,21 @@ namespace PublicKeyServicesModule {
     let PublicKeyServices: angular.IModule = angular.module('PublicKeyServices', []);
 
     PublicKeyServices.factory('FixedPublicKey', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/publickey/fixed', {}, {
                 get: {method: 'GET'}
             });
         }]);
 
     PublicKeyServices.factory('DynamicPublicKey', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/publickey/dynamic', {}, {
                 get: {method: 'GET'}
             });
         }]);
 
     PublicKeyServices.factory('Token', ['$resource',
-        ($resource: any): angular.resource.IResource<any> => {
+        ($resource: any): any => {
             return $resource('/publickey/token', {}, {
                 get: {method: 'GET'}
             });

@@ -11,7 +11,7 @@ export namespace LayoutsPageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const auth: any = core.auth;
     const exception: any = core.exception;
@@ -22,14 +22,14 @@ export namespace LayoutsPageRouter {
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 
-    const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
+    let message = config.message;
 
     /* GET home page. */
     router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, result: any, next: any): void => {
         result.render('services/layouts/player/index', {
             config: config,
             user: request.user,
-            message: "Layouts",
+            message: message,
             status: 200,
             fonts: webfonts
         });
@@ -39,43 +39,44 @@ export namespace LayoutsPageRouter {
         result.render('services/layouts/builder/index', {
             config: config,
             user: request.user,
-            message: "Layouts",
+            message: message,
             status: 200,
             fonts: webfonts
         });
     }]);
 
     router.get('/player/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/player/dialogs/create_dialog', {messages: dialog_message});
+        result.render('services/layouts/player/dialogs/create_dialog', {message: message});
     }]);
 
     router.get('/player/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/player/dialogs/open_dialog', {messages: dialog_message});
+        result.render('services/layouts/player/dialogs/open_dialog', {message: message});
     }]);
 
     router.get('/player/dialogs/saveas_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/player/dialogs/saveas_dialog', {messages: dialog_message});
+        result.render('services/layouts/player/dialogs/saveas_dialog', {message: message});
     }]);
 
     router.get('/player/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/player/dialogs/delete_confirm_dialog', {messages: dialog_message});
+        result.render('services/layouts/player/dialogs/delete_confirm_dialog', {message:message});
     }]);
 
     router.get('/builder/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/builder/dialogs/create_dialog', {messages: dialog_message});
+        result.render('services/layouts/builder/dialogs/create_dialog', {message: message});
     }]);
 
     router.get('/builder/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/builder/dialogs/open_dialog', {messages: dialog_message});
+        result.render('services/layouts/builder/dialogs/open_dialog', {message: message});
     }]);
 
     router.get('/builder/dialogs/saveas_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/builder/dialogs/saveas_dialog', {messages: dialog_message});
+        result.render('services/layouts/builder/dialogs/saveas_dialog', {message: message});
     }]);
 
     router.get('/builder/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/builder/dialogs/delete_confirm_dialog', {messages: dialog_message});
+        result.render('services/layouts/builder/dialogs/delete_confirm_dialog', {message: message});
     }]);
+
 
     router.get("/render/:userid/:name", [exception.page_catch, (request: any, response: any): void => {
         LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);

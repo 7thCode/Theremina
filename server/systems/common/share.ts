@@ -80,6 +80,7 @@ export namespace ShareModule {
     export class Share {
 
     }
+
 }
 
 module.exports = ShareModule;

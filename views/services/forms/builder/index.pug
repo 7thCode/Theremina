@@ -2,7 +2,7 @@ extends ../../../backoffice_layout
 
 block content
     section.content-header
-        .h5.text-gray Builder
+        .h5.text-gray #{message.builder}
     section.content(ng-controller="FormBuilderController")
         include partial/navbar
         .row#draggable_area

@@ -9,7 +9,7 @@
 var server = (typeof window === 'undefined');
 
 if (server) {
-    var _: _.LoDashStatic = require('lodash');
+    var _ = require('lodash');
 }
 
 namespace ShapeEdit {
@@ -1982,6 +1982,8 @@ namespace ShapeEdit {
 
             this.handlebc.location.x = locationx + (sizew / 2);
             this.handlebc.location.y = locationy + sizeh;
+
+            this.canvas.isdirty = true;
         }
 
         public DrawAllHandle(): void {
@@ -2109,6 +2111,7 @@ namespace ShapeEdit {
             if (this.transform === Transform.deformation) {
                 this.FreeDeformation(delta);
                 super.Deformation(delta);
+                this.canvas.isdirty = true;
             }
         }
 
@@ -2118,6 +2121,7 @@ namespace ShapeEdit {
             this.rectangle.size.w = this.rectangle.size.w * magnify.w;
             this.rectangle.size.h = this.rectangle.size.h * magnify.h;
             super.Resize(origin, magnify);
+            this.canvas.isdirty = true;
         }
 
         public Intersection(rect: Rectangle): boolean {
@@ -2156,6 +2160,8 @@ namespace ShapeEdit {
             this.rectangle.location.y = y;
             this.rectangle.size.w = _.maxBy(this.vertex.list, 'x').x - x;
             this.rectangle.size.h = _.maxBy(this.vertex.list, 'y').y - y;
+
+            this.canvas.isdirty = true;
         }
 
         public DrawAllHandle(): void {
@@ -2324,6 +2330,7 @@ namespace ShapeEdit {
                 point.Resize(origin, magnify);
             });
             super.Resize(origin, magnify);
+            this.canvas.isdirty = true;
         }
 
         public Rotate(center: Location, degree: number): void {
@@ -2549,6 +2556,7 @@ namespace ShapeEdit {
             if (this.transform === Transform.deformation) {
                 this.FreeDeformation(delta);
                 super.Deformation(delta);
+                this.canvas.isdirty = true;
             }
         }
 
@@ -2557,6 +2565,7 @@ namespace ShapeEdit {
                 vertex.Resize(origin, magnify);
             });
             super.Resize(origin, magnify);
+            this.canvas.isdirty = true;
         }
 
         public Rotate(center: Location, degree: number): void {
@@ -2564,6 +2573,7 @@ namespace ShapeEdit {
                 vertex.Rotate(center, degree);
             });
             super.Rotate(center, degree);
+            this.canvas.isdirty = true;
         }
 
         public Intersection(rect: Rectangle): boolean {
@@ -2882,6 +2892,7 @@ namespace ShapeEdit {
         public Resize(origin: Location, magnify: Size): void {
             this.property.font.size *= magnify.w;
             super.Resize(origin, magnify);
+            this.canvas.isdirty = true;
         }
 
         public SetText(text: string): void {  // todo : timing measure text
@@ -3118,6 +3129,8 @@ namespace ShapeEdit {
 
         public SetFillColor(color: Style): void {
             this.property.fillstyle = color;
+
+            this.canvas.isdirty = false;
             this.canvas.handlers.Exec('change', this, null);
             //      this.property.fillstyle = color;
             //      this.canvas.handlers.Exec('change', this, null);
@@ -3132,6 +3145,7 @@ namespace ShapeEdit {
 
         public SetStrokeColor(color: Style): void {
             this.property.strokestyle = color;
+            this.canvas.isdirty = false;
             this.canvas.handlers.Exec('change', this, null);
             //       this.property.strokestyle = color;
             //       this.canvas.handlers.Exec('change', this, null);
@@ -3146,6 +3160,7 @@ namespace ShapeEdit {
 
         public SetStrokeWidth(width: number): void {
             this.property.strokewidth = width;
+            this.canvas.isdirty = false;
             this.canvas.handlers.Exec('change', this, null);
             //       this.property.strokewidth = width;
             //       this.canvas.handlers.Exec('change', this, null);
@@ -3203,6 +3218,7 @@ namespace ShapeEdit {
                 if (this.isSelected) {
                     this.rectangle.location.x += delta.x;
                     this.rectangle.location.y += delta.y;
+                    this.canvas.isdirty = false;
                     this.canvas.handlers.Exec('move', this, null);
                     this.Shapes().forEach((shape: BaseShape): void => {
                         shape.MoveTo(delta);
@@ -3273,6 +3289,7 @@ namespace ShapeEdit {
                 shape.Resize(origin, magnify);
             });
             super.Resize(origin, magnify);
+            this.canvas.isdirty = true;
         }
 
         public Rotate(center: Location, degree: number): void {
@@ -3280,6 +3297,7 @@ namespace ShapeEdit {
                 shape.Rotate(center, degree);
             });
             super.Rotate(center, degree);
+            this.canvas.isdirty = true;
         }
 
         public IsRotable(): boolean {
@@ -3437,6 +3455,7 @@ namespace ShapeEdit {
             }), (shape: BaseShape) => {
                 this.shapes.push(shape);
             });
+            this.canvas.isdirty = false;
             this.canvas.handlers.Exec('change', this, null);
         }
 
@@ -3445,6 +3464,7 @@ namespace ShapeEdit {
             }), (shape: BaseShape) => {
                 this.shapes.unshift(shape);
             });
+            this.canvas.isdirty = false;
             this.canvas.handlers.Exec('change', this, null);
         }
 
@@ -3489,6 +3509,7 @@ namespace ShapeEdit {
         public adaptor: any;
         public shapes: Shapes;// All shapes root
         public pixelRatio: number;
+        public isdirty:boolean;
         //  public shift:boolean;// is Shift Key
         public modifier: Key;
         private mode: Mode;//Drwwing mode
@@ -3524,6 +3545,7 @@ namespace ShapeEdit {
             // this.undobuffer = new Stack<string>(1);
             this.undoheap = null;
             this.isdrag = false;
+            this.isdirty = false;
 
             this.selectrect = null;
 
@@ -3769,6 +3791,7 @@ namespace ShapeEdit {
                                                         magnifyh = magnifyw;
                                                     }
                                                     shape.Resize(shape.rectangle.location, new Size(magnifyw, magnifyh));
+                                                    this.isdirty = true;
                                                 }
                                                 break;
                                             case Transform.rotate:
@@ -3890,6 +3913,7 @@ namespace ShapeEdit {
                                                     let magnifyh = (pointy - shape.rectangle.location.y) / (shape.rectangle.bottomright.y - shape.rectangle.location.y);
                                                     if ((magnifyw > 0) && (magnifyh > 0)) {
                                                         shape.Resize(shape.rectangle.location, new Size(magnifyw, magnifyh));
+                                                        this.isdirty = true;
                                                     }
                                                     break;
                                                 case Transform.rotate:
@@ -4266,6 +4290,7 @@ namespace ShapeEdit {
                     this.shapes.Add(shape);
                     shape.ResizeRectangle(); //外接四角形のリサイズ
                 });
+                this.canvas.isdirty = false;
                 this.handlers.Exec('new', shape, null);
                 this.handlers.Exec('change', shape, null);
             } catch (e) {
@@ -4280,6 +4305,7 @@ namespace ShapeEdit {
                         this.shapes.Pull((shape) => {
                             this.handlers.Exec('delete', shape, null);
                         });
+                        this.canvas.isdirty = false;
                     }
                 });
             } catch (e) {
@@ -4320,7 +4346,7 @@ namespace ShapeEdit {
                         subgroup.Shapes().forEach((shape: BaseShape) => {
                             this.shapes.Remove(shape); //remove subgrouped member
                         });
-
+                        this.canvas.isdirty = false;
                         this.handlers.Exec('new', subgroup, null);
                         subgroup.Select();
                     }
@@ -4337,6 +4363,7 @@ namespace ShapeEdit {
                         shape.Ungroup();// move group member to parent
                         if (shape.type === "Shapes") {
                             if (shape.Shapes().length === 0) {
+                                this.canvas.isdirty = false;
                                 this.handlers.Exec('delete', shape, null);
                                 this.shapes.Remove(shape); // remove group root;
                             }
@@ -4365,6 +4392,7 @@ namespace ShapeEdit {
                 this.Draw(() => {
                     if (this.copybuffer) {
                         this.Add(this.copybuffer.Clone());
+                        this.canvas.isdirty = false;
                         this.handlers.Exec('change', this.copybuffer, null);
                         this.copybuffer = null;
                     }

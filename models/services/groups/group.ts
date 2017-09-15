@@ -7,6 +7,7 @@
 "use strict";
 
 namespace GroupModule {
+
     const mongoose = require('mongoose');
     const Schema = mongoose.Schema;
     const timestamp: any = require('../../systems/plugins/timestamp/timestamp');

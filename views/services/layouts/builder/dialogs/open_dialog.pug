@@ -2,11 +2,11 @@ div
     .modal-header
         span.h5.modal-title Layouts ({{count}})
         span.pull-right
-                button.btn.btn-xs.btn-info(style="border-radius:0.6rem 0 0 0.6rem;", ng-click="Next()", ng-disabled="progress")
+                button.btn.btn-xs.btn-info(ng-click="Next()", ng-disabled="progress")
                     i.fa.fa-chevron-down
-                button.btn.btn-xs.btn-default(style="border-radius:0 0.6rem 0.6rem 0;",ng-click="Prev()", ng-disabled="progress")
+                button.btn.btn-xs.btn-success(ng-click="Prev()", ng-disabled="progress")
                     i.fa.fa-chevron-up
-    .modal-body.noto
+    .modal-body
         ul.nav.nav-pills
             li(ng-repeat="layout in layouts", ng-disabled="progress")
                 div.select-item(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", ng-click="Get(layout)",style="height:12rem;width:8rem;", ng-hide="progress")
@@ -40,4 +40,4 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}

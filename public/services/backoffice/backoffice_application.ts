@@ -23,7 +23,6 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "BackOfficeControllers",
     'FileServices',
     'FileControllers',
-    "RewritingControllers",
     "AuthServices",
     'AuthControllers',
     "ResourcesProviders",
@@ -53,7 +52,9 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "MailerControllers",
     "MailerServices",
     "RobotControllers",
-    "RobotServices"
+    "RobotServices",
+    "GoogleServices",
+    "GoogleControllers"
 ]);
 
 BackOfficeApplication.run(['$rootScope',
@@ -103,3 +104,17 @@ BackOfficeApplication.filter('limit', [(): any => {
         return result;
     };
 }]);
+
+BackOfficeApplication.filter('round', [():any => {
+    return (value: any): string => {
+        let result = value;
+        if (!isNaN(value)) {
+            result = Math.round(value);
+        }
+        return result;
+    };
+}]);
+
+
+
+

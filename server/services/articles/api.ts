@@ -11,7 +11,7 @@ export namespace ArticleApiRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
@@ -29,10 +29,6 @@ export namespace ArticleApiRouter {
 
     router.get('/api/query/:query/:option', [article.get_article_query_query]);
     router.get("/api/count/:query", [article.get_article_count]);
-
-    router.put("/api/renderobject/:userid/:page_name", [article.render_object]);
-    router.put("/api/renderfragment/:userid/:page_name", [article.render_fragment]);
-    router.get("/api/renderarticle/:userid/:page_name/:article_name", [article.render_articles]);
 
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, article.delete_own]);
 

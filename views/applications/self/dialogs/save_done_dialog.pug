@@ -1,14 +1,14 @@
 .modal-content
     .modal-header
-        .h3 更新完了
-    .modal-body.noto
+        .h3 #{message.savedone}
+    .modal-body
         .row
             .col-xs-12
-                div 更新しました。
+                div #{message.savedone}
             .col-xs-12
                 include ../../../systems/common/error_message
     .modal-footer
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="") OK
+                    button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="") #{message.ok}

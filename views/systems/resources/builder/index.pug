@@ -2,11 +2,9 @@ extends ../../../backoffice_layout
 
 block content
     section.content-header
-        .h5.text-gray Builder
+        .h5.text-gray #{message.builder}
     section.content(ng-controller="ResourceBuilderController")
         include partial/navbar
         .row
             .col-xs-12.col-sm-12
                 include partial/form
-            //.col-xs-2.col-sm-2
-                include partial/pallete

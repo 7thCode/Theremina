@@ -1,15 +1,15 @@
-.box.box-primary
+.box.box-primary(style="margin-top:12px;")
     .box-header.with-border
         .h6(ng-bind="name")
         div(ng-show="opened")
             .row
                 .col-xs-1
-                    a.btn.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/layouts/render/{{userid}}/{{name}}" target="_blank" type="button", aria-label="") Open
+                    a.btn.btn-warning.pull-left(style="padding:8px;" href= config.protocol + "://" + config.domain + "/layouts/render/{{userid}}/{{name}}" target="_blank" type="button", aria-label="") Open
                 .col-xs-10
-                    .well.well-sm(layout="word-wrap:break-all;") #{config.protocol}://#{config.domain}/layouts/render/{{userid}}/{{name}}
+                    .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/layouts/render/{{userid}}/{{name}}
                 .col-xs-1
                     .box-tools.pull-right
-                        button.btn.btn-box-tool(type='button', data-widget='collapse')
+                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                             i.fa.fa-minus
 
     .box-body

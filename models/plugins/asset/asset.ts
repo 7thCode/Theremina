@@ -7,6 +7,7 @@
 "use strict";
 
 export namespace AssetModule {
+
     const mongoose = require('mongoose');
     const request = require('request-promise');
     const Schema = mongoose.Schema;
@@ -14,8 +15,6 @@ export namespace AssetModule {
     const userdata: any = require('../../systems/plugins/userdata/userdata');
 
     const Asset = new Schema({
-        version: {type: Number, default: 1},
-        status: {type: Number, default: 10},
         from: {type: Date},
         to: {type: Date}
     });

@@ -8,7 +8,8 @@
 
 let FrontControllers: angular.IModule = angular.module('FrontControllers', ['ui.bootstrap', 'ngAnimate', 'flow', 'ui.ace']);
 
-//Front
+//Event
+
 FrontControllers.controller('EventController', ['$scope',
     ($scope: any): void => {
 
@@ -19,6 +20,7 @@ FrontControllers.controller('EventController', ['$scope',
     }]);
 
 //Front
+
 FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$uibModal', 'ProfileService',
     ($scope: any, $log: any, $compile: any, $uibModal: any, ProfileService: any): void => {
 
@@ -36,7 +38,22 @@ FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         ProfileService.Get((self: any): void => {
@@ -77,6 +94,7 @@ FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$
     }]);
 
 //Self
+
 FrontControllers.controller('SelfController', ['$scope', '$log', "$uibModal", "ProfileService", 'SessionService', 'ZipService',
     ($scope: any, $log: any, $uibModal: any, ProfileService: any, SessionService: any, ZipService: any): void => {
 
@@ -92,7 +110,22 @@ FrontControllers.controller('SelfController', ['$scope', '$log', "$uibModal", "P
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $scope.opened = false;
@@ -393,8 +426,6 @@ FrontControllers.controller('SelfUpdateDialogController', ['$scope', '$uibModalI
         };
 
         $scope.cancel = (): void => {
-
-
             $uibModalInstance.dismiss();
         };
 
@@ -405,10 +436,11 @@ FrontControllers.controller('SelfUpdateDialogController', ['$scope', '$uibModalI
     }]);
 
 //Data
+
 FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
     ($scope: any, $log: any, $document: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
-        let pagesize = 10;
+        let pagesize = 100;
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -422,7 +454,22 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -432,10 +479,10 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
 
         $scope.opened = false;
 
-        ArticleService.option = {sort: {create: -1}, skip: 0};
+        ArticleService.option.limit = pagesize;
 
         let current_id: any = null;
-        let page_name: string = "";
+        let page_type: string = "";
         let direction: number = -1;
 
         let Clear = (): void => {
@@ -461,14 +508,18 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
          */
         let Map: (present: any) => void = (present: any): void => {
 
-            function unescapeHTML(str) {
-                var div = document.createElement("div");
-                div.innerHTML = str.replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/ /g, "&nbsp;")
-                    .replace(/\r/g, "&#13;")
-                    .replace(/\n/g, "&#10;");
-                return div.textContent || div.innerText;
+            function unescapeHTML(value: any): any {
+                let result = value;
+                if (typeof value == "string") {
+                    let div = document.createElement("div");
+                    div.innerHTML = value.replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/ /g, "&nbsp;")
+                        .replace(/\r/g, "&#13;")
+                        .replace(/\n/g, "&#10;");
+                    result = div.textContent || div.innerText;
+                }
+                return result;
             }
 
             let page = FormPlayerService.current_page;
@@ -496,7 +547,7 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
          elementのlabelを名前として、その値をresultに。
          */
         let Reduce: () => void = (): any => {
-            let result = ArticleService.current_article.content;
+            let result = {};// ArticleService.current_article.content;
             if (!result) {
                 result = {};
             }
@@ -508,38 +559,25 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                         let name = attributes["ng-model"];
                         if (name) {
                             if ($scope[name]) {
-
+                                let type: string = "quoted";
+                                let value = $scope[name];
                                 switch (element.type) {
-                                    case "field":
-                                    case "select":
-                                        result[element.label] = {type: "quoted", value: $scope[name]};
-                                        break;
-                                    case "textarea":
-                                        switch (control.type) {
-                                            case "html" :
-                                                result[element.label] = {type: "html", value: $scope[name]};
-                                                break;
-                                            default:
-                                                result[element.label] = {type: "quoted", value: $scope[name]};
-                                        }
-                                        break;
                                     case "img":
-                                        result[element.label] = {type: "url", value: $scope[name]};
-                                        break;
-                                    case "chips":
-                                        result[element.label] = {type: "array", value: $scope[name]};
+                                        type = "url";
                                         break;
                                     default:
-                                        result[element.label] = {type: "quoted", value: $scope[name]};
+                                        if (Array.isArray(value)) {
+                                            type = "array";
+                                        } else {
+                                            switch (control.type) {
+                                                case "html" :
+                                                    type = "html";
+                                                    break;
+                                                default:
+                                            }
+                                        }
                                 }
-
-                                /*     switch (element.type) {
-                                 case "chips":
-                                 result[element.label] = {type: "array", value: $scope[name]};
-                                 break;
-                                 default:
-                                 result[element.label] = {type: "quoted", value: $scope[name]};
-                                 } */
+                                result[element.label] = {type: type, value: value}; // todo
                             }
                         }
                     }
@@ -558,49 +596,63 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 controller: 'DataCreateDialogController',
                 templateUrl: '/data/dialogs/create_dialog',
                 resolve: {
-                    items: null
+                    items: $scope
                 }
             });
 
             modalRegist.result.then((dialog_scope: any): void => {
                 progress(true);
                 let name: string = dialog_scope.title;
-                ArticleService.Create(name, {}, (result: any): void => {
+                ArticleService.Create(name, { type:{ "type" : "quoted", "value" : dialog_scope.type }}, (result: any): void => {
                     current_id = result._id;
-                    ArticleService.option = {sort: {create: -1}, skip: 0};
-                    DrawArticles(() => {
-                        progress(false);
-                        $scope.opened = true;
-                    });
+                    ArticleService.option.skip = 0;
+
+                    if (current_id) {
+                        ArticleService.Get(current_id, (result: any): void => {
+                            ArticleService.current_article = result;
+                            $scope.current_article = result;
+                            $scope.opened = true;
+                            page_type = result.content.type.value;  //!!
+                            DrawPage(page_type, () => {
+                                Map(result.content);
+                                progress(false);
+                            });
+                        }, error_handler);
+                    } else {
+                        DrawPage(page_type, (): void => {
+                            progress(false);
+                        });
+                    }
+
                     Clear();
                 }, error_handler);
             }, (): void => {
             });
         };
 
-        $scope.SelectPage = (name: string): void => {
+        $scope.SelectPage = (type: string): void => {
             progress(true);
-            page_name = name;
+            page_type = type;
             if (current_id) {
                 ArticleService.Get(current_id, (result: any): void => {
                     ArticleService.current_article = result;
                     $scope.current_article = result;
                     $scope.opened = true;
-                    DrawPage(page_name, () => {
-                        //       Clear();
+                    DrawPage(page_type, () => {
                         Map(result.content);
                         progress(false);
                     });
                 }, error_handler);
+
             } else {
-                DrawPage(page_name, (): void => {
+                DrawPage(page_type, (): void => {
                     progress(false);
                 });
             }
         };
 
-        $scope.PageSelected = (name: string): boolean => {
-            return (page_name == name);
+        $scope.PageSelected = (type: string): boolean => {
+            return (page_type == type);
         };
 
         $scope.SelectArticle = (id: string): void => {
@@ -610,11 +662,14 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 ArticleService.current_article = result;
                 $scope.current_article = result;
                 $scope.opened = true;
-                DrawPage(page_name, () => {
+                page_type = result.content.type.value;
+                DrawPage(page_type, () => {
                     Map(result.content);
                     progress(false);
                 });
             }, error_handler);
+
+
         };
 
         $scope.ArticleSelected = (id: string): boolean => {
@@ -680,6 +735,12 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ArticleService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -690,6 +751,12 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 if (result) {
                     $scope.articles = result;
                 }
+                ArticleService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ArticleService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -729,11 +796,17 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
             ArticleService.Query((data: any): void => {
                 $scope.articles = data;
                 callback();
+                ArticleService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ArticleService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
             }, error_handler);
         };
 
         let Draw: (callback: () => void) => void = (callback: () => void): void => {
-            DrawPage(page_name, (): void => {
+            DrawPage(page_type, (): void => {
                 DrawPages(() => {
                     DrawArticles(callback);
                 });
@@ -819,6 +892,8 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
 FrontControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',
     ($scope: any, $uibModalInstance: any, items: any): void => {
 
+        $scope.pages = items.pages;
+
         $scope.hide = (): void => {
             $uibModalInstance.close();
         };
@@ -869,7 +944,22 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -880,6 +970,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         window.addEventListener('beforeunload', (e) => {
             if (!editor.session.getUndoManager().isClean()) {
                 e.returnValue = '';
+                return '';
             }
         }, false);
 
@@ -902,34 +993,70 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             }
         };
 
+        let query_string = localStorage.getItem("pages_query");
+
         let Query = (): any => {
             progress(true);
-            let query_string = localStorage.getItem("pages_query");
-            if (query_string) {
-                ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
-            }
+            // template query
+            ResourceBuilderService.AddQuery({type: 21});
             ResourceBuilderService.Query((result: any): void => {
+                ResourceBuilderService.InitQuery(null);
                 if (result) {
-                    $scope.pages = result;
-                    localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
+                    $scope.templates = result;
+                    //pages query
+
+                    if (query_string) {
+                        ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
+                    }
+
+                    ResourceBuilderService.Query((result: any): void => {
+                        if (result) {
+                            $scope.pages = result;
+                            localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
+                        }
+                        ResourceBuilderService.Over((hasnext) => {
+                            $scope.over = !hasnext;
+                        });
+                        ResourceBuilderService.Under((hasprev) => {
+                            $scope.under = !hasprev;
+                        });
+                        progress(false);
+                    }, error_handler);
+                    //pages query
                 }
-                progress(false);
             }, error_handler);
+            // template query
         };
 
         let _Find = (key: string, value: any): any => {
             progress(true);
+
+            $scope.query_string_before = JSON.stringify(ResourceBuilderService.GetQuery()) + " " + key;
+
             ResourceBuilderService.RemoveQuery(key);
             if (value) {
                 let query = {};
                 query[key] = value;
                 ResourceBuilderService.AddQuery(query);
+            } else {
+                ResourceBuilderService.RemoveQuery(key);
             }
+
+
+            $scope.query_string_after = JSON.stringify(ResourceBuilderService.GetQuery()) + " " + key;
+
+
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
                     $scope.pages = result;
                     localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
                 }
+                ResourceBuilderService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ResourceBuilderService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -959,7 +1086,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         };
 
         let Count = (): void => {
-      //      ResourceBuilderService.InitQuery(null, 20, 36);
             ResourceBuilderService.Count((result: any): void => {
                 if (result) {
                     $scope.count = result;
@@ -969,11 +1095,16 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
         let Next = (): void => {
             progress(true);
-      //      ResourceBuilderService.InitQuery(null, 20, 36);
             ResourceBuilderService.Next((result: any): void => {
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ResourceBuilderService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -984,6 +1115,12 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                 if (result) {
                     $scope.pages = result;
                 }
+                ResourceBuilderService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                ResourceBuilderService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -1033,9 +1170,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
                 let session = _ace.getSession();
 
-                //      let beautify = _ace.require("ace/ext/beautify"); // get reference to extension
-                //      beautify.beautify(session);
-
                 editor.$blockScrolling = Infinity;
                 editor.setOptions({
                     enableBasicAutocompletion: true,
@@ -1073,15 +1207,15 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         };
 
         let OpenPreview = () => {
-            preview_window = window.open("", "", "width=1024,height=800");
-            document = preview_window.document;
-            Draw(ResourceBuilderService.current.content.resource);
+   //         preview_window = window.open("", "", "width=1024,height=800");
+   //         document = preview_window.document;
+   //         Draw(ResourceBuilderService.current.content.resource);
         };
 
         let ClosePreview = () => {
-            if (preview_window) {
-                document = preview_window.close();
-            }
+    //        if (preview_window) {
+    //            document = preview_window.close();
+    //        }
         };
 
         let CreatePages = (files: any): void => {
@@ -1227,16 +1361,22 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             }
         };
 
-        /*
-         let Query = (): any => {
-         ResourceBuilderService.query = {type: {$lt: 10}};
-         ResourceBuilderService.Query((result: any): void => {
-         if (result) {
-         $scope.templates = result;
-         }
-         }, error_handler);
-         };
-         */
+
+        let BuildSite = (): void => {
+
+            let modalRegist: any = $uibModal.open({
+                controller: 'BiildSiteDialogController',
+                templateUrl: '/pages/dialogs/build_site_dialog',
+                resolve: {
+                    items: $scope
+                }
+            });
+
+            modalRegist.result.then((resource: any): void => {
+                Query();
+            }, (): void => {
+            });
+        };
 
         $scope.opened = false;
 
@@ -1258,7 +1398,9 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         $scope.Update = Update;
         $scope.Delete = Delete;
 
-        $scope.OpenPreview = OpenPreview;
+        $scope.BuildSite = BuildSite;
+
+        //$scope.OpenPreview = OpenPreview;
 
         Query();
 
@@ -1288,7 +1430,6 @@ FrontControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
         };
 
         $scope.type = 20;
@@ -1334,7 +1475,22 @@ FrontControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$ui
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         let Query = (): any => {
@@ -1443,12 +1599,77 @@ FrontControllers.controller('PagesDeleteConfirmController', ['$scope', '$uibModa
 
     }]);
 
-//Photo
+FrontControllers.controller('BiildSiteDialogController', ['$scope', '$log', '$uibModalInstance', 'SiteService', 'items',
+    ($scope: any, $log: any, $uibModalInstance: any, SiteService: any, items: any): void => {
+
+        let file = items.file;
+        let target = items.target;
+        let parent_scope = items.parent_scope;
+
+        $scope.name = "mega";
+
+        if (file) {
+            $scope.title = file.name;
+            $scope.mimetype = file.type;
+        }
+
+        let progress = (value) => {
+            $scope.$emit('progress', value);
+        };
+
+        $scope.$on('progress', (event, value) => {
+            parent_scope.progress = value;
+        });
+
+        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+            progress(false);
+            $scope.message = message;
+            $log.error(message);
+        };
+
+        $scope.type = 20;
+
+        $scope.hide = (): void => {
+            $uibModalInstance.close();
+        };
+
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
+
+        $scope.answer = (): void => {
+            progress(true);
+            SiteService.Build($scope.name, (result: any): void => {
+                progress(false);
+                $scope.message = "";
+                $uibModalInstance.close(result);
+            }, error_handler);
+
+        };
+
+    }]);
+
+//Photo(resizeable/cropable)
+
+//  2000 < key < 3999
+
+interface IControl {
+    name: string;
+    label: string;
+    model: string;
+    type: string;
+}
+
+interface IPictureControl extends IControl {
+    path: string;
+    height: number;
+    width: number;
+}
 
 FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$uibModal', '$log', 'ProfileService', 'SessionService', 'FileService', 'ImageService',
     ($scope: any, $q: any, $document: any, $uibModal: any, $log: any, ProfileService: any, SessionService: any, FileService: any, ImageService: any): void => {
 
-        FileService.option = {limit: 30, skip: 0};
+        FileService.option = {limit: 20, skip: 0};
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -1462,7 +1683,573 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
+        };
+
+        $document.on('drop dragover', (e: any): void => {
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        let Type = (mimetype): string => {
+            let result = "";
+            let nameparts: string[] = mimetype.split("/");
+            if (nameparts.length == 2) {
+                result = nameparts[0].toLowerCase();
+            }
+            return result;
+        };
+
+       let Draw = () => {
+           FileService.Query((result: any) => {
+               if (result) {
+                   $scope.randam = Math.floor(Math.random() * 100);
+                   $scope.files = result;
+               }
+               FileService.Over((hasnext) => {
+                   $scope.over = !hasnext;
+               });
+               FileService.Under((hasprev) => {
+                   $scope.under = !hasprev;
+               });
+           }, error_handler);
+       };
+
+       let Exist = (query:any): void => {
+           FileService.Exist(query,(result: any): void => {
+               if (result) {
+                   $scope.count = result;
+               }
+           }, error_handler);
+       };
+
+       let Count = (): void => {
+           FileService.Count((result: any): void => {
+               if (result) {
+                   $scope.count = result;
+               }
+           }, error_handler);
+       };
+
+       let Next = () => {
+           progress(true);
+           FileService.Next((result) => {
+               if (result) {
+                   $scope.randam = Math.floor(Math.random() * 100);
+                   $scope.files = result;
+               }
+               FileService.Over((hasnext) => {
+                   $scope.over = !hasnext;
+               });
+               FileService.Under((hasprev) => {
+                   $scope.under = !hasprev;
+               });
+               progress(false);
+           }, error_handler);
+       };
+
+       let Prev = () => {
+           progress(true);
+           FileService.Prev((result) => {
+               if (result) {
+                   $scope.randam = Math.floor(Math.random() * 100);
+                   $scope.files = result;
+               }
+               FileService.Over((hasnext) => {
+                   $scope.over = !hasnext;
+               });
+               FileService.Under((hasprev) => {
+                   $scope.under = !hasprev;
+               });
+               progress(false);
+           }, error_handler);
+       };
+
+
+       let createPhoto = (files: any): void => {
+           progress(true);
+           let promises = [];
+           _.forEach(files, (local_file) => {
+               let deferred = $q.defer();
+   //            FileService.Exist({"filename":local_file.name}, (exist) => {
+    //               if (!exist) {
+
+                       let fileReader: any = new FileReader();
+                       fileReader.onload = (event: any): void => {
+                           ImageService.DecodeImage(event.target.result, (image: any, type: string): void => {
+                               switch (type) {
+                                   case "image/jpeg":
+                                   case "image/jpg":
+                                       let modalInstance: any = $uibModal.open({
+                                           controller: 'PhotoResizeDialogController',
+                                           templateUrl: '/images/dialogs/image_resize_dialog',
+                                           resolve: {
+                                               items: (): any => {
+                                                   return {
+                                                       name:local_file.name,
+                                                       image: event.target.result,
+                                                       width: image.width,
+                                                       height: image.height
+                                                   };
+                                               }
+                                           }
+                                       });
+
+                                       modalInstance.result.then((answer: any): void => { // Answer
+                                           if (answer.deformation) {
+                                               ImageService.ResizeImage(event.target.result, answer.width, answer.height, (resized: any): void => {
+                                                   ImageService.RotateImage(resized, answer.resize, answer.orientation, (rotate: any): void => {
+                                                       ImageService.Brightness(rotate, answer.brightness, (brightness: any): void => {
+                                                           FileService.Create(brightness, local_file.name, 2000, (brightness: any) => {
+                                                               deferred.resolve(true);
+                                                           }, (code: number, message: string) => {
+                                                               deferred.reject(false);
+                                                           });
+                                                       });
+                                                   });
+                                               });
+                                           } else {
+                                               FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
+                                                   deferred.resolve(true);
+                                               }, (code: number, message: string) => {
+                                                   deferred.reject(false);
+                                               });
+                                           }
+                                       }, (): void => { // Error
+                                       });
+                                       break;
+                                   default:
+                                       FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
+                                           deferred.resolve(true);
+                                       }, (code: number, message: string) => {
+                                           deferred.reject(false);
+                                       });
+                               }
+                           });
+                       };
+         //          } else {
+         //              alert("already found.");
+         //          }
+      //         });
+               fileReader.readAsDataURL(local_file.file);
+               promises.push(deferred.promise);
+           });
+
+           $q.all(promises).then((result) => {
+               files.forEach((file) => {
+                   file.cancel();
+               });
+               progress(false);
+               Draw();
+           }).finally(() => {
+           });
+       };
+
+       let editPhoto = (filename: string): void => {
+
+           FileService.Get(filename, (result: any) => {
+
+               ImageService.DecodeImage(result, (image: any, type: string): void => {
+                   switch (type) {
+                       case "image/jpeg":
+                       case "image/jpg":
+                           let modalInstance: any = $uibModal.open({
+                               controller: 'PhotoResizeDialogController',
+                               templateUrl: '/images/dialogs/image_resize_dialog',
+                               resolve: {
+                                   items: (): any => {
+                                       return {
+                                           name:filename,
+                                           image: result,
+                                           width: image.width,
+                                           height: image.height
+                                       };
+                                   }
+                               }
+                           });
+
+                           modalInstance.result.then((answer: any): void => { // Answer
+                               if (answer.deformation) {
+                                   ImageService.ResizeImage(result, answer.width, answer.height, (resized: any): void => {
+                                       ImageService.RotateImage(resized, answer.resize, answer.orientation, (rotate: any): void => {
+                                           ImageService.Brightness(rotate, answer.brightness, (brightness: any): void => {
+                                               FileService.Update(brightness, filename, 2000, (brightness: any) => {
+                                                   Draw();
+                                               }, error_handler);
+                                           });
+                                       });
+                                   });
+                               }
+                           }, (): void => { // Error
+                           });
+                           break;
+                       default:
+                   }
+               });
+           }, error_handler);
+
+       };
+
+       let showPhoto = (url: any): void => {
+           let modalInstance: any = $uibModal.open({
+               controller: 'ImageShowDialogController',
+               templateUrl: '/images/dialogs/image_show_dialog',
+               resolve: {
+                   items: (): any => {
+                       return url;
+                   }
+               }
+           });
+
+           modalInstance.result.then((answer: any): void => { // Answer
+           }, (): void => { // Error
+           });
+       };
+
+       let deletePhoto = (filename: any): void => {
+
+           let modalInstance = $uibModal.open({
+               controller: 'PhotoDeleteDialogController',
+               templateUrl: '/files/dialogs/file_delete_dialog',
+           });
+
+           modalInstance.result.then((answer: any): void => { // Answer
+               FileService.Delete(filename, 2000, (result: any) => {
+                   $scope.files = [];
+                   Draw();
+               }, error_handler);
+           }, (): void => { // Error
+           });
+       };
+
+       FileService.SetQuery({"metadata.type": {$regex: "image/"}}, 2000);
+       let Find = (name: string): void => {
+           if (!name) {
+               name = "";
+           }
+           FileService.SetQuery({$and: [{filename: {$regex: name}}, {"metadata.type": {$regex: "image/"}}]}, 2000);
+           Draw();
+       };
+
+       let CreateProfile = (files: any): void => {
+           progress(true);
+           let local_file = files[0];
+           let fileReader: any = new FileReader();
+           let image: any = new Image();
+           $scope.userid = "";     // $scope trick for redraw
+
+           fileReader.onload = (event: any): void => {
+               let uri: any = event.target.result;
+               image.src = uri;
+               image.onload = (): void => {
+                   ProfileService.Get((self: any): void => {
+                       if (self) {
+                           FileService.Delete(self.username, 1999, (result: any) => {
+                                   FileService.Create(event.target.result, self.username, 1999, (result: any) => {
+                                       ProfileService.Get((self: any): void => {
+                                           if (self) {
+                                               $scope.$evalAsync(      // $apply
+                                                   ($scope: any): void => {
+                                                       $scope.userid = self.userid; // $scope trick for redraw
+                                                       progress(false);
+                                                   }
+                                               );
+                                           }
+                                       }, error_handler);
+                                   }, error_handler);
+                               },
+                               FileService.Create(event.target.result, self.username, 1999, (result: any) => {
+                                   ProfileService.Get((self: any): void => {
+                                       if (self) {
+                                           $scope.$evalAsync(      // $apply
+                                               ($scope: any): void => {
+                                                   $scope.userid = self.userid; // $scope trick for redraw
+                                                   progress(false);
+                                               }
+                                           );
+                                       }
+                                   }, error_handler);
+                               }, error_handler)
+                           );
+                       }
+                   }, error_handler);
+               };
+           };
+           fileReader.readAsDataURL(local_file.file);
+       };
+
+       ProfileService.Get((self: any): void => {
+           if (self) {
+               $scope.userid = self.userid;
+           }
+       }, error_handler);
+
+       $scope.createProfile = CreateProfile;
+       $scope.Type = Type;
+       $scope.Next = Next;
+       $scope.Prev = Prev;
+       $scope.createPhoto = createPhoto;
+       $scope.editPhoto = editPhoto;
+       $scope.showPhoto = showPhoto;
+       $scope.deletePhoto = deletePhoto;
+       $scope.Find = Find;
+       Draw();
+
+       // Guidance
+
+       $scope.next = (): void => {
+           $scope.step++;
+           SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
+           }, error_handler);
+       };
+
+       $scope.prev = (): void => {
+           $scope.step--;
+           SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
+           }, error_handler);
+       };
+
+       $scope.to = (step: number): void => {
+           $scope.step = step;
+           SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
+           }, error_handler);
+       };
+
+       SessionService.Get((session: any): void => {
+           if (session) {
+               $scope.step = 0;
+               let _data = session.data;
+               if (_data) {
+                   let guidance = _data.guidance;
+                   if (guidance) {
+                       let photo = guidance.photo;
+                       if (photo) {
+                           $scope.step = photo.step;
+                       }
+                   }
+               }
+           }
+       }, error_handler);
+
+       $scope.scenario = [
+           {
+               outer: {
+                   top: -250, left: 360, width: 500, height: 500,
+                   background: "/applications/img/balloon/right.svg",
+                   target: "create"
+               },
+               inner: {
+                   top: 50, left: 150, width: 300, height: 300,
+                   content: "<h3>ニックネーム</h3>" +
+                   "<br>" +
+                   "<p>ニックネームを入力してください</p>" +
+                   "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
+               },
+               _class: "shake",
+               style: "animation-duration:1s;animation-delay:0.3s;"
+           }
+       ];
+
+   }]);
+
+FrontControllers.controller('PhotoDeleteDialogController', ['$scope', '$uibModalInstance',
+   ($scope: any, $uibModalInstance: any): void => {
+
+       $scope.hide = (): void => {
+           $uibModalInstance.close();
+       };
+
+       $scope.cancel = (): void => {
+           $uibModalInstance.dismiss();
+       };
+
+       $scope.answer = (answer: any): void => {
+           $uibModalInstance.close($scope);
+       };
+
+   }]);
+
+FrontControllers.controller('PhotoResizeDialogController', ['$scope', '$uibModalInstance', 'items', 'ImageService',
+   ($scope: any, $uibModalInstance: any, items: any, ImageService): void => {
+
+       let progress = (value) => {
+           $scope.$emit('progress', value);
+       };
+
+       $scope.$on('progress', (event, value) => {
+           $scope.progress = value;
+       });
+
+       let result = {width: 0, height: 0, orientation: 1,resize:false,brightness:0, deformation: false};
+       result.width = items.width;
+       result.height = items.height;
+
+       $scope.name = items.name;
+       $scope.image = items.image;
+       $scope.width = result.width;
+       $scope.height = result.height;
+       $scope.ratio = 100;
+       $scope.aspect = 1;
+       $scope.brightness = 0;
+
+       // var image = document.getElementById('cropper');
+/*       var image =  $document[0].getElementById('cropper');
+       var cropper = new Cropper(image, {
+           aspectRatio: 16 / 9,
+           crop: function(e) {
+               console.log(e.detail.x);
+               console.log(e.detail.y);
+               console.log(e.detail.width);
+               console.log(e.detail.height);
+               console.log(e.detail.rotate);
+               console.log(e.detail.scaleX);
+               console.log(e.detail.scaleY);
+           }
+       });
+*/
+        /*
+         ImageService.ImageExif(items.image, (exif) => {
+         let exifs = [];
+         Object.keys(exif).forEach((key) => {
+         exifs.push(key + ":" + exif[key]);
+         });
+         $scope.exif = exifs;
+         });
+         */
+
+        let index = 0;
+
+        let orientations: any[] = [
+            {direction: 0, resize: false},
+            {direction: 0.5, resize: true},
+            {direction: 1, resize: false},
+            {direction: 1.5, resize: true}
+        ];
+
+        let current_size = {width: 0, height: 0, orientation: orientations[0],brightness:0};
+
+        let Deformation = (callback: () => void) => {
+            ImageService.ResizeImage(items.image, current_size.width, current_size.height, (resized: any): void => {
+                ImageService.RotateImage(resized, current_size.orientation.resize, current_size.orientation.direction, (rotate: any): void => {
+                    ImageService.Brightness(rotate, current_size.brightness, (brightness:any):void => {
+                        $scope.$evalAsync(      // $apply
+                            ($scope: any): void => {
+                                $scope.image = brightness;
+                                $scope.width = current_size.width;
+                                $scope.height = current_size.height;
+                                result.width = current_size.width;
+                                result.height = current_size.height;
+                                result.orientation = current_size.orientation.direction;
+                                result.resize = current_size.orientation.resize;
+                                result.brightness = current_size.brightness;
+                                result.deformation = true;
+                                callback();
+                            }
+                        );
+                    });
+                });
+            });
+        };
+
+        let SetOrientation = () => {
+            let ratio = $scope.ratio;
+            let aspect = $scope.aspect;
+            let brightness = $scope.brightness;
+            current_size.width = items.width * (ratio / 100) * aspect;
+            current_size.height = items.height * (ratio / 100);
+            current_size.brightness = brightness;
+        };
+
+        $scope.SizeChange = () => {
+            progress(true);
+            SetOrientation();
+            Deformation(() => {
+                progress(false)
+            });
+        };
+
+      /*  $scope.RatioChange = () => {
+            progress(true);
+            SetOrientation();
+            Deformation(() => {
+                progress(false)
+            });
+        };*/
+
+        $scope.Rotate = (n: number) => {
+            progress(true);
+            index += 1;
+            current_size.orientation = orientations[Math.abs(index % 4)];
+            SetOrientation();
+            Deformation(() => {
+                progress(false)
+            });
+        };
+
+        $scope.hide = (): void => {
+            $uibModalInstance.close();
+        };
+
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
+
+        $scope.answer = (answer: any): void => {
+            $uibModalInstance.close(result);
+        };
+
+    }]);
+
+//blob
+
+//  4000 < key < 5999
+
+FrontControllers.controller('BlobController', ['$scope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
+    function ($scope: any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
+
+        let progress = (value) => {
+            $scope.$emit('progress', value);
+        };
+
+        $scope.$on('progress', (event, value) => {
+            $scope.progress = value;
+        });
+
+        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+            progress(false);
+            $scope.message = message;
+            $log.error(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -1484,6 +2271,20 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                FileService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
+            }, error_handler);
+        };
+
+        let Exist = (query:any): void => {
+            FileService.Exist(query,(result: any): void => {
+                if (result) {
+                    $scope.count = result;
+                }
             }, error_handler);
         };
 
@@ -1501,6 +2302,12 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                FileService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
@@ -1511,178 +2318,52 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
                 if (result) {
                     $scope.files = result;
                 }
+                FileService.Over((hasnext) => {
+                    $scope.over = !hasnext;
+                });
+                FileService.Under((hasprev) => {
+                    $scope.under = !hasprev;
+                });
                 progress(false);
             }, error_handler);
         };
 
-        let CreateProfile = (files: any): void => {
-            progress(true);
-            let local_file = files[0];
-            let fileReader: any = new FileReader();
-            let image: any = new Image();
-            $scope.userid = "";     // $scope trick for redraw
-
-            fileReader.onload = (event: any): void => {
-                let uri: any = event.target.result;
-                image.src = uri;
-                image.onload = (): void => {
-                    ProfileService.Get((self: any): void => {
-                        if (self) {
-                            FileService.Delete(self.username, 1999, (result: any) => {
-                                    FileService.Create(event.target.result, self.username, 1999, (result: any) => {
-                                        ProfileService.Get((self: any): void => {
-                                            if (self) {
-                                                $scope.$evalAsync(      // $apply
-                                                    ($scope: any): void => {
-                                                        $scope.userid = self.userid; // $scope trick for redraw
-                                                        progress(false);
-                                                    }
-                                                );
-                                            }
-                                        }, error_handler);
-                                    }, error_handler);
-                                },
-                                FileService.Create(event.target.result, self.username, 1999, (result: any) => {
-                                    ProfileService.Get((self: any): void => {
-                                        if (self) {
-                                            $scope.$evalAsync(      // $apply
-                                                ($scope: any): void => {
-                                                    $scope.userid = self.userid; // $scope trick for redraw
-                                                    progress(false);
-                                                }
-                                            );
-                                        }
-                                    }, error_handler);
-                                }, error_handler)
-                            );
-                        }
-                    }, error_handler);
-                };
-            };
-            fileReader.readAsDataURL(local_file.file);
-        };
-        /*
-         let createPhoto1 = (files: any): void => {
-         progress(true);
-         let promises = [];
-         _.forEach(files, (local_file) => {
-         let deferred = $q.defer();
-         let fileReader: any = new FileReader();
-         fileReader.onload = (event: any): void => {
-         FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
-         deferred.resolve(true);
-         }, (code: number, message: string) => {
-         deferred.reject(false);
-         });
-         };
-
-         fileReader.readAsDataURL(local_file.file);
-         promises.push(deferred.promise);
-         });
-
-         $q.all(promises).then((result) => {
-         progress(false);
-         Draw();
-         }).finally(() => {
-         });
-         };
-         */
-
-        let createPhoto = (files: any): void => {
+        let createBlob = (files: any): void => {
             progress(true);
             let promises = [];
             _.forEach(files, (local_file) => {
                 let deferred = $q.defer();
                 let fileReader: any = new FileReader();
                 fileReader.onload = (event: any): void => {
-                    ImageService.DecodeImage(event.target.result, (image: any, type: string): void => {
-                        switch (type) {
-                            case "image/jpeg":
-                            case "image/jpg":
-                            case "image/png":
-                                let modalInstance: any = $uibModal.open({
-                                    controller: 'PhotoResizeDialogController',
-                                    templateUrl: '/images/dialogs/image_resize_dialog',
-                                    resolve: {
-                                        items: (): any => {
-                                            return {
-                                                image: event.target.result,
-                                                width: image.width,
-                                                height: image.height
-                                            };
-                                        }
-                                    }
-                                });
-
-                                modalInstance.result.then((answer: any): void => { // Answer
-                                    if (answer) {
-                                        ImageService.ResizeImage(event.target.result, answer.width, answer.height, (resized: any): void => {
-                                                FileService.Create(resized, local_file.name, 2000, (result: any) => {
-                                                    deferred.resolve(true);
-                                                }, (code: number, message: string) => {
-                                                    deferred.reject(false);
-                                                });
-                                            }
-                                        );
-                                    } else {
-                                        FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
-                                            deferred.resolve(true);
-                                        }, (code: number, message: string) => {
-                                            deferred.reject(false);
-                                        });
-                                    }
-                                }, (): void => { // Error
-                                });
-                                break;
-                            default:
-                                FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
-                                    deferred.resolve(true);
-                                }, (code: number, message: string) => {
-                                    deferred.reject(false);
-                                });
-                        }
+                    FileService.Create(event.target.result, local_file.name, 4000, (result: any) => {
+                        deferred.resolve(true);
+                    }, (code: number, message: string) => {
+                        deferred.reject(false);
                     });
                 };
-
                 fileReader.readAsDataURL(local_file.file);
                 promises.push(deferred.promise);
             });
 
-            $q.all(promises).then((result) => {
+            $q.all(promises).then(function (result) {
+                progress(false);
                 files.forEach((file) => {
                     file.cancel();
                 });
-                progress(false);
                 Draw();
             }).finally(() => {
             });
         };
 
-        let showPhoto = (url: any): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'ImageShowDialogController',
-                templateUrl: '/images/dialogs/image_show_dialog',
-                resolve: {
-                    items: (): any => {
-                        return url;
-                    }
-                }
-            });
-
-            modalInstance.result.then((answer: any): void => { // Answer
-            }, (): void => { // Error
-            });
-        };
-
-        let deletePhoto = (filename: any): void => {
+        let deleteBlob = (filename: any): void => {
 
             let modalInstance = $uibModal.open({
-                controller: 'PhotoDeleteDialogController',
-                templateUrl: '/files/dialogs/file_delete_dialog',
+                controller: 'BlobDeleteDialogController',
+                templateUrl: '/blob/dialogs/delete_confirm_dialog',
             });
 
             modalInstance.result.then((answer: any): void => { // Answer
-                FileService.Delete(filename, 2000, (result: any) => {
+                FileService.Delete(filename, 4000, (result: any) => {
                     $scope.files = [];
                     Draw();
                 }, error_handler);
@@ -1690,90 +2371,27 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
             });
         };
 
-        FileService.SetQuery(null, 2000);
+        FileService.SetQuery({}, 4000);
         let Find = (name: string): void => {
             if (!name) {
                 name = "";
             }
-            FileService.SetQuery({filename: {$regex: name}}, 2000);
+            FileService.SetQuery({filename: {$regex: name}}, 4000);
             Draw();
         };
 
         $scope.Type = Type;
+        $scope.Count = Count;
         $scope.Next = Next;
         $scope.Prev = Prev;
-        $scope.createPhoto = createPhoto;
-        $scope.createProfile = CreateProfile;
-        $scope.showPhoto = showPhoto;
-        $scope.deletePhoto = deletePhoto;
+        $scope.createBlob = createBlob;
+        $scope.deleteBlob = deleteBlob;
         $scope.Find = Find;
 
-        ProfileService.Get((self: any): void => {
-            if (self) {
-                $scope.userid = self.userid;
-            }
-        }, error_handler);
-
         Draw();
-
-        // Guidance
-
-        $scope.next = (): void => {
-            $scope.step++;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.prev = (): void => {
-            $scope.step--;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.to = (step: number): void => {
-            $scope.step = step;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        SessionService.Get((session: any): void => {
-            if (session) {
-                $scope.step = 0;
-                let _data = session.data;
-                if (_data) {
-                    let guidance = _data.guidance;
-                    if (guidance) {
-                        let photo = guidance.photo;
-                        if (photo) {
-                            $scope.step = photo.step;
-                        }
-                    }
-                }
-            }
-        }, error_handler);
-
-        $scope.scenario = [
-            {
-                outer: {
-                    top: -250, left: 360, width: 500, height: 500,
-                    background: "/applications/img/balloon/right.svg",
-                    target: "create"
-                },
-                inner: {
-                    top: 50, left: 150, width: 300, height: 300,
-                    content: "<h3>ニックネーム</h3>" +
-                    "<br>" +
-                    "<p>ニックネームを入力してください</p>" +
-                    "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                },
-                _class: "shake",
-                style: "animation-duration:1s;animation-delay:0.3s;"
-            }
-        ];
-
     }]);
 
-FrontControllers.controller('PhotoDeleteDialogController', ['$scope', '$uibModalInstance',
+FrontControllers.controller('BlobDeleteDialogController', ['$scope', '$uibModalInstance',
     ($scope: any, $uibModalInstance: any): void => {
 
         $scope.hide = (): void => {
@@ -1786,46 +2404,6 @@ FrontControllers.controller('PhotoDeleteDialogController', ['$scope', '$uibModal
 
         $scope.answer = (answer: any): void => {
             $uibModalInstance.close($scope);
-        };
-
-    }]);
-
-FrontControllers.controller('PhotoResizeDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope: any, $uibModalInstance: any, items: any): void => {
-
-        let result = {width: 0, height: 0};
-        result.width = items.width;
-        result.height = items.height;
-
-        $scope.image = items.image;
-
-        $scope.width = result.width;
-        $scope.height = result.height;
-        $scope.ratio = 1;
-        $scope.aspect = result.width / result.height;
-
-
-        $scope.RatioChange = () => {
-            result.width = items.width * $scope.ratio * $scope.aspect;
-            result.height = items.height * $scope.ratio;
-            $scope.width = result.width;
-            $scope.height = result.height;
-        };
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.no = (answer: any): void => {
-            $uibModalInstance.close(null);
-        };
-
-        $scope.answer = (answer: any): void => {
-            $uibModalInstance.close(result);
         };
 
     }]);
@@ -1847,8 +2425,24 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
         };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
+        };
+
 
         $document.on('drop dragover', (e: any): void => {
             e.stopPropagation();
@@ -1857,7 +2451,10 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         window.addEventListener('beforeunload', (event: any) => {
             if ($scope.opened) {
-                event.returnValue = '';
+                if (ShapeEdit.IsDirty()) {
+                    event.returnValue = '';
+                    return '';
+                }
             }
         }, false);
 
@@ -1875,45 +2472,45 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                 delete ShapeEdit.Input[id];
             });
         };
-
-        WebFont.load({
-            google: {
-                families: ['Pacifico::latin']
-            },
-            loading: function () {
-                // ロードが開始されたとき
-                let a = 1;
-            },
-            active: function () {
-                // Web Fontが使用可能になったとき
-                let a = 1;
-            },
-            inactive: function () {
-                // ブラウザがサポートしていないとき
-                let a = 1;
-            },
-            fontloading: function (fontFamily, fontDescription) {
-                // fontFamilyのロードが開始されたとき
-                let a = 1;
-            },
-            fontactive: function (fontFamily, fontDescription) {
-                let a = 1;
-            },
-            fontinactive: function (fontFamily, fontDescription) {
-                // fontFamilyをブラウザがサポートしていないとき
-                let a = 1;
-            }
-        });
-
+        /*
+         WebFont.load({
+         google: {
+         families: ['Pacifico::latin']
+         },
+         loading: function () {
+         // ロードが開始されたとき
+         let a = 1;
+         },
+         active: function () {
+         // Web Fontが使用可能になったとき
+         let a = 1;
+         },
+         inactive: function () {
+         // ブラウザがサポートしていないとき
+         let a = 1;
+         },
+         fontloading: function (fontFamily, fontDescription) {
+         // fontFamilyのロードが開始されたとき
+         let a = 1;
+         },
+         fontactive: function (fontFamily, fontDescription) {
+         let a = 1;
+         },
+         fontinactive: function (fontFamily, fontDescription) {
+         // fontFamilyをブラウザがサポートしていないとき
+         let a = 1;
+         }
+         });
+         */
         let Font_Display: () => void = (): void => {
-            $scope.fontfills = ShapeEdit.Canvas.CurrentFillColor().RGB();
-            $scope.fontsize = ShapeEdit.Canvas.CurrentFontSize();
-            $scope.FontKeyword = ShapeEdit.Canvas.CurrentFontKeyword();
-            $scope.FontWeight = ShapeEdit.Canvas.CurrentFontWeight();
-            $scope.FontVariant = ShapeEdit.Canvas.CurrentFontVariant();
-            $scope.FontStyle = ShapeEdit.Canvas.CurrentFontStyle();
-            $scope.FontFamily = ShapeEdit.Canvas.CurrentFontFamily()[0];
-            $scope.path = ShapeEdit.Canvas.CurrentPath();
+            $scope.fontfills = ShapeEdit.CurrentFillColor().RGB();
+            $scope.fontsize = ShapeEdit.CurrentFontSize();
+            $scope.FontKeyword = ShapeEdit.CurrentFontKeyword();
+            $scope.FontWeight = ShapeEdit.CurrentFontWeight();
+            $scope.FontVariant = ShapeEdit.CurrentFontVariant();
+            $scope.FontStyle = ShapeEdit.CurrentFontStyle();
+            $scope.FontFamily = ShapeEdit.CurrentFontFamily()[0];
+            $scope.path = ShapeEdit.CurrentPath();
         };
 
         let Select: (shape: any) => void = (shape: any): void => {
@@ -1968,9 +2565,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         };
 
         let changeText = (): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentText($scope.text);
-            }
+            ShapeEdit.SetCurrentText($scope.text);
         };
 
         let IsOpen = (): boolean => {
@@ -1982,39 +2577,39 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         };
 
         let ToTop = () => {
-            ShapeEdit.Canvas.ToTop();
+            ShapeEdit.ToTop();
         };
 
         let ToBottom = () => {
-            ShapeEdit.Canvas.ToBottom();
+            ShapeEdit.ToBottom();
         };
 
         let Lock = () => {
-            ShapeEdit.Canvas.Lock();
+            ShapeEdit.Lock();
         };
 
         let UnLockAll = () => {
-            ShapeEdit.Canvas.UnLockAll();
+            ShapeEdit.UnLockAll();
         };
 
         let Group = () => {
-            ShapeEdit.Canvas.Group();
+            ShapeEdit.Group();
         };
 
         let Ungroup = () => {
-            ShapeEdit.Canvas.Ungroup();
+            ShapeEdit.Ungroup();
         };
 
         let Copy = () => {
-            ShapeEdit.Canvas.Copy();
+            ShapeEdit.Copy();
         };
 
         let Paste = () => {
-            ShapeEdit.Canvas.Paste();
+            ShapeEdit.Paste();
         };
 
         let SetAlign = (align: number) => {
-            ShapeEdit.Canvas.SetCurrentShapesAlign(align);
+            ShapeEdit.SetCurrentShapesAlign(align);
         };
 
         let Create = (): void => {
@@ -2111,7 +2706,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         let PrintPNG = () => {
             let width, height;
 
-            ShapeEdit.Canvas.Snap();
+            ShapeEdit.Snap();
 
             switch (TemplateService.format.layout) {
                 case "portrait":
@@ -2150,13 +2745,13 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         let ChangeEditMode = (mode: string): void => {
             switch (mode) {
                 case 'move':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.move);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.move);
                     break;
                 case 'draw':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.draw);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.draw);
                     break;
                 case 'bezierdraw':
-                    ShapeEdit.Canvas.SetMode(ShapeEdit.Mode.bezierdraw);
+                    ShapeEdit.SetMode(ShapeEdit.Mode.bezierdraw);
                     break;
                 default:
                     break;
@@ -2164,71 +2759,63 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         };
 
         let changeLocationX = (x: number): void => {
-            let loc = ShapeEdit.Canvas.CurrentLocation();
+            let loc = ShapeEdit.CurrentLocation();
             loc.x = x;
-            ShapeEdit.Canvas.SetCurrentLocation(loc);
+            ShapeEdit.SetCurrentLocation(loc);
         };
 
         let changeLocationY = (y: number): void => {
-            let loc = ShapeEdit.Canvas.CurrentLocation();
+            let loc = ShapeEdit.CurrentLocation();
             loc.y = y;
-            ShapeEdit.Canvas.SetCurrentLocation(loc);
+            ShapeEdit.SetCurrentLocation(loc);
         };
 
         let changeSizeW = (w: number): void => {
-            let size = ShapeEdit.Canvas.CurrentSize();
+            let size = ShapeEdit.CurrentSize();
             size.w = w;
-            ShapeEdit.Canvas.SetCurrentSize(size);
+            ShapeEdit.SetCurrentSize(size);
         };
 
         let changeSizeH = (h: number): void => {
-            let size = ShapeEdit.Canvas.CurrentSize();
+            let size = ShapeEdit.CurrentSize();
             size.h = h;
-            ShapeEdit.Canvas.SetCurrentSize(size);
+            ShapeEdit.SetCurrentSize(size);
         };
 
         let strokewidthChange = (stroke: number): void => {
             let color: ShapeEdit.RGBAColor = null;
-            ShapeEdit.Canvas.SetCurrentStrokeWidth(stroke);
+            ShapeEdit.SetCurrentStrokeWidth(stroke);
         };
 
         let pathChange = (path: string): void => {
-            ShapeEdit.Canvas.SetCurrentPath(path);
+            ShapeEdit.SetCurrentPath(path);
         };
 
         let changeFontStyle = (fontstyle: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontStyle(fontstyle);
-                Font_Display();
-            }
+            ShapeEdit.SetCurrentFontStyle(fontstyle);
+            Font_Display();
         };
 
         // 太さ   normal、bold、lighter、bolder、または100〜900の9段階
         let changeFontWeigt = (fontweight: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontWeight(fontweight);
-                Font_Display();
-            }
+            ShapeEdit.SetCurrentFontWeight(fontweight);
+            Font_Display();
         };
 
         // font names
         let changeFontAlign = (FontAlign: string): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentAlign(FontAlign);
-                Font_Display();
-            }
+            ShapeEdit.SetCurrentAlign(FontAlign);
+            Font_Display();
         };
 
         let fontsizeChange = (fontsize: number): void => {
-            if (ShapeEdit.Canvas) {
-                ShapeEdit.Canvas.SetCurrentFontSize(fontsize);
-                Font_Display();
-            }
+            ShapeEdit.SetCurrentFontSize(fontsize);
+            Font_Display();
         };
 
         let labelChange = (label, index) => {
             if (label) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].label = label;
                 }
@@ -2237,7 +2824,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let modeChange = (mode, index) => {
             if (mode) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].mode = mode;
                 }
@@ -2246,7 +2833,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let typeChange = (type, index) => {
             if (type) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].type = type;
                 }
@@ -2255,7 +2842,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let requiredChange = (required, index) => {
             if (required) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate.required = (required == "true");
                 }
@@ -2264,7 +2851,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let maxlengthChange = (maxlength, index) => {
             if (maxlength) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate["ng-maxlength"] = Number(maxlength);
                 }
@@ -2273,7 +2860,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let minlengthChange = (minlength, index) => {
             if (minlength) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].validate["ng-minlength"] = Number(minlength);
                 }
@@ -2282,7 +2869,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let optionsChange = (options, index) => {
             if (options) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].options = options;
                 }
@@ -2291,7 +2878,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let onChangeChange = (onChange, index) => {
             if (onChange) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].events = {onChange: onChange};
                 }
@@ -2300,7 +2887,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
         let lookupChange = (lookup, index) => {
             if (lookup) {
-                let shapes = ShapeEdit.Canvas.Selected();
+                let shapes = ShapeEdit.Selected();
                 if (shapes.length != 0) {
                     shapes[0].Property().description["field"][index].lookup = lookup;
                 }
@@ -2316,7 +2903,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                 })
             };
             let text = new ShapeEdit.Text(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(text);
+            ShapeEdit.Add(text);
         };
 
         let AddBox = (): void => {
@@ -2328,7 +2915,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                 })
             };
             let box = new ShapeEdit.Box(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(box);
+            ShapeEdit.Add(box);
         };
 
         let AddOval = (): void => {
@@ -2340,7 +2927,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                 })
             };
             let rect = new ShapeEdit.Oval(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(rect);
+            ShapeEdit.Add(rect);
         };
 
         let AddBezier = (): void => {
@@ -2360,27 +2947,27 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
 
             context.ResizeRectangle();
 
-            ShapeEdit.Canvas.Add(context);
+            ShapeEdit.Add(context);
         };
 
         let AddImage = (): void => {
-            var obj = {
+            let obj = {
                 rectangle: new ShapeEdit.Rectangle(200, 200, 200, 200),
                 property: new ShapeEdit.ShapeProperty(ShapeEdit.Canvas, '', [], '/systems/files/files/blank.png', new ShapeEdit.RGBAColor(0, 0, 0, 1), new ShapeEdit.RGBAColor(80, 80, 80, 1), 1, new ShapeEdit.Font("normal", "normal", "normal", 18, "sans-serif", []), "left", "miter", {
                     "category": "",
                     "type": ""
                 })
             };
-            var image = new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj);
-            ShapeEdit.Canvas.Add(image);
+            let image = new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj);
+            ShapeEdit.Add(image);
         };
 
         let DeleteSelected = (): void => {
-            ShapeEdit.Canvas.DeleteSelected();
+            ShapeEdit.DeleteSelected();
         };
 
         let SelectedCount = (): number => {
-            return ShapeEdit.Canvas.SelectedCount();
+            return ShapeEdit.SelectedCount();
         };
 
         ShapeEdit.onTick((shape: ShapeEdit.BaseShape, context: any): any => {
@@ -2456,7 +3043,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
         ShapeEdit.onSelect((shape: ShapeEdit.BaseShape, context: any): void => {
             // for inPlace text input
 
-            if (ShapeEdit.Canvas.SelectedCount() === 1) {
+            if (ShapeEdit.SelectedCount() === 1) {
                 if (shape.Parent().IsRoot()) {
 
                     switch (shape.type) {
@@ -2588,7 +3175,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                             })
                         };
 
-                        ShapeEdit.Canvas.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
+                        ShapeEdit.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
                     };
                     image.onerror = (): void => {                           // URLがイメージとしてロード不可能
                     };
@@ -2613,7 +3200,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
                                     "type": "meter"
                                 })
                             };
-                            ShapeEdit.Canvas.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
+                            ShapeEdit.Add(new ShapeEdit.ImageRect(ShapeEdit.Canvas, obj));
                         };
                         img.src = ex.target.result;
                     };
@@ -2682,7 +3269,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             if (color_string) {
                 let color: ShapeEdit.RGBAColor = new ShapeEdit.RGBAColor(0, 0, 0, 1);
                 color.SetRGB(color_string);
-                ShapeEdit.Canvas.SetCurrentFillColor(color);
+                ShapeEdit.SetCurrentFillColor(color);
                 Font_Display();
             }
         });
@@ -2691,35 +3278,35 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             if (color_string) {
                 let color: ShapeEdit.RGBAColor = new ShapeEdit.RGBAColor(0, 0, 0, 0);
                 color.SetRGB(color_string);
-                ShapeEdit.Canvas.SetCurrentStrokeColor(color);
+                ShapeEdit.SetCurrentStrokeColor(color);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontVariant', (FontVariant): void => {
             if (FontVariant) {
-                ShapeEdit.Canvas.SetCurrentFontVariant(FontVariant);
+                ShapeEdit.SetCurrentFontVariant(FontVariant);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontWeight', (fontweight: string): void => {
             if (fontweight) {
-                ShapeEdit.Canvas.SetCurrentFontWeight(fontweight);
+                ShapeEdit.SetCurrentFontWeight(fontweight);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontKeyword', (FontKeyword: string): void => {
             if (FontKeyword) {
-                ShapeEdit.Canvas.SetCurrentFontKeyword(FontKeyword);
+                ShapeEdit.SetCurrentFontKeyword(FontKeyword);
                 Font_Display();
             }
         });
 
         $scope.$watch('FontFamily', (FontFamily: string): void => {
             if (FontFamily) {
-                ShapeEdit.Canvas.SetCurrentFontFamily([FontFamily]);
+                ShapeEdit.SetCurrentFontFamily([FontFamily]);
                 Font_Display();
             }
         });
@@ -3007,7 +3594,22 @@ FrontControllers.controller('MemberController', ['$scope', '$document', '$log', 
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {
@@ -3101,3 +3703,61 @@ FrontControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalI
         };
 
     }]);
+
+
+FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'DataService',
+    ($scope: any, $q: any, $document: any, $uibModal: any, $log: any, DataService: any): void => {
+
+        let progress = (value) => {
+            $scope.$emit('progress', value);
+        };
+
+        $scope.$on('progress', (event, value) => {
+            $scope.progress = value;
+        });
+
+        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+            progress(false);
+            $scope.message = message;
+            $log.error(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
+        };
+
+        $document.on('drop dragover', (e: any): void => {
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        $scope.UploadBackup = (file: any): void => {
+            progress(true);
+            let fileReader: any = new FileReader();
+            fileReader.onload = (event: any): void => {
+                DataService.Upload(event.target.result, file[0].name, (result: any) => {
+
+                }, (code: number, message: string) => {
+
+                });
+            };
+
+            fileReader.readAsDataURL(file[0].file);
+        };
+
+    }]);
+
+/*! Controllers  */
+

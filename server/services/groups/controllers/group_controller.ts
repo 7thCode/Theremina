@@ -16,13 +16,11 @@ export namespace GroupModule {
     const _ = require('lodash');
 
     const mongoose: any = require('mongoose');
-    mongoose.Promise = require('q').Promise;
+    mongoose.Promise = global.Promise;
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const GroupModel: any = require(share.Models("services/groups/group"));
 

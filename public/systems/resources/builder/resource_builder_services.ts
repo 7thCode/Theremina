@@ -9,12 +9,12 @@
 let ResourceBuilderServices: angular.IModule = angular.module('ResourceBuilderServices', []);
 
 ResourceBuilderServices.factory('ResourceCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/resources/api/create', {}, {});
     }]);
 
 ResourceBuilderServices.factory('Resource', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/resources/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -23,14 +23,14 @@ ResourceBuilderServices.factory('Resource', ['$resource',
     }]);
 
 ResourceBuilderServices.factory('ResourceQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/resources/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 ResourceBuilderServices.factory('ResourceCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/resources/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -39,11 +39,10 @@ ResourceBuilderServices.factory('ResourceCount', ['$resource',
 ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount",
     function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any): void {
 
-        this.InitQuery = (query: any, type: number = 0, pagesize: number = 10) => {
-            this.pagesize = pagesize;
+        this.InitQuery = (query: any, type: number = 0, pagesize: number = 40) => {
 
             this.option.skip = 0;
-            this.option.limit = this.pagesize;
+            this.option.limit = pagesize;
 
             this.query = {$and: [{}]};
             if (query) {
@@ -58,7 +57,9 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
         this.AddQuery = (query: any) => {
             if (this.query) {
                 if (this.query.$and) {
-                    this.query.$and.push(query);
+                    if (Object.keys(query).length !== 0) {
+                        this.query.$and.push(query);
+                    }
                 }
             }
         };
@@ -69,14 +70,15 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
                     let filted = [{}];
                     this.query.$and.forEach((query) => {
                         if (!query[name]) {
-                            filted.push(query);
+                            if (Object.keys(query).length !== 0) {
+                                filted.push(query);
+                            }
                         }
                     });
 
                     this.query.$and = filted;
                     if (filted.length == 0) {
                         this.query = {$and: [{}]};
-                        //            this.query = {$and:[{type:{$gte:0}}]};
                     }
                 }
             }
@@ -84,11 +86,8 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
 
 
         let init = () => {
-            this.pagesize = 10;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.InitQuery();
-
             this.current = {content: {}};
         };
 
@@ -129,20 +128,20 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
             });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -153,7 +152,7 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

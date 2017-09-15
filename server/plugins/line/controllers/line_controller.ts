@@ -12,11 +12,9 @@ export namespace LineModule {
 
     const line = require('node-line-bot-api');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const plugins_config = share.plugins_config;
 
@@ -48,32 +46,7 @@ export namespace LineModule {
                         break;
                     default:
                 }
-                /*
-                 ai.textRequest(event.message.text, {
-                 sessionId: sessionId
-                 }).then( (response) => {
-                 switch (response.result.source) {
-                 case "agent":
-                 text = response.result.fulfillment.speech;
-                 break;
-                 case "domains":
-                 text = response.result.source.action;
-                 break;
-                 default:
-                 }
-                 }).then( (response) =>  {
-                 return line.client.replyMessage({
-                 replyToken: event.replyToken,
-                 messages: [{
-                 type: 'text',
-                 text: text
-                 }]
-                 });
-                 }).catch(function (error) {
-                 console.log(error);
-                 });
 
-                 */
                 let promise = ai.inquiry(sessionId, event.message.text, (response) => {
                     text = response;
                 });

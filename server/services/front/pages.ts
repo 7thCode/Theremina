@@ -11,19 +11,17 @@ export namespace PageRouter {
     const express = require('express');
     export const router = express.Router();
 
-    const _: _.LoDashStatic = require('lodash');
+    const _ = require('lodash');
 
-    const core = require(process.cwd() + '/core');
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
-    const auth: any = core.auth;
-    const exception: any = core.exception;
     const analysis: any = core.analysis;
 
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    const dialog_message = {long: "too long", short: "Too Short", required: "Required"};
+    let message = config.message;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
@@ -33,7 +31,7 @@ export namespace PageRouter {
         response.render("services/front/index", {
             config: config,
             user: request.user,
-            message: "Welcome",
+            message: message,
             status: 200,
             fonts: webfonts
         });
@@ -51,7 +49,7 @@ export namespace PageRouter {
                             ArticleModel.find({$and: [{type: 0}, {userid: account.userid}]}).then((docs: any): void => {
                                 _.forEach(pages, (page: any): void => {
                                     _.forEach(docs, (doc: any): void => {
-                                        let url = config.protocol + "://" + config.domain + "/site/" + account.userid + "/" + page.name + "/" + doc.name;
+                                        let url = config.protocol + "://" + config.domain + "/" + account.userid + "/doc/" + page.name + "/" + doc.name;
                                         let priority = "1.0";
                                         result += '<url><loc>' + url + '</loc><priority>' + priority + '</priority></url>';
                                     });
@@ -72,7 +70,7 @@ export namespace PageRouter {
             let r = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
                 result
                 + '</urlset>';
-            response.set('Content-Type', 'text/xml');
+            response.setHeader('Content-Type', 'text/xml');
             response.send(r);
         }).catch((error: any): void => {
 
@@ -82,12 +80,12 @@ export namespace PageRouter {
 
     router.get("/robots.txt", [(request: any, response: any): void => {
         let robots = "User-agent: *\n\nSitemap: http://" + config.domain + "/sitemap.xml";
-        response.set('Content-Type', 'text/plain');
+        response.setHeader('Content-Type', 'text/plain');
         response.send(robots);
     }]);
 
     router.get("/test", [(request: any, response: any): void => {
-        response.render("test", {user: request.user, message: "Welcome", status: 200});
+        response.render("test", {user: request.user, message: message, status: 200});
     }]);
 
 }

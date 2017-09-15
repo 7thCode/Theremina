@@ -1,10 +1,10 @@
 div
     .modal-header
-        span.h5.modal-title Group {{title}}
+        span.h5.modal-title #{message.group} {{title}}
         span.pull-right
             button.btn.btn-box-tool(type='button',ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12
         .row
@@ -15,5 +15,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

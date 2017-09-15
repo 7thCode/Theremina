@@ -1,27 +1,27 @@
 .box.box-info
     .box-header
-        .h6 Element
+        .h6 #{message.element}
         .box-tools.pull-right
-            button.btn.btn-sm.btn-box-tool(type='button', data-widget='collapse')
+            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                 i.fa.fa-minus
     .box-body
         .row
             .col-xs-12.text-center
                 .btn-group(role="group",style="width:100%;")
-                    button.btn.btn-sm.btn-primary(ng-click="up();",style="width:33%;")
+                    button.btn.btn-sm.btn-primary(ng-click="up();", style="width:33%;")
                         i.fa.fa-chevron-up
-                        span.hidden-xs.hidden-sm.hidden-md Up
-                    button.btn.btn-sm.btn-info(ng-click="down();",style="width:34%;")
+                        span.hidden-xs.hidden-sm.hidden-md #{message.up}
+                    button.btn.btn-sm.btn-info(ng-click="down();", style="width:34%;")
                         i.fa.fa-chevron-down
-                        span.hidden-xs.hidden-sm.hidden-md Down
-                    button.btn.btn-sm.btn-danger(ng-click="delete();",style="width:33%;")
+                        span.hidden-xs.hidden-sm.hidden-md #{message.down}
+                    button.btn.btn-sm.btn-danger(ng-click="delete();", style="width:33%;")
                         i.fa.fa-trash
-                        span.hidden-xs.hidden-sm.hidden-md Delete
+                        span.hidden-xs.hidden-sm.hidden-md #{message.delete}
         .row
             .col-xs-12.text-center
-                button.btn.btn-sm.btn-secondaly(ng-click="deselect();",style="width:100%;")
+                button.btn.btn-sm.btn-secondaly(ng-click="deselect();", style="width:100%;")
                     i.fa.fa-check
-                    span.hidden-xs.hidden-sm.hidden-md select root
+                    span.hidden-xs.hidden-sm.hidden-md #{message.select_root}
         .row
             .col-xs-12
                 div(style="height:80vh;overflow:scroll")

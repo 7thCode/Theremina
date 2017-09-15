@@ -1,10 +1,10 @@
 div
     .modal-header
-        span.h5.modal-title Add Style
+        span.h5.modal-title #{message.add_style}
         span.pull-right
-            button.btn.btn-box-tool(type='button',ng-click='cancel()')
+            button.btn.btn-box-tool(type='button', ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row.row-padded
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
@@ -13,15 +13,15 @@ div
                             .form-group
                                 label.h6(for="name") style
                                 span(ng-messages="validate.name.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="dialog.key", type="text", name='name', required, ng-maxlength="50")
                         .col-xs-6
                             .form-group
                                 label.h6(for="value") value
                                 span(ng-messages="validate.value.$error")
-                                    span.error-message(ng-message="required") #{messages.required}
-                                    span.error-message(ng-message="maxlength") #{messages.long}
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#value(ng-model="dialog.value", type="text", name='value', required, ng-maxlength="50")
         .row
             .col-xs-12
@@ -30,5 +30,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='dialog.cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='dialog.answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='dialog.cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button", ng-click='dialog.answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

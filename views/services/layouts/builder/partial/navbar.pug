@@ -1,65 +1,65 @@
-nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="navigation")
-        .container-fluid.noto
+nav.navbar.navbar-fixed-top.navbar-default(role="navigation")
+        .container-fluid
             .navbar-header
                 button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
                     span.sr-only Toggle navigation
                     span.icon-bar
                     span.icon-bar
                     span.icon-bar
-                a.navbar-brand.page-scroll(href="/", ng-click="go('/')") Layouts
+                a.navbar-brand.page-scroll.brand-font(href="/", ng-click="go('/')") #{message.layout}
                     //i.ion-ios-analytics-outline(style="text-align:center;") #{type}
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav
                     if user
                         li.dropdown
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | File
+                                | #{message.file}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="Create();", role="menuitem") Create
+                                    a(href="#", ng-click="Create();", role="menuitem") #{message.create}
                                 li
-                                    a(href="", ng-click="Open();", role="menuitem") Open...
+                                    a(href="", ng-click="Open();", role="menuitem") #{message.open}
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && Update();", role="menuitem") Save
+                                    a(href="", ng-click="opened && Update();", role="menuitem") #{message.save}
                                 li.divider
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && UpdateAs();", role="menuitem") Save As...
+                                    a(href="", ng-click="opened && UpdateAs();", role="menuitem") #{message.saveas}
                                 li.divider
                                 li(ng-class="{disabled: !opened}")
-                                    a(href="", ng-click="opened && Delete();", role="menuitem") Delete
+                                    a(href="", ng-click="opened && Delete();", role="menuitem") #{message.delete}
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Edit
+                                | #{message.edit}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && Copy();", role="menuitem") Copy
+                                    a(href="#", ng-click="opened && Copy();", role="menuitem") #{message.copy}
                                 li
-                                    a(href="#", ng-click="opened && Paste();", role="menuitem") Paste
+                                    a(href="#", ng-click="opened && Paste();", role="menuitem") #{message.paste}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && DeleteSelected();", role="menuitem") Delete
+                                    a(href="#", ng-click="opened && DeleteSelected();", role="menuitem") #{message.delete}
 
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Align
+                                | #{message.align}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") Align Top
+                                    a(href="#", ng-click="opened && SetAlign(0);", role="menuitem") #{message.align_top}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") Align Right
+                                    a(href="#", ng-click="opened && SetAlign(1);", role="menuitem") #{message.align_right}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") Align Bottom
+                                    a(href="#", ng-click="opened && SetAlign(2);", role="menuitem") #{message.align_bottom}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") Align Left
+                                    a(href="#", ng-click="opened && SetAlign(3);", role="menuitem") #{message.align_left}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") Contact Top
+                                    a(href="#", ng-click="opened && SetAlign(4);", role="menuitem") #{message.contact_top}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") Contact Left
+                                    a(href="#", ng-click="opened && SetAlign(5);", role="menuitem") #{message.contact_left}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") Contact Bottom
+                                    a(href="#", ng-click="opened && SetAlign(6);", role="menuitem") #{message.contact_bottom}
                                 li
-                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") Contact Right
+                                    a(href="#", ng-click="opened && SetAlign(7);", role="menuitem") #{message.contact_right}
                                 li.divider
                                 li
                                     a(href="#", ng-click="opened && SetScale(1);", role="menuitem") Scale(1)
@@ -67,47 +67,44 @@ nav.navbar.navbar-default.navbar-fixed-top.shadow(style="position:fixed;" role="
                                     a(href="#", ng-click="opened && SetScale(1.2);", role="menuitem") Scale(1.2)
 
 
-
-
-
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Shapes
+                                | #{message.shapes}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") Box
+                                    a(href="#", ng-click="opened && AddBox();", role="menuitem") #{message.rect}
                                 li
-                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") Oval
+                                    a(href="#", ng-click="opened && AddOval();", role="menuitem") #{message.oval}
                                 li
-                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") Bezier
+                                    a(href="#", ng-click="opened && AddBezier();", role="menuitem") #{message.curve}
                                 li
-                                    a(href="#", ng-click="opened && AddText();", role="menuitem") Text
+                                    a(href="#", ng-click="opened && AddText();", role="menuitem") #{message.text}
                                 li
-                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") Image
+                                    a(href="#", ng-click="opened && AddImage();", role="menuitem") #{message.image}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") ToTop
+                                    a(href="#", ng-click="opened && ToTop();", role="menuitem") #{message.front}
                                 li
-                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") ToBottom
+                                    a(href="#", ng-click="opened && ToBottom();", role="menuitem") #{message.back}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Lock();", role="menuitem") Lock
+                                    a(href="#", ng-click="opened && Lock();", role="menuitem") #{message.lock}
                                 li
-                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") UnLockAll
+                                    a(href="#", ng-click="opened && UnLockAll();", role="menuitem") #{message.unlockall}
                                 li.divider
                                 li
-                                    a(href="#", ng-click="opened && Group();", role="menuitem") Group
+                                    a(href="#", ng-click="opened && Group();", role="menuitem") #{message.group}
                                 li
-                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") Ungroup
+                                    a(href="#", ng-click="opened && Ungroup();", role="menuitem") #{message.ungroup}
                                 //li
                                     a(href="#", ng-click="hoge1();") hoge
                         li.dropdown(ng-class="{disabled: !opened}")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | Download
+                                | #{message.download}
                             ul.dropdown-menu(role="menu")
                                 li
-                                    a(href="", ng-click="opened && PrintPDF();", role="menuitem") PDF
+                                    a(href="", ng-click="opened && PrintPDF();", role="menuitem") #{message.pdf}
                                 li
-                                    a(href="", ng-click="opened && PrintSVG();", role="menuitem") SVG
+                                    a(href="", ng-click="opened && PrintSVG();", role="menuitem") #{message.svg}
                                 li
-                                    a(href="", ng-click="opened && PrintPNG();", role="menuitem") PNG
+                                    a(href="", ng-click="opened && PrintPNG();", role="menuitem") #{message.png}

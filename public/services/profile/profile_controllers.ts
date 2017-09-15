@@ -10,8 +10,8 @@ let ProfileControllers: angular.IModule = angular.module('ProfileControllers', [
 
 //Self
 
-ProfileControllers.controller('ProfileController', ['$scope','$document', '$log', "ProfileService", 'SessionService', 'FileService',
-    ($scope: any,$document:any, $log: any, ProfileService: any, SessionService: any, FileService): void => {
+ProfileControllers.controller('ProfileController', ['$scope','$document', '$log',"$uibModal", "ProfileService", 'SessionService', 'FileService',
+    ($scope: any,$document:any, $log: any,$uibModal, ProfileService: any, SessionService: any, FileService): void => {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -25,7 +25,22 @@ ProfileControllers.controller('ProfileController', ['$scope','$document', '$log'
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
+            alert(message);
+        };
+
+        let alert = (message): void => {
+            let modalInstance: any = $uibModal.open({
+                controller: 'AlertDialogController',
+                templateUrl: '/common/dialogs/alert_dialog',
+                resolve: {
+                    items: (): any => {
+                        return message;
+                    }
+                }
+            });
+            modalInstance.result.then((answer: any): void => {
+            }, (): void => {
+            });
         };
 
         $document.on('drop dragover', (e: any): void => {

@@ -9,17 +9,17 @@
 let GroupServices: angular.IModule = angular.module('GroupServices', []);
 
 GroupServices.factory('GroupOwn', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/groups/api/own', {}, {});
     }]);
 
 GroupServices.factory('GroupCreate', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/groups/api/create', {}, {});
     }]);
 
 GroupServices.factory('Group', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/groups/api/:id', {id: "@id"}, {
             get: {method: 'GET'},
             put: {method: 'PUT'},
@@ -28,14 +28,14 @@ GroupServices.factory('Group', ['$resource',
     }]);
 
 GroupServices.factory('GroupQuery', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource("/groups/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
             query: {method: 'GET'}
         });
     }]);
 
 GroupServices.factory('GroupCount', ['$resource',
-    ($resource: any): angular.resource.IResource<any> => {
+    ($resource: any): any => {
         return $resource('/groups/api/count/:query', {query: '@query'}, {
             get: {method: 'GET'}
         });
@@ -53,9 +53,7 @@ GroupServices.service('GroupService', [ "GroupOwn","GroupCreate", "Group", "Grou
         };
 
         let init = () => {
-            this.pagesize = 25;
-
-            this.option = {limit: this.pagesize, skip: 0};
+            this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
         };
 
@@ -96,20 +94,20 @@ GroupServices.service('GroupService', [ "GroupOwn","GroupCreate", "Group", "Grou
             });
         };
 
-        this.Over = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
             this.Count((count) => {
-                callback((this.option.skip + this.pagesize) < count);
+                callback((this.option.skip + this.option.limit) <= count);
             }, error);
         };
 
-        this.Under = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip >= this.pagesize);
+        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+            callback(this.option.skip > 0);
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Over((hasnext) => {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.pagesize;
+                    this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);
@@ -120,7 +118,7 @@ GroupServices.service('GroupService', [ "GroupOwn","GroupCreate", "Group", "Grou
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             this.Under((hasprev) => {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.pagesize;
+                    this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
                 } else {
                     callback(null);

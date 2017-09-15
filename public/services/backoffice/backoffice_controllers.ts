@@ -25,7 +25,6 @@ BackOfficeControllers.controller('BackOfficeController', ['$scope', '$document',
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
         };
 
         $scope.Notify = (message: any): void => {
@@ -45,13 +44,5 @@ BackOfficeControllers.controller('BackOfficeController', ['$scope', '$document',
             });
         };
 
-        //   $document.on('drop dragover', (e: any): void => {
-        //       e.stopPropagation();
-        //       e.preventDefault();
-        //   });
-
-     //    PluginsSettingService.Get((result: any) => {
-     //       let a = result;
-     //    }, error_handler);
 
     }]);

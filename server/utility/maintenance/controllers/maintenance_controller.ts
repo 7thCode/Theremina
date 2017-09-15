@@ -8,8 +8,6 @@
 
 export namespace MaintenanceModule {
 
-    const fs: any = require('graceful-fs');
-
     export class Installer {
 
     }

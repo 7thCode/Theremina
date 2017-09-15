@@ -23,7 +23,6 @@ RobotControllers.controller('RobotController', ['$scope', '$log', 'RobotService'
             progress(false);
             $scope.message = message;
             $log.error(message);
-            window.alert(message);
         };
 
         //   let url = "https://www.npmjs.com/package/wgxpath";

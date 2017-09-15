@@ -8,13 +8,22 @@
 
 export namespace GoogleApiRouter {
 
-    const express: any = require("express");
+    const express = require('express');
     export const router = express.Router();
 
-    const core = require(process.cwd() + "/core");
+    const core = require(process.cwd() + '/gs');
     const share: any = core.share;
+    const exception: any = core.exception;
     const plugins_config = share.plugins_config;
+
+    if (plugins_config.google_api) {
+        const GoogleModule: any = require(share.Server("plugins/google/controllers/google_controller"));
+        const analytics: any = new GoogleModule.Analytics(plugins_config.google_api.analytics);
+
+        router.get('/api/ga/:dimensions',[exception.exception, analytics.get]);
+    }
 
 }
 
 module.exports = GoogleApiRouter.router;
+

@@ -7,10 +7,9 @@
 "use strict";
 
 namespace AccountModule {
+
     const mongoose = require('mongoose');
-
     const Schema = mongoose.Schema;
-
     const passport = require('passport-local-mongoose');
     const timestamp = require('../plugins/timestamp/timestamp');
 
@@ -21,6 +20,7 @@ namespace AccountModule {
         type: {type: String, default: "User"},
         auth: {type: Number, default: 100},
         userid: {type: String, required: true, sparse: true},
+        role: {type: String,  default: ""},
         username: {type: String, required: true, index: {unique: true}},
         password: {type: String},
         passphrase: {type: String, default: ""},

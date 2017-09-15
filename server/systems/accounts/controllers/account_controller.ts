@@ -11,12 +11,10 @@ export namespace AccountModule {
     const _ = require('lodash');
 
     const mongoose: any = require('mongoose');
-    mongoose.Promise = require('q').Promise;
+    mongoose.Promise = global.Promise;
 
     const share = require(process.cwd() + '/server/systems/common/share');
-    const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 

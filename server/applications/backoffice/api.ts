@@ -11,8 +11,6 @@ export namespace BackofficeApiRouter {
     const express: any = require('express');
     export const router: any = express.Router();
 
-    const core: any = require(process.cwd() + '/core');
-    const share: any = core.share;
 }
 
 module.exports = BackofficeApiRouter.router;

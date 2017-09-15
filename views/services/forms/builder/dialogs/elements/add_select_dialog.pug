@@ -1,28 +1,28 @@
 div
     .modal-header
         span.h5.modal-title Select
-    .modal-body.noto
+    .modal-body
         .row.row-padded
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
                         .col-xs-12
                             .form-group
-                                label(for="name") Key
+                                label(for="name") #{message.key}
                                 span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") 必須です
-                                    span.error-message(ng-message="maxlength") もう少し短く
-                                    span.error-message(ng-message="pattern") その文字を含むことはできません
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                    span.error-message(ng-message="pattern") #{message.invalid}
                                 input.form-control.no-zoom#name(ng-model="key", type="text", name='title', required, ng-maxlength="50", ng-pattern="key_escape")
 
                         .col-xs-12
-                            label(for="contents") contents
+                            label(for="contents") #{message.contents}
                             div(style="overflow:scroll;")
-                                chips(ng-model='contents',style="height: 36px;")
+                                chips(ng-model='contents', style="height: 36px;")
                                     chip-tmpl
                                         .default-chip {{chip}}
                                             span.fa.fa-times(remove-chip='')
-                                    input#contents(name="contents",style="background-color:transparent;" chip-control)
+                                    input#contents(name="contents", style="background-color:transparent;", chip-control)
                     .row
                         //.col-xs-4
                             label.btn.btn-primary(ng-model="required.value" uib-btn-checkbox) required
@@ -30,8 +30,8 @@ div
                             .form-group
                                 label(for="requiredmessage") Requred Message
                                 span(ng-messages="validate.requiredmessage.$error")
-                                    span.error-message(ng-message="maxlength") もう少し短く
-                                input.form-control.no-zoom#requiredmessage(ng-model="requiredmessage", type="text", name='requiredmessage', ng-maxlength="50")
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#requiredmessage(ng-model="required.message", type="text", name='requiredmessage', ng-maxlength="50")
 
 
             .col-xs-12.text-center
@@ -41,5 +41,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") Cancel
-                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") OK
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}
+                    button.btn.btn-primary(type="button" ,ng-click='answer();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", aria-label="") #{message.ok}

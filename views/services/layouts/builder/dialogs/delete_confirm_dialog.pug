@@ -4,7 +4,7 @@ div
         span.pull-right
             button.btn.btn-xs.btn-box-tool(type='button',ng-click='cancel()')
                 i.fa.fa-times
-    .modal-body.noto
+    .modal-body
         .row
             .col-xs-12
                 div Delete {{title}}. OK？
@@ -14,5 +14,5 @@ div
         .row
             .col-xs-12
                 .text-center(style="margin:2rem;")
-                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") Cancel
+                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") #{message.cancel}
                     button.btn.btn-primary(type="button" ,ng-click='answer();', ng-disabled="progress", aria-label="") OK
