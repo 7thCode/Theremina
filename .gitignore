@@ -1,3 +1,6 @@
+
+*.js
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Node template
 # Logs
@@ -108,4 +111,4 @@ licenses/
 public/applications/front/files/templates/paper/files/
 public/applications/front/files/templates/shape/files/
 
-*.js
+
