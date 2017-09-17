@@ -45,25 +45,25 @@
  "initfiles": [],
  "initresources": [],
  "facebook": {
-  "token": "EAAPg8nJJ6U0BAD842mwV6SYzJpMiadzu3cG132wJDZBFNjWqjCjO3h8KE7ajIGlg9c4PJzzlxJj0L58mcPESkNMZBJ6SHGpJQZBrBm3rJZCr5cooJFZCMeIY34aG3zFIlZBZBgEZCZCVHt2XeE3CkB45oEiRLZBpy4RQPm6CAvWb3OQwZDZD"
+  "token": "TOKEN"
  },
  "slack1": {
-  "token": "xoxb-148487963922-2Ih9oU4M1Ks1PIvGN8bG8vcZ"
+  "token": "TOKEN"
  },
  "line1": {
   "token": {
-   "accessToken": "u+2R2ezf48jqFMil41p0pnQgfkXPmTsvP8ovitF7dL/xO9UknbPCxC1j0EGjJsMA6HQonPLIELB0WRvWZECZOvoAqfEsTQsSrIPsg8iFS4CE+oLbulVvSJ5hJ7F/WEmpiF986yZlMIhTASR6KzC/tAdB04t89/1O/w1cDnyilFU=",
-   "channelSecret": "feefcea88f4f7d25546da49e23c9c739"
+   "accessToken": "TOKEN",
+   "channelSecret": "TOKEN"
   },
-  "uid": "U9d91cc3d42465d98b7abb0e044889c73"
+  "uid": "UID"
  },
  "apiai": {
-  "token": "73c22837d5894617a8f0de8e560b8bb3"
+  "token": "TOKEN"
  },
  "google_api": {
   "calendar": {
-   "client_id": "111192643141-1f4mgtkl7n7gdovn3med96r9hcuab8ea.apps.googleusercontent.com",
-   "project_id": "spatial-skein-154413",
+   "client_id": "XXX-XXX.apps.googleusercontent.com",
+   "project_id": "spatial-skein-XXXX",
    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
    "token_uri": "https://accounts.google.com/o/oauth2/token",
    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
@@ -74,10 +74,10 @@
    ]
   },
   "analytics": {
-   "client_id": "560414460200-97e8kskuc4e6lonrm2llahdbpu84q2di.apps.googleusercontent.com",
-   "service_account_email": "560414460200-97e8kskuc4e6lonrm2llahdbpu84q2di@developer.gserviceaccount.com",
+   "client_id": "XXX-XXX.apps.googleusercontent.com",
+   "service_account_email": "XXX-XXX@developer.gserviceaccount.com",
    "service_account_key_file": "./config/plugins/analytics.pem",
-   "ids": "ga:15857470"
+   "ids": "ga:XXXXXX"
   }
  }
 }

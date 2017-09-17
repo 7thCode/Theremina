@@ -1,0 +1,443 @@
+{
+ "status": "production",
+ "mode": 1,
+ "port": 8000,
+ "loglevel": "INFO",
+ "domain": "localhost:8000",
+ "protocol": "http",
+ "cache1": "max-age=86400",
+ "cache": "no-cache",
+ "timeout": 100000,
+ "ua": "Theremina",
+ "compression": false,
+ "use_publickey": true,
+ "dav": false,
+ "redis": false,
+ "mecab": false,
+ "opencv": false,
+ "db": {
+  "address": "localhost",
+  "user": "USERNAME",
+  "password": "PASSWORD",
+  "name": "DBNAME"
+ },
+ "analysis": {
+  "count": 100
+ },
+ "regist": {
+  "user": true,
+  "member": true,
+  "expire": 60
+ },
+ "sessionname": "SESSION",
+ "sessionsecret": "SESSIONSECRET",
+ "tokensecret": "TOKENSECRET",
+ "key2": "SECRET",
+ "directories": {
+  "temporary": "/tmp/"
+ },
+ "files": {
+  "temporary": "noname"
+ },
+ "systems": {
+  "userid": "000000000000000000000000"
+ },
+ "modules": [
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "common",
+   "description": {
+    "display": "Common"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "accounts",
+   "description": {
+    "display": "Accounts"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "analysis",
+   "description": {
+    "display": "Analysis"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "auth",
+   "description": {}
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "files",
+   "description": {
+    "display": "Files"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "publickey",
+   "description": {}
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "resources",
+   "description": {
+    "display": "Resources"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "session",
+   "description": {}
+  },
+  {
+   "type": "required",
+   "path": "/systems/",
+   "name": "setting",
+   "description": {
+    "display": "Settings"
+   }
+  }
+ ],
+ "initusers": [
+  {
+   "type": "System",
+   "auth": 1,
+   "userid": "000000000000000000000000",
+   "username": "xxxx@xxxx.com",
+   "displayName": "xxxx",
+   "password": "xxxx"
+  }
+ ],
+ "initfiles": [
+  {
+   "type": 0,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/files/files",
+   "name": "blank.png",
+   "content": {
+    "type": "image/png"
+   }
+  }
+ ],
+ "initresources": [
+  {
+   "type": 12,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/resources/files/mail",
+   "name": "regist_mail.html",
+   "content": {
+    "type": "text/html"
+   }
+  },
+  {
+   "type": 12,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/resources/files/mail",
+   "name": "regist_member_mail.html",
+   "content": {
+    "type": "text/html"
+   }
+  },
+  {
+   "type": 12,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/resources/files/mail",
+   "name": "password_mail.html",
+   "content": {
+    "type": "text/html"
+   }
+  },
+  {
+   "type": 12,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/resources/files/mail",
+   "name": "username_mail.html",
+   "content": {
+    "type": "text/html"
+   }
+  },
+  {
+   "type": 20,
+   "userid": "000000000000000000000000",
+   "path": "/public/systems/resources/files/page",
+   "name": "error.html",
+   "content": {
+    "type": "text/html"
+   }
+  }
+ ],
+ "facebook": {
+  "enable": "true",
+  "redirect": "/",
+  "key": {
+   "clientID": "11111111111111111",
+   "clientSecret": "aaaa1111bbbb2222cccc3333dddd4444",
+   "callbackURL": "https://xxxx.com/auth/facebook/callback"
+  },
+  "accessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ },
+ "twitter1": {
+  "enable": "false",
+  "redirect": "/",
+  "key": {
+   "consumerKey": "zzzzzzzzzzzzzzzzzzzzzzzzz",
+   "consumerSecret": "aaaaaaaaaa9999999999bbbbbcccccccccc2222222222ddddd",
+   "callbackURL": "https://xxxx.com/auth/twitter/callback"
+  }
+ },
+ "instagram1": {
+  "enable": "false",
+  "redirect": "/",
+  "key": {
+   "clientID": "0000000000aaaaaa1111111111cccccc",
+   "clientSecret": "123456789abcdef01234567890abcdef",
+   "callbackURL": "https://xxxx.com/auth/instagram/callback"
+  }
+ },
+ "line": {
+  "enable": "true",
+  "redirect": "/",
+  "key": {
+   "channelID": "1234567890",
+   "channelSecret": "1111111111000000abcdef0000001111",
+   "callbackURL": "https://xxxx.com/auth/line/callback"
+  }
+ },
+ "googleplus1": {
+  "enable": "false",
+  "redirect": "/",
+  "key": {
+   "clientId": "1234567890123-1234567890abcdef01234567890abcde.apps.googleusercontent.com",
+   "apiKey": "ABCDeF123456ABCDeF123456",
+   "callbackURL": "https://xxxx.com/auth/googleplus/callback"
+  }
+ },
+ "mailer": {
+  "type": "mailgun",
+  "account": "postmaster@xxxx.com",
+  "setting": {
+   "api_key": "key-abcdef0123456789abcdef0123456789",
+   "domain": "xxxx.com"
+  }
+ },
+ "mailer1": {
+  "type": "gmail",
+  "account": "inbox.xxxx@gmail.com",
+  "setting": {
+   "service": "gmail",
+   "auth": {
+    "user": "inbox.xxxx@gmail.com",
+    "pass": "1111111111"
+   }
+  }
+ },
+ "receiver1": {
+  "type": "imap",
+  "address": "imap.gmail.com",
+  "auth": {
+   "user": "inbox.xxxx@gmail.com",
+   "pass": "1111111111"
+  }
+ },
+ "message": {
+  "account": "Account",
+  "accounts": "Accounts",
+  "add_attribute": "Add Attribute",
+  "add_style": "Add Style",
+  "align_bottom": "Align Bottom",
+  "align_left": "Align Left",
+  "align_right": "Align Right",
+  "align_top": "Align Top",
+  "align": "Align",
+  "all": "All",
+  "analysis": "Analysis",
+  "analytics": "Analytics",
+  "article": "Article",
+  "articlename": "Article Name",
+  "articles": "Articles",
+  "articletype": "Article Dimension",
+  "aspect": "W/H Ratio",
+  "attribute": "Attribute",
+  "attributes": "Attributes",
+  "auther": "Author",
+  "back": "Back",
+  "backoffice": "BackOffice",
+  "begin": "Let's Begin.",
+  "blob": "Blob",
+  "brand": "[Theremina]",
+  "brightness": "Brightness",
+  "build": "Build",
+  "builder": "Builder",
+  "cancel": "Cancel",
+  "check": "Check",
+  "checkbox": "CheckBox",
+  "chips": "Chips",
+  "class": "Class",
+  "close": "Close",
+  "components": "Components",
+  "contact_bottom": "Contact Bottom",
+  "contact_left": "Contact Left",
+  "contact_right": "Contact Right",
+  "contact_top": "Contact Top",
+  "contents": "contents",
+  "copy": "Copy",
+  "create_from_template": "Create from Template...",
+  "create": "Create...",
+  "curve": "Curve",
+  "date": "Date",
+  "deformation": "Deformation",
+  "delete": "Delete",
+  "deleteconfirmtext": "Delete {{title}}. Continue?",
+  "dimension": "Dimension",
+  "div": "Div",
+  "down": "Down",
+  "download": "Download",
+  "dpi": "DPI",
+  "edit": "Edit",
+  "element_contents": "element_contents",
+  "element": "Element",
+  "field": "Field",
+  "figure": "Figure",
+  "file": "File",
+  "filedrop": "Drop file Here",
+  "files": "Files",
+  "find": "Find",
+  "form": "Form",
+  "forms": "Forms",
+  "front": "Front",
+  "google":"Google",
+  "group": "Group",
+  "groups": "Groups",
+  "help": "Help",
+  "home": "Home",
+  "html": "HTML",
+  "illust": "Illust",
+  "image": "Image",
+  "img": "Img",
+  "invalid_mail_format": "invalid mail format",
+  "invalid": "Invalid",
+  "key": "Key",
+  "landscape": "landscape",
+  "layout": "Layout",
+  "lock": "Lock",
+  "login": "Login",
+  "logindialogtitle": "Login",
+  "logout": "Logout",
+  "long": "too long",
+  "mail_field": "Mail Address",
+  "mail": "Mail",
+  "mailerror": "Mail Error",
+  "mailinquirysubject": "Inquiry complete",
+  "mailmembersubject": "member",
+  "mailnotationsubject": "notation",
+  "mailpasswordsubject": "Update Password",
+  "mailregistsubject": "",
+  "mailusernamesubject": "Update Username",
+  "maintenance":"maintenance in progress",
+  "margin": "Margin",
+  "max_message": "Max Message",
+  "max": "Max",
+  "member": "Member",
+  "memberconfirmdialogtitle": "Member Register Mail Sent",
+  "memberconfirmtext": "Add Member",
+  "memberdialogtitle": "Member Regist",
+  "members": "Members",
+  "membertext": "Members must click on Mail Authentication to complete the authentication",
+  "mimetype": "mimetype",
+  "min_message": "Min Message",
+  "min": "Min",
+  "mode": "Mode",
+  "module": "Module",
+  "name": "Name",
+  "newsite": "new site...",
+  "nickname_field": "Nickname",
+  "nickname": "Nickname",
+  "number": "Number",
+  "ok": "OK",
+  "open": "Open...",
+  "oval": "Oval",
+  "over4under30": "4 to 30 characters",
+  "page": "Page",
+  "password_field": "Password",
+  "password_missmatch": "password missmatch",
+  "password": "Password",
+  "passwordconfirmdialogtitle": "Password reset mail sent.",
+  "passwordconfirmtext": "Update Password",
+  "passworddialogtitle": "Password Reset",
+  "paste": "Paste",
+  "pattern_message": "Pattern Message",
+  "pattern": "Pattern",
+  "pdf": "PDF",
+  "photo": "Photo",
+  "picture": "Picture",
+  "picturedrop": "Drop Photo Here",
+  "player": "Player",
+  "plugins": "Plugins",
+  "png": "PNG",
+  "portrait": "portrait",
+  "preview": "Preview",
+  "print": "Print",
+  "profile": "Profile",
+  "re_password_field": "Confirm Password",
+  "rect": "Rect",
+  "regist": "Regist",
+  "registconfirmdialogtitle": "Register Mail Sent",
+  "registconfirmtext": "User Register Mail Sent.",
+  "registdialogtitle": "User Regist",
+  "registtext": "Please click on Mail Authentication to complete the authentication.",
+  "request": "Request...",
+  "required": "Required.",
+  "requred_message": "Requred Message",
+  "resource": "Resource",
+  "resources": "Resources",
+  "resourcetype": "resourcetype",
+  "retypepassword": "Retype Password",
+  "robot":"ROBOT",
+  "save": "Save",
+  "saveas": "Save As...",
+  "savedone": "Save Done. ",
+  "select_root": "select root",
+  "select": "Select",
+  "setting": "Setting",
+  "shapes": "Shapes",
+  "short": "Too Short",
+  "show": "Show",
+  "sitesetting": "Site Setting",
+  "sizeratio": "Size Ratio",
+  "step": "Step",
+  "subject": "Subject",
+  "svg": "SVG",
+  "system": "System",
+  "tag": "Tag",
+  "template": "Template",
+  "text": "Text",
+  "textarea": "Textarea",
+  "title": "Title",
+  "tree": "Tree",
+  "type": "Type",
+  "undo": "Undo",
+  "ungroup": "Ungroup",
+  "unlockall": "Unlock All",
+  "up": "Up",
+  "update": "Update",
+  "usernamealreadyregist": "Username already Exist",
+  "usernameconfirmtext": "Update Username",
+  "usernamenotfound": "Username not found",
+  "value": "Value",
+  "w_h_ratio": "W/H Ratio",
+  "welcome": "welcome",
+  "wrongusername": "Wrong Username or Password"
+ }
+}
