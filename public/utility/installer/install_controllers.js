@@ -19,6 +19,10 @@ var Install;
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
+<<<<<<< HEAD
+=======
+                window.alert(message);
+>>>>>>> base
             };
             let Draw = () => {
                 progress(true);

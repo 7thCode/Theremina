@@ -11,7 +11,7 @@ namespace Install {
     let InstallServices: angular.IModule = angular.module('InstallServices', []);
 
     InstallServices.factory('InstallSetting', ['$resource',
-        ($resource): any => {
+        ($resource): angular.resource.IResource<any> => {
             return $resource('/install', {}, {
                 get: {method: 'GET'},
                 put: {method: 'PUT'}

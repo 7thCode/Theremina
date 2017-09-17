@@ -163,7 +163,11 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
             });
         };
         this.Get = (id, callback, error) => {
+<<<<<<< HEAD
             init();
+=======
+            //      init();
+>>>>>>> base
             Resource.get({
                 id: id
             }, (result) => {

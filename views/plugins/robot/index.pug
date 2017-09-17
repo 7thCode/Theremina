@@ -3,32 +3,37 @@ extends ../../backoffice_layout
 block content
     section.content(ng-controller="RobotController")
         include partial/navbar
-        .box.box-info
-            .box-header.with-border
-                div
-                    .box-tools.pull-right
-                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                            i.fa.fa-minus
-            .box-body
-                .row
-                    .col-xs-12
-                        .input-group(style="margin:0 10px;")
-                            span.input-group-addon url
-                            input.form-control.no-zoom(ng-model='url', name="url", type='text', placeholder='http://.....')
-                            span.input-group-addon path
-                            input.form-control.no-zoom(ng-model='path', name="path", type='text', placeholder='/html/...')
-                            span.input-group-btn
-                                button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="Get()")
-                                    i.fa.fa-chevron-down
+        .row
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.robot}
+        .row
+            .col-xs-12
+                .box.box-info
+                    .box-header.with-border
+                        div
+                            .box-tools.pull-right
+                                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                    .box-body
+                        .row
+                            .col-xs-12
+                                .input-group(style="margin:0 10px;")
+                                    span.input-group-addon url
+                                    input.form-control.no-zoom(ng-model='url', name="url", type='text', placeholder='http://.....')
+                                    span.input-group-addon path
+                                    input.form-control.no-zoom(ng-model='path', name="path", type='text', placeholder='/html/...')
+                                    span.input-group-btn
+                                        button.btn.btn-sm.btn-info(style="border-radius:0 0 0 0;", ng-click="Get()")
+                                            i.fa.fa-chevron-down
 
-                    .col-xs-12
-                        div(style="margin:10px;border-style: solid; border-color: #eeeeee;border-width:1px;")
-                            div(style="background-color: #eeeeee;height:3.0rem;")
-                                .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
-                                    div link
-                            .flex-column(style="display:block;height:70vh;overflow-y:scroll;")
-                                .flex-row(ng-repeat="link in links" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
-                                    .ellipsis(style="user-select: text;") {{link}}
+                            .col-xs-12
+                                div(style="margin:10px;border-style: solid; border-color: #eeeeee;border-width:1px;")
+                                    div(style="background-color: #eeeeee;height:3.0rem;")
+                                        .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
+                                            div link
+                                    .flex-column(style="display:block;height:70vh;overflow-y:scroll;")
+                                        .flex-row(ng-repeat="link in links" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                                            .ellipsis(style="user-select: text;") {{link}}
 
-            .box-footer.clearfix
-                div(ng-bind="message")
+                    .box-footer.clearfix
+                        div(ng-bind="message")

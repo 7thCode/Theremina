@@ -3,29 +3,55 @@ extends ../../backoffice_layout
 block content
     section.content(ng-controller="GroupController")
         include partial/navbar
-        .box.box-info
-            .box-header.with-border
-                .row
-                    .col-xs-12
-                        .box-tools.pull-right
-                            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                                i.fa.fa-minus
-                    .col-xs-12
-                        include ../../systems/common/next_prev
-            .box-body
-                .row
-                    .col-xs-12
-                        div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
-                            .flex-column(style="background-color: #eeeeee;height:3.0rem;")
-                                .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
-                                    .ellipsis(style="width:70%;") groupname
-                                    .ellipsis(style="width:20%;") create
-                                    .ellipsis(style="width:10%;")
-                            .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
-                                .flex-row(ng-repeat="group in groups" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
-                                    .ellipsis(style="width:70%;user-select: text;") {{group.name}}
-                                    .ellipsis(style="width:20%;user-select: text;") {{group.create | date: short}}
-                                    div(style="width:10%;")
+        .row
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.group}
+        .row
+            .col-xs-12
+                .box.box-info
+                    .box-header.with-border
+                        .row
+                            .col-xs-12
+                                .box-tools.pull-right
+                                    button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                                        i.fa.fa-minus
+                            .col-xs-12
+                                include ../../systems/common/next_prev
+                    .box-body
+                        .row
+                            .col-xs-12
+                                div(style="margin:10px 0;border-style: solid; border-color: #eeeeee;border-width:1px;")
+                                    .flex-column(style="background-color: #eeeeee;height:3.0rem;")
+                                        .flex-row(style="font-size:1.4rem;font-weight: bold;color:#6060a0;")
+                                            .ellipsis(style="width:70%;") groupname
+                                            .ellipsis(style="width:20%;") create
+                                            .ellipsis(style="width:10%;")
+                                    .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
+                                        .flex-row(ng-repeat="group in groups" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
+                                            .ellipsis(style="width:70%;user-select: text;") {{group.name}}
+                                            .ellipsis(style="width:20%;user-select: text;") {{group.create | date: short}}
+                                            div(style="width:10%;")
+                                                    .box-tools.pull-right
+                                                        button.btn.btn-box-tool(type='button', ng-click="Delete(group);")
+                                                            i.fa.fa-trash
+                                                    .box-tools.pull-right
+                                                        button.btn.btn-box-tool(type='button', ng-click="Open(group);")
+                                                            i.fa.fa-pencil
+
+
+
+
+                        //.table-responsive(style="height:70vh;overflow:scroll;")
+                            table.table.table-striped
+                                thead
+                                    tr
+                                        th groupname
+                                        th create
+                                tbody
+                                    tr.gradeX(ng-repeat="group in groups")
+                                        td {{group.name}}
+                                        td {{group.create | date: short}}
+                                        td
                                             .box-tools.pull-right
                                                 button.btn.btn-box-tool(type='button', ng-click="Delete(group);")
                                                     i.fa.fa-trash
@@ -33,26 +59,5 @@ block content
                                                 button.btn.btn-box-tool(type='button', ng-click="Open(group);")
                                                     i.fa.fa-pencil
 
-
-
-
-                //.table-responsive(style="height:70vh;overflow:scroll;")
-                    table.table.table-striped
-                        thead
-                            tr
-                                th groupname
-                                th create
-                        tbody
-                            tr.gradeX(ng-repeat="group in groups")
-                                td {{group.name}}
-                                td {{group.create | date: short}}
-                                td
-                                    .box-tools.pull-right
-                                        button.btn.btn-box-tool(type='button', ng-click="Delete(group);")
-                                            i.fa.fa-trash
-                                    .box-tools.pull-right
-                                        button.btn.btn-box-tool(type='button', ng-click="Open(group);")
-                                            i.fa.fa-pencil
-
-            .box-footer.clearfix
-                div(ng-bind="message")
+                    .box-footer.clearfix
+                        div(ng-bind="message")

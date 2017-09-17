@@ -88,6 +88,10 @@ var ScannerBehavior;
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
+<<<<<<< HEAD
+=======
+            this.default_query = { "userid": this.id };
+>>>>>>> base
             this.filters = {
                 date: (result, param) => {
                     try {
@@ -111,6 +115,7 @@ var ScannerBehavior;
         }
         GetDatasource(query, parent) {
             let result_promise = null;
+<<<<<<< HEAD
             let depth = 0;
             let position = 0;
             if (parent) {
@@ -122,6 +127,19 @@ var ScannerBehavior;
             if (query_object.q) {
                 try {
                     _query = JSON.parse(query_object.q);
+=======
+            //           let depth: number = 0;
+            //           let position: number = 0;
+            //         if (parent) {
+            //           depth = parent.depth;
+            //           position = parent.position;
+            //       }
+            let query_object = this.ParseQueryFormat(query);
+            let _query = this.default_query;
+            if (query_object.q) {
+                try {
+                    _query = { "$and": [this.default_query, JSON.parse(query_object.q)] };
+>>>>>>> base
                 }
                 catch (e) {
                 }
@@ -163,6 +181,7 @@ var ScannerBehavior;
         }
         GetCount(query, parent) {
             let result_promise = null;
+<<<<<<< HEAD
             let depth = 0;
             let position = 0;
             if (parent) {
@@ -174,6 +193,19 @@ var ScannerBehavior;
             if (query_object.q) {
                 try {
                     _query = JSON.parse(query_object.q);
+=======
+            //        let depth: number = 0;
+            //        let position: number = 0;
+            //        if (parent) {
+            //            depth = parent.depth;
+            //            position = parent.position;
+            //        }
+            let query_object = this.ParseQueryFormat(query);
+            let _query = this.default_query;
+            if (query_object.q) {
+                try {
+                    _query = { "$and": [this.default_query, JSON.parse(query_object.q)] };
+>>>>>>> base
                 }
                 catch (e) {
                 }
@@ -191,8 +223,13 @@ var ScannerBehavior;
         }
         GetUrl(target_url_string, parent) {
             let result_promise = null;
+<<<<<<< HEAD
             let depth = parent.depth;
             let position = parent.position;
+=======
+            //    let depth: number = parent.depth;
+            //    let position: number = parent.position;
+>>>>>>> base
             let resolved_url_string = this.ResolveUrl(target_url_string);
             let target_url = url.parse(resolved_url_string);
             let host_string = parent.config.protocol + "://" + parent.config.domain;
@@ -252,8 +289,13 @@ var ScannerBehavior;
             return result;
         }
         FieldValue(object, params, parent) {
+<<<<<<< HEAD
             let depth = parent.depth;
             let position = parent.position;
+=======
+            //    let depth: number = parent.depth;
+            //    let position: number = parent.position;
+>>>>>>> base
             let result = null;
             let full_params = params.trim();
             if (full_params) {
@@ -319,6 +361,7 @@ var ScannerBehavior;
                                         case "prev":
                                             result = this.Prev(this.page_params);
                                             break;
+<<<<<<< HEAD
                                         /*
                                         case "page" :
                                             result = Search(object, 0);
@@ -330,6 +373,8 @@ var ScannerBehavior;
                                             result = object.current;
                                             break;
                                             */
+=======
+>>>>>>> base
                                         case "self":
                                         default:
                                             result = this.Query(this.page_params);

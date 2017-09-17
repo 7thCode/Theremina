@@ -5,13 +5,18 @@ block content
         .h5.text-gray #{message.player}
     section.content(ng-controller="PlayerController")
         include ./partial/navbar
-        ng-form(name="validate")
-            div#draggable_area
-                .row
-                    .col-xs-12
-                        include ./partial/select
-                .row
-                    .col-xs-3
-                        include ./partial/article
-                    .col-xs-9
-                        include ./partial/canvas
+        .row
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.layouts}
+        .row
+            .col-xs-12
+                ng-form(name="validate")
+                    div#draggable_area
+                        .row
+                            .col-xs-12
+                                include ./partial/select
+                        .row
+                            .col-xs-3
+                                include ./partial/article
+                            .col-xs-9
+                                include ./partial/canvas

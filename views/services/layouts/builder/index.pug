@@ -6,7 +6,10 @@ block content
     section.content(ng-controller="BuilderController")
         include partial/navbar
         .row
-            .col-sm-12.col-md-12#draggable_area
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.layouts}
+        .row
+            .col-xs-12#draggable_area
                 include partial/canvas
 
         div

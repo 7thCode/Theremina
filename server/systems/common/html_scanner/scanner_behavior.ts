@@ -121,6 +121,8 @@ namespace ScannerBehavior {
 
         public models: any[];
 
+        private default_query:any;
+
         constructor(parent_name: string, name: string, id: string, params: any, isdocument: boolean, models: any) {
             this.parent_name = parent_name;
             this.name = name;
@@ -128,6 +130,7 @@ namespace ScannerBehavior {
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
+            this.default_query = {"userid":this.id};
 
             this.filters = {
                 date: (result: string, param: string) => {
@@ -155,19 +158,19 @@ namespace ScannerBehavior {
         public GetDatasource(query: any, parent: any): any {// db query
             let result_promise: any = null;
 
-            let depth: number = 0;
-            let position: number = 0;
-            if (parent) {
-                depth = parent.depth;
-                position = parent.position;
-            }
+ //           let depth: number = 0;
+ //           let position: number = 0;
+   //         if (parent) {
+     //           depth = parent.depth;
+     //           position = parent.position;
+     //       }
 
             let query_object: any = this.ParseQueryFormat(query);
 
-            let _query: any = {};
+            let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = JSON.parse(query_object.q);
+                    _query = {"$and":[this.default_query,JSON.parse(query_object.q)]} ;
                 } catch (e) {
 
                 }
@@ -216,19 +219,19 @@ namespace ScannerBehavior {
         public GetCount(query: any, parent: any): any {// db query
             let result_promise: any = null;
 
-            let depth: number = 0;
-            let position: number = 0;
-            if (parent) {
-                depth = parent.depth;
-                position = parent.position;
-            }
+    //        let depth: number = 0;
+    //        let position: number = 0;
+    //        if (parent) {
+    //            depth = parent.depth;
+    //            position = parent.position;
+    //        }
 
             let query_object: any = this.ParseQueryFormat(query);
 
-            let _query: any = {};
+            let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = JSON.parse(query_object.q);
+                    _query = {"$and":[this.default_query,JSON.parse(query_object.q)]};
                 } catch (e) {
 
                 }
@@ -249,8 +252,8 @@ namespace ScannerBehavior {
 
         public GetUrl(target_url_string: string, parent: any): any {// url
             let result_promise: any = null;
-            let depth: number = parent.depth;
-            let position: number = parent.position;
+        //    let depth: number = parent.depth;
+        //    let position: number = parent.position;
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let target_url: any = url.parse(resolved_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
@@ -312,8 +315,8 @@ namespace ScannerBehavior {
         }
 
         public FieldValue(object: any, params: string, parent: any): any {
-            let depth: number = parent.depth;
-            let position: number = parent.position;
+        //    let depth: number = parent.depth;
+        //    let position: number = parent.position;
 
             let result: any = null;
             let full_params = params.trim();
@@ -379,17 +382,7 @@ namespace ScannerBehavior {
                                         case "prev":
                                             result = this.Prev(this.page_params);
                                             break;
-                                        /*
-                                        case "page" :
-                                            result = Search(object, 0);
-                                            break;
-                                        case "index" :
-                                            result = object.index;
-                                            break;
-                                        case "current" :
-                                            result = object.current;
-                                            break;
-                                            */
+
                                         case "self":
                                         default:
                                             result = this.Query(this.page_params);

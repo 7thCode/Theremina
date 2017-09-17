@@ -180,7 +180,7 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
         };
 
         this.Get = (id: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            init();
+      //      init();
             Resource.get({
                 id: id
             }, (result: any): void => {

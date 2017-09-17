@@ -3,31 +3,36 @@ extends ../../backoffice_layout
 block content
     section.content(ng-controller="ArticleController")
         include ./partial/navbar
-        div#draggable_area
-            .row
-                .col-xs-12
-                    include ./partial/select
-            .row
-                .col-xs-12
-                    .box.box-primary
-                        .box-header
-                            .h6 page: {{current_page.name}}
-                            .h6 article: {{current_article.name}}
-                            .box-tools.pull-right
-                                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                                    i.fa.fa-minus
-                        .box-body
-                            ng-form(name="validate", ng-show="opened")
-                                .row
-                                    .col-xs-12
-                                        button.btn.btn-info.pull-right(ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
-                                            i.fa.fa-cloud
-                                            span.hidden-xs.hidden-sm #{message.save}
-                                .row
-                                    .col-xs-12
-                                        #root
-                        .box-footer.clearfix
-                            div(ng-bind="message")
-        div
-            include partial/pallete
-            include partial/images
+        .row
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.article}
+        .row
+            .col-xs-12
+                div#draggable_area
+                    .row
+                        .col-xs-12
+                            include ./partial/select
+                    .row
+                        .col-xs-12
+                            .box.box-primary
+                                .box-header
+                                    .h6 page: {{current_page.name}}
+                                    .h6 article: {{current_article.name}}
+                                    .box-tools.pull-right
+                                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                                            i.fa.fa-minus
+                                .box-body
+                                    ng-form(name="validate", ng-show="opened")
+                                        .row
+                                            .col-xs-12
+                                                button.btn.btn-info.pull-right(ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                                    i.fa.fa-cloud
+                                                    span.hidden-xs.hidden-sm #{message.save}
+                                        .row
+                                            .col-xs-12
+                                                #root
+                                .box-footer.clearfix
+                                    div(ng-bind="message")
+                div
+                    include partial/pallete
+                    include partial/images
