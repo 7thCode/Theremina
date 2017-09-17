@@ -1,4 +1,4 @@
-nav.navbar.navbar-fixed-top.navbar-default(ng-controller='LoginController' role="navigation")
+nav.navbar.navbar-fixed-top.navbar-color-invert(ng-controller='LoginController' role="navigation")
         .container-fluid
             .navbar-header
                 button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
@@ -6,7 +6,6 @@ nav.navbar.navbar-fixed-top.navbar-default(ng-controller='LoginController' role=
                     span.icon-bar
                     span.icon-bar
                     span.icon-bar
-                a.navbar-brand.page-scroll.brand-font(href="/", ng-click="go('/')") Images
-                    //i.ion-ios-analytics-outline(style="text-align:center;") #{type}
+                a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav

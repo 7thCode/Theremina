@@ -1,4 +1,4 @@
-nav.navbar.navbar-fixed-top.navbar-default(role="navigation")
+nav.navbar.navbar-fixed-top.navbar-color-invert(role="navigation")
     .container-fluid
         .navbar-header
             button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
@@ -6,7 +6,7 @@ nav.navbar.navbar-fixed-top.navbar-default(role="navigation")
                 span.icon-bar
                 span.icon-bar
                 span.icon-bar
-            a.navbar-brand.page-scroll.brand-font(href="/", ng-click="go('/')") Mail
+            a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
         #bs-navbar.navbar-collapse.collapse
             ul.nav.navbar-nav
                 li.dropdown

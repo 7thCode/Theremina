@@ -1,0 +1,104 @@
+/**!
+ Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ This software is released under the MIT License.
+ //opensource.org/licenses/mit-license.php
+ */
+"use strict";
+//import forEach = require("lodash/forEach");
+let BackOfficeApplication = angular.module('BackOfficeApplication', [
+    'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar',
+    'ngSanitize',
+    'textAngular',
+    "Services",
+    "TemplateServices",
+    "LayoutServices",
+    "LayoutsProviders",
+    'ImageControllers',
+    'BuilderControllers',
+    'PlayerControllers',
+    "BackOfficeControllers",
+    'FileServices',
+    'FileControllers',
+    "AuthServices",
+    'AuthControllers',
+    "ResourcesProviders",
+    "ResourceBuilderServices",
+    'ResourceBuilderControllers',
+    'ResourcePlayerServices',
+    'ResourcePlayerControllers',
+    "GroupControllers",
+    "GroupServices",
+    "FormsProviders",
+    "FormBuilderServices",
+    'FormBuilderControllers',
+    'FormPlayerServices',
+    'FormPlayerControllers',
+    'AccountServices',
+    'AccountControllers',
+    'AnalysisServices',
+    'AnalysisControllers',
+    'ArticleServices',
+    'ArticleControllers',
+    'ProfileControllers',
+    'SettingControllers',
+    "SettingServices",
+    "GoogleServices",
+    "YahooServices",
+    "PublicKeyServices",
+    "MailerControllers",
+    "MailerServices",
+    "RobotControllers",
+    "RobotServices",
+    "GoogleServices",
+    "GoogleControllers"
+]);
+BackOfficeApplication.run(['$rootScope',
+    function ($rootScope) {
+        $rootScope.$on("$routeChangeSuccess", (event, current, previous, rejection) => {
+        });
+    }
+]);
+BackOfficeApplication.config(['$compileProvider', '$httpProvider',
+    ($compileProvider, $httpProvider) => {
+        $compileProvider.debugInfoEnabled(false);
+        $httpProvider.defaults.headers.common = { 'x-requested-with': 'XMLHttpRequest' };
+        $httpProvider.defaults.headers.common['If-Modified-Since'] = 'Thu, 01 Jun 1970 00:00:00 GMT'; //マイクロソフトのバグ対応！！！
+    }]);
+BackOfficeApplication.config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+        cfpLoadingBarProvider.parentSelector = '#body';
+        cfpLoadingBarProvider.spinnerTemplate = '<div style="z-index:20000;position:fixed;top:50%;left:50%;margin-top:-70px;margin-left:-75px;"><div id="progress"><div id="rond"><div id="test"></div></div><div id="load"></div></div></div>';
+        cfpLoadingBarProvider.latencyThreshold = 500;
+    }]);
+BackOfficeApplication.config(['ShapeEditProvider', function (ShapeEditProvider) {
+        ShapeEditProvider.configure({
+            wrapper: 'wrapper',
+            canvas: 'canvas',
+            width: 600,
+            height: 600
+        });
+    }]);
+BackOfficeApplication.config(['$sceDelegateProvider', function ($sceDelegateProvider) {
+        $sceDelegateProvider.resourceUrlWhitelist(['**']);
+    }]);
+BackOfficeApplication.filter('limit', [() => {
+        return (text, limit) => {
+            let result = "";
+            if (text) {
+                result = text;
+                if (text.length > limit) {
+                    result = text.slice(0, limit) + "...";
+                }
+            }
+            return result;
+        };
+    }]);
+BackOfficeApplication.filter('round', [() => {
+        return (value) => {
+            let result = value;
+            if (!isNaN(value)) {
+                result = Math.round(value);
+            }
+            return result;
+        };
+    }]);
+//# sourceMappingURL=backoffice_application.js.map
