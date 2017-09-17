@@ -851,7 +851,7 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 }
             }
         }, error_handler);
-
+/*
         $scope.scenario = [
             {
                 outer: {
@@ -886,6 +886,7 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 style: "animation-duration:1s;animation-delay:0.3s;"
             }
         ];
+        */
 
     }]);
 
@@ -993,7 +994,8 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             }
         };
 
-        let query_string = localStorage.getItem("pages_query");
+    //    ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
+    //    let query_string = localStorage.getItem("pages_query");
 
         let Query = (): any => {
             progress(true);
@@ -1005,9 +1007,10 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                     $scope.templates = result;
                     //pages query
 
-                    if (query_string) {
-                        ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
-                    }
+                    ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
+             //       if (query_string) {
+             //           ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
+             //       }
 
                     ResourceBuilderService.Query((result: any): void => {
                         if (result) {
@@ -1031,8 +1034,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         let _Find = (key: string, value: any): any => {
             progress(true);
 
-            $scope.query_string_before = JSON.stringify(ResourceBuilderService.GetQuery()) + " " + key;
-
             ResourceBuilderService.RemoveQuery(key);
             if (value) {
                 let query = {};
@@ -1041,10 +1042,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             } else {
                 ResourceBuilderService.RemoveQuery(key);
             }
-
-
-            $scope.query_string_after = JSON.stringify(ResourceBuilderService.GetQuery()) + " " + key;
-
 
             ResourceBuilderService.Query((result: any): void => {
                 if (result) {
@@ -1291,6 +1288,9 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         };
 
         let Open = (): void => {
+
+
+
             let modalRegist: any = $uibModal.open({
                 controller: 'PagesOpenDialogController',
                 templateUrl: '/pages/dialogs/open_dialog',
@@ -1319,6 +1319,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
                     editor.session.getUndoManager().markClean();
                     $scope.opened = true;
+
                 }
             }, (): void => {
             });

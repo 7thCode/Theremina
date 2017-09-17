@@ -3,8 +3,11 @@ extends ../../layout
 block content
     section.content(ng-controller="SelfController")
         include ../common/navbar
-        .row
-            .col-xs-12
+        .flex-row
+            .flex-column
+                div(style="font-size:2rem;color:#607D8B") #{message.profile}
+        .flex-row
+            .flex-column
                 include ./partial/mid
 
     guidance(scenario="{{scenario}}")

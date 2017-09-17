@@ -261,8 +261,7 @@ export namespace FrontModule {
          * ユーザ登録時に作成されるデフォルトリソース。
          * ユーザ登録時、システムのリソースをコピー。
          *  let userid = Pages.userid(request);
-         * @param request
-         * @param response
+         * @param user
          * @returns none
          */
         public create_init_user_resources(user: any): void {
@@ -297,8 +296,7 @@ export namespace FrontModule {
          * ユーザ登録時に作成されるデフォルトアーティクル。
          * ユーザ登録時、システムのアーティクルをコピー。
          *  let userid = Pages.userid(request);
-         * @param request
-         * @param response
+         * @param user
          * @returns none
          */
         public create_init_user_articles(user: any): void {
@@ -330,11 +328,8 @@ export namespace FrontModule {
         }
 
         /**
-         * @param userid
-         * @param name
-         * @param record
-         * @param records
-         * @param callback
+         * @param request
+         * @param response
          * @returns none
          */
         public build(request: any, response: any): void {
