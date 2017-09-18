@@ -31,7 +31,7 @@ div
                             span.error-message(ng-message="required") #{message.required}
                             span.error-message(ng-message="minlength") #{message.short}
                             span.error-message(ng-message="maxlength") #{message.long}
-                        input.form-control.no-zoom#password(tabindex="3" ng-model="items.password", type="password", name="password", placeholder='4字以上30字以下', required, ng-minlength="4", ng-maxlength="255")
+                        input.form-control.no-zoom#password(tabindex="3" ng-model="items.password", type="password", name="password", placeholder=message.over4under30, required, ng-minlength="4", ng-maxlength="255")
 
                 .col-xs-10.col-xs-offset-1
                     .form-group
@@ -41,7 +41,7 @@ div
                             span.error-message(ng-message="compareTo") #{message.password_missmatch}
                             span.error-message(ng-message="minlength") #{message.short}
                             span.error-message(ng-message="maxlength") #{message.long}
-                        input.form-control.no-zoom#retypepassword(tabindex="4" ng-model="items.retypepassword", compare-to="items.password", type="password", name="retypepassword", placeholder='Retype Password', required, ng-minlength="4", ng-maxlength="255")
+                        input.form-control.no-zoom#retypepassword(tabindex="4" ng-model="items.retypepassword", compare-to="items.password", type="password", name="retypepassword", placeholder=message.re_password_field, required, ng-minlength="4", ng-maxlength="255")
 
             .row
                 .col-xs-12

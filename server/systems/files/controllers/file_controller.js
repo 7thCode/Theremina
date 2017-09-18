@@ -158,6 +158,7 @@ var FileModule;
                                                             return new Promise((resolve, reject) => {
                                                                 let path = process.cwd() + doc.path;
                                                                 let filename = doc.name;
+                                                                let namespace = doc.namespace;
                                                                 let mimetype = doc.content.type;
                                                                 let type = doc.type;
                                                                 let query = {};
@@ -170,7 +171,7 @@ var FileModule;
                                                                 collection.findOne(query, (error, item) => {
                                                                     if (!error) {
                                                                         if (!item) {
-                                                                            Files.from_local(gfs, path, "", type, filename, mimetype, (error, file) => {
+                                                                            Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
                                                                                 if (!error) {
                                                                                     resolve(file);
                                                                                 }
@@ -182,7 +183,7 @@ var FileModule;
                                                                         else {
                                                                             collection.remove({ _id: item._id }, (error, result) => {
                                                                                 if (!error) {
-                                                                                    Files.from_local(gfs, path, "", type, filename, mimetype, (error, file) => {
+                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
                                                                                         if (!error) {
                                                                                             resolve(file);
                                                                                         }

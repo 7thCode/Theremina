@@ -1,106 +1,91 @@
 /**
  * Created by oda on 2017/07/05.
  */
-
-namespace HTMLScanner {
-
+var HTMLScanner;
+(function (HTMLScanner) {
     const url = require('url');
     const jsdom = require("node-jsdom");
     const _ = require('lodash');
-
-    const PREFIX: string = "ds";
-
-    export class NodeScanner {
-
-        public document_depth: number = 0;
-        public depth: number = 0;
-        public position: number = 0;
-        protected callback: (error: any, result: any) => void;
-
-        constructor(callback: (error: any, result: any) => void) {
+    const PREFIX = "ds";
+    class NodeScanner {
+        constructor(callback) {
+            this.document_depth = 0;
+            this.depth = 0;
+            this.position = 0;
             this.callback = callback;
         }
-
-        static prefix(name: string): string {
-            let result:string = "";
+        static prefix(name) {
+            let result = "";
             let splited_name = name.toLowerCase().split(":");
             if (splited_name.length == 2) {
                 result = splited_name[0];
             }
             return result;
         }
-
-        static localName(name: string): string {
-            let splited_name:any = name.toLowerCase().split(":");
+        static localName(name) {
+            let splited_name = name.toLowerCase().split(":");
             return splited_name[splited_name.length - 1];
         }
-
-        protected ScanChild(node: any, data: any): void {
+        ScanChild(node, data) {
             if (node) {
-                let childnodes:any[] = node.childNodes;
+                let childnodes = node.childNodes;
                 this.depth++;
                 if (childnodes) {
-                    _.forEach(childnodes, (node: any, index: number): void => {
+                    _.forEach(childnodes, (node, index) => {
                         this.position = index;
                         this.ScanNode(node, data);
                     });
                 }
                 this.depth--;
-            } else {
-                this.callback({code: 1}, null);
+            }
+            else {
+                this.callback({ code: 1 }, null);
             }
         }
-
-        protected ScanNode(node: any, data: any): void {
+        ScanNode(node, data) {
             this.ScanChild(node, data);
         }
-
-        public ScanHtml(url: string): any {
+        ScanHtml(url) {
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, "");
+            jsdom.env(url, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (childnodes) {
+                        _.forEach(childnodes, (element, index) => {
+                            this.position = index;
+                            this.ScanNode(element, null);
+                        });
                     }
                 }
-            );
+                else {
+                    this.callback(errors, null);
+                }
+                this.document_depth--;
+                if (this.document_depth == 0) {
+                    this.callback(null, "");
+                }
+            });
         }
-
     }
-
-    export class LinkScanner extends NodeScanner {
-
-        protected links:any[] = [];
-        private base_url:string = "";
-
-        private UrlNormalize(partial_url: string): string {
+    HTMLScanner.NodeScanner = NodeScanner;
+    class LinkScanner extends NodeScanner {
+        constructor() {
+            super(...arguments);
+            this.links = [];
+            this.base_url = "";
+        }
+        UrlNormalize(partial_url) {
             return url.resolve(this.base_url, partial_url);
         }
-
-        private ScanLinks(node: any, data: any): void {
+        ScanLinks(node, data) {
             if (node.attributes) {
                 if (node.attributes.href) {
-                    let url_value:any = node.attributes.href.nodeValue;
-                    let target_url_string:any = this.UrlNormalize(url_value);
+                    let url_value = node.attributes.href.nodeValue;
+                    let target_url_string = this.UrlNormalize(url_value);
                     if (_.indexOf(this.links, target_url_string) == -1) {
                         this.links.push(target_url_string);
-                        let parsed_base_url:{hostname:any} = url.parse(this.base_url);
-                        let parsed_target_url:{hostname:any} = url.parse(target_url_string);
+                        let parsed_base_url = url.parse(this.base_url);
+                        let parsed_target_url = url.parse(target_url_string);
                         if (parsed_target_url.hostname == parsed_base_url.hostname) {
                             this.ScanHtml(target_url_string);
                         }
@@ -108,11 +93,10 @@ namespace HTMLScanner {
                 }
             }
         }
-
-        protected ScanNode(node: any, data: any): void {
+        ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:
                         switch (node.localName) {
                             case "a":
                                 this.ScanLinks(node, data);
@@ -125,13 +109,13 @@ namespace HTMLScanner {
                     default:
                         this.ScanChild(node, data);
                 }
-            } else {
-                this.callback({code: 1}, null);
+            }
+            else {
+                this.callback({ code: 1 }, null);
             }
         }
-
     }
-
+    HTMLScanner.LinkScanner = LinkScanner;
     /* DataSourceResolver
     *
     *  与えられたHTMLソースをパース・トラバース。
@@ -140,54 +124,49 @@ namespace HTMLScanner {
     *  クエリー文字列を名前、クエリーの結果を値としてオブジェクトを構成。
     *
     * */
-    export class DataSourceResolver extends NodeScanner {
-
-        public datasource: ScannerBehavior.Behavior;
-
-        public datasource_promises: { name: string, promise: any, count: any, resolved: string }[] = [];
-
-        constructor(datasource: ScannerBehavior.Behavior, callback: (error: any, result: any) => void) {
+    class DataSourceResolver extends NodeScanner {
+        constructor(datasource, callback) {
             super(callback);
+            this.datasource_promises = [];
             this.datasource = datasource;
         }
-
-        private PromisedDataSource(node: any): any {
-            let result:any = null;
+        PromisedDataSource(node) {
+            let result = null;
             try {
-                let query:any = node.attributes.query.nodeValue;
+                let query = node.attributes.query.nodeValue;
                 result = this.datasource.GetDatasource(query, this);
-            } catch (e) {
-                this.callback({code: 1}, null);
+            }
+            catch (e) {
+                this.callback({ code: 1 }, null);
             }
             return result;
         }
-
-        private PromisedDataCount(node: any): any {
-            let result:any = null;
+        PromisedDataCount(node) {
+            let result = null;
             try {
-                let query:any = node.attributes.query.nodeValue;
+                let query = node.attributes.query.nodeValue;
                 result = this.datasource.GetCount(query, this);
-            } catch (e) {
-                this.callback({code: 1}, null);
+            }
+            catch (e) {
+                this.callback({ code: 1 }, null);
             }
             return result;
         }
-
-        protected ScanNode(node: any, data: any): void {
+        ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
-                        let tagname:any = node.localName;
+                    case 1:
+                        let tagname = node.localName;
                         if (tagname) {
-                            let prefix:string = DataSourceResolver.prefix(tagname);
-                            let localname:string = DataSourceResolver.localName(tagname);
+                            let prefix = DataSourceResolver.prefix(tagname);
+                            let localname = DataSourceResolver.localName(tagname);
                             switch (localname) {
                                 case "resolve":
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.query) {
-                                                let query:any = node.attributes.query;
+                                                let query = node.attributes.query;
                                                 this.datasource_promises.push({
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
@@ -202,127 +181,105 @@ namespace HTMLScanner {
                                     break;
                             }
                             this.ScanChild(node, data);
-                        } else {
-                            this.callback({code: 1}, null);
+                        }
+                        else {
+                            this.callback({ code: 1 }, null);
                         }
                         break;
                     default:
                 }
-            } else {
-                this.callback({code: 1}, null);
+            }
+            else {
+                this.callback({ code: 1 }, null);
             }
         }
-
-        public ResolveDataSource(source: string, result: any): any {
+        ResolveDataSource(source, result) {
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes:any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {// Promise all(record) then Prmise All(count)
-
-                        // resolve all [record reference] in document.
-                        Promise.all(this.datasource_promises.map((doc: any): void => {
-                            let result:any = null;
-                            if (doc.promise) {
-                                result = doc.promise;
-                            }
-                            return result;
-                        })).then((resolved: any[]): void => {
-
-                            _.forEach(resolved, (entry: any, index: number): void => {
-                                result[this.datasource_promises[index].name] = {content: entry, count: 0};
-                            });
-
-                            Promise.all(this.datasource_promises.map((doc: any): void => {
-                                let result:any = null;
-                                if (doc.count) {
-                                    result = doc.count;
-                                }
-                                return result;
-                            })).then((resolved: any[]): void => {
-                                _.forEach(resolved, (count: any, index: number): void => {
-                                    result[this.datasource_promises[index].name].count = count;
-                                });
-                                this.callback(null, result);
-                            }).catch((error: any): void => {
-                                this.callback(error, null);
-                            });
-
-
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
+            jsdom.env(source, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (childnodes) {
+                        _.forEach(childnodes, (element, index) => {
+                            this.position = index;
+                            this.ScanNode(element, null);
                         });
-
                     }
                 }
-            );
+                else {
+                    this.callback(errors, null);
+                }
+                this.document_depth--;
+                if (this.document_depth == 0) {
+                    // resolve all [record reference] in document.
+                    Promise.all(this.datasource_promises.map((doc) => {
+                        let result = null;
+                        if (doc.promise) {
+                            result = doc.promise;
+                        }
+                        return result;
+                    })).then((resolved) => {
+                        _.forEach(resolved, (entry, index) => {
+                            result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+                        });
+                        Promise.all(this.datasource_promises.map((doc) => {
+                            let result = null;
+                            if (doc.count) {
+                                result = doc.count;
+                            }
+                            return result;
+                        })).then((resolved) => {
+                            _.forEach(resolved, (count, index) => {
+                                result[this.datasource_promises[index].name].count = count;
+                            });
+                            this.callback(null, result);
+                        }).catch((error) => {
+                            this.callback(error, null);
+                        });
+                    }).catch((error) => {
+                        this.callback(error, null);
+                    });
+                }
+            });
         }
-
         // todo:1path
-        public ResolveDataSource2(childnodes: string, result: any): any {
-
-
+        ResolveDataSource2(childnodes, result) {
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
                     this.ScanNode(element, null);
                 });
             }
-
-
             // resolve all [record reference] in document.
-            Promise.all(this.datasource_promises.map((doc: any): void => {
-                let result:any = null;
+            Promise.all(this.datasource_promises.map((doc) => {
+                let result = null;
                 if (doc.promise) {
                     result = doc.promise;
                 }
                 return result;
-            })).then((resolved: any[]): void => {
-
-                _.forEach(resolved, (entry: any, index: number): void => {
-                    result[this.datasource_promises[index].name] = {content: entry, count: 0};
+            })).then((resolved) => {
+                _.forEach(resolved, (entry, index) => {
+                    result[this.datasource_promises[index].name] = { content: entry, count: 0 };
                 });
-
-                Promise.all(this.datasource_promises.map((doc: any): void => {
-                    let result:any = null;
+                Promise.all(this.datasource_promises.map((doc) => {
+                    let result = null;
                     if (doc.count) {
                         result = doc.count;
                     }
                     return result;
-                })).then((resolved: any[]): void => {
-                    _.forEach(resolved, (count: any, index: number): void => {
+                })).then((resolved) => {
+                    _.forEach(resolved, (count, index) => {
                         result[this.datasource_promises[index].name].count = count;
                     });
                     this.callback(null, result);
-                }).catch((error: any): void => {
+                }).catch((error) => {
                     this.callback(error, null);
                 });
-
-
-            }).catch((error: any): void => {
+            }).catch((error) => {
                 this.callback(error, null);
             });
-
-
-
         }
-
     }
-
+    HTMLScanner.DataSourceResolver = DataSourceResolver;
     /* UrlResolver
     *
     *  与えられたHTMLソースをパース・トラバース。
@@ -331,39 +288,32 @@ namespace HTMLScanner {
     *  URLを名前、HTTP Getの結果を値としてオブジェクトを構成。
     *
     * */
-    export class UrlResolver extends NodeScanner {
-
-        public datasource:ScannerBehavior.Behavior; // ScannerBehaviorModule.Behavior;
-
-        private config;
-
-        public url_promises: { name: string, promise: any, count: any, resolved: string }[] = [];
-
-        constructor(datasource: ScannerBehavior.Behavior, config:any, callback: (error: any, result: any) => void) {
+    class UrlResolver extends NodeScanner {
+        constructor(datasource, config, callback) {
             super(callback);
+            this.url_promises = [];
             this.datasource = datasource;
             this.config = config;
         }
-
-        private PromisedUrl(target_url_string: string): any {
-            let result:any = null;
+        PromisedUrl(target_url_string) {
+            let result = null;
             try {
                 result = this.datasource.GetUrl(target_url_string, this);
-            } catch (e) {
-                this.callback({code: 1}, null);
+            }
+            catch (e) {
+                this.callback({ code: 1 }, null);
             }
             return result;
         }
-
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        private Include(node: any): void {
+        Include(node) {
             if (node.attributes) {
-                let number:number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                let number = node.attributes.length;
+                for (var index = 0; index < number; index++) {
+                    let attribute = node.attributes[index];
+                    let prefix = Expander.prefix(attribute.name);
+                    let localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         if (localname == "include") {
                             this.url_promises.push({
@@ -377,27 +327,26 @@ namespace HTMLScanner {
                 }
             }
         }
-
-        protected ScanNode(node: {nodeType:number,localName:string, attributes:{src:{nodeValue:string}}}, data: any): void {
+        ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
-                        let tagname:string = node.localName;
+                    case 1:
+                        let tagname = node.localName;
                         if (tagname) {
-                            let prefix:string = UrlResolver.prefix(tagname);
-                            let localname:string = UrlResolver.localName(tagname);
+                            let prefix = UrlResolver.prefix(tagname);
+                            let localname = UrlResolver.localName(tagname);
                             switch (localname) {
                                 case "meta":
                                     this.Include(node);
                                     break;
                                 case "foreach":
                                     break;
-                            //    case "resolve":
+                                //    case "resolve":
                                 case "include":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.src) {
-                                                let src:any = node.attributes.src;
+                                                let src = node.attributes.src;
                                                 this.url_promises.push({
                                                     name: src.nodeValue,
                                                     promise: this.PromisedUrl(src.nodeValue),
@@ -416,83 +365,70 @@ namespace HTMLScanner {
                         break;
                     default:
                 }
-            } else {
-                this.callback({code: 1}, null);
+            }
+            else {
+                this.callback({ code: 1 }, null);
             }
         }
-
-        public ResolveUrl(source: string, result: any): any {
+        ResolveUrl(source, result) {
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes:any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element:any, index:number):void => {
-                                this.position = index;
-                                this.ScanNode(element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        Promise.all(this.url_promises.map((doc: any): void => {
-                            let promise:any = null;
-                            if (doc.promise) {
-                                promise = doc.promise;
-                            }
-                            return promise;
-                        })).then((resolved: any[]): void => {
-                            _.forEach(resolved, (entry:any, index:number) :void => {
-                                result[this.url_promises[index].name] = {content: entry, count: 1};
-                            });
-                            this.callback(null, result);
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
+            jsdom.env(source, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (childnodes) {
+                        _.forEach(childnodes, (element, index) => {
+                            this.position = index;
+                            this.ScanNode(element, null);
                         });
                     }
                 }
-            );
+                else {
+                    this.callback(errors, null);
+                }
+                this.document_depth--;
+                if (this.document_depth == 0) {
+                    Promise.all(this.url_promises.map((doc) => {
+                        let promise = null;
+                        if (doc.promise) {
+                            promise = doc.promise;
+                        }
+                        return promise;
+                    })).then((resolved) => {
+                        _.forEach(resolved, (entry, index) => {
+                            result[this.url_promises[index].name] = { content: entry, count: 1 };
+                        });
+                        this.callback(null, result);
+                    }).catch((error) => {
+                        this.callback(error, null);
+                    });
+                }
+            });
         }
-
         // todo:1path
-        public ResolveUrl2(childnodes: any, result: any): any {
-
-
-
+        ResolveUrl2(childnodes, result) {
             if (childnodes) {
-                _.forEach(childnodes, (element:any, index:number):void => {
+                _.forEach(childnodes, (element, index) => {
                     this.position = index;
                     this.ScanNode(element, null);
                 });
             }
-
-
-            Promise.all(this.url_promises.map((doc: any): void => {
-                let promise:any = null;
+            Promise.all(this.url_promises.map((doc) => {
+                let promise = null;
                 if (doc.promise) {
                     promise = doc.promise;
                 }
                 return promise;
-            })).then((resolved: any[]): void => {
-                _.forEach(resolved, (entry:any, index:number) :void => {
-                    result[this.url_promises[index].name] = {content: entry, count: 1};
+            })).then((resolved) => {
+                _.forEach(resolved, (entry, index) => {
+                    result[this.url_promises[index].name] = { content: entry, count: 1 };
                 });
                 this.callback(null, result);
-            }).catch((error: any): void => {
+            }).catch((error) => {
                 this.callback(error, null);
             });
-
-
         }
-
     }
-
+    HTMLScanner.UrlResolver = UrlResolver;
     /* Expander
     *
     *  与えられたHTMLソースをパース・トラバース。
@@ -505,27 +441,23 @@ namespace HTMLScanner {
     *  例　　　<div ds:class="fieldname">   ->   <div class="hoge">
     *
     * */
-    export class Expander extends NodeScanner {
-
-        public fragments: any = {};
-        public html: string = "";
-        public datasource: ScannerBehavior.Behavior; // Behavior;
-
-        constructor(datasource: ScannerBehavior.Behavior, callback: (error: any, result: any) => void) {
+    class Expander extends NodeScanner {
+        constructor(datasource, callback) {
             super(callback);
+            this.fragments = {};
+            this.html = "";
             this.datasource = datasource;
         }
-
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        private Include(node: any, data: any): void {
-            let resolved:boolean = false;
+        Include(node, data) {
+            let resolved = false;
             if (node.attributes) {
                 let number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                for (var index = 0; index < number; index++) {
+                    let attribute = node.attributes[index];
+                    let prefix = Expander.prefix(attribute.name);
+                    let localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         if (localname == "include") {
                             this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
@@ -538,39 +470,37 @@ namespace HTMLScanner {
                 this.NodeToElement(node, data);
             }
         }
-
-        private NodeToElement(node: any, data: any): void {
-            let tagname:string = node.localName;
-            let attribute_string:string = "";
+        NodeToElement(node, data) {
+            let tagname = node.localName;
+            let attribute_string = "";
             if (node.attributes) {
                 let number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                for (var index = 0; index < number; index++) {
+                    let attribute = node.attributes[index];
+                    let prefix = Expander.prefix(attribute.name);
+                    let localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
                             count: 1
                         }, this) + '"';
-                    } else {
+                    }
+                    else {
                         attribute_string += ' ' + attribute.name + '="' + attribute.value + '"';
                     }
                 }
             }
-
-            let localname:string = DataSourceResolver.localName(tagname);
-            let prefix:string = DataSourceResolver.prefix(tagname);
-
+            let localname = DataSourceResolver.localName(tagname);
+            let prefix = DataSourceResolver.prefix(tagname);
             if (prefix != PREFIX) {
                 localname = tagname;
             }
-
             if (node.childNodes.length > 0) {
                 this.html += "<" + localname + attribute_string + ">";
                 this.ScanChild(node, data);
                 this.html += "</" + localname + ">";
-            } else {
+            }
+            else {
                 switch (localname.toLowerCase()) {
                     case "link":
                     case "script":
@@ -583,29 +513,28 @@ namespace HTMLScanner {
                 }
             }
         }
-
-        private ResolveChildren(node: any, result: any): void {
-            _.forEach(node.childNodes, (childnode: any, index): void => {
+        ResolveChildren(node, result) {
+            _.forEach(node.childNodes, (childnode, index) => {
                 this.position = index;
                 this.ScanNode(childnode, result);
-            })
+            });
         }
-
-        protected ScanNode(node: any, data: any): void {
+        ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
-                        let tagname:string = node.localName;
+                    case 1:
+                        let tagname = node.localName;
                         if (tagname) {
-                            let prefix:string = Expander.prefix(tagname);
-                            let localname:string = Expander.localName(tagname);
+                            let prefix = Expander.prefix(tagname);
+                            let localname = Expander.localName(tagname);
                             switch (localname) {
                                 case "html":
                                 case "head":
                                 case "body":
                                     if (this.datasource.isdocument) {
                                         this.NodeToElement(node, data);
-                                    } else {
+                                    }
+                                    else {
                                         this.ScanChild(node, data);
                                     }
                                     break;
@@ -615,18 +544,19 @@ namespace HTMLScanner {
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) { // query="{}"
-                                                let query:any = node.attributes.query;
-                                                let result:any = this.fragments[query.nodeValue].content;
+                                            if (node.attributes.query) {
+                                                let query = node.attributes.query;
+                                                let result = this.fragments[query.nodeValue].content;
                                                 if (result) {
                                                     _.forEach(result, (resolved_data, index) => {
                                                         this.ResolveChildren(node, resolved_data);
                                                     });
                                                 }
-                                            } else if (node.attributes.scope) { // scope="a.b.c"
+                                            }
+                                            else if (node.attributes.scope) {
                                                 if (data) {
-                                                    let scope:any = node.attributes.scope;
-                                                    let result:any = this.datasource.FieldValue(data, scope.nodeValue, this);//fragment
+                                                    let scope = node.attributes.scope;
+                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, this); //fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             _.forEach(result, (resolved_data, index) => {
@@ -642,8 +572,8 @@ namespace HTMLScanner {
                                 case "include":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                              if (node.attributes.src) {    // src="url"
-                                                let src:any = node.attributes.src;
+                                            if (node.attributes.src) {
+                                                let src = node.attributes.src;
                                                 this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], this);
                                             }
                                         }
@@ -652,29 +582,32 @@ namespace HTMLScanner {
                                 case "resolve":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {         // query="{}"
-                                                let query:any = node.attributes.query;
-                                                let current_datasource:any = this.fragments[query.nodeValue].content;
-                                                _.forEach(node.childNodes, (childnode: any, index: number): void => {
+                                            if (node.attributes.query) {
+                                                let query = node.attributes.query;
+                                                let current_datasource = this.fragments[query.nodeValue].content;
+                                                _.forEach(node.childNodes, (childnode, index) => {
                                                     this.position = index;
                                                     this.ScanNode(childnode, current_datasource[0]);
-                                                })
-                                            } else if (node.attributes.field) {  // field="{a.b.c}"
-                                                let field:any = node.attributes.field;
+                                                });
+                                            }
+                                            else if (node.attributes.field) {
+                                                let field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
                                                 }, this);
-                                            } else if (node.attributes.scope) {  // scope="a.b.c"
+                                            }
+                                            else if (node.attributes.scope) {
                                                 if (data) {
-                                                    let scope:any = node.attributes.scope;
-                                                    let result:any = this.datasource.FieldValue(data, scope.nodeValue, this);
+                                                    let scope = node.attributes.scope;
+                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
                                                                 this.ResolveChildren(node, result[0]);
                                                             }
-                                                        } else {
+                                                        }
+                                                        else {
                                                             this.ResolveChildren(node, result);
                                                         }
                                                     }
@@ -687,8 +620,8 @@ namespace HTMLScanner {
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist:any = node.attributes.exist;
-                                                let result:any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let exist = node.attributes.exist;
+                                                let result = this.datasource.FieldValue(data, exist.nodeValue, this); //model
                                                 if (result) {
                                                     this.ResolveChildren(node, data);
                                                 }
@@ -700,8 +633,8 @@ namespace HTMLScanner {
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist:any = node.attributes.exist;
-                                                let result:any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let exist = node.attributes.exist;
+                                                let result = this.datasource.FieldValue(data, exist.nodeValue, this); //model
                                                 if (!result) {
                                                     this.ResolveChildren(node, data);
                                                 }
@@ -715,16 +648,18 @@ namespace HTMLScanner {
                             }
                         }
                         break;
-                    case 3://text
-                        if (node.parentNode) {  // field="{a.b.c}"
-                            let parent_name:string = node.parentNode.localName;
-                            let prefix:string = Expander.prefix(parent_name);
+                    case 3:
+                        if (node.parentNode) {
+                            let parent_name = node.parentNode.localName;
+                            let prefix = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
-                                this.html += this.datasource.ResolveFormat(data, {content: node.data, count: 1}, this);
-                            } else {
+                                this.html += this.datasource.ResolveFormat(data, { content: node.data, count: 1 }, this);
+                            }
+                            else {
                                 this.html += node.data;
                             }
-                        } else {
+                        }
+                        else {
                             this.html += node.data;
                         }
                         break;
@@ -735,40 +670,35 @@ namespace HTMLScanner {
                         break;
                     default:
                 }
-            } else {
-                this.callback({code: 1}, null);
+            }
+            else {
+                this.callback({ code: 1 }, null);
             }
         }
-
-        public ExpandHtml(source: string, fragments: { content: string, count: number }[]): any {
+        ExpandHtml(source, fragments) {
             this.fragments = fragments;
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes:any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, fragments);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, this.html);
+            jsdom.env(source, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (childnodes) {
+                        _.forEach(childnodes, (element, index) => {
+                            this.position = index;
+                            this.ScanNode(element, fragments);
+                        });
                     }
                 }
-            );
+                else {
+                    this.callback(errors, null);
+                }
+                this.document_depth--;
+                if (this.document_depth == 0) {
+                    this.callback(null, this.html);
+                }
+            });
         }
-
         // todo:1path
-        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[]): any {
+        ExpandHtml2(childnodes, fragments) {
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
@@ -777,117 +707,109 @@ namespace HTMLScanner {
             }
         }
     }
-
+    HTMLScanner.Expander = Expander;
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
     *　todo: ３回パースするのはダサダサ。
     *
     * */
-    export class Builder {
-
-        static Build(source: any, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
-
-            let build:any = (source: any, datasource: any, page_init, callback: (error: any, result: string) => void) => {
-                let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
+    class Builder {
+        static Build(source, datasource, page_init, config, callback) {
+            let build = (source, datasource, page_init, callback) => {
+                let datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, (error, datasource_result) => {
                     if (!error) {
-                        let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
+                        let url_resolver = new HTMLScanner.UrlResolver(datasource, config, (error, url_result) => {
                             if (!error) {
-                                let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                                let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
                                     if (!error) {
                                         callback(null, expand_result);
-                                    } else {
+                                    }
+                                    else {
                                         callback(error, null);
                                     }
                                 });
                                 expander.ExpandHtml(source, url_result);
-                            } else {
+                            }
+                            else {
                                 callback(error, null);
                             }
                         });
                         url_resolver.ResolveUrl(source, datasource_result);
-                    } else {
+                    }
+                    else {
                         callback(error, null);
                     }
                 });
-
                 datasource_resolver.datasource_promises.push(page_init);
                 datasource_resolver.ResolveDataSource(source, {});
             };
-
             if (datasource.page_params) {
                 build(source, datasource, page_init, callback);
-            } else {
+            }
+            else {
                 build(source, datasource, {}, callback);
             }
-
-        };
-
-        static Resolve(source:any, datasource:ScannerBehavior.Behavior, url_result:any, callback: (error: any, result: string) => void) :void {
-            let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+        }
+        ;
+        static Resolve(source, datasource, url_result, callback) {
+            let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
                 if (!error) {
                     callback(null, expand_result);
-                } else {
+                }
+                else {
                     callback(error, null);
                 }
             });
             expander.ExpandHtml(source, url_result);
         }
-
         // todo:1path
-        static Build2(source: string, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
-
-            let build:any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
-                let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
+        static Build2(source, datasource, page_init, config, callback) {
+            let build = (source, datasource, page_init, callback) => {
+                let datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, (error, datasource_result) => {
                     if (!error) {
-                        let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
+                        let url_resolver = new HTMLScanner.UrlResolver(datasource, config, (error, url_result) => {
                             if (!error) {
-                                let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                                let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
                                     if (!error) {
                                         callback(null, expand_result);
-                                    } else {
+                                    }
+                                    else {
                                         callback(error, null);
                                     }
                                 });
                                 expander.ExpandHtml2(source, url_result);
-                            } else {
+                            }
+                            else {
                                 callback(error, null);
                             }
                         });
                         url_resolver.ResolveUrl2(source, datasource_result);
-                    } else {
+                    }
+                    else {
                         callback(error, null);
                     }
                 });
-
                 datasource_resolver.datasource_promises.push(page_init);
                 datasource_resolver.ResolveDataSource2(source, {});
             };
-
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes = window.document.childNodes;
-                        if (datasource.page_params) {
-                            build(childnodes, datasource, page_init, callback);
-                        } else {
-                            build(childnodes, datasource, {}, callback);
-                        }
-
-                    } else {
-                        callback(errors, null);
+            jsdom.env(source, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (datasource.page_params) {
+                        build(childnodes, datasource, page_init, callback);
                     }
-
+                    else {
+                        build(childnodes, datasource, {}, callback);
+                    }
                 }
-            );
-
-        };
-
+                else {
+                    callback(errors, null);
+                }
+            });
+        }
+        ;
     }
-
-}
-
+    HTMLScanner.Builder = Builder;
+})(HTMLScanner || (HTMLScanner = {}));
 module.exports = HTMLScanner;
-
+//# sourceMappingURL=html_scanner.js.map
