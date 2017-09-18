@@ -977,9 +977,9 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
 
         let editor = null;
         let document = null;
-        let inner_peview = false;
-        let preview_window = null;
-        let local_query = [];
+       // let inner_peview = false;
+       // let preview_window = null;
+       // let local_query = [];
 
         let Draw = (text) => {
             switch (ResourceBuilderService.current.content.type) {
@@ -994,9 +994,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             }
         };
 
-    //    ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
-    //    let query_string = localStorage.getItem("pages_query");
-
         let Query = (): any => {
             progress(true);
             // template query
@@ -1008,9 +1005,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                     //pages query
 
                     ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
-             //       if (query_string) {
-             //           ResourceBuilderService.InitQuery(JSON.parse(query_string), 20, 36);
-             //       }
 
                     ResourceBuilderService.Query((result: any): void => {
                         if (result) {
@@ -1607,7 +1601,7 @@ FrontControllers.controller('BiildSiteDialogController', ['$scope', '$log', '$ui
         let target = items.target;
         let parent_scope = items.parent_scope;
 
-        $scope.name = "mega";
+        $scope.name = "sample";
 
         if (file) {
             $scope.title = file.name;

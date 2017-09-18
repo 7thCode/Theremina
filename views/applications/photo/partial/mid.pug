@@ -11,7 +11,7 @@
             .col-xs-12
                 include ../../../systems/common/next_prev
 
-    .box-body(style="height:auto;min-height:80vh;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title="#{message.picturedrop}")
+    .box-body(style="height:auto;min-height:80vh;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title=message.picturedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="file in files")
                 div(ng-if="Type(file.metadata.type) == 'image'", ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")

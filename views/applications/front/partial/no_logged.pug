@@ -31,7 +31,7 @@
                                             span.error-message(ng-message="required") Required fields.
                                             span.error-message(ng-message="minlength") Please 4 or more characters.
                                             span.error-message(ng-message="maxlength") Please within 30 characters.
-                                        input.center-block.form-control.no-zoom(ng-model="items.password", type="password", name="password", placeholder='4 or more,within 30 characters', required, ng-minlength="4", ng-maxlength="30")
+                                        input.center-block.form-control.no-zoom(ng-model="items.password", type="password", name="password", placeholder=message.over4under30, required, ng-minlength="4", ng-maxlength="30")
 
                                     .col-xs-12.form-group
                                         label.control-label #{message.retypepassword}
@@ -40,7 +40,7 @@
                                             span.error-message(ng-message="compareTo") Passwords do not match.
                                             span.error-message(ng-message="minlength") Please 4 or more characters.
                                             span.error-message(ng-message="maxlength") Please within 30 characters.
-                                        input.center-block.form-control.no-zoom(ng-model="items.retypepassword", compare-to="items.password", type="password", name="retypepassword", placeholder='Retype Password', required, ng-minlength="4", ng-maxlength="30")
+                                        input.center-block.form-control.no-zoom(ng-model="items.retypepassword", compare-to="items.password", type="password", name="retypepassword", placeholder=message.re_password_field, required, ng-minlength="4", ng-maxlength="30")
                                 .row
                                     .col-xs-12
                                         .error-message(style="text-align:center;font-weight:bold;", ng-bind="message")

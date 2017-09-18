@@ -252,7 +252,31 @@ var PageRouter;
                 });
         }
     };
-    PageRouter.router.get("/:userid/doc/static/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+    PageRouter.router.get("/:userid/doc/js/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+            resources.render_direct(request, (error, result) => {
+                if (!error) {
+                    response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
+                    response.write(result.content);
+                    response.end();
+                }
+                else {
+                    Error(error, request, response);
+                }
+            });
+        }]);
+    PageRouter.router.get("/:userid/doc/css/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+            resources.render_direct(request, (error, result) => {
+                if (!error) {
+                    response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
+                    response.write(result.content);
+                    response.end();
+                }
+                else {
+                    Error(error, request, response);
+                }
+            });
+        }]);
+    PageRouter.router.get("/:userid/static/:page", [exception.page_catch, analysis.page_view, (request, response) => {
             resources.render_direct(request, (error, result) => {
                 if (!error) {
                     response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });

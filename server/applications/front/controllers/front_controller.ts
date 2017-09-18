@@ -48,9 +48,9 @@ export namespace FrontModule {
             let result = null;
             const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
             if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name,options);
+                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
             } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name,options);
+                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
             }
             return result;
         }
@@ -337,31 +337,39 @@ export namespace FrontModule {
             let name = request.params.name;
 
             let sites = {
+                "sample": {
+                    "resources": [
+                        {type: "resource", original: "head.html", target: "head.html"},
+                        {type: "resource", original: "index.html", target: "index.html"},
+                        {type: "resource", original: "main.js", target: "main.js"},
+                        {type: "resource", original: "nav.html", target: "nav.html"},
+                        {type: "resource", original: "pagenator.html", target: "pagenator.html"},
+                        {type: "resource", original: "scripts.html", target: "scripts.html"},
+                        {type: "resource", original: "style.css", target: "style.css"}
+                    ]
+                },
+
                 "paper": {
                     "resources": [
-                        {type: "resource", original: "paper-index.html", target: "index.html"},
-                        {type: "resource", original: "paper-contact.html", target: "contact.html"},
-                        {type: "resource", original: "paper-about.html", target: "about.html"},
-                        {type: "resource", original: "paper-blog.html", target: "blog.html"},
-                        {type: "resource", original: "paper-main.js", target: "main.js"},
-                        {type: "resource", original: "paper-style.css", target: "style.css"}
+                        {type: "resource", original: "index.html", target: "index.html"},
+                        {type: "resource", original: "contact.html", target: "contact.html"},
+                        {type: "resource", original: "about.html", target: "about.html"},
+                        {type: "resource", original: "blog.html", target: "blog.html"},
+                        {type: "resource", original: "main.js", target: "main.js"},
+                        {type: "resource", original: "style.css", target: "style.css"}
                     ]
                 },
                 "shape": {
                     "resources": [
-                        {type: "resource", original: "shape-index.html", target: "index.html"},
-                        {type: "resource", original: "shape-work.html", target: "work.html"},
-                        {type: "resource", original: "shape-services.html", target: "services.html"},
-                        {type: "resource", original: "shape-contact.html", target: "contact.html"},
-                        {type: "resource", original: "shape-blog.html", target: "blog.html"},
-                        {type: "resource", original: "shape-about.html", target: "about.html"},
-                        {type: "resource", original: "shape-main.js", target: "main.js"},
-                        {
-                            type: "resource",
-                            original: "shape-magnific-popup-options.js",
-                            target: "magnific-popup-options.js"
-                        },
-                        {type: "resource", original: "shape-style.css", target: "style.css"}
+                        {type: "resource", original: "index.html", target: "index.html"},
+                        {type: "resource", original: "work.html", target: "work.html"},
+                        {type: "resource", original: "services.html", target: "services.html"},
+                        {type: "resource", original: "contact.html", target: "contact.html"},
+                        {type: "resource", original: "blog.html", target: "blog.html"},
+                        {type: "resource", original: "about.html", target: "about.html"},
+                        {type: "resource", original: "main.js", target: "main.js"},
+                        {type: "resource", original: "magnific-popup-options.js", target: "magnific-popup-options.js"},
+                        {type: "resource", original: "style.css", target: "style.css"}
                     ]
                 }
 
@@ -369,18 +377,22 @@ export namespace FrontModule {
 
             let site = sites[name];
 
+            let namesapce = name;
+
             let resources = site.resources;
             let copy = (resourcename: any): any => {
 
                 let copy_resource = (resolve: any, reject: any): void => {
-                    ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: resourcename.original}, {type: 30}]}, {}, {}).then((doc: any): void => {
+
+                    ResourceModel.findOne({$and: [{namespace: namesapce}, {userid: config.systems.userid}, {name: resourcename.original}, {type: 30}]}, {}, {}).then((doc: any): void => {
                         if (doc) {
                             let name: string = resourcename.target;
                             let content: any = doc.content;
-                            ResourceModel.findOne({$and: [{userid: userid}, {type: 20}, {name: name}]}).then((found: any): void => {
+                            ResourceModel.findOne({$and: [{namesapce: namesapce}, {userid: userid}, {name: name}, {type: 20}]}).then((found: any): void => {
                                 if (!found) {
                                     let page: any = new ResourceModel();
                                     page.userid = userid;
+                                    page.namespace = namesapce;
                                     page.name = name;
                                     page.type = 20;
                                     page.content = content;
@@ -394,6 +406,7 @@ export namespace FrontModule {
                                     found.remove().then(() => {
                                         let page: any = new ResourceModel();
                                         page.userid = userid;
+                                        page.namespace = namesapce;
                                         page.name = name;
                                         page.type = 20;
                                         page.content = content;
@@ -616,7 +629,7 @@ export namespace FrontModule {
                                             create: "",
                                             modify: "",
                                             content: content
-                                        },(error: any, doc: string) => {
+                                        }, (error: any, doc: string) => {
                                             if (!error) {
                                                 mailer.send(report_to, report_title, doc, (error: any) => {
                                                     if (!error) {
@@ -627,7 +640,7 @@ export namespace FrontModule {
                                                                     create: "",
                                                                     modify: "",
                                                                     content: content
-                                                                },(error: any, doc: string) => {
+                                                                }, (error: any, doc: string) => {
                                                                     if (!error) {
                                                                         mailer.send(thanks_to, thanks_title, doc, (error: any) => {
                                                                             if (!error) {

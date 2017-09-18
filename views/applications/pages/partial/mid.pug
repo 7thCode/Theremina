@@ -33,11 +33,11 @@
 
             include ../../../applications/common/find
 
-    .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title="#{message.filedrop}")
+    .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title=message.filedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="page in pages")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
-                    a.btn.btn-success.btn-xs(download ng-href="/" + '{{page.userid}}' + "/direct/" + '{{page.name}}' target="_blank")
+                    a.btn.btn-success.btn-xs(download ng-href="/" + '{{page.userid}}' + "/static/" + '{{page.name}}' target="_blank")
                         i.fa.fa-cloud-download
                     div(style="height:8rem;",data-toggle="tooltip" data-placement="top" title="{{page.name}}" , ng-click="Get(page)")
                         img.center-block.thumbnail(ng-src="{{page.content.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
