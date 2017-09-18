@@ -111,13 +111,6 @@ var ScannerBehavior;
             return params.ToParams();
         }
         GetDatasource(query, parent) {
-            let result_promise = null;
-            //           let depth: number = 0;
-            //           let position: number = 0;
-            //         if (parent) {
-            //           depth = parent.depth;
-            //           position = parent.position;
-            //       }
             let query_object = this.ParseQueryFormat(query);
             let _query = this.default_query;
             if (query_object.q) {
@@ -159,17 +152,9 @@ var ScannerBehavior;
             if (!model) {
                 model = this.models["Default"];
             }
-            result_promise = model.find(_query).limit(limit).skip(skip).sort(sort).exec();
-            return result_promise;
+            return model.find(_query).limit(limit).skip(skip).sort(sort).exec();
         }
         GetCount(query, parent) {
-            let result_promise = null;
-            //        let depth: number = 0;
-            //        let position: number = 0;
-            //        if (parent) {
-            //            depth = parent.depth;
-            //            position = parent.position;
-            //        }
             let query_object = this.ParseQueryFormat(query);
             let _query = this.default_query;
             if (query_object.q) {
@@ -187,13 +172,9 @@ var ScannerBehavior;
             if (!model) {
                 model = this.models["Default"];
             }
-            result_promise = model.count(_query).exec();
-            return result_promise;
+            return model.count(_query).exec();
         }
         GetUrl(target_url_string, parent) {
-            let result_promise = null;
-            //    let depth: number = parent.depth;
-            //    let position: number = parent.position;
             let resolved_url_string = this.ResolveUrl(target_url_string);
             let target_url = url.parse(resolved_url_string);
             let host_string = parent.config.protocol + "://" + parent.config.domain;
@@ -210,8 +191,7 @@ var ScannerBehavior;
                     'User-Agent': parent.config.ua
                 },
             };
-            result_promise = requestpromise(options);
-            return result_promise;
+            return requestpromise(options);
         }
         SplitFormat(value, callback) {
             if (value) {
@@ -253,8 +233,6 @@ var ScannerBehavior;
             return result;
         }
         FieldValue(object, params, parent) {
-            //    let depth: number = parent.depth;
-            //    let position: number = parent.position;
             let result = null;
             let full_params = params.trim();
             if (full_params) {

@@ -272,6 +272,55 @@ namespace HTMLScanner {
             );
         }
 
+        // todo:1path
+        public ResolveDataSource2(childnodes: string, result: any): any {
+
+
+            if (childnodes) {
+                _.forEach(childnodes, (element, index) => {
+                    this.position = index;
+                    this.ScanNode(element, null);
+                });
+            }
+
+
+            // resolve all [record reference] in document.
+            Promise.all(this.datasource_promises.map((doc: any): void => {
+                let result:any = null;
+                if (doc.promise) {
+                    result = doc.promise;
+                }
+                return result;
+            })).then((resolved: any[]): void => {
+
+                _.forEach(resolved, (entry: any, index: number): void => {
+                    result[this.datasource_promises[index].name] = {content: entry, count: 0};
+                });
+
+                Promise.all(this.datasource_promises.map((doc: any): void => {
+                    let result:any = null;
+                    if (doc.count) {
+                        result = doc.count;
+                    }
+                    return result;
+                })).then((resolved: any[]): void => {
+                    _.forEach(resolved, (count: any, index: number): void => {
+                        result[this.datasource_promises[index].name].count = count;
+                    });
+                    this.callback(null, result);
+                }).catch((error: any): void => {
+                    this.callback(error, null);
+                });
+
+
+            }).catch((error: any): void => {
+                this.callback(error, null);
+            });
+
+
+
+        }
+
     }
 
     /* UrlResolver
@@ -409,6 +458,37 @@ namespace HTMLScanner {
                     }
                 }
             );
+        }
+
+        // todo:1path
+        public ResolveUrl2(childnodes: any, result: any): any {
+
+
+
+            if (childnodes) {
+                _.forEach(childnodes, (element:any, index:number):void => {
+                    this.position = index;
+                    this.ScanNode(element, null);
+                });
+            }
+
+
+            Promise.all(this.url_promises.map((doc: any): void => {
+                let promise:any = null;
+                if (doc.promise) {
+                    promise = doc.promise;
+                }
+                return promise;
+            })).then((resolved: any[]): void => {
+                _.forEach(resolved, (entry:any, index:number) :void => {
+                    result[this.url_promises[index].name] = {content: entry, count: 1};
+                });
+                this.callback(null, result);
+            }).catch((error: any): void => {
+                this.callback(error, null);
+            });
+
+
         }
 
     }
@@ -686,18 +766,28 @@ namespace HTMLScanner {
                 }
             );
         }
+
+        // todo:1path
+        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[]): any {
+            if (childnodes) {
+                _.forEach(childnodes, (element, index) => {
+                    this.position = index;
+                    this.ScanNode(element, fragments);
+                });
+            }
+        }
     }
 
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
-    *　todo: ３回パースするのはダサダサ。Resolveフェーズは文字列検索でなんとかならないか。。。
+    *　todo: ３回パースするのはダサダサ。
     *
     * */
     export class Builder {
 
-        static Build(source: string, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
+        static Build(source: any, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
 
-            let build:any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+            let build:any = (source: any, datasource: any, page_init, callback: (error: any, result: string) => void) => {
                 let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
                     if (!error) {
                         let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
@@ -742,6 +832,58 @@ namespace HTMLScanner {
             });
             expander.ExpandHtml(source, url_result);
         }
+
+        // todo:1path
+        static Build2(source: string, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
+
+            let build:any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+                let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
+                    if (!error) {
+                        let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
+                            if (!error) {
+                                let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                                    if (!error) {
+                                        callback(null, expand_result);
+                                    } else {
+                                        callback(error, null);
+                                    }
+                                });
+                                expander.ExpandHtml2(source, url_result);
+                            } else {
+                                callback(error, null);
+                            }
+                        });
+                        url_resolver.ResolveUrl2(source, datasource_result);
+                    } else {
+                        callback(error, null);
+                    }
+                });
+
+                datasource_resolver.datasource_promises.push(page_init);
+                datasource_resolver.ResolveDataSource2(source, {});
+            };
+
+            jsdom.env(
+                source,
+                [],
+                {},
+                (errors, window) => {
+                    if (!errors) {
+                        let childnodes = window.document.childNodes;
+                        if (datasource.page_params) {
+                            build(childnodes, datasource, page_init, callback);
+                        } else {
+                            build(childnodes, datasource, {}, callback);
+                        }
+
+                    } else {
+                        callback(errors, null);
+                    }
+
+                }
+            );
+
+        };
 
     }
 

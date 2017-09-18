@@ -140,19 +140,33 @@
     
     
     USERID --|
-             |-----doc--------|   
+             |-----doc--------|
              |                |
+             |                |----img------|
+             |                |             |
+             |                |
+             |                |
+             |                |----js-------|
+             |                |             |
+             |                |
+             |                |
+             |                |----css------|
+             |                |             |
+             |                |
+             |                |
+             |                |
+             |                |
+             |                
+             |
+             |----static------|
+             |                |
+             |
              |
              |----fragment----|
-             |                |
-             |
-             |----direct------|
-             |                |
-             |
-             |----photos------|
                               |
-               
-   
+
+
+
     レンダリングを行い、ドキュメントを返す。
     http://DOMAIN/USERID/doc/PAGENAME?co=COLLECTION&q=QUERY&s=SKIP&l=LIMIT&so=SORT
     
@@ -217,11 +231,23 @@
   
 ####特殊な値
 
+        #init
+        #name:self
+        #name:document
+        #userid
+        #query:self
+        #pager
+        
+            #pager:page
+            #pager:index
+            #pager:current
+
+
 #####Page URL Query
 
-     特殊なfield_name"init"は、ページクエリーの結果を参照する。
+     特殊なfield_name"#init"は、ページクエリーの結果を参照する。
      
-     <ds:foreach scope="init">
+     <ds:foreach scope="#init">
          <ds:resolve field='field_formula'></ds:resolve>
      </ds:foreach>
                   
@@ -258,21 +284,24 @@
      
 #####Pagenation
 
-    特殊なfield_name"#pager"は、"#query:page"で参照されるクエリーの配列を生成する。
+    特殊なfield_name"#pager"は、"#pager:page"で参照されるクエリーおよびindex、currentの配列を生成する。
     ドキュメント内で使用可能  
     
-    特殊なfield_name"#query:next"と”#query:prev”は、ページクエリーを引き継いで、次ページ・前ページをクエリーするようなクエリー式を返す。
+    特殊なfield_name"#pager:next"と”#pager:prev”は、ページクエリーを引き継いで、次ページ・前ページをクエリーするようなクエリー式を返す。
     ドキュメント内で使用可能 
          
+    特殊なfield_name"#pager:index"はページを表す。
+    特殊なfield_name"#pager:current"はページが現在のページの場合に真となる。
+                   
     例
     
         ページクエリーが”?l=5&s=5”であれば、
     
-        <a ds:href="/doc/00000000000000000000/test4|{#query:next}">next</a>    
+        <a ds:href="/00000000000000000000/doc/test4|{#pager:next}">next</a>    
     
         は
     
-        <a ds:href="/doc/00000000000000000000/test4?l=5&s=10">next</a>
+        <a ds:href="/00000000000000000000/doc/test4?l=5&s=10">next</a>
      
         と展開される。
      
@@ -280,7 +309,8 @@
       特殊なfield_name"#hasprev"は、現在のクエリーによって得られる結果の前に要素がある場合は真となる
       
       特殊なfield_name"#hasnext"は、現在のクエリーによって得られる結果の後に要素がある場合は真となる
-                             
+                     
+                                    
 ####クエリー式
 
     現状は、公開されたcollection名とMongoDBのクエリー式,limit,skip,sortを以下のように連結したもの。
@@ -298,6 +328,9 @@
         
     BODY要素内    
         <ds:include src='url'></ds:include>
+        
+        
+        
     
 #####resolve    
     
@@ -382,33 +415,41 @@
     http://localhost:8000/doc/000000000000000000000000/test?l=10&s=0
     
         <!DOCTYPE html>
-        <HTML lang="ja">
+        <html lang="ja">
             <head>
                 <meta ds:include="/|{#userid}|/fragment/|{#name:self}|/head"/>
             </head>
-        	<BODY>
-        	    <ds:include src='/|{#userid}|/fragment/|{#name:self}|/testnav|{#query:self}'></ds:include>
-        	    
-        	    <div class="container">
+        	<body>
+        	    <ds:include src='/|{#userid}|/fragment/|{#name:self}|/nav|{#query:self}'></ds:include>
+        	    <div class="container" style="margin-top:70px;">
+        	        <div class="jumbotron jumbotron-fluid">
+                        <div class="container">
+                            <h1 class="display-3">Fluid jumbotron</h1>
+                            <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+                            <img src="img/img16.jpg?w=100&h=100"/>
+                        </div>
+                    </div>
         	        <div class="card">
         	            <div class="card-header">query from url</div>
         	            <div class="card-body">
-        	                <div class="card-columns" style="column-count: 3;">
+        	                <div class="row" style="column-count: 3;">
         	                    <ds:foreach scope='#init'>
-        	                        <div class="card">
-        	                            <ds:resolve scope='content'>
-                                            <img class="card-img-top" ds:src="{image.value}">
-                                            <div class="card-body">
-                                                <ds:if exist='title.value'>
-        	                                        <div ds:style="{klass.value}">
-        	                                            <ds:h4 class="card-title">{title.value}</ds:h4>
-        	                                        </div> 
-        	                                    </ds:if>
-                                                <ds:div class="card-text" style="font-size:1vw">{desc.value}</ds:div>
+        	                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        	                            <div class="card">
+        	                                <ds:resolve scope='content'>
+                                                <img class="card-img-top" ds:src="{image.value}">
+                                                <div class="card-body">
+                                                    <ds:if exist='title.value'>
+        	                                            <div ds:style="{klass.value}">
+        	                                                <ds:h4 class="card-title">{title.value}</ds:h4>
+        	                                            </div> 
+        	                                        </ds:if>
+                                                    <ds:div class="card-text" style="font-size:1vw">{desc.value}</ds:div>
+                                                </div>
+                                            </ds:resolve>
+                                            <div class="card-footer d-flex justify-content-end">
+                                                <ds:small class="text-muted">{create == date("MM月DD日")}</ds:small>
                                             </div>
-                                        </ds:resolve>
-                                        <div class="card-footer d-flex justify-content-end">
-                                            <ds:small class="text-muted">{create == date("MM月DD日")}</ds:small>
                                         </div>
                                     </div>
         	                    </ds:foreach>
@@ -439,10 +480,9 @@
         	            </div>
         	        </div>
                 </div>
-                 
                 <ds:include src='/|{#userid}|/fragment/|{#name:self}|/scripts'></ds:include>
-            </BODY>
-        </HTML>
+            </body>
+        </html>
     
     
     
@@ -452,125 +492,113 @@
             <ul class="pagination">
                 <ds:if exist='#hasprev:#init'>
                     <li class="page-item">
-                        <a class="btn btn-primary" role="button" ds:href="/doc/|{#userid}|/|{#name:document}|{#query:prev}">
-                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
-                        </a>
+                        <a class="page-link" ds:href="|{#name:document}|{#query:prev}|">Prev</a>
                     </li>
                 </ds:if>
                 <ds:foreach scope='#pager:#init'>
                     <li class="page-item">
-                        <a class="btn btn-xs btn-info" role="button" ds:href="/doc/|{#userid}|/|{#name:document}|{#query:page}">
-                            <i class="fa fa-circle" aria-hidden="true"></i>
-                        </a>
+                        <ds:if exist='#pager:current'>
+                            <ds:a class="page-link" style="color:#ff0000;" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
+                        </ds:if>
+                        <ds:ifn exist='#pager:current'>
+                            <ds:a class="page-link" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
+                        </ds:ifn>
                     </li>
                 </ds:foreach>
                 <ds:if exist='#hasnext:#init'>
                     <li class="page-item">
-                        <a class="btn btn-primary" role="button" ds:href="/doc/|{#userid}|/|{#name:document}|{#query:next}">
-                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
-                        </a>
+                        <a class="page-link" ds:href="|{#name:document}|{#query:next}|">Next</a>
                     </li>
                 </ds:if>
             </ul>
         </nav>
     
     
-   
+    
     フラグメント"nav"
     
-    	<NAV class="gtco-nav" role="navigation" style="padding:0;">
-    	    <div class="container" style="padding:0;">
-   			    <div class="row">
-   				    <div class="col-xs-2 text-left" >
-    				    <div id="gtco-logo" ><A href="#fh5co-hero" >MAVERICK<SPAN>.</SPAN></A></div>
-    			    </div>
-    			    <div class="col-xs-10 text-right menu-1">
-    				    <ul>
-    				        <li><A href='/doc/|{#userid}|/index.html'>ホーム</A></li>
-    				        <repeat filter='{"type":"work1"}' sorter='{"field":["number"], "order":["asc"]}'>
-    			                <li><A href='/doc/|{#userid}|/|{"name":"link","type":"string"}'>{"name":"title","type":"string"}</A></li>
-        	                </repeat>
-        	                <li><A href='/doc/|{#userid}|/inquiry.html'>お問い合わせ</A></li>
-    				    </ul>
-    			    </div>
-    		    </div>
-    	   </div>
-        </NAV>
+    	<nav class="navbar navbar-expand-sm navbar-light fixed-top bg-light">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">Disabled1</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     	    
     	    
     	    
     フラグメント"head"	    
     
-    	<meta charset="utf-8" >
-    	<meta http-equiv="X-UA-Compatible"  content="IE=edge">
-    	<title>たいとる</title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1">
-    	<meta name="description" content="" >
-    	<meta name="keywords" content="">
+	    <meta charset="utf-8" >
+	    <meta http-equiv="X-UA-Compatible"  content="IE=edge">
+	    <title></title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <meta name="description" content="" >
+	    <meta name="keywords" content="">
         <meta name="Robots" content="index,follow">
-    	<meta name="author" content="MAVERICK">
-    	
-    	<meta property="og:title" content="" >
-    	<meta property="og:image" content="" >
-    	<meta property="og:url" content="" >
-    	<meta property="og:site_name" content="" >
-    	<meta property="og:description" content="" >
-    	<meta name="twitter:title" content="" >
-    	<meta name="twitter:image" content="" >
-    	<meta name="twitter:url" content="" >
-    	<meta name="twitter:card" content="" >
+	    <meta name="author" content="">
+	    
+	    <meta property="og:title" content="" >
+	    <meta property="og:image" content="" >
+	    <meta property="og:url" content="" >
+	    <meta property="og:site_name" content="" >
+	    <meta property="og:description" content="" >
+	    <meta name="twitter:title" content="" >
+	    <meta name="twitter:image" content="" >
+	    <meta name="twitter:url" content="" >
+	    <meta name="twitter:card" content="" >
     
-    	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabimincho.css" rel="stylesheet" async>
-    	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabigothic.css" rel="stylesheet" async>
-    	<LINK href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" async>
-    	<LINK href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" async>
-    	<LINK href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
-    	<LINK href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700"  rel="stylesheet">
-    	<LINK rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css">
-    	<LINK rel="stylesheet"  href="/direct/|{#userid}|/icomoon.css">
-    	<link rel='stylesheet'  type="text/css"  href='/bower_components/font-awesome/css/font-awesome.min.css'>
-    	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    	<LINK rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
-    	<LINK rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/flexslider/2.6.3/flexslider.min.css">
+	    <LINK href="https://fonts.googleapis.com/earlyaccess/sawarabimincho.css" rel="stylesheet" async>
+	    <LINK href="https://fonts.googleapis.com/earlyaccess/sawarabigothic.css" rel="stylesheet" async>
+	    <LINK href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" async>
+	    <LINK href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" async>
+	    <LINK href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
+	    <LINK href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700"  rel="stylesheet">
+	    <LINK rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css">
+	    <LINK rel="stylesheet" href="static/icomoon.css">
+	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	    <LINK rel="stylesheet" href="static/style.css">
+	    <SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" ></SCRIPT>
+    	
     
-    	<LINK rel="stylesheet"  href="/direct/|{#userid}|/style.css">
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" ></SCRIPT>
-    	
-    	
     
     フラグメント"script"
     
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" ></SCRIPT>
-    	<SCRIPT type="text/javascript"  src="/bower_components/lodash/dist/lodash.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular/angular.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-resource/angular-resource.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-animate/angular-animate.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-sanitize/angular-sanitize.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-messages/angular-messages.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-aria/angular-aria.min.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/bower_components/angular-i18n/angular-locale_ja-jp.js" ></SCRIPT>
-        <script type="text/javascript"  src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+	    <script type="text/javascript" src="/bower_components/lodash/dist/lodash.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular/angular.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-resource/angular-resource.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-animate/angular-animate.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-messages/angular-messages.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-aria/angular-aria.min.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-i18n/angular-locale_ja-jp.js"></script>
+        <script type="text/javascript" src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script type="text/javascript" src="/js/application.js"></script>
+        <script type="text/javascript" src="/js/controllers.js"></script>
+        <script type="text/javascript" src="/js/services.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+	    <script type="text/javascript" src="static/main.js"></script>
+    	
     
-        <SCRIPT type="text/javascript"  src="/js/application.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/js/controllers.js" ></SCRIPT>
-        <SCRIPT type="text/javascript"  src="/js/services.js" ></SCRIPT>
-        
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" ></SCRIPT>
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" ></SCRIPT>
-    	
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js" ></SCRIPT>
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/flexslider/2.6.3/jquery.flexslider.min.js" ></SCRIPT>
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js" ></SCRIPT>
-    	<SCRIPT src="/direct/|{#userid}|/magnific-popup-options.js" ></SCRIPT>
-    	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/jquery-countto/1.2.0/jquery.countTo.min.js" ></SCRIPT>
-    	
-    	<SCRIPT src="/direct/|{#userid}|/main.js" ></SCRIPT>
-    	
-    	
 ###resource
 
     mimetypeがtext/htmlの場合、Articleの値を参照可能

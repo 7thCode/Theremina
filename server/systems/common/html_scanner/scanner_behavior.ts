@@ -156,14 +156,6 @@ namespace ScannerBehavior {
         }
 
         public GetDatasource(query: any, parent: any): any {// db query
-            let result_promise: any = null;
-
- //           let depth: number = 0;
- //           let position: number = 0;
-   //         if (parent) {
-     //           depth = parent.depth;
-     //           position = parent.position;
-     //       }
 
             let query_object: any = this.ParseQueryFormat(query);
 
@@ -212,19 +204,11 @@ namespace ScannerBehavior {
             if (!model) {
                 model = this.models["Default"];
             }
-            result_promise = model.find(_query).limit(limit).skip(skip).sort(sort).exec();
-            return result_promise;
+
+            return model.find(_query).limit(limit).skip(skip).sort(sort).exec();
         }
 
         public GetCount(query: any, parent: any): any {// db query
-            let result_promise: any = null;
-
-    //        let depth: number = 0;
-    //        let position: number = 0;
-    //        if (parent) {
-    //            depth = parent.depth;
-    //            position = parent.position;
-    //        }
 
             let query_object: any = this.ParseQueryFormat(query);
 
@@ -246,14 +230,11 @@ namespace ScannerBehavior {
             if (!model) {
                 model = this.models["Default"];
             }
-            result_promise = model.count(_query).exec();
-            return result_promise;
+
+            return model.count(_query).exec();
         }
 
         public GetUrl(target_url_string: string, parent: any): any {// url
-            let result_promise: any = null;
-        //    let depth: number = parent.depth;
-        //    let position: number = parent.position;
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let target_url: any = url.parse(resolved_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
@@ -270,8 +251,8 @@ namespace ScannerBehavior {
                     'User-Agent': parent.config.ua
                 },
             };
-            result_promise = requestpromise(options);
-            return result_promise;
+
+            return requestpromise(options);
         }
 
         private SplitFormat(value: string, callback: (element) => void): void {
@@ -315,9 +296,6 @@ namespace ScannerBehavior {
         }
 
         public FieldValue(object: any, params: string, parent: any): any {
-        //    let depth: number = parent.depth;
-        //    let position: number = parent.position;
-
             let result: any = null;
             let full_params = params.trim();
             if (full_params) {

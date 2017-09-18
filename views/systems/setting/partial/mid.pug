@@ -5,12 +5,10 @@
                 .col-xs-12.col-sm-6.col-lg-4
                     .box.box-success
                         .box-header.with-border
-
                             .h7 Database
                             .box-tools.pull-right
                                 button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                                     i.fa.fa-minus
-
                         .box-body.row
                             .col-xs-12
                                 label.h6(for="db_address") db address
@@ -72,7 +70,6 @@
                                 span.error-message(ng-message="maxlength") #{message.long}
                             input.form-control.no-zoom#cache(tabindex="9" ng-model="system_setting.cache", type="text", name='cache', ng-maxlength="128")
 
-
                 .col-xs-12.col-sm-6.col-lg-4
                     .box.box-primary
                         .box-header.with-border
@@ -112,8 +109,6 @@
                                     span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#inquiry(tabindex="13" ng-model="system_setting.message.mailinquirysubject", type="text", name='mail_inquiry_subject', ng-maxlength="50")
 
-
-
                 .col-xs-12.col-sm-6.col-lg-4
                     .box.box-info
                         .box-header.with-border
@@ -139,4 +134,3 @@
                     .row(style="margin-top:3rem")
                         .col-xs-2.col-xs-offset-5
                             button.btn.btn-primary#save(tabindex="16" style="width:100%",type="button" ,ng-click='Write();content.$dirty = false;', ng-disabled="progress || content.$invalid", aria-label="") #{message.save}
-

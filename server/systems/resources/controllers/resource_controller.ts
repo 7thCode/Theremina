@@ -81,7 +81,7 @@ export namespace ResourcesModule {
                         return new Promise((resolve: any, reject: any): void => {
 
                             let filename = process.cwd() + doc.path + '/' + doc.name;
-                            let namespace: string = Resource.namespace(doc.name);
+                            let namespace: string = doc.namespace;// Resource.namespace(doc.name);
                             let localname: string = Resource.localname(doc.name);
                             let userid = doc.userid;
                             let type: string = doc.type;
@@ -389,7 +389,7 @@ export namespace ResourcesModule {
             let userid: string = request.params.userid;
             let page_name: string = request.params.page;
             let params: any = request.query;
-            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid}]}).then((doc: any): void => {
+            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid},{type:20}]}).then((doc: any): void => {
                 if (doc) {
                     let content = doc.content.resource;
                     let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, params, true, {
@@ -421,7 +421,7 @@ export namespace ResourcesModule {
             let parent_page_name: string = request.params.parent;
             let page_name: string = request.params.page;
             let params: any = request.query;
-            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid}]}).then((doc: any): void => {
+            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid},{type:20}]}).then((doc: any): void => {
                 if (doc) {
                     let content = doc.content.resource;
                     let datasource = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid, params, false, {
@@ -451,7 +451,7 @@ export namespace ResourcesModule {
         public render_direct(request: { params: any }, callback: (error: {code:number,message:string}, result: any) => void): void {
             let userid: string = request.params.userid;
             let page_name: string = request.params.page;
-            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid}]}).then((doc: any): void => {
+            ResourceModel.findOne({$and: [{name: page_name}, {userid: userid},{type:20}]}).then((doc: any): void => {
                 if (doc) {
                     callback(null, {content: doc.content.resource, type: doc.content.type})
                 } else {
@@ -463,7 +463,7 @@ export namespace ResourcesModule {
         }
 
         public render_object(userid: string, page_name: string, object:any, callback: (error: {code:number,message:string}, result: any) => void): void {
-            ResourceModel.findOne({$and: [{userid: userid}, {name: page_name}]}).then((doc: any): void => {
+            ResourceModel.findOne({$and: [{userid: userid}, {name: page_name},{type:20}]}).then((doc: any): void => {
                 if (doc) {
                     let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, null, true, {});
                     HtmlScannerModule.Builder.Resolve(doc.content.resource, datasource, object, (error: {code:number,message:string}, result: string):void => {

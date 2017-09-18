@@ -241,6 +241,43 @@ var HTMLScanner;
                 }
             });
         }
+        // todo:1path
+        ResolveDataSource2(childnodes, result) {
+            if (childnodes) {
+                _.forEach(childnodes, (element, index) => {
+                    this.position = index;
+                    this.ScanNode(element, null);
+                });
+            }
+            // resolve all [record reference] in document.
+            Promise.all(this.datasource_promises.map((doc) => {
+                let result = null;
+                if (doc.promise) {
+                    result = doc.promise;
+                }
+                return result;
+            })).then((resolved) => {
+                _.forEach(resolved, (entry, index) => {
+                    result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+                });
+                Promise.all(this.datasource_promises.map((doc) => {
+                    let result = null;
+                    if (doc.count) {
+                        result = doc.count;
+                    }
+                    return result;
+                })).then((resolved) => {
+                    _.forEach(resolved, (count, index) => {
+                        result[this.datasource_promises[index].name].count = count;
+                    });
+                    this.callback(null, result);
+                }).catch((error) => {
+                    this.callback(error, null);
+                });
+            }).catch((error) => {
+                this.callback(error, null);
+            });
+        }
     }
     HTMLScanner.DataSourceResolver = DataSourceResolver;
     /* UrlResolver
@@ -365,6 +402,29 @@ var HTMLScanner;
                         this.callback(error, null);
                     });
                 }
+            });
+        }
+        // todo:1path
+        ResolveUrl2(childnodes, result) {
+            if (childnodes) {
+                _.forEach(childnodes, (element, index) => {
+                    this.position = index;
+                    this.ScanNode(element, null);
+                });
+            }
+            Promise.all(this.url_promises.map((doc) => {
+                let promise = null;
+                if (doc.promise) {
+                    promise = doc.promise;
+                }
+                return promise;
+            })).then((resolved) => {
+                _.forEach(resolved, (entry, index) => {
+                    result[this.url_promises[index].name] = { content: entry, count: 1 };
+                });
+                this.callback(null, result);
+            }).catch((error) => {
+                this.callback(error, null);
             });
         }
     }
@@ -637,11 +697,20 @@ var HTMLScanner;
                 }
             });
         }
+        // todo:1path
+        ExpandHtml2(childnodes, fragments) {
+            if (childnodes) {
+                _.forEach(childnodes, (element, index) => {
+                    this.position = index;
+                    this.ScanNode(element, fragments);
+                });
+            }
+        }
     }
     HTMLScanner.Expander = Expander;
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
-    *　todo: ３回パースするのはダサダサ。Resolveフェーズは文字列検索でなんとかならないか。。。
+    *　todo: ３回パースするのはダサダサ。
     *
     * */
     class Builder {
@@ -693,6 +762,52 @@ var HTMLScanner;
             });
             expander.ExpandHtml(source, url_result);
         }
+        // todo:1path
+        static Build2(source, datasource, page_init, config, callback) {
+            let build = (source, datasource, page_init, callback) => {
+                let datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, (error, datasource_result) => {
+                    if (!error) {
+                        let url_resolver = new HTMLScanner.UrlResolver(datasource, config, (error, url_result) => {
+                            if (!error) {
+                                let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
+                                    if (!error) {
+                                        callback(null, expand_result);
+                                    }
+                                    else {
+                                        callback(error, null);
+                                    }
+                                });
+                                expander.ExpandHtml2(source, url_result);
+                            }
+                            else {
+                                callback(error, null);
+                            }
+                        });
+                        url_resolver.ResolveUrl2(source, datasource_result);
+                    }
+                    else {
+                        callback(error, null);
+                    }
+                });
+                datasource_resolver.datasource_promises.push(page_init);
+                datasource_resolver.ResolveDataSource2(source, {});
+            };
+            jsdom.env(source, [], {}, (errors, window) => {
+                if (!errors) {
+                    let childnodes = window.document.childNodes;
+                    if (datasource.page_params) {
+                        build(childnodes, datasource, page_init, callback);
+                    }
+                    else {
+                        build(childnodes, datasource, {}, callback);
+                    }
+                }
+                else {
+                    callback(errors, null);
+                }
+            });
+        }
+        ;
     }
     HTMLScanner.Builder = Builder;
 })(HTMLScanner || (HTMLScanner = {}));
