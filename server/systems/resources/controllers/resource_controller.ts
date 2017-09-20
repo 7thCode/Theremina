@@ -334,9 +334,7 @@ export namespace ResourcesModule {
             let userid: string = Resource.userid(request);
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-
             Wrapper.Find(response, number, ResourceModel, {$and: [{userid: userid}, query]}, {}, option, (response: any, pages: any): any => {
-
                 _.forEach(pages, (page) => {
                     if (page.content) {
                         if (page.content.resource) {

@@ -401,6 +401,42 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             });
         };
 
+        let addHtmlField = (): void => {
+
+            let modalRegist: any = $uibModal.open({
+                controller: 'FormBuilderAddFieldDialogController',
+                templateUrl: '/forms/dialogs/elements/add_field_dialog',
+                resolve: {
+                    items: null
+                }
+            });
+
+            modalRegist.result.then((dialog_scope): void => {
+
+                let validator = {
+                    min: {
+                        value: dialog_scope.min.value,
+                        message: dialog_scope.min.message
+                    },
+                    max: {
+                        value: dialog_scope.max.value,
+                        message: dialog_scope.max.message
+                    },
+                    pattern: {
+                        value: dialog_scope.pattern.value,
+                        message: dialog_scope.pattern.message
+                    },
+                    required: {
+                        value: dialog_scope.required.value,
+                        message: dialog_scope.required.message
+                    }
+                };
+
+                FormBuilderService.AddElement(ElementsService.HtmlField(dialog_scope.key, validator));
+            }, (): void => {
+            });
+        };
+
         let addTextArea = (): void => {
 
             let modalRegist: any = $uibModal.open({
@@ -1072,6 +1108,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
         $scope.addDiv = addDiv;
         $scope.addForm = addForm;
         $scope.addField = addField;
+        $scope.addHtmlField = addHtmlField;
         $scope.addTextArea = addTextArea;
         $scope.addNumber = addNumber;
         $scope.addHtml = addHtml;

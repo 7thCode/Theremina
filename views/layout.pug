@@ -34,7 +34,7 @@ html(lang="ja")
         .wrapper(style="overflow:scroll;")
             header.main-header(style="margin-top:1rem;")
                 include applications/front/partial/front_sidebar
-            .content-wrapper(style="padding-top: 50px;height:100vh;overflow:scroll;")
+            .content-wrapper(style="height:auto;overflow:scroll;")
                 block content
 
 include ./systems/common/scripts
@@ -42,7 +42,7 @@ include ./services/common/scripts
 include ./plugins/common/scripts
 include ./applications/common/scripts
 
-
 // AdminLTE
+script(src='/bower_components/jquery-slimscroll/jquery.slimscroll.js')
 script(src='/bower_components/AdminLTE/dist/js/app.min.js')
 // AdminLTE

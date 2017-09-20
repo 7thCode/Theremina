@@ -121,7 +121,7 @@ namespace ScannerBehavior {
 
         public models: any[];
 
-        private default_query:any;
+        private default_query: any;
 
         constructor(parent_name: string, name: string, id: string, params: any, isdocument: boolean, models: any) {
             this.parent_name = parent_name;
@@ -130,7 +130,7 @@ namespace ScannerBehavior {
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
-            this.default_query = {"userid":this.id};
+            this.default_query = {"userid": this.id};
 
             this.filters = {
                 date: (result: string, param: string) => {
@@ -150,9 +150,15 @@ namespace ScannerBehavior {
         }
 
         private ParseQueryFormat(query: any) {
-            let params: any = new Params();
-            params.FromQueryFormat(query);
-            return params.ToParams();
+            let result = null;
+            if (query == "#query:self") {
+                result = this.page_params;
+            } else {
+                let params: any = new Params();
+                params.FromQueryFormat(query);
+                result = params.ToParams();
+            }
+            return result;
         }
 
         public GetDatasource(query: any, parent: any): any {// db query
@@ -162,7 +168,7 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = {"$and":[this.default_query,JSON.parse(query_object.q)]} ;
+                    _query = {"$and": [this.default_query, JSON.parse(query_object.q)]};
                 } catch (e) {
 
                 }
@@ -215,7 +221,7 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = {"$and":[this.default_query,JSON.parse(query_object.q)]};
+                    _query = {"$and": [this.default_query, JSON.parse(query_object.q)]};
                 } catch (e) {
 
                 }
@@ -304,6 +310,7 @@ namespace ScannerBehavior {
 
                 // parse object path
                 if (path) {
+
                     let isObject = (value: any): boolean => {
                         let result: boolean = false;
                         if (value !== null) {
@@ -494,7 +501,12 @@ namespace ScannerBehavior {
                 return result;
             };
 
-            let page_length: number = parseInt(query_object.l, 10);
+
+            let page_length = parseInt(query_object.l, 10);
+            if (!page_length) {
+                page_length = 1;
+            }
+
             let page_start: number = parseInt(query_object.s, 10);
 
             let index = 0;
