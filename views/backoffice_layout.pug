@@ -21,11 +21,11 @@ html(lang="ja")
         include ./plugins/common/stylesheets
         include ./applications/common/stylesheets
 
-    body.control.hold-transition.skin-blue.sidebar-mini.fixed#body(ng-app="BackOfficeApplication", ng-controller="BackOfficeController")
+    body.control.hold-transition.sidebar-mini.fixed#body(ng-app="BackOfficeApplication", ng-controller="BackOfficeController")
         .wrapper
             header.main-header
                 include services/backoffice/partial/backoffice_sidebar
-            .content-wrapper(style="padding-top: 50px;height:100vh;overflow:scroll;")
+            .content-wrapper(style="height:auto;overflow:scroll;")
                 block content
 
 include ./systems/common/scripts
@@ -34,5 +34,6 @@ include ./plugins/common/scripts
 include ./applications/common/scripts
 
 // AdminLTE
+script(src='/bower_components/jquery-slimscroll/jquery.slimscroll.js')
 script(src='/bower_components/AdminLTE/dist/js/app.min.js')
 // AdminLTE

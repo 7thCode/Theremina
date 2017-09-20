@@ -150,7 +150,7 @@ AuthControllers.controller('LoginController', ["$scope", "$rootScope", "$documen
             $window.location.href = ref;
         };
         $scope.$on('Login', () => {
-            $window.location.href = "//" + $window.location.host + "/front";
+            $window.location.href = "//" + $window.location.host + "/pages";
         });
         $scope.$on('Logout', () => {
             $window.location.href = "//" + $window.location.host + "/";

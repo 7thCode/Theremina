@@ -41,6 +41,7 @@
     "angular-loading-bar": "^0.9.0",
     "cryptico": "*",
     "textAngular": "^1.5.16",
-    "js-load-image-bower": "^2.6.1"
+    "js-load-image-bower": "^2.6.1",
+    "jquery-slimscroll": "slimscroll#^1.3.8"
   }
 }

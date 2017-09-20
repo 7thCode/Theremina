@@ -128,6 +128,14 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                                 let value = $scope[name];
                                 switch (element.type) {
                                     case "field":
+                                        switch (control.type) {
+                                            case "html":
+                                                type = "html";
+                                                break;
+                                            default:
+                                                type = "quoted";
+                                        }
+                                        break;
                                     case "select":
                                         type = "quoted";
                                         break;

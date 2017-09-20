@@ -319,8 +319,13 @@
     
     を一つの要素とし、複数の要素を連結する。
     
-    co::Article;q::{"content.type.value":"a"};l::10;s::2;so::{"name":1};      
+    co::Article;q::{"content.type.value":"a"};l::10;s::2;so::{"name":1};  
     
+    以下は、URLに含まれるクエリーを表す
+    
+    #query:self
+    
+ 
 #####Include
 
     HEAD要素内
@@ -329,9 +334,6 @@
     BODY要素内    
         <ds:include src='url'></ds:include>
         
-        
-        
-    
 #####resolve    
     
     <ds:resolve query='query'></ds:resolve>

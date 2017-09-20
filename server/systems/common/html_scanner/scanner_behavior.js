@@ -106,9 +106,16 @@ var ScannerBehavior;
             };
         }
         ParseQueryFormat(query) {
-            let params = new Params();
-            params.FromQueryFormat(query);
-            return params.ToParams();
+            let result = null;
+            if (query == "#query:self") {
+                result = this.page_params;
+            }
+            else {
+                let params = new Params();
+                params.FromQueryFormat(query);
+                result = params.ToParams();
+            }
+            return result;
         }
         GetDatasource(query, parent) {
             let query_object = this.ParseQueryFormat(query);
@@ -417,6 +424,9 @@ var ScannerBehavior;
                 return result;
             };
             let page_length = parseInt(query_object.l, 10);
+            if (!page_length) {
+                page_length = 1;
+            }
             let page_start = parseInt(query_object.s, 10);
             let index = 0;
             for (var count = 0; count < record_count; count += page_length) {
