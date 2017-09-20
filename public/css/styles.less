@@ -9,30 +9,34 @@
   font-weight:500;
 }
 
+@wrapper-color : #1565C0;
+@sidebar-color : #1A237E;
+@navbar-color : #e53935;
+
 .wrapper-color {
-  background: #1565C0;
+  background: @wrapper-color;
 }
 
 .sidebar-color {
-  background:#1A237E;
+  background: @sidebar-color;
 }
 
 .navbar-color {
-  background-color: #e53935;
-  border: 0;
+  background: @navbar-color;
+
 }
 
 .wrapper-color-invert {
-  background: darken(#1565C0, 20%);
+  background: darken(@wrapper-color, 20%);
 }
 
 .sidebar-color-invert {
-  background:darken(#1A237E, 20%);
+  background:darken(@sidebar-color, 20%);
 }
 
 .navbar-color-invert {
-  background-color: darken(#e53935, 20%);
-  border: 0;
+  background: darken(@navbar-color, 20%);
+
 }
 
 .pallete-background {

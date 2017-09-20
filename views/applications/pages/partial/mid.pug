@@ -2,13 +2,13 @@
     .box-header.with-border
         .h7(ng-bind="name")
         .row
-                .col-xs-1
-                    a.btn.btn-sm.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/{{userid}}/doc/{{name}}" target="_blank" type="button", aria-label="") Open
-                .col-xs-10
-                    .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/doc/{{name}}
-                .col-xs-1
-                    button.btn.btn-sm.btn-info(type='button', ng-click="Close();" )
-                        i.fa.fa-times-circle
+            .col-xs-1
+                a.btn.btn-sm.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/{{userid}}/doc/{{name}}" target="_blank" type="button", aria-label="") Open
+            .col-xs-10
+                .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/doc/{{name}}
+            .col-xs-1
+                button.btn.btn-sm.btn-info(type='button', ng-click="Close();" )
+                    i.fa.fa-times-circle
     .box-body
         .row-fluid(ng-show="inner_preview")
             .col-xs-6

@@ -32,19 +32,19 @@ html(lang="ja")
 
     body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController",style="background:#eeeeee;")
         .wrapper
-                header.main-header(style="margin-top:1rem;")
-                    include ./partial/front_sidebar
-                if user
-                    .content-wrapper(style="padding-top: 50px;overflow:scroll;")
-                        include ../common/navbar
-                        include ./partial/logged
+            header.main-header(style="margin-top:1rem;")
+            if user
+                include ./partial/front_sidebar
+                .content-wrapper(style="padding-top: 50px;overflow:scroll;")
+                    include ../common/navbar
+                    include ./partial/logged
 
-                else
-                    div
-                        include ../common/no_logged_navbar
-                        include ./partial/no_logged
+            else
+                div
+                    include ../common/no_logged_navbar
+                    include ./partial/no_logged
 
-                    guidance(scenario="{{scenario}}")
+                guidance(scenario="{{scenario}}")
 
 include ../../systems/common/scripts
 include ../../services/common/scripts

@@ -234,7 +234,6 @@ export namespace PageRouter {
         result.render('applications/blob/dialogs/delete_confirm_dialog', {message: message});
     }]);
 
-
     // Members
     router.get("/members", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
         response.render("applications/members/index", {
@@ -369,8 +368,6 @@ export namespace PageRouter {
             }
         });
     }]);
-
-
 
 }
 

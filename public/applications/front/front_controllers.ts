@@ -3700,8 +3700,8 @@ FrontControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalI
     }]);
 
 
-FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'DataService',
-    ($scope: any, $q: any, $document: any, $uibModal: any, $log: any, DataService: any): void => {
+FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'ProfileService','DataService',
+    ($scope: any, $q: any, $document: any, $uibModal: any, $log: any,ProfileService, DataService: any): void => {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -3732,6 +3732,12 @@ FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document
             }, (): void => {
             });
         };
+
+        ProfileService.Get((self: any): void => {
+            if (self) {
+                $scope.userid = self.userid;
+            }
+        }, error_handler);
 
         $document.on('drop dragover', (e: any): void => {
             e.stopPropagation();

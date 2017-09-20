@@ -2619,7 +2619,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             if (ShapeEdit.SelectedCount() === 1) {
                 if (shape.Parent().IsRoot()) {
                     switch (shape.type) {
-                        case "Text":
+                        case "Text"://for inPlace Input  only Text
                             $scope.$evalAsync(// $apply
                             function ($scope) {
                                 let id = shape.ID();
@@ -3174,8 +3174,8 @@ FrontControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalI
             $uibModalInstance.dismiss();
         };
     }]);
-FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'DataService',
-    ($scope, $q, $document, $uibModal, $log, DataService) => {
+FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'ProfileService', 'DataService',
+    ($scope, $q, $document, $uibModal, $log, ProfileService, DataService) => {
         let progress = (value) => {
             $scope.$emit('progress', value);
         };
@@ -3202,6 +3202,11 @@ FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document
             }, () => {
             });
         };
+        ProfileService.Get((self) => {
+            if (self) {
+                $scope.userid = self.userid;
+            }
+        }, error_handler);
         $document.on('drop dragover', (e) => {
             e.stopPropagation();
             e.preventDefault();
