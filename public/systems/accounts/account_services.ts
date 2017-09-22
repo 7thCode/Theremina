@@ -34,7 +34,7 @@ AccountServices.factory('AccountCount', ['$resource',
 AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCount', 'CollectionService',
     function (Account:any, AccountQuery: any, AccountCount: any, CollectionService: any): void {
 
-        this.SetQuery = (query) => {
+        this.SetQuery = (query):void => {
             this.option.skip = 0;
             this.query = {};
             if (query) {
@@ -42,12 +42,12 @@ AccountServices.service('AccountService', ['Account','AccountQuery', 'AccountCou
             }
         };
 
-        let init = () => {
+        let init = ():void => {
             this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
         };
 
-        this.Init = () => {
+        this.Init = ():void => {
             init();
         };
 

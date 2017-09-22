@@ -139,36 +139,36 @@
 ###URL
     
     
-    USERID --|
-             |-----doc--------|
-             |                |
-             |                |----img------|
-             |                |             |
-             |                |
-             |                |
-             |                |----js-------|
-             |                |             |
-             |                |
-             |                |
-             |                |----css------|
-             |                |             |
-             |                |
-             |                |
-             |                |
-             |                |
-             |                
-             |
-             |----static------|
-             |                |
-             |
-             |
-             |----fragment----|
-                              |
+    USERID --- NAMESPACE ---|
+                            |-----doc--------|
+                            |                |
+                            |                |----img------|
+                            |                |             |
+                            |                |
+                            |                |
+                            |                |----js-------|
+                            |                |             |
+                            |                |
+                            |                |
+                            |                |----css------|
+                            |                |             |
+                            |                |
+                            |                |
+                            |                |
+                            |                |
+                            |                
+                            |
+                            |----static------|
+                            |                |
+                            |
+                            |
+                            |----fragment----|
+                                             |
 
 
 
     レンダリングを行い、ドキュメントを返す。
-    http://DOMAIN/USERID/doc/PAGENAME?co=COLLECTION&q=QUERY&s=SKIP&l=LIMIT&so=SORT
+    http://DOMAIN/USERID/NAMESPACE/doc/PAGENAME?co=COLLECTION&q=QUERY&s=SKIP&l=LIMIT&so=SORT
     
     PAGENAME ::= resource_name
     COLLECTION ::= コレクション名
@@ -179,7 +179,7 @@
     
     
     レンダリングを行い、フラグメントを返す。
-    http://DOMAIN/USERID/fragment/DOCUMENTNAME/FRAGMENTNAME?co=COLLECTION&q=QUERY&s=SKIP&l=LIMIT&so=SORT
+    http://DOMAIN/USERID/NAMESPACE/fragment/DOCUMENTNAME/FRAGMENTNAME?co=COLLECTION&q=QUERY&s=SKIP&l=LIMIT&so=SORT
 
     DOCUMENTNAME ::= resource_name
     FRAGMENTNAME ::= resource_name
@@ -192,11 +192,17 @@
     フラグメントは呼び元のドキュメント名とクエリーを引き継ぐ。
      
     
-    レンダリングを行わず、フラグメントを返す。
-    http://DOMAIN/USERID/direct/FRAGMENTNAME
+    レンダリングを行わず、documentを返す。
+    http://DOMAIN/USERID/NAMESPACE/static/FRAGMENTNAME
         
+    レンダリングを行わず、jsを返す。
+    http://DOMAIN/USERID/NAMESPACE/doc/js/FRAGMENTNAME
+    
+    レンダリングを行わず、cssを返す。
+    http://DOMAIN/USERID/NAMESPACE/doc/css/FRAGMENTNAME
+               
     画像
-    http://DOMAIN/USERID/photos/FILENAME
+    http://DOMAIN/USERID/NAMESPACE/doc/img/FILENAME
             
         
 ####要素
@@ -419,10 +425,10 @@
         <!DOCTYPE html>
         <html lang="ja">
             <head>
-                <meta ds:include="/|{#userid}|/fragment/|{#name:self}|/head"/>
+                <meta ds:include="/|{#userid}|/n/fragment/|{#name:self}|/head"/>
             </head>
         	<body>
-        	    <ds:include src='/|{#userid}|/fragment/|{#name:self}|/nav|{#query:self}'></ds:include>
+        	    <ds:include src='/|{#userid}|/n/fragment/|{#name:self}|/nav|{#query:self}'></ds:include>
         	    <div class="container" style="margin-top:70px;">
         	        <div class="jumbotron jumbotron-fluid">
                         <div class="container">
@@ -458,7 +464,7 @@
         	                </div>
         	            </div>
         	            <div class="d-flex justify-content-center">
-        	                <ds:include src='/|{#userid}|/fragment/|{#name:self}|/pagenator|{#query:self}'></ds:include>
+        	                <ds:include src='/|{#userid}|/n/fragment/|{#name:self}|/pagenator|{#query:self}'></ds:include>
                         </div>
         	        </div>
         	        <div class="card">
@@ -482,7 +488,7 @@
         	            </div>
         	        </div>
                 </div>
-                <ds:include src='/|{#userid}|/fragment/|{#name:self}|/scripts'></ds:include>
+                <ds:include src='/|{#userid}|/n/fragment/|{#name:self}|/scripts'></ds:include>
             </body>
         </html>
     
