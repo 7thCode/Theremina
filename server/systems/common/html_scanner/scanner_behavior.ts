@@ -115,6 +115,7 @@ namespace ScannerBehavior {
         public name: string = "";
         public parent_name: string = "";
         public id: string = "";
+        public namespace:string;
         public page_params: any;
         public isdocument: boolean;
         public filters: {};
@@ -123,10 +124,11 @@ namespace ScannerBehavior {
 
         private default_query: any;
 
-        constructor(parent_name: string, name: string, id: string, params: any, isdocument: boolean, models: any) {
+        constructor(parent_name: string, name: string, id: string, namespace:string, params: any, isdocument: boolean, models: any) {
             this.parent_name = parent_name;
             this.name = name;
             this.id = id;
+            this.namespace = namespace;
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
@@ -291,6 +293,9 @@ namespace ScannerBehavior {
                     case "{#userid}" :
                         appender = this.id;
                         break;
+                    case "{#namespace}" :
+                        appender = this.namespace;
+                        break;
                     case "{#query:self}" :
                         appender = this.Query(this.page_params);
                         break;
@@ -358,6 +363,9 @@ namespace ScannerBehavior {
                                     break;
                                 case "#userid" :
                                     result = this.id;
+                                    break;
+                                case "#namespace" :
+                                    result = this.namespace;
                                     break;
                                 case "#query" :
                                     switch (postfix) {

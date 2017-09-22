@@ -94,7 +94,8 @@ export namespace AccountModule {
          */
         public delete_own(request: any, response: any): void {
             let userid = Accounts.userid(request);
-            Wrapper.FindOne(response, 5100, LocalAccount, {userid: userid}, (response: any, page: any): void => {
+            let namespace = "";
+            Wrapper.FindOne(response, 5100, LocalAccount, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
                     Wrapper.Remove(response, 5100, page, (response: any): void => {
                         Wrapper.SendSuccess(response, {});

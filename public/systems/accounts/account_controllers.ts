@@ -13,7 +13,7 @@ let AccountControllers: angular.IModule = angular.module('AccountControllers', [
 AccountControllers.controller('AccountController', ['$scope', '$document', '$log', '$uibModal', 'AccountService',
     ($scope: any, $document: any, $log: any, $uibModal: any, AccountService: any): void => {
 
-        let progress = (value) => {
+        let progress = (value:any):void => {
             $scope.$emit('progress', value);
         };
 
@@ -28,7 +28,7 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
             alert(message);
         };
 
-        let alert = (message): void => {
+        let alert = (message:string): void => {
             let modalInstance: any = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
@@ -48,7 +48,7 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
             e.preventDefault();
         });
 
-        let Draw = () => {
+        let Draw = ():void => {
             AccountService.Query((result: any): void => {
                 if (result) {
                     $scope.accounts = result;
@@ -66,7 +66,7 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
             }, error_handler);
         };
 
-        let Next = () => {
+        let Next = ():void => {
             progress(true);
             AccountService.Next((result) => {
                 if (result) {
@@ -78,7 +78,7 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
             }, error_handler);
         };
 
-        let Prev = () => {
+        let Prev = ():void => {
             progress(true);
             AccountService.Prev((result) => {
                 if (result) {
@@ -90,7 +90,7 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
             }, error_handler);
         };
 
-        let Find = (name) => {
+        let Find = (name):void => {
             if (name) {
                 AccountService.query = {username: {$regex: name}};
             }
