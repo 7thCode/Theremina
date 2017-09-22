@@ -23,21 +23,21 @@
                                     span(ng-messages="validate.nickname.$error")
                                         span.error-message(ng-message="required") #{message.required}
                                         span.error-message(ng-message="maxlength") #{message.long}
-                                    input.form-control.no-zoom#nickname(ng-model='nickname', type='text', name='nickname', placeholder='xxxxxxx', required, ng-maxlength="30",data-toggle="tooltip" data-placement="top" title=message.nickname)
+                                    input.form-control.no-zoom#nickname(ng-model='nickname', type='text', name='nickname', placeholder='xxxxxxx', required, ng-maxlength="30", data-toggle="tooltip", data-placement="top", title=message.nickname)
 
                     .col-xs-12
                         label.control-label(for="mails") #{message.mail}
-                        chips(ng-model='mails',style="height: 36px;")
+                        chips(ng-model='mails', style="height: 36px;")
                             chip-tmpl
                                 .default-chip {{chip}}
                                     span.fa.fa-times(remove-chip='')
-                            input#mails(name="mails",style="background-color:transparent;" chip-control,data-toggle="tooltip" data-placement="top" title=message.mail)
+                            input#mails(name="mails", style="background-color:transparent;", chip-control, data-toggle="tooltip", data-placement="top", title=message.mail)
                     .col-xs-12
                         .row(style="margin-top:3rem")
                             .col-xs-2.col-xs-offset-5
-                                button.btn.btn-primary#save(style="width:100%",type="button" ,ng-click='Save();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty",data-toggle="tooltip" data-placement="top" title=message.update, aria-label="") #{message.update}
+                                button.btn.btn-primary#save(style="width:100%", type="button", ng-click='Save();validate.$dirty = false;', ng-disabled="progress || validate.$invalid || !validate.$dirty", data-toggle="tooltip", data-placement="top", title=message.update, aria-label="") #{message.update}
 
                     .col-xs-12
                         .row(style="margin-top:3rem")
                             .col-xs-2.col-xs-offset-5
-                                button.btn.btn-danger#help(style="width:100%",type="button" ,ng-click='to(0)', aria-label="") #{message.help}
+                                button.btn.btn-danger#help(style="width:100%", type="button", ng-click='to(0)', aria-label="") #{message.help}

@@ -137,7 +137,8 @@ export namespace FrontModule {
          * @returns none
          */
         static get_article_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            ArticleModel.find({userid: userid}, {}, {}).then((docs: any): void => {
+            let namespace = "";
+            ArticleModel.find({$and: [{namespace:namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -154,7 +155,8 @@ export namespace FrontModule {
          * @returns none
          */
         static get_resource_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            ResourceModel.find({userid: userid}, {}, {}).then((docs: any): void => {
+            let namespace = "";
+            ResourceModel.find({$and: [{namespace:namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -270,9 +272,10 @@ export namespace FrontModule {
                 _.forEach(docs, (doc) => {
                     let name: string = doc.name;
                     let userid = user.userid;
+                    let namespace = "";
                     let type: string = doc.type;
                     let content: any = doc.content;
-                    ResourceModel.findOne({$and: [{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                    ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
                         if (!found) {
                             let page: any = new ResourceModel();
                             page.userid = userid;
@@ -305,9 +308,10 @@ export namespace FrontModule {
                 _.forEach(docs, (doc) => {
                     let name: string = doc.name;
                     let userid = user.userid;
+                    let namespace = "";
                     let type: string = doc.type;
                     let content: any = doc.content;
-                    ArticleModel.findOne({$and: [{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                    ArticleModel.findOne({$and: [{namespace:namespace},{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
                         if (!found) {
                             let page: any = new ArticleModel();
                             page.userid = userid;
@@ -383,7 +387,6 @@ export namespace FrontModule {
             let copy = (resourcename: any): any => {
 
                 let copy_resource = (resolve: any, reject: any): void => {
-
                     ResourceModel.findOne({$and: [{namespace: namesapce}, {userid: config.systems.userid}, {name: resourcename.original}, {type: 30}]}, {}, {}).then((doc: any): void => {
                         if (doc) {
                             let name: string = resourcename.target;
@@ -432,8 +435,9 @@ export namespace FrontModule {
                     ArticleModel.findOne({$and: [{userid: config.systems.userid}, {name: resourcename.original}]}, {}, {}).then((doc: any): void => {
                         if (doc) {
                             let name: string = resourcename.target;
+                            let namespace = "";
                             let content: any = doc.content;
-                            ArticleModel.findOne({$and: [{userid: userid}, {name: name}]}).then((found: any): void => {
+                            ArticleModel.findOne({$and: [{namespace:namespace},{userid: userid}, {name: name}]}).then((found: any): void => {
                                 if (!found) {
                                     let article: any = new ArticleModel();
                                     article.userid = userid;
@@ -455,17 +459,10 @@ export namespace FrontModule {
                 };
 
                 let copy_file = (resolve: any, reject: any): void => {
-
                     let name: string = resourcename.target;
                     let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
                     if (gfs) {
-                        let query = {};
-                        if (config.structured) {
-                            query = {$and: [{filename: resourcename.original}, {"metadata.namespace": ""}, {"metadata.userid": config.systems.userid}]};
-                        } else {
-                            query = {$and: [{filename: resourcename.original}, {"metadata.userid": config.systems.userid}]};
-                        }
-
+                        let query = {$and: [{filename: resourcename.original}, {"metadata.userid": config.systems.userid}]};
                         gfs.findOne(query, (error: any, item: any): void => {
                             if (!error) {
                                 if (item) {
@@ -523,8 +520,8 @@ export namespace FrontModule {
             };
 
             let conn = Pages.connect(config.db.user);
-            let collection = null;
-            let bucket = null;
+            //let collection = null;
+            //let bucket = null;
             if (conn) {
                 conn.once('open', (error: any): void => {
                     if (!error) {
@@ -545,6 +542,9 @@ export namespace FrontModule {
             }
 
         }
+
+
+
     }
 
     const MailerModule: any = require('../../../systems/common/mailer');
@@ -611,6 +611,8 @@ export namespace FrontModule {
                 let path = referer_url.pathname;
                 let separated_path = path.split("/");
                 let userid = separated_path[2];
+                let namespace = "";
+
                 if (userid) {
                     if (request.body.content) {
                         if (request.body.content.thanks) {
@@ -619,28 +621,28 @@ export namespace FrontModule {
                                 let report_to = request.body.content.report;
 
                                 let content = {};
-                                Object.keys(request.body.content).forEach((key) => {
+                                Object.keys(request.body.content).forEach((key):void => {
                                     content[key] = {"value": request.body.content[key], "type": "quoted"};
                                 });
-                                ResourceModel.findOne({$and: [{userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
-                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, null, true, {});
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid,namespace, null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                             create: "",
                                             modify: "",
                                             content: content
                                         }, (error: any, doc: string) => {
                                             if (!error) {
-                                                mailer.send(report_to, report_title, doc, (error: any) => {
+                                                mailer.send(report_to, report_title, doc, (error: any):void => {
                                                     if (!error) {
-                                                        ResourceModel.findOne({$and: [{userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                                        ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
-                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, null, true, {});
+                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid,namespace, null, true, {});
                                                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                                                     create: "",
                                                                     modify: "",
                                                                     content: content
-                                                                }, (error: any, doc: string) => {
+                                                                }, (error: any, doc: string):void => {
                                                                     if (!error) {
                                                                         mailer.send(thanks_to, thanks_title, doc, (error: any) => {
                                                                             if (!error) {
@@ -701,8 +703,9 @@ export namespace FrontModule {
          */
         public get_member(request: any, response: any): void {
             let userid = Members.userid(request);
+            let namespace = "";
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2 = {$and: [query, {namespace:namespace},{userid: userid}]};
 
             Wrapper.FindOne(response, 1000, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -720,8 +723,9 @@ export namespace FrontModule {
          */
         public put_member(request: any, response: any): void {
             let userid = Members.userid(request);
+            let namespace = "";
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2 = {$and: [query, {namespace:namespace},{userid: userid}]};
 
             Wrapper.FindOne(response, 1100, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -744,9 +748,10 @@ export namespace FrontModule {
          */
         public get_member_query_query(request: any, response: any): void {
             let userid = Members.userid(request);
+            let namespace = "";
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2 = {$and: [query,{namespace:namespace}, {userid: userid}]};
 
             Wrapper.Find(response, 5000, LocalAccount, query2, {}, option, (response: any, accounts: any): any => {
                 Wrapper.SendSuccess(response, accounts);
@@ -775,7 +780,8 @@ export namespace FrontModule {
          */
         public delete_own(request: any, response: any): void {
             let userid = Members.userid(request);
-            let query: any = {userid: userid};
+            let namespace = "";
+            let query: any = {$and:[{namespace:namespace},{userid: userid}]};
 
             Wrapper.FindOne(response, 5100, LocalAccount, query, (response: any, page: any): void => {
                 if (page) {
@@ -802,7 +808,7 @@ export namespace FrontModule {
             }
             return result;
         }
-
+/*
         static namespace(name: string): string {
             let result = "";
             if (name) {
@@ -817,7 +823,7 @@ export namespace FrontModule {
             }
             return result;
         }
-
+*/
         static localname(name: string): string {
             let result = "";
             if (name) {
@@ -837,6 +843,14 @@ export namespace FrontModule {
 
         static username(request): string {
             return request.user.username;
+        }
+
+        static retrieve_account(userid, callback: (error: { code: number, message: string }, result: any) => void) {
+            LocalAccount.findOne({username: userid}).then((account: any): void => {
+                callback(null, account);
+            }).catch((error: any): void => {
+                callback(error, null);
+            });
         }
 
         static result_file(conn, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
@@ -878,9 +892,10 @@ export namespace FrontModule {
         public get_photo(request: any, response: any, next: any): void {
             try {
                 let conn = Pictures.connect(config.db.user);
-                let namespace = Pictures.namespace(request.params.name);
+                let namespace: string = request.params.namespace;
+             //   let namespace = Pictures.namespace(request.params.name);
                 let name = Pictures.localname(request.params.name);
-                let userid = request.params.userid;
+             //   let userid = request.params.userid;
                 let size = request.query;
 
                 conn.once('open', (error: any): void => {
@@ -890,51 +905,62 @@ export namespace FrontModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-
-                                        let query = {};
-                                        if (config.structured) {
-                                            query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                        } else {
-                                            query = {$and: [{filename: name}, {"metadata.userid": userid}]};
-                                        }
-
-                                        collection.findOne(query, (error: any, item: any): void => {
+                                        let userid: string = request.params.userid;
+                                        Pictures.retrieve_account(userid, (error:any, account:any):void => {
                                             if (!error) {
-                                                if (item) {
-                                                    let readstream = gfs.createReadStream({_id: item._id});
-                                                    if (readstream) {
-                                                        let type = item.metadata.type;
-                                                        response.setHeader("Content-Type", type);
-                                                        response.setHeader("Cache-Control", config.cache);
-                                                        readstream.on('close', (): void => {
-                                                            conn.db.close();
-                                                        });
+                                                if (account) {
+                                                    userid = account.userid;
+                                                }
 
-                                                        readstream.on('error', (error: any): void => {
-                                                            conn.db.close();
-                                                        });
+                                                let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                                collection.findOne(query, (error: any, item: any): void => {
+                                                    if (!error) {
+                                                        if (item) {
+                                                            let readstream = gfs.createReadStream({_id: item._id});
+                                                            if (readstream) {
+                                                                let type = item.metadata.type;
+                                                                response.setHeader("Content-Type", type);
+                                                                response.setHeader("Cache-Control", config.cache);
+                                                                readstream.on('close', (): void => {
+                                                                    conn.db.close();
+                                                                });
 
-                                                        try {
-                                                            if (type == "image/jpeg" || type == "image/png" || type == "image/gif") {
-                                                                if (size.w && size.h) {
-                                                                    if (size.l && size.t) {
-                                                                        /*
-                                                                        // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
-                                                                        let extractor = sharp().extract({
-                                                                            left: parseInt(size.l),
-                                                                            top: parseInt(size.t),
-                                                                            width: parseInt(size.w),
-                                                                            height: parseInt(size.h)
-                                                                        });
-                                                                        readstream = readstream.pipe(extractor);
-                                                                        */
+                                                                readstream.on('error', (error: any): void => {
+                                                                    conn.db.close();
+                                                                });
+
+                                                                try {
+                                                                    if (type == "image/jpeg" || type == "image/png" || type == "image/gif") {
+                                                                        if (size.w && size.h) {
+                                                                            if (size.l && size.t) {
+                                                                                /*
+                                                                                // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                                                                                let extractor = sharp().extract({
+                                                                                    left: parseInt(size.l),
+                                                                                    top: parseInt(size.t),
+                                                                                    width: parseInt(size.w),
+                                                                                    height: parseInt(size.h)
+                                                                                });
+                                                                                readstream = readstream.pipe(extractor);
+                                                                                */
+                                                                            }
+                                                                            let resizer = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
+                                                                            readstream = readstream.pipe(resizer);
+                                                                        }
                                                                     }
-                                                                    let resizer = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
-                                                                    readstream = readstream.pipe(resizer);
+                                                                    readstream.pipe(response);
+                                                                } catch (e) {
+                                                                    // NOT FOUND IMAGE.
+                                                                    Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                                        conn.db.close();
+                                                                        next();
+                                                                    });
                                                                 }
+                                                            } else {
+                                                                conn.db.close();
+                                                                next();
                                                             }
-                                                            readstream.pipe(response);
-                                                        } catch (e) {
+                                                        } else {
                                                             // NOT FOUND IMAGE.
                                                             Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
                                                                 conn.db.close();
@@ -945,13 +971,7 @@ export namespace FrontModule {
                                                         conn.db.close();
                                                         next();
                                                     }
-                                                } else {
-                                                    // NOT FOUND IMAGE.
-                                                    Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
-                                                        conn.db.close();
-                                                        next();
-                                                    });
-                                                }
+                                                });
                                             } else {
                                                 conn.db.close();
                                                 next();
@@ -979,9 +999,7 @@ export namespace FrontModule {
                 next();
             }
         }
-
     }
-
 
 }
 

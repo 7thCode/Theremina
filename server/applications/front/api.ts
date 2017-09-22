@@ -24,7 +24,7 @@ export namespace ApiRouter {
     const asset: any = new FrontModule.Asset;
     const pictures: any = new FrontModule.Pictures;
 
-    router.get('/:userid/doc/img/:name', pictures.get_photo);
+    router.get('/:userid/:namespace/doc/img/:name', pictures.get_photo);
 
     router.put('/api/upload/:name', [exception.exception, exception.authenticate,pages.put_all]);
     router.get('/api/download', [exception.exception, exception.authenticate, pages.get_all]);
@@ -43,8 +43,8 @@ export namespace ApiRouter {
     router.delete('/members/api/own', [exception.exception, exception.guard, exception.authenticate, members.delete_own]);
 
     event.emitter.on('register', (param: any): void => {
-        pages.create_init_user_resources(param.user);
-        pages.create_init_user_articles(param.user);
+     //   pages.create_init_user_resources(param.user);
+     //   pages.create_init_user_articles(param.user);
     });
 
 }

@@ -3,9 +3,9 @@
         .h7(ng-bind="name")
         .row
             .col-xs-1
-                a.btn.btn-sm.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/{{userid}}/doc/{{name}}" target="_blank" type="button", aria-label="") Open
+                a.btn.btn-sm.btn-warning.pull-left(href= config.protocol + "://" + config.domain + "/{{userid}}/n/doc/{{name}}" target="_blank" type="button", aria-label="") Open
             .col-xs-10
-                .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/doc/{{name}}
+                .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/n/doc/{{name}}
             .col-xs-1
                 button.btn.btn-sm.btn-info(type='button', ng-click="Close();" )
                     i.fa.fa-times-circle
@@ -20,7 +20,7 @@
             .col-xs-12
                 div(ui-ace="aceOption", ng-model='resource', style="height: 70vh;")
 
-.box.box-primary(style="margin-top:12px;" ng-hide="opened" flow-init)
+.box.box-primary(style="margin-top:12px;", ng-hide="opened", flow-init)
     .box-header.with-border
         div
             .box-tools.pull-right
@@ -32,6 +32,8 @@
                     i.fa.fa-plus-circle.text-primary
 
             include ../../../applications/common/find
+
+            button.btn.btn-info(ng-click="SetNamespace('n')") Set Namespace
 
     .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title=message.filedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")

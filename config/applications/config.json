@@ -445,7 +445,7 @@
       }
      },
      "id": "root_2",
-     "type": "field",
+     "type": "html",
      "kind": "control"
     },
     {
@@ -851,8 +851,8 @@
   }
  ],
  "redirect": {
-  "/": "/000000000000000000000000/doc/index.html",
-  "index": "/000000000000000000000000/doc/index.html"
+  "/": "/000000000000000000000000/n/doc/index.html",
+  "index": "/000000000000000000000000/n/doc/index.html"
  },
  "services": [
   {

@@ -294,7 +294,7 @@ export namespace PageRouter {
         }
     };
 
-    router.get("/:userid/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    let render_static = (request:any, response:any):void => {
         resources.render_direct(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -304,33 +304,21 @@ export namespace PageRouter {
                 Error(error, request, response);
             }
         });
+    };
+
+    router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        render_static(request, response);
     }]);
 
-    router.get("/:userid/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        resources.render_direct(request, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
+    router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        render_static(request, response);
     }]);
 
-    router.get("/:userid/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        resources.render_direct(request, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
+    router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        render_static(request, response);
     }]);
 
-    router.get("/:userid/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    let render_html = (request:any, response:any):void => {
         resources.render_html(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -355,9 +343,17 @@ export namespace PageRouter {
                 Error(error, request, response);
             }
         });
+    };
+
+    router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        render_html(request, response);
     }]);
 
-    router.get("/:userid/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+  //  router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+  //      render_html(request, response);
+  //  }]);
+
+    router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});

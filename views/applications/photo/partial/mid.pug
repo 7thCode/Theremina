@@ -11,6 +11,9 @@
             .col-xs-12
                 include ../../../systems/common/next_prev
 
+                button.btn.btn-info(ng-click="SetNamespace('n')") Set Namespace
+
+
     .box-body(style="height:auto;min-height:80vh;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title=message.picturedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="file in files")
@@ -20,8 +23,8 @@
                     button.btn.btn-success.btn-xs(ng-click="editPhoto(file.filename);", style="position:relative;top:10px;left:10.5rem;border-radius: 10px")
                         i.fa.fa-pencil(aria-hidden="true")
                     div(style="height:8rem;",data-toggle="tooltip", data-placement="top", title="{{file.filename}}")
-                        a(download ng-href="/" + '{{file.metadata.userid}}' + "/doc/img/" + '{{file.filename}}', target="_blank")
-                            img.center-block.thumbnail(ng-src="/" + '{{file.metadata.userid}}' + "/doc/img/" + '{{file.filename}}' + "?w=64&h=64", style="max-height:8rem;max-width:8rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+                        a(download ng-href="/" + '{{file.metadata.userid}}' + "/n/doc/img/" + '{{file.filename}}', target="_blank")
+                            img.center-block.thumbnail(ng-src="/" + '{{file.metadata.userid}}' + "/n/doc/img/" + '{{file.filename}}' + "?w=64&h=64", style="max-height:8rem;max-width:8rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
                     div(style="height:8rem;text-align:center;")
                         .row
                             .col-xs-12

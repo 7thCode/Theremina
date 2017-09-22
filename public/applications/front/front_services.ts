@@ -34,7 +34,7 @@ FrontServices.factory('GroupMemberCount', ['$resource',
 FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'GroupMemberCount', 'CollectionService',
     function (GroupMember:any, GroupMemberQuery: any, GroupMemberCount: any, CollectionService: any): void {
 
-        this.SetQuery = (query) => {
+        this.SetQuery = (query):void => {
             this.option.skip = 0;
             this.query = {};
             if (query) {
@@ -42,12 +42,12 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
             }
         };
 
-        let init = () => {
+        let init = ():void => {
             this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
         };
 
-        this.Init = () => {
+        this.Init = ():void => {
             init();
         };
 
@@ -70,7 +70,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Over((hasnext) => {
+            this.Over((hasnext):void => {
                 if (hasnext) {
                     this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
@@ -81,7 +81,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         };
 
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Under((hasprev) => {
+            this.Under((hasprev):void => {
                 if (hasprev) {
                     this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);

@@ -94,8 +94,6 @@ FrontApplication.filter('round', [():any => {
     };
 }]);
 
-
-
 FrontApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
     ($scope: any, $uibModalInstance: any, items: any): void => {
 

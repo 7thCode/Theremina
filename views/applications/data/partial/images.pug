@@ -23,7 +23,7 @@
                     button.btn.btn-success.btn-xs(ng-click="editPhoto(file.filename);", style="position:relative;top:10px;left:3rem;border-radius: 10px")
                         i.fa.fa-pencil(aria-hidden="true")
                     div(style="height:4rem;")
-                            img.center-block.thumbnail(ng-drag="true" ng-drag-data="obj" data-allow-transform="true", ng-src="/" + '{{file.metadata.userid}}' + "/doc/img/" + '{{file.filename}}' , style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
+                            img.center-block.thumbnail(ng-drag="true" ng-drag-data="obj" data-allow-transform="true", ng-src="/" + '{{file.metadata.userid}}' + "/n/doc/img/" + '{{file.filename}}' , style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
                     div(style="height:2rem;text-align:center;")
                         div(style="word-wrap: break-word;font-size:1rem;" ng-bind="file.filename | filename:10")
 
