@@ -273,6 +273,7 @@ namespace HTMLScanner {
         }
 
         // todo:1path
+        /*
         public ResolveDataSource2(childnodes: string, result: any): any {
 
 
@@ -320,7 +321,7 @@ namespace HTMLScanner {
 
 
         }
-
+*/
     }
 
     /* UrlResolver
@@ -461,6 +462,7 @@ namespace HTMLScanner {
         }
 
         // todo:1path
+        /*
         public ResolveUrl2(childnodes: any, result: any): any {
 
 
@@ -490,6 +492,7 @@ namespace HTMLScanner {
 
 
         }
+        */
 
     }
 
