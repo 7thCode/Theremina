@@ -10,10 +10,10 @@
                 .row
                     .col-xs-2
                         label.control-label #{message.picture}
-                        div(ng-controller="PhotoController",flow-init)
+                        div(ng-controller="PhotoController", flow-init)
                             .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createProfile($files);")
                             div(flow-drop,data-toggle="tooltip" data-placement="top" title=message.picturedrop)
-                                img.center-block.thumbnail#profile(ng-src="/files/api/" + '{{userid}}' + "/" + '{{username}}', style="width:100px;height:100px;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+                                img.center-block.thumbnail#profile(ng-src="/files/api/{{userid}}/{{username}}", style="width:100px;height:100px;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
 
                     .col-xs-10
                         .row

@@ -38,6 +38,13 @@ export namespace FrontModule {
     const validator: any = require('validator');
     const url: any = require('url');
 
+
+    const FileModule: any = require(share.Server("systems/files/controllers/file_controller"));
+    const file: any = new FileModule.Files();
+
+    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+    const resource = new ResourcesModule.Resource;
+
     // type 20   page
     // type 21   stamp
     // type 30   template(system only)
@@ -543,6 +550,22 @@ export namespace FrontModule {
 
         }
 
+        public namespaces(request: any, response: any): void {
+            let userid = Pages.userid(request);
+            file.namespaces(userid, (error, files_namespaces): void => {
+                if (!error) {
+                    resource.namespaces(userid, (error, resource_namespaces): void => {
+                        if (!error) {
+                            Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces)));
+                        } else {
+                            Wrapper.SendError(response, 200, error.message, error);
+                        }
+                    });
+                }else {
+                    Wrapper.SendError(response, 200, error.message, error);
+                }
+            });
+        }
 
 
     }

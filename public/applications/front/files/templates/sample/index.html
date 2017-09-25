@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <meta ds:include="/|{#userid}|/fragment/|{#name:self}|/head.html"/>
+        <meta ds:include="/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/head.html"/>
     </head>
 	<body>
-	    <ds:include src='/|{#userid}|/fragment/|{#name:self}|/nav.html|{#query:self}'></ds:include>
+	    <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/nav.html|{#query:self}'></ds:include>
 	    <div class="container" style="margin-top:70px;">
 	        <div class="jumbotron jumbotron-fluid">
                 <div class="container">
@@ -40,7 +40,7 @@
 	                </div>
 	            </div>
 	            <div class="d-flex justify-content-center">
-	                <ds:include src='/|{#userid}|/fragment/|{#name:self}|/pagenator.html|{#query:self}'></ds:include>
+	                <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/pagenator.html|{#query:self}'></ds:include>
                 </div>
 	        </div>
 	        <div class="card">
@@ -64,6 +64,6 @@
 	            </div>
 	        </div>
         </div>
-        <ds:include src='/|{#userid}|/fragment/|{#name:self}|/scripts.html'></ds:include>
+        <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/scripts.html'></ds:include>
     </body>
 </html>

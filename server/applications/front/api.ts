@@ -26,6 +26,9 @@ export namespace ApiRouter {
 
     router.get('/:userid/:namespace/doc/img/:name', pictures.get_photo);
 
+    router.get('/api/namespaces', [exception.exception, exception.authenticate,pages.namespaces]);
+
+
     router.put('/api/upload/:name', [exception.exception, exception.authenticate,pages.put_all]);
     router.get('/api/download', [exception.exception, exception.authenticate, pages.get_all]);
 

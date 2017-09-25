@@ -3,12 +3,12 @@
         | #{message.brand}
         small(style="color:#607D8B;font-size:0.8rem;") Version 1.0
 
-        .row
+        .row(ng-controller="NamespacesController")
             .col-xs-1
-                a.btn.btn-sm.btn-warning.pull-left(href=config.protocol + "://" + config.domain + "/{{userid}}/n/doc/index.html" target="_blank" type="button", aria-label="") Open
+                a.btn.btn-sm.btn-warning.pull-left(href=config.protocol + "://" + config.domain + "/{{userid}}/{{namespace}}/doc/index.html" target="_blank" type="button", aria-label="") Open
             .col-xs-10
                 div
                     span #{config.protocol}
                     span ://
                     span #{config.domain}
-                    span /{{userid}}/n/doc/index.html
+                    span /{{userid}}/{{namespace}}/doc/index.html
