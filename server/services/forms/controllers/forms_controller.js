@@ -55,13 +55,7 @@ var FormsModule;
                         let userid = doc.userid;
                         let type = doc.type;
                         let content = doc.content;
-                        let query = {};
-                        if (config.structured) {
-                            query = { $and: [{ userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }, { namespace: namespace }] };
-                        }
-                        else {
-                            query = { $and: [{ userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
-                        }
+                        let query = { $and: [{ userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
                         Wrapper.FindOne(null, 1000, FormModel, query, (response, page) => {
                             if (!page) {
                                 let page = new FormModel();

@@ -80,7 +80,8 @@ var AccountModule;
          */
         delete_own(request, response) {
             let userid = Accounts.userid(request);
-            Wrapper.FindOne(response, 5100, LocalAccount, { userid: userid }, (response, page) => {
+            let namespace = "";
+            Wrapper.FindOne(response, 5100, LocalAccount, { $and: [{ namespace: namespace }, { userid: userid }] }, (response, page) => {
                 if (page) {
                     Wrapper.Remove(response, 5100, page, (response) => {
                         Wrapper.SendSuccess(response, {});

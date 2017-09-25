@@ -241,43 +241,6 @@ var HTMLScanner;
                 }
             });
         }
-        // todo:1path
-        ResolveDataSource2(childnodes, result) {
-            if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null);
-                });
-            }
-            // resolve all [record reference] in document.
-            Promise.all(this.datasource_promises.map((doc) => {
-                let result = null;
-                if (doc.promise) {
-                    result = doc.promise;
-                }
-                return result;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.datasource_promises[index].name] = { content: entry, count: 0 };
-                });
-                Promise.all(this.datasource_promises.map((doc) => {
-                    let result = null;
-                    if (doc.count) {
-                        result = doc.count;
-                    }
-                    return result;
-                })).then((resolved) => {
-                    _.forEach(resolved, (count, index) => {
-                        result[this.datasource_promises[index].name].count = count;
-                    });
-                    this.callback(null, result);
-                }).catch((error) => {
-                    this.callback(error, null);
-                });
-            }).catch((error) => {
-                this.callback(error, null);
-            });
-        }
     }
     HTMLScanner.DataSourceResolver = DataSourceResolver;
     /* UrlResolver
@@ -402,29 +365,6 @@ var HTMLScanner;
                         this.callback(error, null);
                     });
                 }
-            });
-        }
-        // todo:1path
-        ResolveUrl2(childnodes, result) {
-            if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null);
-                });
-            }
-            Promise.all(this.url_promises.map((doc) => {
-                let promise = null;
-                if (doc.promise) {
-                    promise = doc.promise;
-                }
-                return promise;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.url_promises[index].name] = { content: entry, count: 1 };
-                });
-                this.callback(null, result);
-            }).catch((error) => {
-                this.callback(error, null);
             });
         }
     }

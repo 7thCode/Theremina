@@ -531,7 +531,12 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
             modalRegist.result.then((dialog_scope) => {
                 progress(true);
                 let name = dialog_scope.title;
-                ArticleService.Create(name, { type: { "type": "quoted", "value": dialog_scope.type } }, (result) => {
+                ArticleService.Create(name, {
+                    type: {
+                        "type": "quoted",
+                        "value": dialog_scope.type
+                    }
+                }, (result) => {
                     current_id = result._id;
                     ArticleService.option.skip = 0;
                     if (current_id) {
@@ -816,8 +821,8 @@ FrontControllers.controller('DataDeleteConfirmController', ['$scope', '$uibModal
         };
     }]);
 //Leaflet
-FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$log", "$uibModal", "ResourceBuilderService",
-    function ($scope, $q, $document, $log, $uibModal, ResourceBuilderService) {
+FrontControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$document", "$log", "$uibModal", "ResourceBuilderService",
+    function ($scope, $rootScope, $q, $document, $log, $uibModal, ResourceBuilderService) {
         let progress = (value) => {
             $scope.$emit('progress', value);
         };
@@ -856,9 +861,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         }, false);
         let editor = null;
         let document = null;
-        // let inner_peview = false;
-        // let preview_window = null;
-        // let local_query = [];
         let Draw = (text) => {
             switch (ResourceBuilderService.current.content.type) {
                 case "text/html":
@@ -1091,6 +1093,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                 files.forEach((file) => {
                     file.cancel();
                 });
+                $rootScope.$emit('change_files', {});
                 Query();
             }).finally(() => {
             });
@@ -1119,6 +1122,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                         break;
                     default:
                 }
+                $rootScope.$emit('change_files', {});
                 Query();
                 editor.session.getUndoManager().markClean();
                 $scope.opened = true;
@@ -1181,6 +1185,7 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
                     progress(true);
                     ResourceBuilderService.Delete((result) => {
                         ClosePreview();
+                        $scope.$emit('change_files', {});
                         Query();
                         $scope.name = "";
                         progress(false);
@@ -1203,6 +1208,13 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
             }, () => {
             });
         };
+        $scope.$on('get_namespaces', (event, value) => {
+            ///        $scope.namespaces = value;
+        });
+        $scope.$on('change_namespace', (event, value) => {
+            $scope.namespace = value;
+            Query();
+        });
         $scope.opened = false;
         $scope.Get = Get;
         $scope.Query = Query;
@@ -1221,7 +1233,6 @@ FrontControllers.controller('PagesController', ["$scope", "$q", "$document", "$l
         $scope.Delete = Delete;
         $scope.BuildSite = BuildSite;
         //$scope.OpenPreview = OpenPreview;
-        Query();
     }]);
 FrontControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'ResourceBuilderService', 'items',
     ($scope, $log, $uibModalInstance, ResourceBuilderService, items) => {
@@ -1714,6 +1725,13 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
                 $scope.userid = self.userid;
             }
         }, error_handler);
+        $scope.$on('get_namespaces', (event, value) => {
+            //        $scope.namespaces = value;
+        });
+        $scope.$on('change_namespace', (event, value) => {
+            $scope.namespace = value;
+            Draw();
+        });
         $scope.createProfile = CreateProfile;
         $scope.Type = Type;
         $scope.Next = Next;
@@ -1723,7 +1741,6 @@ FrontControllers.controller('PhotoController', ['$scope', '$q', '$document', '$u
         $scope.showPhoto = showPhoto;
         $scope.deletePhoto = deletePhoto;
         $scope.Find = Find;
-        Draw();
         // Guidance
         $scope.next = () => {
             $scope.step++;
@@ -2317,7 +2334,8 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             }
         };
         let PrintPNG = () => {
-            let width, height;
+            let width = 300;
+            let height = 300;
             ShapeEdit.Snap();
             switch (TemplateService.format.layout) {
                 case "portrait":
@@ -3045,7 +3063,6 @@ FrontControllers.controller('SVGSaveAsDialogController', ['$scope', '$log', '$ui
             $uibModalInstance.dismiss();
         };
         $scope.answer = () => {
-            //       let short = 525;
             progress(true);
             if (TemplateService.current_layout) {
                 progress(true);
@@ -3174,8 +3191,8 @@ FrontControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalI
             $uibModalInstance.dismiss();
         };
     }]);
-FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'ProfileService', 'DataService',
-    ($scope, $q, $document, $uibModal, $log, ProfileService, DataService) => {
+FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document', '$uibModal', '$log', 'ProfileService', "SessionService", 'DataService', "NamespaceService",
+    ($scope, $q, $document, $uibModal, $log, ProfileService, SessionService, DataService, NamespaceService) => {
         let progress = (value) => {
             $scope.$emit('progress', value);
         };
@@ -3204,12 +3221,18 @@ FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document
         };
         ProfileService.Get((self) => {
             if (self) {
-                $scope.userid = self.userid;
+                $scope.userid = self.username;
             }
         }, error_handler);
         $document.on('drop dragover', (e) => {
             e.stopPropagation();
             e.preventDefault();
+        });
+        $scope.$on('get_namespaces', (event, value) => {
+            //         $scope.namespaces = value;
+        });
+        $scope.$on('change_namespace', (event, value) => {
+            $scope.namespace = value;
         });
         $scope.UploadBackup = (file) => {
             progress(true);
@@ -3221,5 +3244,45 @@ FrontControllers.controller('UserSettingController', ['$scope', '$q', '$document
             };
             fileReader.readAsDataURL(file[0].file);
         };
+    }]);
+FrontControllers.controller('NamespacesController', ['$scope', "$rootScope", "$log", 'SessionService', 'NamespaceService',
+    ($scope, $rootScope, $log, SessionService, NamespaceService) => {
+        let progress = (value) => {
+            $scope.$emit('progress', value);
+        };
+        let error_handler = (code, message) => {
+            progress(false);
+            $scope.message = message;
+            $log.error(message);
+        };
+        let GetNamespaces = () => {
+            NamespaceService.Get((namespaces) => {
+                $scope.namespaces = namespaces;
+                $scope.$emit('get_namespaces', namespaces);
+                GetNamespace();
+            }, error_handler);
+        };
+        $scope.SetNamespace = (namespace) => {
+            SessionService.Put({ namespace: namespace }, (data) => {
+                $scope.namespace = namespace;
+                $scope.$emit('change_namespace', data.namespace);
+            }, error_handler);
+        };
+        let GetNamespace = () => {
+            SessionService.Get((session) => {
+                if (session) {
+                    let data = session.data;
+                    if (data) {
+                        $scope.$emit('change_namespace', data.namespace);
+                    }
+                }
+            }, error_handler);
+        };
+        $rootScope.$on('change_files', (event, value) => {
+            GetNamespaces();
+            GetNamespace();
+        });
+        $scope.GetNamespace = GetNamespace;
+        GetNamespaces();
     }]);
 //# sourceMappingURL=front_controllers.js.map

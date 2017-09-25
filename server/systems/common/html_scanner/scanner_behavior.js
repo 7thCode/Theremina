@@ -78,13 +78,14 @@ var ScannerBehavior;
         }
     }
     class CustomBehavior {
-        constructor(parent_name, name, id, params, isdocument, models) {
+        constructor(parent_name, name, id, namespace, params, isdocument, models) {
             this.name = "";
             this.parent_name = "";
             this.id = "";
             this.parent_name = parent_name;
             this.name = name;
             this.id = id;
+            this.namespace = namespace;
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
@@ -230,6 +231,9 @@ var ScannerBehavior;
                     case "{#userid}":
                         appender = this.id;
                         break;
+                    case "{#namespace}":
+                        appender = this.namespace;
+                        break;
                     case "{#query:self}":
                         appender = this.Query(this.page_params);
                         break;
@@ -296,6 +300,9 @@ var ScannerBehavior;
                                     break;
                                 case "#userid":
                                     result = this.id;
+                                    break;
+                                case "#namespace":
+                                    result = this.namespace;
                                     break;
                                 case "#query":
                                     switch (postfix) {

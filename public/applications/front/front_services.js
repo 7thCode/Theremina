@@ -149,4 +149,26 @@ FrontServices.service('SiteService', ['BuildSite',
             });
         };
     }]);
+FrontServices.factory('Namespaces', ['$resource',
+    ($resource) => {
+        return $resource('/api/namespaces', {}, {});
+    }]);
+FrontServices.service('NamespaceService', ['Namespaces',
+    function (Namespaces) {
+        this.Get = (callback, error) => {
+            Namespaces.get({}, (result) => {
+                if (result) {
+                    if (result.code === 0) {
+                        callback(result.value);
+                    }
+                    else {
+                        error(result.code, result.message);
+                    }
+                }
+                else {
+                    error(10000, "network error");
+                }
+            });
+        };
+    }]);
 //# sourceMappingURL=front_services.js.map

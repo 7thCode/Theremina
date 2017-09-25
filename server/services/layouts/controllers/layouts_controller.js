@@ -59,10 +59,11 @@ var LayoutsModule;
         static create(request, response, layout_type) {
             const number = 2000;
             let userid = Layout.userid(request);
+            let namespace = "";
             let name = request.body.name;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, LayoutModel, { $and: [{ name: name }, { type: layout_type }, { userid: userid }] }, (response, exists) => {
+                    Wrapper.FindOne(response, number, LayoutModel, { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { userid: userid }] }, (response, exists) => {
                         if (!exists) {
                             let layout = new LayoutModel();
                             layout.userid = userid;
@@ -117,9 +118,10 @@ var LayoutsModule;
         static put(request, response, layout_type) {
             const number = 2000;
             let userid = Layout.userid(request);
+            let namespace = "";
             let name = request.body.name;
             if (name) {
-                Wrapper.FindOne(response, number, LayoutModel, { $and: [{ name: name }, { type: layout_type }, { userid: userid }] }, (response, exists) => {
+                Wrapper.FindOne(response, number, LayoutModel, { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { userid: userid }] }, (response, exists) => {
                     if (!exists) {
                         let layout = new LayoutModel();
                         layout.userid = userid;
@@ -133,7 +135,7 @@ var LayoutsModule;
                     }
                     else {
                         let id = request.params.id;
-                        Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: layout_type }, { userid: userid }] }, (response, layout) => {
+                        Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: layout_type }, { namespace: namespace }, { userid: userid }] }, (response, layout) => {
                             if (layout) {
                                 layout.content = request.body.content;
                                 layout.open = true;
@@ -175,8 +177,9 @@ var LayoutsModule;
         static delete(request, response, layout_type) {
             const number = 2200;
             let userid = Layout.userid(request);
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: layout_type }, { userid: userid }] }, (response, layout) => {
+            Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: layout_type }, { namespace: namespace }, { userid: userid }] }, (response, layout) => {
                 if (layout) {
                     Wrapper.Remove(response, number, layout, (response) => {
                         Wrapper.SendSuccess(response, {});
@@ -195,7 +198,8 @@ var LayoutsModule;
         delete_own(request, response) {
             const number = 2300;
             let userid = Layout.userid(request);
-            Wrapper.Delete(response, number, LayoutModel, { userid: userid }, (response) => {
+            let namespace = "";
+            Wrapper.Delete(response, number, LayoutModel, { $and: [{ namespace: namespace }, { userid: userid }] }, (response) => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -207,6 +211,7 @@ var LayoutsModule;
         get_template(request, response) {
             const number = 2400;
             let userid = Layout.userid(request);
+            let namespace = "";
             let id = request.params.id;
             Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: 1 }, { $or: [{ userid: userid }, { userid: builder_userid }] }] }, (response, layout) => {
                 if (layout) {
@@ -225,8 +230,9 @@ var LayoutsModule;
         get_layout(request, response) {
             const number = 2500;
             let userid = Layout.userid(request);
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: 2 }, { userid: userid }] }, (response, layout) => {
+            Wrapper.FindOne(response, number, LayoutModel, { $and: [{ _id: id }, { type: 2 }, { namespace: namespace }, { userid: userid }] }, (response, layout) => {
                 if (layout) {
                     Wrapper.SendSuccess(response, layout);
                 }
@@ -267,11 +273,12 @@ var LayoutsModule;
         get_layout_query(request, response) {
             const number = 2700;
             let userid = Layout.userid(request);
+            let namespace = "";
             //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
             //    let option: any = JSON.parse(decodeURIComponent(request.params.option));
             let query = Wrapper.Decode(request.params.query);
             let option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, number, LayoutModel, { $and: [{ type: 2 }, { userid: userid }, query] }, {}, option, (response, layouts) => {
+            Wrapper.Find(response, number, LayoutModel, { $and: [{ type: 2 }, { namespace: namespace }, { userid: userid }, query] }, {}, option, (response, layouts) => {
                 let _layouts = [];
                 _.forEach(layouts, (layout) => {
                     if (layout.content) {
@@ -305,9 +312,10 @@ var LayoutsModule;
         get_layout_count(request, response) {
             const number = 2900;
             let userid = Layout.userid(request);
+            let namespace = "";
             //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let query = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, number, LayoutModel, { $and: [{ type: 2 }, { userid: userid }, query] }, (response, count) => {
+            Wrapper.Count(response, number, LayoutModel, { $and: [{ type: 2 }, { namespace: namespace }, { userid: userid }, query] }, (response, count) => {
                 Wrapper.SendSuccess(response, count);
             });
         }
@@ -341,13 +349,14 @@ var LayoutsModule;
          */
         static get_svg(request, response, userid, name, layout_type) {
             const number = 3000;
+            let namespace = "";
             // layout_type
             //     1   --- system template
             //   other --- own
-            let query = { $and: [{ name: name }, { type: layout_type }, { userid: userid }] };
+            let query = { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { userid: userid }] };
             switch (layout_type) {
                 case 1:
-                    query = { $and: [{ name: name }, { type: layout_type }, { $or: [{ userid: userid }, { userid: builder_userid }] }] };
+                    query = { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { $or: [{ userid: userid }, { userid: builder_userid }] }] };
                     break;
                 default:
             }

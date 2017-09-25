@@ -298,7 +298,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                                 "@": contents
                             }];
                         break;
-                    case "select":
+                    case "select":// for bootstrap 3
                         let contents_model_name = id + "_contents";
                         this.$scope[contents_model_name] = contents;
                         field = [{
@@ -317,7 +317,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                                 ]
                             }];
                         break;
-                    case "button":
+                    case "button":// for bootstrap 3
                         field = [
                             {
                                 "name": "button", "type": "element",

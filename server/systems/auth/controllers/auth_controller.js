@@ -233,7 +233,7 @@ var AuthModule;
                         let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                         ResourceModel.findOne({ $and: [{ userid: config.systems.userid }, { name: "regist_mail.html" }, { "type": 12 }] }).then((record) => {
                             if (record) {
-                                let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, null, true, {});
+                                let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link, "beacon": beacon }, (error, doc) => {
                                     if (!error) {
                                         _mailer.send(username, message.registconfirmtext, doc, (error) => {
@@ -390,7 +390,7 @@ var AuthModule;
                         let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                         ResourceModel.findOne({ $and: [{ userid: config.systems.userid }, { name: "regist_member_mail.html" }, { "type": 12 }] }).then((record) => {
                             if (record) {
-                                let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, null, true, {});
+                                let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link, "beacon": beacon }, (error, doc) => {
                                     if (!error) {
                                         _mailer.send(username, message.memberconfirmtext, doc, (error) => {
@@ -545,7 +545,7 @@ var AuthModule;
                                 let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                                 ResourceModel.findOne({ $and: [{ userid: config.systems.userid }, { name: "username_mail.html" }, { "type": 12 }] }).then((record) => {
                                     if (record) {
-                                        let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid, null, true, {});
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid, "", null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link, "beacon": beacon }, (error, doc) => {
                                             if (!error) {
                                                 _mailer.send(username, message.usernameconfirmtext, doc, (error) => {
@@ -648,7 +648,7 @@ var AuthModule;
                         let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                         ResourceModel.findOne({ $and: [{ userid: config.systems.userid }, { name: "password_mail.html" }, { "type": 12 }] }).then((record) => {
                             if (record) {
-                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, null, true, {});
+                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link, "beacon": beacon }, (error, doc) => {
                                     if (!error) {
                                         _mailer.send(username, message.passwordconfirmtext, doc, (error) => {
