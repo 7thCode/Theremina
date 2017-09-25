@@ -17,6 +17,14 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                         i.fa.fa-user-circle.text-primary
                         span #{message.profile}
                 li
+                    a(href="/pages")
+                        i.fa.fa-file-text.text-success
+                        span #{message.page}
+                li
+                    a(href="/data")
+                        i.fa.fa-database.text-primary
+                        span #{message.article}
+                li
                     a(href="/photo")
                         i.fa.fa-file.text-success
                         span #{message.photo}
@@ -24,14 +32,6 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                     a(href="/svg")
                         i.fa.fa-file-image-o.text-info
                         span #{message.illust}
-                li
-                    a(href="/data")
-                        i.fa.fa-database.text-primary
-                        span #{message.article}
-                li
-                    a(href="/pages")
-                        i.fa.fa-file-text.text-success
-                        span #{message.page}
                 li
                     a(href="/blob")
                         i.fa.fa-file-text.text-info

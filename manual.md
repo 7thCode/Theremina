@@ -241,6 +241,7 @@
         #name:self
         #name:document
         #userid
+        #namespace
         #query:self
         #pager
         

@@ -19,7 +19,7 @@ export namespace FileModule {
     const share = require(process.cwd() + '/server/systems/common/share');
     const config = share.config;
     const Wrapper = share.Wrapper;
-  //  const logger = share.logger;
+    //  const logger = share.logger;
 
     const result = require(share.Server('systems/common/result'));
 
@@ -50,22 +50,23 @@ export namespace FileModule {
             }
             return result;
         }
-/*
-        static namespace(name: string): string {
-            let result = "";
-            if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
+
+        /*
+                static namespace(name: string): string {
+                    let result = "";
+                    if (name) {
+                        let names = name.split("#");
+                        let delimmiter = "";
+                        names.forEach((name, index) => {
+                            if (index < (names.length - 1)) {
+                                result += delimmiter + name;
+                                delimmiter = ":";
+                            }
+                        })
                     }
-                })
-            }
-            return result;
-        }
-*/
+                    return result;
+                }
+        */
 
         static namespace(request: any): string {
             let result = "";
@@ -285,7 +286,7 @@ export namespace FileModule {
                                         skip = option.skip;
                                     }
 
-                                    collection.find({$and: [query,{"metadata.namespace": namespace}, {"metadata.userid": userid}]}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
+                                    collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
                                         if (!error) {
                                             conn.db.close();
                                             Wrapper.SendSuccess(response, docs);
@@ -338,7 +339,7 @@ export namespace FileModule {
                             if (!error) {
                                 if (collection) {
                                     let query: any = Wrapper.Decode(request.params.query);
-                                    collection.find({$and: [query,{"metadata.namespace": namespace}, {"metadata.userid": userid}]}).count((error: any, count: any): void => {
+                                    collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).count((error: any, count: any): void => {
                                         if (!error) {
                                             conn.db.close();
                                             Wrapper.SendSuccess(response, count);
@@ -373,6 +374,57 @@ export namespace FileModule {
             }
         }
 
+
+        /**
+         *
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public namespaces(userid:string, callback:any): void {
+            let number: number = 27000;
+            let conn = Files.connect(config.db.user);
+            if (conn) {
+                conn.once('open', (error: any): void => {
+                    if (!error) {
+                        conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            if (!error) {
+                                if (collection) {
+                                    collection.find({"metadata.userid": userid}, {"metadata.namespace": 1, "_id": 0}).toArray((error: any, docs: any): void => {
+                                        if (!error) {
+                                            conn.db.close();
+                                            let result = [];
+                                            _.forEach(docs, (page) => {
+                                                if (page.metadata.namespace) {
+                                                    result.push(page.metadata.namespace);
+                                                }
+                                            });
+                                            callback(null, _.uniqBy(result));
+                                        } else {
+                                            callback(error, null);
+                                            conn.db.close();
+                                        }
+                                    });
+                                } else {
+                                    callback({message:"", code:1}, null);
+                                    conn.db.close();
+                                }
+                            } else {
+                                callback(error, null);
+                                conn.db.close();
+                            }
+                        });
+                    } else {
+                        callback(error, null);
+                        conn.db.close();
+                    }
+                });
+            } else {
+                callback({message:"2", code:1}, null);
+            }
+        }
+
+
         /**
          *
          * @param request
@@ -394,7 +446,7 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                         collection.findOne(query, (error: any, item: any): void => {
                                             if (!error) {
                                                 if (item) {
@@ -473,7 +525,7 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                         collection.findOne(query, (error: any, item: any): void => {
                                             if (!error) {
                                                 if (item) {
@@ -567,7 +619,7 @@ export namespace FileModule {
                                     conn.db.collection('fs.files', (error: any, collection: any): void => {
                                         if (!error) {
                                             if (collection) {
-                                                let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                                let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                                 collection.findOne(query, (error: any, item: any): void => {
                                                     if (!error) {
                                                         if (!item) {
@@ -707,7 +759,7 @@ export namespace FileModule {
                             conn.db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                         collection.findOne(query, (error: any, item: any): void => {
                                             if (!error) {
                                                 if (item) {
@@ -824,7 +876,7 @@ export namespace FileModule {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
                             if (!error) {
                                 if (collection) {
-                                    let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                    let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                     collection.findOne(query, (error: any, item: any): void => {
                                         if (!error) {
                                             if (item) {

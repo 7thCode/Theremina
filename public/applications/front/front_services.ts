@@ -34,7 +34,7 @@ FrontServices.factory('GroupMemberCount', ['$resource',
 FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'GroupMemberCount', 'CollectionService',
     function (GroupMember:any, GroupMemberQuery: any, GroupMemberCount: any, CollectionService: any): void {
 
-        this.SetQuery = (query) => {
+        this.SetQuery = (query):void => {
             this.option.skip = 0;
             this.query = {};
             if (query) {
@@ -42,12 +42,12 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
             }
         };
 
-        let init = () => {
+        let init = ():void => {
             this.option = {limit: 40, skip: 0};
             this.SetQuery(null);
         };
 
-        this.Init = () => {
+        this.Init = ():void => {
             init();
         };
 
@@ -70,7 +70,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         };
 
         this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Over((hasnext) => {
+            this.Over((hasnext):void => {
                 if (hasnext) {
                     this.option.skip = this.option.skip + this.option.limit;
                     this.Query(callback, error);
@@ -81,7 +81,7 @@ FrontServices.service('MemberService', ['GroupMember','GroupMemberQuery', 'Group
         };
 
         this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Under((hasprev) => {
+            this.Under((hasprev):void => {
                 if (hasprev) {
                     this.option.skip = this.option.skip - this.option.limit;
                     this.Query(callback, error);
@@ -146,6 +146,7 @@ FrontServices.factory('BuildSite', ['$resource',
         return $resource('/api/buildsite/:name', {name:"@name"}, {});
     }]);
 
+
 FrontServices.service('SiteService', ['BuildSite',
     function (BuildSite: any): void {
 
@@ -167,3 +168,27 @@ FrontServices.service('SiteService', ['BuildSite',
 
     }]);
 
+
+FrontServices.factory('Namespaces', ['$resource',
+    ($resource: any): any => {
+        return $resource('/api/namespaces', {}, {});
+    }]);
+
+FrontServices.service('NamespaceService', ['Namespaces',
+    function (Namespaces: any): void {
+
+        this.Get = (callback: (result: any) => void, error: (code: number, message: string) => void) => {
+            Namespaces.get({}, (result: any): void => {
+                if (result) {
+                    if (result.code === 0) {
+                        callback(result.value);
+                    } else {
+                        error(result.code, result.message);
+                    }
+                } else {
+                    error(10000, "network error");
+                }
+            });
+        };
+
+    }]);

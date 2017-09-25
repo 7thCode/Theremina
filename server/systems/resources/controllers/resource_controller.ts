@@ -316,6 +316,27 @@ export namespace ResourcesModule {
             });
         }
 
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public namespaces(userid:string, callback:any): void {
+            const number: number = 1400;
+            ResourceModel.find( {userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
+                let result = [];
+                _.forEach(pages, (page) => {
+                    if (page.namespace) {
+                        result.push(page.namespace);
+                    }
+                });
+                callback(null, _.uniqBy(result));
+            }).catch((error: any): void => {
+                callback(error, null);
+            });
+        }
+
     }
 
     const mongoose: any = require('mongoose');

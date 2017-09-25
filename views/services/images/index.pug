@@ -29,7 +29,7 @@ block content
                                 div(ng-if="Type(file.metadata.type) == 'image'", ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
                                     button.btn.btn-danger.btn-xs(ng-click="deleteImage(file.filename);", style="position:relative;top:10px;left:10px;border-radius: 10px") x
                                     div(style="height:8rem;",data-toggle="tooltip" data-placement="top" title="{{file.filename}}")
-                                        img.center-block.thumbnail(ng-src="/images/api/" + '{{file.metadata.userid}}' + "/" + '{{file.filename}}', style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+                                        img.center-block.thumbnail(ng-src="/images/api/{{file.metadata.userid}}/{{file.filename}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
                                     div(style="height:8rem;text-align:center;")
                                         .row
                                             .col-xs-12

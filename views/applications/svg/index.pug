@@ -4,9 +4,11 @@ block content
     section.content(ng-controller="SVGController")
         include partial/navbar
         .row
+            .col-sm-12.col-md-12
+                div(style="font-size:2rem;color:#607D8B") #{message.svg}
+        .row
             .col-sm-12.col-md-12#draggable_area
                 include partial/canvas
-
         div
             include partial/images
             include partial/mode

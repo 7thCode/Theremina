@@ -1,0 +1,33 @@
+.brand-font {
+  font-size: 30px;
+  font-family: 'Source Code Pro', monospace;
+}
+.brand-font-local {
+  font-family: 'Miss Fajardose', cursive;
+  font-size: 3.2rem;
+  font-weight: 500;
+}
+.wrapper-color {
+  background: #1565C0;
+}
+.sidebar-color {
+  background: #1A237E;
+}
+.navbar-color {
+  background: #e53935;
+}
+.wrapper-color-invert {
+  background: #0b3564;
+}
+.sidebar-color-invert {
+  background: #090c29;
+}
+.navbar-color-invert {
+  background: #9f1815;
+}
+.pallete-background {
+  background: #ffffff;
+}
+a {
+  color: #ffffff;
+}

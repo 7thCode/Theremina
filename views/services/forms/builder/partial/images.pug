@@ -17,7 +17,7 @@
                 div(ng-if="Type(file.metadata.type) == 'image'",ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:8rem;width:8rem;margin-left:auto;margin-right:auto;")
                     button.btn.btn-danger.btn-xs(ng-click="deleteImage(file.filename);", style="position:relative;top:10px;left:10px;border-radius: 10px") x
                     div(style="height:4rem;")
-                        img.center-block.thumbnail(ng-src="/files/api/" + '{{file.metadata.userid}}' + "/" + '{{file.filename}}' , style="border: 1px #404040 solid;max-height: 4rem;max-width: 6rem;")
+                        img.center-block.thumbnail(ng-src="/files/api/{{file.metadata.userid}}/{{file.filename}}" , style="border: 1px #404040 solid;max-height: 4rem;max-width: 6rem;")
                         //ng-drag="true" ng-drag-data="obj" data-allow-transform="true",
                     div(style="height:2rem;text-align:center;")
                         div(style="word-wrap: break-word;font-size:1rem;") {{file.filename}}
