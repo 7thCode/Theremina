@@ -59,7 +59,7 @@
 					<ul id="gtco-post-list">
 					    <ds:foreach scope='#init'>
 					        <ds:resolve scope='content'>
-					            <li class="full entry animate-box" data-animate-effect="fadeIn"> 
+					            <li ds:class="{klass.value}" data-animate-effect="fadeIn">
 							    <a ds:href='{link.value}'>
 								    <div class="entry-img" ds:style="background-image: url(|{image.value}|)"></div>
 								    <div class="entry-desc">
