@@ -876,7 +876,7 @@ FrontControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$
         let Query = () => {
             progress(true);
             // template query
-            ResourceBuilderService.AddQuery({ type: 21 });
+            //    ResourceBuilderService.AddQuery({type: 21});
             ResourceBuilderService.Query((result) => {
                 ResourceBuilderService.InitQuery(null);
                 if (result) {

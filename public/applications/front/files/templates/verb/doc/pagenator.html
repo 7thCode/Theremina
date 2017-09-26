@@ -1,0 +1,30 @@
+<nav aria-label="Page navigation">
+	<ul class="pagination">
+	    <ds:if exist='#hasprev:#init'>
+	    <li>
+		    <a href="#" aria-label="Previous">
+		        <span aria-hidden="true">&laquo;</span>
+		    </a>
+		</li>
+		</ds:if>
+		<ds:foreach scope='#pager:#init'>
+		    
+		    <li class="page-item">
+                <ds:if exist='#pager:current'>
+                    <ds:a class="page-link active" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
+                </ds:if>
+                <ds:ifn exist='#pager:current'>
+                    <ds:a class="page-link" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
+                </ds:ifn>
+            </li>
+            
+		</ds:foreach>
+		<ds:if exist='#hasnext:#init'>
+		<li>
+			<a href="#" aria-label="Next">
+			    <span aria-hidden="true">&raquo;</span>
+		    </a>
+		</li>
+		</ds:if>
+	</ul>
+</nav>

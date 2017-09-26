@@ -262,8 +262,75 @@ export namespace FrontModule {
         }
 
         public put_all(request: any, response: any): void {
+        }
 
+        public create_init_user_file(user: any): void {
+            let userid = user.userid;
+            let conn = Pages.connect(config.db.user);
+            if (conn) {
+                conn.once('open', (error: any): void => {
+                    if (!error) {
+                        conn.db.collection('fs.files', (error: any, collection: any): void => {
 
+                                let query = {"metadata.userid": config.systems.userid};
+                                collection.find(query, (error: any, items: any): void => {
+                                    if (!error) {
+                                        items.toArray((error,items) => {
+                                            if (!error) {
+                                                let promises = [];
+                                                _.forEach(items, (item) => {
+                                                    promises.push(new Promise((resolve: any, reject: any): void => {
+                                                        if (item) {
+                                                            let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                                                            let readstream =  bucket.openDownloadStream(item._id);
+
+                                                           let meta = item.metadata;
+                                                           meta.userid = userid;
+
+                                                            let writestream = bucket.openUploadStream(item.filename, {
+                                                                contentType: item.contentType,
+                                                                metadata: meta
+                                                            });
+
+                                                            if (writestream) {
+                                                                writestream.on('close', (file: any): void => {
+                                                                    resolve(file);
+                                                                });
+                                                                readstream.on('error', (error: any): void => {
+                                                                    reject(error);
+                                                                });
+                                                                readstream.pipe(writestream);
+                                                            } else {
+                                                                reject({});
+                                                            }
+                                                        } else {
+                                                            reject({});
+                                                        }
+                                                    }));
+                                                });
+
+                                                Promise.all(promises).then((results: any[]): void => {
+                                                    conn.db.close();
+                                                }).catch((error: any): void => {
+                                                    conn.db.close();
+                                                });
+                                            }else {
+
+                                            }
+                                        });
+                                    } else {
+
+                                    }
+                                });
+
+                        });
+                    } else {
+
+                    }
+                });
+            } else {
+
+            }
         }
 
         /**
@@ -279,7 +346,7 @@ export namespace FrontModule {
                 _.forEach(docs, (doc) => {
                     let name: string = doc.name;
                     let userid = user.userid;
-                    let namespace = "";
+                    let namespace = doc.namespace;
                     let type: string = doc.type;
                     let content: any = doc.content;
                     ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
@@ -287,6 +354,7 @@ export namespace FrontModule {
                             let page: any = new ResourceModel();
                             page.userid = userid;
                             page.name = name;
+                            page.namespace = namespace;
                             page.type = type;
                             page.content = content;
                             page.open = true;
@@ -391,7 +459,7 @@ export namespace FrontModule {
             let namesapce = name;
 
             let resources = site.resources;
-            let copy = (resourcename: any): any => {
+            let copy = (collection,resourcename: any): any => {
 
                 let copy_resource = (resolve: any, reject: any): void => {
                     ResourceModel.findOne({$and: [{namespace: namesapce}, {userid: config.systems.userid}, {name: resourcename.original}, {type: 30}]}, {}, {}).then((doc: any): void => {
@@ -465,12 +533,12 @@ export namespace FrontModule {
                     })
                 };
 
-                let copy_file = (resolve: any, reject: any): void => {
+                let copy_file = (collection,resolve: any, reject: any): void => {
                     let name: string = resourcename.target;
                     let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
                     if (gfs) {
                         let query = {$and: [{filename: resourcename.original}, {"metadata.userid": config.systems.userid}]};
-                        gfs.findOne(query, (error: any, item: any): void => {
+                        collection.findOne(query, (error: any, item: any): void => {
                             if (!error) {
                                 if (item) {
                                     let readstream = gfs.createReadStream({_id: item._id});
@@ -518,7 +586,7 @@ export namespace FrontModule {
                                 copy_article(resolve, reject);
                                 break;
                             case "file":
-                                copy_file(resolve, reject);
+                                copy_file(collection,resolve, reject);
                                 break;
                             default:
                         }
@@ -533,9 +601,9 @@ export namespace FrontModule {
                 conn.once('open', (error: any): void => {
                     if (!error) {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            collection = collection;
+                    //        collection = collection;
                             Promise.all(resources.map((pagename: any): void => {
-                                return copy(pagename);
+                                return copy(collection,pagename);
                             })).then((results: any[]): void => {
                                 conn.db.close();
                                 Wrapper.SendSuccess(response, {code: 0, message: ""});
