@@ -101,10 +101,13 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
 
         this.SetQuery = (query:any, type:number = 0) => {
             this.option.skip = 0;
-            this.query = {"metadata.key": {$gte: type, $lt: type + 2000}};
-            if (query) {
-                this.query = {$and:[{"metadata.key": {$gte: type, $lt: type + 2000}},query]};
-            }
+        //    this.query = {"metadata.key": {$gte: type, $lt: type + 2000}};
+        //    if (query) {
+         //       this.query = {$and:[{"metadata.key": {$gte: type, $lt: type + 2000}},query]};
+         //   }
+
+
+            this.query = query;
         };
 
         let init = () => {

@@ -99,6 +99,22 @@ export namespace FileModule {
 
         static from_local(gfs: any, path_from: string, namespace: string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
+/*
+                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+
+                let writestream = bucket.openUploadStream(name, {
+                    contentType: "binary/octet-stream",
+                    metadata: {
+                        userid: config.systems.userid,
+                        key: key,
+                        type: mimetype,
+                        namespace: namespace,
+                        parent: null
+                    }
+                });
+*/
+
+
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
@@ -109,6 +125,7 @@ export namespace FileModule {
                         parent: null
                     }
                 });
+
 
                 let readstream = fs.createReadStream(path_from + '/' + name, {encoding: null, bufferSize: 1});
 
@@ -374,7 +391,6 @@ export namespace FileModule {
             }
         }
 
-
         /**
          *
          * @param request
@@ -423,7 +439,6 @@ export namespace FileModule {
                 callback({message:"2", code:1}, null);
             }
         }
-
 
         /**
          *
@@ -510,7 +525,8 @@ export namespace FileModule {
         public get_file_data_name(request: any, response: any, next: any): void {
             try {
                 let conn = Files.connect(config.db.user);
-                let namespace: string = request.params.namespace;
+               // let namespace: string = request.params.namespace;
+                let namespace: string = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = Files.userid(request);
 
@@ -592,7 +608,6 @@ export namespace FileModule {
                 Wrapper.SendFatal(response, e.code, e.message, e);
             }
         }
-
 
         /**
          *

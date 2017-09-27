@@ -96,7 +96,7 @@ var HTMLScanner;
         ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:
                         switch (node.localName) {
                             case "a":
                                 this.ScanLinks(node, data);
@@ -155,7 +155,7 @@ var HTMLScanner;
         ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:
                         let tagname = node.localName;
                         if (tagname) {
                             let prefix = DataSourceResolver.prefix(tagname);
@@ -330,7 +330,7 @@ var HTMLScanner;
         ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:
                         let tagname = node.localName;
                         if (tagname) {
                             let prefix = UrlResolver.prefix(tagname);
@@ -522,7 +522,7 @@ var HTMLScanner;
         ScanNode(node, data) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:
                         let tagname = node.localName;
                         if (tagname) {
                             let prefix = Expander.prefix(tagname);
@@ -648,7 +648,7 @@ var HTMLScanner;
                             }
                         }
                         break;
-                    case 3://text
+                    case 3:
                         if (node.parentNode) {
                             let parent_name = node.parentNode.localName;
                             let prefix = Expander.prefix(parent_name);

@@ -385,6 +385,9 @@ namespace ScannerBehavior {
                                     switch (postfix) {
                                         case "page" :
                                             result = Search(object, 0);
+                                            if (!result) {
+                                                result = "";
+                                            }
                                             break;
                                         case "index" :
                                             result = object.index;

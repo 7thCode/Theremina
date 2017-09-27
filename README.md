@@ -785,8 +785,8 @@
     $ mongo
     > use admin
     > db.createUser({user: "admin",pwd: "zz0101",roles:[{role: "userAdminAnyDatabase",db: "admin"}]})
-    > use theremina
-    > db.createUser({user:"thereminamaster", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
+    > use blog0
+    > db.createUser({user:"blog0master", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
 ## Redis Clear
     $ redis-cli
     > AUTH zz0101
