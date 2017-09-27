@@ -286,7 +286,7 @@ export namespace ResourcesModule {
             const number: number = 1400;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
-            let query: any = Wrapper.Decode(request.params.query);
+            let query: any =  Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, number, ResourceModel, {$and: [{namespace: namespace}, {userid: userid}, query]}, {}, option, (response: any, pages: any): any => {
                 _.forEach(pages, (page) => {
