@@ -13,7 +13,7 @@ div
                         span(ng-messages="validate.username.$error")
                             //span.error-message(ng-message="required") #{message.required}
                             span.error-message(ng-message="maxlength") #{message.long}
-                        input.form-control.no-zoom#username(tabindex="1", ng-model="items.username", data-ng-required="true", type='text', name="username", placeholder='xxxxxxx@xxx.co.jp', required, ng-maxlength="255")
+                        input.form-control.no-zoom#username(tabindex="1", style="font-weight:500;", ng-model="items.username", data-ng-required="true", type='text', name="username", placeholder='xxxxxxx@xxx.co.jp', required, ng-maxlength="255")
 
                 .col-xs-10.col-xs-offset-1
                     .form-group
@@ -22,7 +22,7 @@ div
                             //span.error-message(ng-message="required") #{message.required}
                             span.error-message(ng-message="minlength") #{message.short}
                             span.error-message(ng-message="maxlength") #{message.long}
-                        input.form-control.no-zoom#password(tabindex="2", ng-model="items.password", type='password', name="password", placeholder='*******', required, ng-minlength="4", ng-maxlength="255", data-ng-required="true")
+                        input.form-control.no-zoom#password(tabindex="2", style="font-weight:500;", ng-model="items.password", type='password', name="password", placeholder='*******', required, ng-minlength="4", ng-maxlength="255", data-ng-required="true")
 
             .row
                 .col-xs-12

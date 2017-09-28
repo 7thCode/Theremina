@@ -22,7 +22,7 @@ namespace HTMLScanner {
         }
 
         static prefix(name: string): string {
-            let result:string = "";
+            let result: string = "";
             let splited_name = name.toLowerCase().split(":");
             if (splited_name.length == 2) {
                 result = splited_name[0];
@@ -31,13 +31,13 @@ namespace HTMLScanner {
         }
 
         static localName(name: string): string {
-            let splited_name:any = name.toLowerCase().split(":");
+            let splited_name: any = name.toLowerCase().split(":");
             return splited_name[splited_name.length - 1];
         }
 
         protected ScanChild(node: any, data: any): void {
             if (node) {
-                let childnodes:any[] = node.childNodes;
+                let childnodes: any[] = node.childNodes;
                 this.depth++;
                 if (childnodes) {
                     _.forEach(childnodes, (node: any, index: number): void => {
@@ -85,8 +85,8 @@ namespace HTMLScanner {
 
     export class LinkScanner extends NodeScanner {
 
-        protected links:any[] = [];
-        private base_url:string = "";
+        protected links: any[] = [];
+        private base_url: string = "";
 
         private UrlNormalize(partial_url: string): string {
             return url.resolve(this.base_url, partial_url);
@@ -95,12 +95,12 @@ namespace HTMLScanner {
         private ScanLinks(node: any, data: any): void {
             if (node.attributes) {
                 if (node.attributes.href) {
-                    let url_value:any = node.attributes.href.nodeValue;
-                    let target_url_string:any = this.UrlNormalize(url_value);
+                    let url_value: any = node.attributes.href.nodeValue;
+                    let target_url_string: any = this.UrlNormalize(url_value);
                     if (_.indexOf(this.links, target_url_string) == -1) {
                         this.links.push(target_url_string);
-                        let parsed_base_url:{hostname:any} = url.parse(this.base_url);
-                        let parsed_target_url:{hostname:any} = url.parse(target_url_string);
+                        let parsed_base_url: { hostname: any } = url.parse(this.base_url);
+                        let parsed_target_url: { hostname: any } = url.parse(target_url_string);
                         if (parsed_target_url.hostname == parsed_base_url.hostname) {
                             this.ScanHtml(target_url_string);
                         }
@@ -152,9 +152,9 @@ namespace HTMLScanner {
         }
 
         private PromisedDataSource(node: any): any {
-            let result:any = null;
+            let result: any = null;
             try {
-                let query:any = node.attributes.query.nodeValue;
+                let query: any = node.attributes.query.nodeValue;
                 result = this.datasource.GetDatasource(query, this);
             } catch (e) {
                 this.callback({code: 1}, null);
@@ -163,9 +163,9 @@ namespace HTMLScanner {
         }
 
         private PromisedDataCount(node: any): any {
-            let result:any = null;
+            let result: any = null;
             try {
-                let query:any = node.attributes.query.nodeValue;
+                let query: any = node.attributes.query.nodeValue;
                 result = this.datasource.GetCount(query, this);
             } catch (e) {
                 this.callback({code: 1}, null);
@@ -177,17 +177,30 @@ namespace HTMLScanner {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname:any = node.localName;
+                        let tagname: any = node.localName;
                         if (tagname) {
-                            let prefix:string = DataSourceResolver.prefix(tagname);
-                            let localname:string = DataSourceResolver.localName(tagname);
+                            let prefix: string = DataSourceResolver.prefix(tagname);
+                            let localname: string = DataSourceResolver.localName(tagname);
                             switch (localname) {
+                                case "meta":
+                                    if (node.attributes) {
+                                        if (node.attributes["query"]) {
+                                            let query: any = node.attributes["query"];
+                                            this.datasource_promises.push({
+                                                name: query.nodeValue,
+                                                promise: this.PromisedDataSource(node),
+                                                count: this.PromisedDataCount(node),
+                                                resolved: ""
+                                            });
+                                        }
+                                    }
+                                    break;
                                 case "resolve":
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
-                                                let query:any = node.attributes.query;
+                                            if (node.attributes["query"]) {
+                                                let query: any = node.attributes["query"];
                                                 this.datasource_promises.push({
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
@@ -221,7 +234,7 @@ namespace HTMLScanner {
                 {},
                 (errors, window) => {
                     if (!errors) {
-                        let childnodes:any = window.document.childNodes;
+                        let childnodes: any = window.document.childNodes;
                         if (childnodes) {
                             _.forEach(childnodes, (element, index) => {
                                 this.position = index;
@@ -236,7 +249,7 @@ namespace HTMLScanner {
 
                         // resolve all [record reference] in document.
                         Promise.all(this.datasource_promises.map((doc: any): void => {
-                            let result:any = null;
+                            let result: any = null;
                             if (doc.promise) {
                                 result = doc.promise;
                             }
@@ -248,7 +261,7 @@ namespace HTMLScanner {
                             });
 
                             Promise.all(this.datasource_promises.map((doc: any): void => {
-                                let result:any = null;
+                                let result: any = null;
                                 if (doc.count) {
                                     result = doc.count;
                                 }
@@ -334,20 +347,20 @@ namespace HTMLScanner {
     * */
     export class UrlResolver extends NodeScanner {
 
-        public datasource:ScannerBehavior.Behavior; // ScannerBehaviorModule.Behavior;
+        public datasource: ScannerBehavior.Behavior; // ScannerBehaviorModule.Behavior;
 
         private config;
 
         public url_promises: { name: string, promise: any, count: any, resolved: string }[] = [];
 
-        constructor(datasource: ScannerBehavior.Behavior, config:any, callback: (error: any, result: any) => void) {
+        constructor(datasource: ScannerBehavior.Behavior, config: any, callback: (error: any, result: any) => void) {
             super(callback);
             this.datasource = datasource;
             this.config = config;
         }
 
         private PromisedUrl(target_url_string: string): any {
-            let result:any = null;
+            let result: any = null;
             try {
                 result = this.datasource.GetUrl(target_url_string, this);
             } catch (e) {
@@ -360,11 +373,11 @@ namespace HTMLScanner {
         //よって、"meta"タグをInclude命令に使用する。
         private Include(node: any): void {
             if (node.attributes) {
-                let number:number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                let number: number = node.attributes.length;
+                for (var index: number = 0; index < number; index++) {
+                    let attribute: any = node.attributes[index];
+                    let prefix: string = Expander.prefix(attribute.name);
+                    let localname: string = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         if (localname == "include") {
                             this.url_promises.push({
@@ -379,26 +392,26 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: {nodeType:number,localName:string, attributes:{src:{nodeValue:string}}}, data: any): void {
+        protected ScanNode(node: { nodeType: number, localName: string, attributes: { src: { nodeValue: string } } }, data: any): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname:string = node.localName;
+                        let tagname: string = node.localName;
                         if (tagname) {
-                            let prefix:string = UrlResolver.prefix(tagname);
-                            let localname:string = UrlResolver.localName(tagname);
+                            let prefix: string = UrlResolver.prefix(tagname);
+                            let localname: string = UrlResolver.localName(tagname);
                             switch (localname) {
                                 case "meta":
                                     this.Include(node);
                                     break;
                                 case "foreach":
                                     break;
-                            //    case "resolve":
+                                //    case "resolve":
                                 case "include":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.src) {
-                                                let src:any = node.attributes.src;
+                                                let src: any = node.attributes.src;
                                                 this.url_promises.push({
                                                     name: src.nodeValue,
                                                     promise: this.PromisedUrl(src.nodeValue),
@@ -430,9 +443,9 @@ namespace HTMLScanner {
                 {},
                 (errors, window) => {
                     if (!errors) {
-                        let childnodes:any = window.document.childNodes;
+                        let childnodes: any = window.document.childNodes;
                         if (childnodes) {
-                            _.forEach(childnodes, (element:any, index:number):void => {
+                            _.forEach(childnodes, (element: any, index: number): void => {
                                 this.position = index;
                                 this.ScanNode(element, null);
                             });
@@ -443,13 +456,13 @@ namespace HTMLScanner {
                     this.document_depth--;
                     if (this.document_depth == 0) {
                         Promise.all(this.url_promises.map((doc: any): void => {
-                            let promise:any = null;
+                            let promise: any = null;
                             if (doc.promise) {
                                 promise = doc.promise;
                             }
                             return promise;
                         })).then((resolved: any[]): void => {
-                            _.forEach(resolved, (entry:any, index:number) :void => {
+                            _.forEach(resolved, (entry: any, index: number): void => {
                                 result[this.url_promises[index].name] = {content: entry, count: 1};
                             });
                             this.callback(null, result);
@@ -521,19 +534,63 @@ namespace HTMLScanner {
 
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        private Include(node: any, data: any): void {
-            let resolved:boolean = false;
+        private Meta(node: any, data: any): void {
+            let resolved: boolean = false;
             if (node.attributes) {
                 let number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                for (var index: number = 0; index < number; index++) {
+                    let attribute: any = node.attributes[index];
+                    let prefix: string = Expander.prefix(attribute.name);
+                    let localname: string = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
-                        if (localname == "include") {
-                            this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
-                            resolved = true;
+                        switch (localname) {
+                            case "include":
+                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
+                                resolved = true;
+                                break;
+                            case "title": {
+                                let query_attribute: any = node.attributes["query"];
+                                if (query_attribute) {
+                                    let datas = data[query_attribute.nodeValue];
+                                    if (datas.content.length > 0) {
+                                        let first_data = datas.content[0];
+                                        this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
+                                            content: attribute.value,
+                                            count: 1
+                                        }, this) + '</title>';
+                                    }
+                                    resolved = true;
+                                }
+
+                            }
+                                break;
+                            case "content": {
+                                let query_attribute: any = node.attributes["query"];
+                                if (query_attribute) {
+                                    let datas = data[query_attribute.nodeValue];
+                                    if (datas.content.length > 0) {
+                                        let first_data = datas.content[0];
+                                        let name_attribute: any = node.attributes["name"];
+                                        let name = "";
+                                        if (name_attribute) {
+                                            name = 'name="' + name_attribute.nodeValue + '"';
+                                        }
+                                        this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
+                                            content: attribute.value,
+                                            count: 1
+                                        }, this) + '"/>';
+                                    }
+                                    resolved = true;
+                                }
+                            }
+                                break;
                         }
+
+
+                        //     if (localname == "include") {
+                        //         this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
+                        //         resolved = true;
+                        //     }
                     }
                 }
             }
@@ -543,14 +600,14 @@ namespace HTMLScanner {
         }
 
         private NodeToElement(node: any, data: any): void {
-            let tagname:string = node.localName;
-            let attribute_string:string = "";
+            let tagname: string = node.localName;
+            let attribute_string: string = "";
             if (node.attributes) {
                 let number = node.attributes.length;
-                for (var index:number = 0; index < number; index++) {
-                    let attribute:any = node.attributes[index];
-                    let prefix:string = Expander.prefix(attribute.name);
-                    let localname:string = Expander.localName(attribute.name);
+                for (var index: number = 0; index < number; index++) {
+                    let attribute: any = node.attributes[index];
+                    let prefix: string = Expander.prefix(attribute.name);
+                    let localname: string = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
@@ -562,8 +619,8 @@ namespace HTMLScanner {
                 }
             }
 
-            let localname:string = DataSourceResolver.localName(tagname);
-            let prefix:string = DataSourceResolver.prefix(tagname);
+            let localname: string = DataSourceResolver.localName(tagname);
+            let prefix: string = DataSourceResolver.prefix(tagname);
 
             if (prefix != PREFIX) {
                 localname = tagname;
@@ -598,10 +655,10 @@ namespace HTMLScanner {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname:string = node.localName;
+                        let tagname: string = node.localName;
                         if (tagname) {
-                            let prefix:string = Expander.prefix(tagname);
-                            let localname:string = Expander.localName(tagname);
+                            let prefix: string = Expander.prefix(tagname);
+                            let localname: string = Expander.localName(tagname);
                             switch (localname) {
                                 case "html":
                                 case "head":
@@ -613,14 +670,14 @@ namespace HTMLScanner {
                                     }
                                     break;
                                 case "meta":
-                                    this.Include(node, data);
+                                    this.Meta(node, data);
                                     break;
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) { // query="{}"
-                                                let query:any = node.attributes.query;
-                                                let result:any = this.fragments[query.nodeValue].content;
+                                            if (node.attributes["query"]) { // query="{}"
+                                                let query: any = node.attributes["query"];
+                                                let result: any = this.fragments[query.nodeValue].content;
                                                 if (result) {
                                                     _.forEach(result, (resolved_data, index) => {
                                                         this.ResolveChildren(node, resolved_data);
@@ -628,8 +685,8 @@ namespace HTMLScanner {
                                                 }
                                             } else if (node.attributes.scope) { // scope="a.b.c"
                                                 if (data) {
-                                                    let scope:any = node.attributes.scope;
-                                                    let result:any = this.datasource.FieldValue(data, scope.nodeValue, this);//fragment
+                                                    let scope: any = node.attributes.scope;
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, this);//fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             _.forEach(result, (resolved_data, index) => {
@@ -645,8 +702,8 @@ namespace HTMLScanner {
                                 case "include":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                              if (node.attributes.src) {    // src="url"
-                                                let src:any = node.attributes.src;
+                                            if (node.attributes.src) {    // src="url"
+                                                let src: any = node.attributes.src;
                                                 this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], this);
                                             }
                                         }
@@ -655,23 +712,23 @@ namespace HTMLScanner {
                                 case "resolve":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {         // query="{}"
-                                                let query:any = node.attributes.query;
-                                                let current_datasource:any = this.fragments[query.nodeValue].content;
+                                            if (node.attributes["query"]) {         // query="{}"
+                                                let query: any = node.attributes["query"];
+                                                let current_datasource: any = this.fragments[query.nodeValue].content;
                                                 _.forEach(node.childNodes, (childnode: any, index: number): void => {
                                                     this.position = index;
                                                     this.ScanNode(childnode, current_datasource[0]);
                                                 })
                                             } else if (node.attributes.field) {  // field="{a.b.c}"
-                                                let field:any = node.attributes.field;
+                                                let field: any = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
                                                 }, this);
                                             } else if (node.attributes.scope) {  // scope="a.b.c"
                                                 if (data) {
-                                                    let scope:any = node.attributes.scope;
-                                                    let result:any = this.datasource.FieldValue(data, scope.nodeValue, this);
+                                                    let scope: any = node.attributes.scope;
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
@@ -690,8 +747,8 @@ namespace HTMLScanner {
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist:any = node.attributes.exist;
-                                                let result:any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let exist: any = node.attributes.exist;
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
                                                 if (result) {
                                                     this.ResolveChildren(node, data);
                                                 }
@@ -703,8 +760,8 @@ namespace HTMLScanner {
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist:any = node.attributes.exist;
-                                                let result:any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let exist: any = node.attributes.exist;
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
                                                 if (!result) {
                                                     this.ResolveChildren(node, data);
                                                 }
@@ -720,8 +777,8 @@ namespace HTMLScanner {
                         break;
                     case 3://text
                         if (node.parentNode) {  // field="{a.b.c}"
-                            let parent_name:string = node.parentNode.localName;
-                            let prefix:string = Expander.prefix(parent_name);
+                            let parent_name: string = node.parentNode.localName;
+                            let prefix: string = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
                                 this.html += this.datasource.ResolveFormat(data, {content: node.data, count: 1}, this);
                             } else {
@@ -752,7 +809,7 @@ namespace HTMLScanner {
                 {},
                 (errors, window) => {
                     if (!errors) {
-                        let childnodes:any = window.document.childNodes;
+                        let childnodes: any = window.document.childNodes;
                         if (childnodes) {
                             _.forEach(childnodes, (element, index) => {
                                 this.position = index;
@@ -788,14 +845,14 @@ namespace HTMLScanner {
     * */
     export class Builder {
 
-        static Build(source: any, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
+        static Build(source: any, datasource: any, page_init: any, config: any, callback: (error: any, result: string) => void): void {
 
-            let build:any = (source: any, datasource: any, page_init, callback: (error: any, result: string) => void) => {
-                let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
+            let build: any = (source: any, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+                let datasource_resolver: any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
                     if (!error) {
-                        let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
+                        let url_resolver: any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
                             if (!error) {
-                                let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                                let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
                                     if (!error) {
                                         callback(null, expand_result);
                                     } else {
@@ -825,8 +882,8 @@ namespace HTMLScanner {
 
         };
 
-        static Resolve(source:any, datasource:ScannerBehavior.Behavior, url_result:any, callback: (error: any, result: string) => void) :void {
-            let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+        static Resolve(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string) => void): void {
+            let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
                 if (!error) {
                     callback(null, expand_result);
                 } else {
@@ -837,14 +894,14 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        static Build2(source: string, datasource: any, page_init:any,config:any, callback: (error: any, result: string) => void): void {
+        static Build2(source: string, datasource: any, page_init: any, config: any, callback: (error: any, result: string) => void): void {
 
-            let build:any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
-                let datasource_resolver:any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
+            let build: any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+                let datasource_resolver: any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
                     if (!error) {
-                        let url_resolver:any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
+                        let url_resolver: any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
                             if (!error) {
-                                let expander:any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                                let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
                                     if (!error) {
                                         callback(null, expand_result);
                                     } else {

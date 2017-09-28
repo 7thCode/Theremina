@@ -111,7 +111,13 @@ export namespace ResourcesModule {
                                     }).catch((error): void => {
                                         reject(error);
                                     });
-                                } else {
+                                }  else {
+                                    resolve({});
+                                }
+
+
+
+                          /*      else {
                                     page.remove().then(() => {
                                         let page: any = new ResourceModel();
                                         page.userid = userid;
@@ -135,7 +141,7 @@ export namespace ResourcesModule {
                                     }).catch((error: any): void => {
                                         reject(error);
                                     });
-                                }
+                                }*/
                             });
                         })
                     };

@@ -219,6 +219,8 @@ export namespace FileModule {
                                                                                 }
                                                                             });
                                                                         } else {
+                                                                            resolve({});
+                                                                        } /*else {
                                                                             collection.remove({_id: item._id}, (error, result) => {
                                                                                 if (!error) {
                                                                                     Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
@@ -230,7 +232,7 @@ export namespace FileModule {
                                                                                     });
                                                                                 }
                                                                             })
-                                                                        }
+                                                                        }*/
                                                                     } else {
                                                                         reject(error);
                                                                     }
