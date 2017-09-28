@@ -207,9 +207,11 @@
 #####Include
 
     HEAD要素内
+    
         <meta ds:include="url"/>
         
-    BODY要素内    
+    BODY要素内
+    
         <ds:include src='url'></ds:include>
         
         
@@ -217,41 +219,50 @@
     
 #####resolve    
     
-    <ds:resolve query='query'></ds:resolve>
+    HEAD要素内
     
-    <ds:resolve scope='field_name'>
-
-    <ds:resolve field='field_formula'></ds:resolve>
+        <meta name="xx" query="query" ds:content="field_element" />   ->    <meta name="keywords" content="XXXXXX" />
+       
+        <meta query='query' ds:title="field_element">                 ->    <title>XXXXXXXXX</title>
     
-    <hoge ds:attr='field_formula'>
-
-    例1
-    
-        <ds:resolve scope='content'>
-            <img ds:src="{image.value}"/>
-        </ds:resolve>
         
-        query結果が{content:{image:{value:"X"}}}の場合、
+    BODY要素内 
+    
+        <ds:resolve query='query'></ds:resolve>
+    
+        <ds:resolve scope='field_name'>
+
+        <ds:resolve field='field_formula'></ds:resolve>
+    
+        <hoge ds:attr='field_formula'>
+
+        例1
+    
+            <ds:resolve scope='content'>
+                <img ds:src="{image.value}"/>
+            </ds:resolve>
+        
+            query結果が{content:{image:{value:"X"}}}の場合、
                 
-        <img src='X'/>
+            <img src='X'/>
                     
-        と展開される。
+            と展開される。
         
-    例2    
+        例2    
         
-        <ds:resolve query='query'>
-            <div ds:class="{a}|{b.a}">
-                <ds:resolve field="{a}|{b.a}|{b.b}"></ds:resolve>
+            <ds:resolve query='query'>
+                <div ds:class="{a}|{b.a}">
+                    <ds:resolve field="{a}|{b.a}|{b.b}"></ds:resolve>
+                </div>
+            </ds:resolve>
+    
+            query結果が[{a:"X", b:{a:"Y", b:"Z"}},......]の場合、
+        
+            <div class='XY'>
+                XYZ
             </div>
-        </ds:resolve>
     
-        query結果が[{a:"X", b:{a:"Y", b:"Z"}},......]の場合、
-        
-        <div class='XY'>
-             XYZ
-        </div>
-    
-        と展開される。
+            と展開される。
     
   
 #####foreach
