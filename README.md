@@ -119,6 +119,7 @@
         #name:document
         #userid
         #query:self
+        #position
         #pager
         
             #pager:page
@@ -158,6 +159,9 @@
         <LINK rel="stylesheet" href="/direct/000000000000000000000000/style.css">
     
         と展開される。
+####Position
+
+    特殊なfield_name”#position”は、クエリーデータのシーケンスを返す。
     
 ####Query
 
@@ -215,8 +219,7 @@
         <ds:include src='url'></ds:include>
         
         
-        
-    
+       
 #####resolve    
     
     HEAD要素内

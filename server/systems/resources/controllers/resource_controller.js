@@ -98,31 +98,33 @@ var ResourcesModule;
                                     });
                                 }
                                 else {
-                                    page.remove().then(() => {
-                                        let page = new ResourceModel();
-                                        page.userid = userid;
-                                        page.namespace = namespace;
-                                        page.name = localname;
-                                        page.type = type;
-                                        let resource = "";
-                                        try {
-                                            fs.statSync(filename);
-                                            resource = fs.readFileSync(filename, 'utf-8');
-                                        }
-                                        catch (e) {
-                                            reject(e);
-                                        }
-                                        page.content = { type: content.type, resource: resource };
-                                        page.open = true;
-                                        page.save().then(() => {
-                                            resolve({});
-                                        }).catch((error) => {
-                                            reject(error);
-                                        });
-                                    }).catch((error) => {
-                                        reject(error);
-                                    });
+                                    resolve({});
                                 }
+                                /*      else {
+                                          page.remove().then(() => {
+                                              let page: any = new ResourceModel();
+                                              page.userid = userid;
+                                              page.namespace = namespace;
+                                              page.name = localname;
+                                              page.type = type;
+                                              let resource = "";
+                                              try {
+                                                  fs.statSync(filename);
+                                                  resource = fs.readFileSync(filename, 'utf-8');
+                                              } catch (e) {
+                                                  reject(e);
+                                              }
+                                              page.content = {type: content.type, resource: resource};
+                                              page.open = true;
+                                              page.save().then(() => {
+                                                  resolve({});
+                                              }).catch((error): void => {
+                                                  reject(error);
+                                              });
+                                          }).catch((error: any): void => {
+                                              reject(error);
+                                          });
+                                      }*/
                             });
                         });
                     };

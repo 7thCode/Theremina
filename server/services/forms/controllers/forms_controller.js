@@ -50,12 +50,13 @@ var FormsModule;
             if (docs) {
                 let save = (doc) => {
                     return new Promise((resolve, reject) => {
-                        let namespace = Form.namespace(doc.name);
+                        //   let namespace: string = Form.namespace(doc.name);
                         let localname = Form.localname(doc.name);
                         let userid = doc.userid;
+                        let namespace = "";
                         let type = doc.type;
                         let content = doc.content;
-                        let query = { $and: [{ userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
+                        let query = { $and: [{ namespace: namespace }, { userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
                         Wrapper.FindOne(null, 1000, FormModel, query, (response, page) => {
                             if (!page) {
                                 let page = new FormModel();
@@ -89,11 +90,12 @@ var FormsModule;
         create_form(request, response) {
             const number = 1000;
             let userid = builder_userid;
+            let namespace = "";
             let name = request.body.name;
             let type = request.body.type;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, FormModel, { $and: [{ name: name }, { type: type }, { userid: userid }] }, (response, exists) => {
+                    Wrapper.FindOne(response, number, FormModel, { $and: [{ name: name }, { type: type }, { namespace: namespace }, { userid: userid }] }, (response, exists) => {
                         if (!exists) {
                             let page = new FormModel();
                             page.userid = userid;
@@ -129,8 +131,9 @@ var FormsModule;
         put_form(request, response) {
             const number = 1100;
             let userid = builder_userid;
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { userid: userid }] }, (response, page) => {
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
                 if (page) {
                     page.content = request.body.content;
                     page.open = true;
@@ -151,8 +154,9 @@ var FormsModule;
         delete_form(request, response) {
             const number = 1200;
             let userid = builder_userid;
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { userid: userid }] }, (response, page) => {
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
                 if (page) {
                     Wrapper.Remove(response, number, page, (response) => {
                         Wrapper.SendSuccess(response, {});
@@ -171,8 +175,9 @@ var FormsModule;
         get_form(request, response) {
             const number = 1300;
             let userid = builder_userid;
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { userid: userid }] }, (response, page) => {
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
                 if (page) {
                     Wrapper.SendSuccess(response, page);
                 }
@@ -189,7 +194,8 @@ var FormsModule;
         delete_own(request, response) {
             const number = 1200;
             let userid = builder_userid;
-            Wrapper.Delete(response, number, FormModel, { userid: userid }, (response) => {
+            let namespace = "";
+            Wrapper.Delete(response, number, FormModel, { $and: [{ namespace: namespace }, { userid: userid }] }, (response) => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -201,9 +207,10 @@ var FormsModule;
         get_form_query(request, response) {
             const number = 1400;
             let userid = builder_userid;
+            let namespace = "";
             let query = Wrapper.Decode(request.params.query);
             let option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, number, FormModel, { $and: [{ userid: userid }, query] }, {}, option, (response, pages) => {
+            Wrapper.Find(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, {}, option, (response, pages) => {
                 _.forEach(pages, (page) => {
                     page.content = null;
                 });
@@ -218,8 +225,9 @@ var FormsModule;
         get_form_count(request, response) {
             const number = 2800;
             let userid = builder_userid;
+            let namespace = "";
             let query = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, number, FormModel, { $and: [{ userid: userid }, query] }, (response, count) => {
+            Wrapper.Count(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, (response, count) => {
                 Wrapper.SendSuccess(response, count);
             });
         }

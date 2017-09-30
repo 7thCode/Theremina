@@ -84,6 +84,20 @@ var FileModule;
         }
         static from_local(gfs, path_from, namespace, key, name, mimetype, callback) {
             try {
+                /*
+                                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                
+                                let writestream = bucket.openUploadStream(name, {
+                                    contentType: "binary/octet-stream",
+                                    metadata: {
+                                        userid: config.systems.userid,
+                                        key: key,
+                                        type: mimetype,
+                                        namespace: namespace,
+                                        parent: null
+                                    }
+                                });
+                */
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
@@ -184,19 +198,20 @@ var FileModule;
                                                                             });
                                                                         }
                                                                         else {
-                                                                            collection.remove({ _id: item._id }, (error, result) => {
+                                                                            resolve({});
+                                                                        } /*else {
+                                                                            collection.remove({_id: item._id}, (error, result) => {
                                                                                 if (!error) {
-                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
+                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
                                                                                         if (!error) {
                                                                                             resolve(file);
-                                                                                        }
-                                                                                        else {
+                                                                                        } else {
                                                                                             reject(error);
                                                                                         }
                                                                                     });
                                                                                 }
-                                                                            });
-                                                                        }
+                                                                            })
+                                                                        }*/
                                                                     }
                                                                     else {
                                                                         reject(error);
@@ -506,7 +521,8 @@ var FileModule;
         get_file_data_name(request, response, next) {
             try {
                 let conn = Files.connect(config.db.user);
-                let namespace = request.params.namespace;
+                // let namespace: string = request.params.namespace;
+                let namespace = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = Files.userid(request);
                 let BinaryToBase64 = (str) => {

@@ -243,7 +243,7 @@ var ScannerBehavior;
             });
             return result;
         }
-        FieldValue(object, params, parent) {
+        FieldValue(object, params, position, parent) {
             let result = null;
             let full_params = params.trim();
             if (full_params) {
@@ -301,6 +301,9 @@ var ScannerBehavior;
                                 case "#userid":
                                     result = this.id;
                                     break;
+                                case "#position":
+                                    result = position;
+                                    break;
                                 case "#namespace":
                                     result = this.namespace;
                                     break;
@@ -322,6 +325,9 @@ var ScannerBehavior;
                                         switch (postfix) {
                                             case "page":
                                                 result = Search(object, 0);
+                                                if (!result) {
+                                                    result = "";
+                                                }
                                                 break;
                                             case "index":
                                                 result = object.index;
@@ -493,7 +499,7 @@ var ScannerBehavior;
             }
             return result;
         }
-        ResolveFormat(data, value, parent) {
+        ResolveFormat(data, value, position, parent) {
             let result = "";
             this.SplitFormat(value.content, (element) => {
                 let appender = element;
@@ -501,7 +507,7 @@ var ScannerBehavior;
                 if (data) {
                     if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
                         let sliceed = trimed.slice(1, -1);
-                        appender = this.FieldValue(data, sliceed.trim(), parent); // fragment, model
+                        appender = this.FieldValue(data, sliceed.trim(), position, parent); // fragment, model
                     }
                 }
                 result += appender;

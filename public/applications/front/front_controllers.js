@@ -2637,7 +2637,7 @@ FrontControllers.controller('SVGController', ["$scope", '$document', '$log', '$w
             if (ShapeEdit.SelectedCount() === 1) {
                 if (shape.Parent().IsRoot()) {
                     switch (shape.type) {
-                        case "Text"://for inPlace Input  only Text
+                        case "Text":
                             $scope.$evalAsync(// $apply
                             function ($scope) {
                                 let id = shape.ID();

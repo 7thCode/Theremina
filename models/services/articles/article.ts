@@ -9,7 +9,7 @@
 export namespace ArticleModule {
 
     const mongoose = require('mongoose');
-    const request = require('request-promise');
+   // const request = require('request-promise');
     const Schema = mongoose.Schema;
     const timestamp: any = require('../../systems/plugins/timestamp/timestamp');
     const userdata: any = require('../../systems/plugins/userdata/userdata');
@@ -22,8 +22,8 @@ export namespace ArticleModule {
     Article.plugin(timestamp);
     Article.plugin(userdata, {});
 
-    Article.index({_id: 1, userid: 1}, {unique: true, index: true});
-    Article.index({name: 1}, {unique: true, index: true});
+    Article.index({userid: 1, name: 1}, {unique: true, index: true});
+   // Article.index({name: 1}, {unique: true, index: true});
 
     Article.method("GetContent", function (name: string): void {
         return this.content[name];

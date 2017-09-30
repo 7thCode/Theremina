@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ArticleModule;
 (function (ArticleModule) {
     const mongoose = require('mongoose');
-    const request = require('request-promise');
+    // const request = require('request-promise');
     const Schema = mongoose.Schema;
     const timestamp = require('../../systems/plugins/timestamp/timestamp');
     const userdata = require('../../systems/plugins/userdata/userdata');
@@ -18,8 +18,8 @@ var ArticleModule;
     });
     Article.plugin(timestamp);
     Article.plugin(userdata, {});
-    Article.index({ _id: 1, userid: 1 }, { unique: true, index: true });
-    Article.index({ name: 1 }, { unique: true, index: true });
+    Article.index({ userid: 1, name: 1 }, { unique: true, index: true });
+    // Article.index({name: 1}, {unique: true, index: true});
     Article.method("GetContent", function (name) {
         return this.content[name];
     });
