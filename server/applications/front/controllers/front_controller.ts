@@ -145,7 +145,7 @@ export namespace FrontModule {
          */
         static get_article_all(userid: string, tmp_path: string, callback: (error) => void): void {
             let namespace = "";
-            ArticleModel.find({$and: [{namespace:namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
+            ArticleModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -163,7 +163,7 @@ export namespace FrontModule {
          */
         static get_resource_all(userid: string, tmp_path: string, callback: (error) => void): void {
             let namespace = "";
-            ResourceModel.find({$and: [{namespace:namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
+            ResourceModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -272,56 +272,56 @@ export namespace FrontModule {
                     if (!error) {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
 
-                                let query = {"metadata.userid": config.systems.userid};
-                                collection.find(query, (error: any, items: any): void => {
-                                    if (!error) {
-                                        items.toArray((error,items) => {
-                                            if (!error) {
-                                                let promises = [];
-                                                _.forEach(items, (item) => {
-                                                    promises.push(new Promise((resolve: any, reject: any): void => {
-                                                        if (item) {
-                                                            let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
-                                                            let readstream =  bucket.openDownloadStream(item._id);
+                            let query = {"metadata.userid": config.systems.userid};
+                            collection.find(query, (error: any, items: any): void => {
+                                if (!error) {
+                                    items.toArray((error, items) => {
+                                        if (!error) {
+                                            let promises = [];
+                                            _.forEach(items, (item) => {
+                                                promises.push(new Promise((resolve: any, reject: any): void => {
+                                                    if (item) {
+                                                        let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                                                        let readstream = bucket.openDownloadStream(item._id);
 
-                                                           let meta = item.metadata;
-                                                           meta.userid = userid;
+                                                        let meta = item.metadata;
+                                                        meta.userid = userid;
 
-                                                            let writestream = bucket.openUploadStream(item.filename, {
-                                                                contentType: item.contentType,
-                                                                metadata: meta
+                                                        let writestream = bucket.openUploadStream(item.filename, {
+                                                            contentType: item.contentType,
+                                                            metadata: meta
+                                                        });
+
+                                                        if (writestream) {
+                                                            writestream.on('close', (file: any): void => {
+                                                                resolve(file);
                                                             });
-
-                                                            if (writestream) {
-                                                                writestream.on('close', (file: any): void => {
-                                                                    resolve(file);
-                                                                });
-                                                                readstream.on('error', (error: any): void => {
-                                                                    reject(error);
-                                                                });
-                                                                readstream.pipe(writestream);
-                                                            } else {
-                                                                reject({});
-                                                            }
+                                                            readstream.on('error', (error: any): void => {
+                                                                reject(error);
+                                                            });
+                                                            readstream.pipe(writestream);
                                                         } else {
                                                             reject({});
                                                         }
-                                                    }));
-                                                });
+                                                    } else {
+                                                        reject({});
+                                                    }
+                                                }));
+                                            });
 
-                                                Promise.all(promises).then((results: any[]): void => {
-                                                    conn.db.close();
-                                                }).catch((error: any): void => {
-                                                    conn.db.close();
-                                                });
-                                            }else {
+                                            Promise.all(promises).then((results: any[]): void => {
+                                                conn.db.close();
+                                            }).catch((error: any): void => {
+                                                conn.db.close();
+                                            });
+                                        } else {
 
-                                            }
-                                        });
-                                    } else {
+                                        }
+                                    });
+                                } else {
 
-                                    }
-                                });
+                                }
+                            });
 
                         });
                     } else {
@@ -349,7 +349,7 @@ export namespace FrontModule {
                     let namespace = doc.namespace;
                     let type: string = doc.type;
                     let content: any = doc.content;
-                    ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                    ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
                         if (!found) {
                             let page: any = new ResourceModel();
                             page.userid = userid;
@@ -386,7 +386,7 @@ export namespace FrontModule {
                     let namespace = "";
                     let type: string = doc.type;
                     let content: any = doc.content;
-                    ArticleModel.findOne({$and: [{namespace:namespace},{userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
+                    ArticleModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
                         if (!found) {
                             let page: any = new ArticleModel();
                             page.userid = userid;
@@ -406,11 +406,14 @@ export namespace FrontModule {
 
         }
 
+
         /**
          * @param request
          * @param response
          * @returns none
          */
+
+        /*
         public build(request: any, response: any): void {
             let userid = Pages.userid(request);
             let name = request.params.name;
@@ -617,6 +620,36 @@ export namespace FrontModule {
             }
 
         }
+*/
+
+        public build(request: any, response: any): void {
+            let userid = Pages.userid(request);
+            let name = request.params.name;
+
+            const core = require(process.cwd() + '/gs');
+            const file: any = core.file;
+            const resource: any = core.resource;
+
+            let all_resource_set = applications_config.sites;
+            if (all_resource_set) {
+                let target_resource_set = all_resource_set[name];
+                if (target_resource_set) {
+                    file.create_init_files(userid, target_resource_set.files, (error: any, result: any): void => {
+                        if (!error) {
+                            resource.create_init_resources(userid, target_resource_set.resources, (error: any, result: any): void => {
+                                if (!error) {
+                                    Wrapper.SendSuccess(response, {code: 0, message: ""});
+                                } else {
+                                    Wrapper.SendError(response, error.code, error.message, error);
+                                }
+                            });
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
+                }
+            }
+        }
 
         public namespaces(request: any, response: any): void {
             let userid = Pages.userid(request);
@@ -629,7 +662,7 @@ export namespace FrontModule {
                             Wrapper.SendError(response, 200, error.message, error);
                         }
                     });
-                }else {
+                } else {
                     Wrapper.SendError(response, 200, error.message, error);
                 }
             });
@@ -701,8 +734,8 @@ export namespace FrontModule {
                 let referer_url = url.parse(referer);
                 let path = referer_url.pathname;
                 let separated_path = path.split("/");
-                let userid = separated_path[2];
-                let namespace = "";
+                let userid = separated_path[1];
+                let namespace = separated_path[2];
 
                 if (userid) {
                     if (request.body.content) {
@@ -711,29 +744,29 @@ export namespace FrontModule {
                                 let thanks_to = request.body.content.thanks;
                                 let report_to = request.body.content.report;
 
-                                let content = {};
-                                Object.keys(request.body.content).forEach((key):void => {
-                                    content[key] = {"value": request.body.content[key], "type": "quoted"};
-                                });
-                                ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                //  let content = {};
+                                //  Object.keys(request.body.content).forEach((key):void => {
+                                //      content[key] = {"value": request.body.content[key], "type": "quoted"};
+                                //  });
+                                ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
-                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid,namespace, null, true, {});
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                             create: "",
                                             modify: "",
-                                            content: content
+                                            content: request.body.content
                                         }, (error: any, doc: string) => {
                                             if (!error) {
-                                                mailer.send(report_to, report_title, doc, (error: any):void => {
+                                                mailer.send(report_to, report_title, doc, (error: any): void => {
                                                     if (!error) {
-                                                        ResourceModel.findOne({$and: [{namespace:namespace},{userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                                        ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
-                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid,namespace, null, true, {});
+                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, namespace, null, true, {});
                                                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                                                     create: "",
                                                                     modify: "",
-                                                                    content: content
-                                                                }, (error: any, doc: string):void => {
+                                                                    content: request.body.content
+                                                                }, (error: any, doc: string): void => {
                                                                     if (!error) {
                                                                         mailer.send(thanks_to, thanks_title, doc, (error: any) => {
                                                                             if (!error) {
@@ -796,7 +829,7 @@ export namespace FrontModule {
             let userid = Members.userid(request);
             let namespace = "";
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {namespace:namespace},{userid: userid}]};
+            let query2 = {$and: [query, {namespace: namespace}, {userid: userid}]};
 
             Wrapper.FindOne(response, 1000, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -816,7 +849,7 @@ export namespace FrontModule {
             let userid = Members.userid(request);
             let namespace = "";
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {namespace:namespace},{userid: userid}]};
+            let query2 = {$and: [query, {namespace: namespace}, {userid: userid}]};
 
             Wrapper.FindOne(response, 1100, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -842,7 +875,7 @@ export namespace FrontModule {
             let namespace = "";
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let query2 = {$and: [query,{namespace:namespace}, {userid: userid}]};
+            let query2 = {$and: [query, {namespace: namespace}, {userid: userid}]};
 
             Wrapper.Find(response, 5000, LocalAccount, query2, {}, option, (response: any, accounts: any): any => {
                 Wrapper.SendSuccess(response, accounts);
@@ -872,7 +905,7 @@ export namespace FrontModule {
         public delete_own(request: any, response: any): void {
             let userid = Members.userid(request);
             let namespace = "";
-            let query: any = {$and:[{namespace:namespace},{userid: userid}]};
+            let query: any = {$and: [{namespace: namespace}, {userid: userid}]};
 
             Wrapper.FindOne(response, 5100, LocalAccount, query, (response: any, page: any): void => {
                 if (page) {
@@ -899,22 +932,24 @@ export namespace FrontModule {
             }
             return result;
         }
-/*
-        static namespace(name: string): string {
-            let result = "";
-            if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
+
+        /*
+                static namespace(name: string): string {
+                    let result = "";
+                    if (name) {
+                        let names = name.split("#");
+                        let delimmiter = "";
+                        names.forEach((name, index) => {
+                            if (index < (names.length - 1)) {
+                                result += delimmiter + name;
+                                delimmiter = ":";
+                            }
+                        })
                     }
-                })
-            }
-            return result;
-        }
-*/
+                    return result;
+                }
+        */
+
         static localname(name: string): string {
             let result = "";
             if (name) {
@@ -984,9 +1019,9 @@ export namespace FrontModule {
             try {
                 let conn = Pictures.connect(config.db.user);
                 let namespace: string = request.params.namespace;
-             //   let namespace = Pictures.namespace(request.params.name);
+                //   let namespace = Pictures.namespace(request.params.name);
                 let name = Pictures.localname(request.params.name);
-             //   let userid = request.params.userid;
+                //   let userid = request.params.userid;
                 let size = request.query;
 
                 conn.once('open', (error: any): void => {
@@ -997,13 +1032,13 @@ export namespace FrontModule {
                                 if (!error) {
                                     if (collection) {
                                         let userid: string = request.params.userid;
-                                        Pictures.retrieve_account(userid, (error:any, account:any):void => {
+                                        Pictures.retrieve_account(userid, (error: any, account: any): void => {
                                             if (!error) {
                                                 if (account) {
                                                     userid = account.userid;
                                                 }
 
-                                                let query = {$and: [{filename: name},{"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                                let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
                                                 collection.findOne(query, (error: any, item: any): void => {
                                                     if (!error) {
                                                         if (item) {
@@ -1021,7 +1056,7 @@ export namespace FrontModule {
                                                                 });
 
                                                                 try {
-                                                                    if (type == "image/jpeg" || type == "image/png" || type == "image/gif") {
+                                                                    if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
                                                                         if (size.w && size.h) {
                                                                             if (size.l && size.t) {
                                                                                 /*

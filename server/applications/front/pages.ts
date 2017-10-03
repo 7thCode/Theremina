@@ -153,8 +153,44 @@ export namespace PageRouter {
     }]);
 
     router.get('/pages/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/pages/dialogs/build_site_dialog', {message: message});
+
+        let items = [];
+        if (applications_config.sites) {
+            let keys = Object.keys(applications_config.sites);
+
+            keys.forEach((key:string):void => {
+                items.push(applications_config.sites[key].description);
+            });
+        }
+
+        result.render('applications/pages/dialogs/build_site_dialog',
+            {
+                message: message,
+                items: items
+            });
     }]);
+
+    /*
+    [
+                    {
+                        class: "item active",
+                        img: "/000000000000000000000000/verb/doc/img/img_3.jpg",
+                        name: "verb"
+                    },
+                    {
+                        class: "item",
+                        img: "/000000000000000000000000/verb/doc/img/img_4.jpg",
+                        name: "story"
+                    },
+                    {
+                        class: "item",
+                        img: "/000000000000000000000000/verb/doc/img/img_5.jpg",
+                        name: "words"
+                    }
+                ]
+
+
+    */
 
     router.get('/pages/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('applications/pages/dialogs/delete_confirm_dialog', {message: message});
@@ -294,7 +330,7 @@ export namespace PageRouter {
         }
     };
 
-    let render_static = (request:any, response:any):void => {
+    let render_static = (request: any, response: any): void => {
         resources.render_direct(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -318,7 +354,7 @@ export namespace PageRouter {
         render_static(request, response);
     }]);
 
-    let render_html = (request:any, response:any):void => {
+    let render_html = (request: any, response: any): void => {
         resources.render_html(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -349,9 +385,9 @@ export namespace PageRouter {
         render_html(request, response);
     }]);
 
-  //  router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-  //      render_html(request, response);
-  //  }]);
+    //  router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    //      render_html(request, response);
+    //  }]);
 
     router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {

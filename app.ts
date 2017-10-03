@@ -38,7 +38,7 @@ if (config_seed) {
         const core = require(process.cwd() + '/gs');
         const share: any = core.share;
         const config: any = share.config;
-        const logger:any = share.logger;
+   //     const logger:any = share.logger;
 
         app.use("/", require("./server/utility/installer/api"));
         app.use("/", require("./server/utility/installer/pages"));
@@ -324,10 +324,10 @@ if (config_seed) {
         auth.create_init_user(applications_config.initusers);
 
         const file: any = core.file;
-        file.create_init_files(config.initfiles, (error, result) => {
-            file.create_init_files(services_config.initfiles, (error, result) => {
-                file.create_init_files(plugins_config.initfiles, (error, result) => {
-                    file.create_init_files(applications_config.initfiles, (error, result) => {
+        file.create_init_files(config.systems.userid,config.initfiles, (error, result) => {
+            file.create_init_files(config.systems.userid,services_config.initfiles, (error, result) => {
+                file.create_init_files(config.systems.userid,plugins_config.initfiles, (error, result) => {
+                    file.create_init_files(config.systems.userid,applications_config.initfiles, (error, result) => {
 
                     });
                 });
@@ -335,10 +335,10 @@ if (config_seed) {
         });
 
         const resource: any = core.resource;
-        resource.create_init_resources(config.initresources, (error, result) => {
-            resource.create_init_resources(services_config.initresources,(error, result) => {
-                resource.create_init_resources(plugins_config.initresources,(error, result) => {
-                    resource.create_init_resources(applications_config.initresources,(error, result) => {
+        resource.create_init_resources(config.systems.userid,config.initresources, (error, result) => {
+            resource.create_init_resources(config.systems.userid,services_config.initresources,(error, result) => {
+                resource.create_init_resources(config.systems.userid,plugins_config.initresources,(error, result) => {
+                    resource.create_init_resources(config.systems.userid,applications_config.initresources,(error, result) => {
 
                     });
                 });

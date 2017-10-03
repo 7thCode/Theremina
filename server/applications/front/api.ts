@@ -46,8 +46,8 @@ export namespace ApiRouter {
     router.delete('/members/api/own', [exception.exception, exception.guard, exception.authenticate, members.delete_own]);
 
     event.emitter.on('register', (param: any): void => {
-        pages.create_init_user_resources(param.user);
-        pages.create_init_user_file(param.user);
+    //    pages.create_init_user_resources(param.user);
+    //    pages.create_init_user_file(param.user);
      //   pages.create_init_user_articles(param.user);
     });
 

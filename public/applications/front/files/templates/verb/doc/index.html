@@ -59,7 +59,7 @@
             <div class="row row-pb-md">
                 <div class="col-md-12">
                     <ul id="gtco-post-list">
-                        <ds:foreach query='q::{"content.type.value":"blog"};'>
+                        <ds:foreach scope='#init'>
                             <li ds:class="{content.klass.value}" data-animate-effect="fadeIn">
                                 <ds:resolve scope='content'>
                                     <a ds:href='{link.value}'>
