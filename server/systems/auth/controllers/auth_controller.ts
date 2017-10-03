@@ -207,6 +207,13 @@ export namespace AuthModule {
             }
         }
 
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
         public is_enabled_regist_user(request: any, response: any, next: any): void {
             let user = request.user;
             if (user) {
@@ -224,6 +231,13 @@ export namespace AuthModule {
             }
         }
 
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
         public is_enabled_regist_member(request: any, response: any, next: any): void {
             let user = request.user;
             if (user) {
@@ -241,7 +255,6 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-
         public post_local_register(request: any, response: any): void {
             const number: number = 15000;
             let username: string = request.body.username;
