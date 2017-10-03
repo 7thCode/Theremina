@@ -97,7 +97,7 @@ export namespace FileModule {
             return request.user.username;
         }
 
-        static from_local(gfs: any, path_from: string, namespace: string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
+        static from_local(gfs: any, path_from: string, namespace: string,userid:string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
 /*
                 let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
@@ -113,19 +113,16 @@ export namespace FileModule {
                     }
                 });
 */
-
-
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
-                        userid: config.systems.userid,
+                        userid: userid,// config.systems.userid,
                         key: key,
                         type: mimetype,
                         namespace: namespace,
                         parent: null
                     }
                 });
-
 
                 let readstream = fs.createReadStream(path_from + '/' + name, {encoding: null, bufferSize: 1});
 
@@ -181,7 +178,7 @@ export namespace FileModule {
          *
          * @returns none
          */
-        public create_init_files(initfiles: any[], callback: (error, result) => void): void {
+        public create_init_files(userid:string,initfiles: any[], callback: (error:any, result:any) => void): void {
             if (initfiles) {
                 if (initfiles.length > 0) {
                     let conn = Files.connect(config.db.user);
@@ -206,12 +203,12 @@ export namespace FileModule {
                                                                 let namespace = doc.namespace;
                                                                 let mimetype = doc.content.type;
                                                                 let type: number = doc.type;
-                                                                let query = {$and: [{filename: filename}, {"metadata.userid": config.systems.userid}]};
+                                                                let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
 
                                                                 collection.findOne(query, (error: any, item: any): void => {
                                                                     if (!error) {
                                                                         if (!item) {
-                                                                            Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
+                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
                                                                                 if (!error) {
                                                                                     resolve(file);
                                                                                 } else {

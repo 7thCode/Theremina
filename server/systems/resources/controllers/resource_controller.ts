@@ -77,7 +77,7 @@ export namespace ResourcesModule {
          * @param initresources
          * @returns none
          */
-        public create_init_resources(initresources: any[], callback: (error: any, result: any) => void): void {
+        public create_init_resources(userid:string,initresources: any[], callback: (error: any, result: any) => void): void {
             if (initresources) {
                 if (initresources.length > 0) {
                     let save = (doc: any): any => {
@@ -86,7 +86,6 @@ export namespace ResourcesModule {
                             let filename = process.cwd() + doc.path + '/' + doc.name;
                             let namespace: string = doc.namespace;// Resource.namespace(doc.name);
                             let localname: string = Resource.localname(doc.name);
-                            let userid = doc.userid;
                             let type: string = doc.type;
                             let content: any = doc.content;
 
@@ -114,8 +113,6 @@ export namespace ResourcesModule {
                                 }  else {
                                     resolve({});
                                 }
-
-
 
                           /*      else {
                                     page.remove().then(() => {

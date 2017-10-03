@@ -35,14 +35,14 @@ namespace HTMLScanner {
             return splited_name[splited_name.length - 1];
         }
 
-        protected ScanChild(node: any, data: any): void {
+        protected ScanChild(node: any, data: any, position:number): void {
             if (node) {
                 let childnodes: any[] = node.childNodes;
                 this.depth++;
                 if (childnodes) {
                     _.forEach(childnodes, (node: any, index: number): void => {
                         this.position = index;
-                        this.ScanNode(node, data);
+                        this.ScanNode(node, data,position);
                     });
                 }
                 this.depth--;
@@ -51,8 +51,8 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: any, data: any): void {
-            this.ScanChild(node, data);
+        protected ScanNode(node: any, data: any,position:number): void {
+            this.ScanChild(node, data,position);
         }
 
         public ScanHtml(url: string): any {
@@ -67,7 +67,7 @@ namespace HTMLScanner {
                         if (childnodes) {
                             _.forEach(childnodes, (element, index) => {
                                 this.position = index;
-                                this.ScanNode(element, null);
+                                this.ScanNode(element, null, 0);
                             });
                         }
                     } else {
@@ -109,7 +109,7 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: any, data: any): void {
+        protected ScanNode(node: any, data: any,position:number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -118,12 +118,12 @@ namespace HTMLScanner {
                                 this.ScanLinks(node, data);
                                 break;
                             default:
-                                this.ScanChild(node, data);
+                                this.ScanChild(node, data, position);
                                 break;
                         }
                         break;
                     default:
-                        this.ScanChild(node, data);
+                        this.ScanChild(node, data,position);
                 }
             } else {
                 this.callback({code: 1}, null);
@@ -173,7 +173,7 @@ namespace HTMLScanner {
             return result;
         }
 
-        protected ScanNode(node: any, data: any): void {
+        protected ScanNode(node: any, data: any,position:number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -214,7 +214,7 @@ namespace HTMLScanner {
                                 default:
                                     break;
                             }
-                            this.ScanChild(node, data);
+                            this.ScanChild(node, data,position);
                         } else {
                             this.callback({code: 1}, null);
                         }
@@ -238,7 +238,7 @@ namespace HTMLScanner {
                         if (childnodes) {
                             _.forEach(childnodes, (element, index) => {
                                 this.position = index;
-                                this.ScanNode(element, null);
+                                this.ScanNode(element, null, 0);
                             });
                         }
                     } else {
@@ -392,7 +392,7 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: { nodeType: number, localName: string, attributes: { src: { nodeValue: string } } }, data: any): void {
+        protected ScanNode(node: { nodeType: number, localName: string, attributes: { src: { nodeValue: string } } }, data: any, position:number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -425,7 +425,7 @@ namespace HTMLScanner {
                                 default:
                                     break;
                             }
-                            this.ScanChild(node, data);
+                            this.ScanChild(node, data, position);
                         }
                         break;
                     default:
@@ -447,7 +447,7 @@ namespace HTMLScanner {
                         if (childnodes) {
                             _.forEach(childnodes, (element: any, index: number): void => {
                                 this.position = index;
-                                this.ScanNode(element, null);
+                                this.ScanNode(element, null, 0);
                             });
                         }
                     } else {
@@ -534,7 +534,7 @@ namespace HTMLScanner {
 
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        private Meta(node: any, data: any): void {
+        private Meta(node: any, data: any,position:number): void {
             let resolved: boolean = false;
             if (node.attributes) {
                 let number = node.attributes.length;
@@ -545,7 +545,7 @@ namespace HTMLScanner {
                     if (prefix == PREFIX) {
                         switch (localname) {
                             case "include":
-                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
+                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue],position, this);
                                 resolved = true;
                                 break;
                             case "title": {
@@ -557,7 +557,7 @@ namespace HTMLScanner {
                                         this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
                                             content: attribute.value,
                                             count: 1
-                                        }, this) + '</title>';
+                                        }, position,this) + '</title>';
                                     }
                                     resolved = true;
                                 }
@@ -578,7 +578,7 @@ namespace HTMLScanner {
                                         this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
                                             content: attribute.value,
                                             count: 1
-                                        }, this) + '"/>';
+                                        }, position, this) + '"/>';
                                     }
                                     resolved = true;
                                 }
@@ -595,11 +595,11 @@ namespace HTMLScanner {
                 }
             }
             if (!resolved) {
-                this.NodeToElement(node, data);
+                this.NodeToElement(node, data,position);
             }
         }
 
-        private NodeToElement(node: any, data: any): void {
+        private NodeToElement(node: any, data: any, position:number): void {
             let tagname: string = node.localName;
             let attribute_string: string = "";
             if (node.attributes) {
@@ -612,7 +612,7 @@ namespace HTMLScanner {
                         attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
                             count: 1
-                        }, this) + '"';
+                        },position, this) + '"';
                     } else {
                         attribute_string += ' ' + attribute.name + '="' + attribute.value + '"';
                     }
@@ -628,7 +628,7 @@ namespace HTMLScanner {
 
             if (node.childNodes.length > 0) {
                 this.html += "<" + localname + attribute_string + ">";
-                this.ScanChild(node, data);
+                this.ScanChild(node, data, position);
                 this.html += "</" + localname + ">";
             } else {
                 switch (localname.toLowerCase()) {
@@ -644,14 +644,14 @@ namespace HTMLScanner {
             }
         }
 
-        private ResolveChildren(node: any, result: any): void {
+        private ResolveChildren(node: any, result: any, position:number): void {
             _.forEach(node.childNodes, (childnode: any, index): void => {
                 this.position = index;
-                this.ScanNode(childnode, result);
+                this.ScanNode(childnode, result, position);
             })
         }
 
-        protected ScanNode(node: any, data: any): void {
+        protected ScanNode(node: any, data: any,position:number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -664,13 +664,13 @@ namespace HTMLScanner {
                                 case "head":
                                 case "body":
                                     if (this.datasource.isdocument) {
-                                        this.NodeToElement(node, data);
+                                        this.NodeToElement(node, data,position);
                                     } else {
-                                        this.ScanChild(node, data);
+                                        this.ScanChild(node, data,position);
                                     }
                                     break;
                                 case "meta":
-                                    this.Meta(node, data);
+                                    this.Meta(node, data,position);
                                     break;
                                 case "foreach":
                                     if (prefix == PREFIX) {
@@ -679,18 +679,18 @@ namespace HTMLScanner {
                                                 let query: any = node.attributes["query"];
                                                 let result: any = this.fragments[query.nodeValue].content;
                                                 if (result) {
-                                                    _.forEach(result, (resolved_data, index) => {
-                                                        this.ResolveChildren(node, resolved_data);
+                                                    _.forEach(result, (resolved_data, position) => {
+                                                        this.ResolveChildren(node, resolved_data, position);
                                                     });
                                                 }
                                             } else if (node.attributes.scope) { // scope="a.b.c"
                                                 if (data) {
                                                     let scope: any = node.attributes.scope;
-                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, this);//fragment
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue,position, this);//fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
-                                                            _.forEach(result, (resolved_data, index) => {
-                                                                this.ResolveChildren(node, resolved_data);
+                                                            _.forEach(result, (resolved_data, position) => {
+                                                                this.ResolveChildren(node, resolved_data,position);
                                                             });
                                                         }
                                                     }
@@ -704,7 +704,7 @@ namespace HTMLScanner {
                                         if (node.attributes) {
                                             if (node.attributes.src) {    // src="url"
                                                 let src: any = node.attributes.src;
-                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], this);
+                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue],position, this);
                                             }
                                         }
                                     }
@@ -717,25 +717,25 @@ namespace HTMLScanner {
                                                 let current_datasource: any = this.fragments[query.nodeValue].content;
                                                 _.forEach(node.childNodes, (childnode: any, index: number): void => {
                                                     this.position = index;
-                                                    this.ScanNode(childnode, current_datasource[0]);
+                                                    this.ScanNode(childnode, current_datasource[0], 0);
                                                 })
                                             } else if (node.attributes.field) {  // field="{a.b.c}"
                                                 let field: any = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
-                                                }, this);
+                                                },position, this);
                                             } else if (node.attributes.scope) {  // scope="a.b.c"
                                                 if (data) {
                                                     let scope: any = node.attributes.scope;
-                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, this);
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue,position, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
-                                                                this.ResolveChildren(node, result[0]);
+                                                                this.ResolveChildren(node, result[0], 0);
                                                             }
                                                         } else {
-                                                            this.ResolveChildren(node, result);
+                                                            this.ResolveChildren(node, result, position);
                                                         }
                                                     }
                                                 }
@@ -748,9 +748,9 @@ namespace HTMLScanner {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
-                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue,position, this); //model
                                                 if (result) {
-                                                    this.ResolveChildren(node, data);
+                                                    this.ResolveChildren(node, data, position);
                                                 }
                                             }
                                         }
@@ -761,16 +761,16 @@ namespace HTMLScanner {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
-                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue,position, this); //model
                                                 if (!result) {
-                                                    this.ResolveChildren(node, data);
+                                                    this.ResolveChildren(node, data, position);
                                                 }
                                             }
                                         }
                                     }
                                     break;
                                 default:
-                                    this.NodeToElement(node, data);
+                                    this.NodeToElement(node, data,position);
                                     break;
                             }
                         }
@@ -780,7 +780,7 @@ namespace HTMLScanner {
                             let parent_name: string = node.parentNode.localName;
                             let prefix: string = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
-                                this.html += this.datasource.ResolveFormat(data, {content: node.data, count: 1}, this);
+                                this.html += this.datasource.ResolveFormat(data, {content: node.data, count: 1},position, this);
                             } else {
                                 this.html += node.data;
                             }
@@ -813,7 +813,7 @@ namespace HTMLScanner {
                         if (childnodes) {
                             _.forEach(childnodes, (element, index) => {
                                 this.position = index;
-                                this.ScanNode(element, fragments);
+                                this.ScanNode(element, fragments, 0);
                             });
                         }
                     } else {
@@ -828,11 +828,11 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[]): any {
+        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[], position:number): any {
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
-                    this.ScanNode(element, fragments);
+                    this.ScanNode(element, fragments, position);
                 });
             }
         }

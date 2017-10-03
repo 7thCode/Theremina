@@ -19,9 +19,9 @@ namespace ScannerBehavior {
 
         GetUrl(target_url_string: string, parent): any;
 
-        FieldValue(object: any, path: string, parent: any): any;
+        FieldValue(object: any, path: string, position: number, parent: any): any;
 
-        ResolveFormat(data: any, value: { content: any, count: number }, parent: any): string;
+        ResolveFormat(data: any, value: { content: any, count: number }, position: number, parent: any): string;
     }
 
     class Params {
@@ -115,7 +115,7 @@ namespace ScannerBehavior {
         public name: string = "";
         public parent_name: string = "";
         public id: string = "";
-        public namespace:string;
+        public namespace: string;
         public page_params: any;
         public isdocument: boolean;
         public filters: {};
@@ -124,7 +124,7 @@ namespace ScannerBehavior {
 
         private default_query: any;
 
-        constructor(parent_name: string, name: string, id: string, namespace:string, params: any, isdocument: boolean, models: any) {
+        constructor(parent_name: string, name: string, id: string, namespace: string, params: any, isdocument: boolean, models: any) {
             this.parent_name = parent_name;
             this.name = name;
             this.id = id;
@@ -306,7 +306,7 @@ namespace ScannerBehavior {
             return result;
         }
 
-        public FieldValue(object: any, params: string, parent: any): any {
+        public FieldValue(object: any, params: string, position: number, parent: any): any {
             let result: any = null;
             let full_params = params.trim();
             if (full_params) {
@@ -363,6 +363,9 @@ namespace ScannerBehavior {
                                     break;
                                 case "#userid" :
                                     result = this.id;
+                                    break;
+                                case "#position" :
+                                    result = position;
                                     break;
                                 case "#namespace" :
                                     result = this.namespace;
@@ -590,7 +593,7 @@ namespace ScannerBehavior {
             return result;
         }
 
-        public ResolveFormat(data: any, value: { content: any, count: number }, parent: any): string { //model
+        public ResolveFormat(data: any, value: { content: any, count: number }, position: number, parent: any): string { //model
             let result: string = "";
             this.SplitFormat(value.content, (element) => {//model
                 let appender: any = element;
@@ -598,7 +601,7 @@ namespace ScannerBehavior {
                 if (data) {
                     if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
                         let sliceed: string = trimed.slice(1, -1);
-                        appender = this.FieldValue(data, sliceed.trim(), parent); // fragment, model
+                        appender = this.FieldValue(data, sliceed.trim(), position, parent); // fragment, model
                     }
                 }
                 result += appender;
