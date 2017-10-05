@@ -42,6 +42,7 @@
     "cryptico": "*",
     "textAngular": "^1.5.16",
     "js-load-image-bower": "^2.6.1",
-    "jquery-slimscroll": "slimscroll#^1.3.8"
+    "jquery-slimscroll": "slimscroll#^1.3.8",
+    "jquery-resizable": "^0.20.0"
   }
 }

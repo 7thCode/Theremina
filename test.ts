@@ -52,22 +52,23 @@ async.parallel(funcs, function (err, results) {
 
 */
 
-const fs = require('fs');
-const path: any = require('path');
+//const fs = require('fs');
+//const path: any = require('path');
+//
+//var model = require(path.join(process.cwd(), "models/systems/files/file.js"));
+//
+//var file_path = path.join(process.cwd(), "test.html");
+//var readstream = fs.createReadStream(file_path);
+////var file_path_2 = path.join(process.cwd(), "test2.html");
+////var writestream = fs.createWriteStream(file_path_2);
+//
+//var writestream = model.writeStream('test.html', {
+    //metadata: {}
+//});
+//
+//writestream.once('finish', function(){
+    //console.info('オワタ');
+//});
+//
+//readstream.pipe(writestream);
 
-var model = require(path.join(process.cwd(), "models/systems/files/file.js"));
-
-var file_path = path.join(process.cwd(), "test.html");
-var readstream = fs.createReadStream(file_path);
-//var file_path_2 = path.join(process.cwd(), "test2.html");
-//var writestream = fs.createWriteStream(file_path_2);
-
-var writestream = model.writeStream('test.html', {
-    metadata: {}
-});
-
-writestream.once('finish', function(){
-    console.info('オワタ');
-});
-
-readstream.pipe(writestream);

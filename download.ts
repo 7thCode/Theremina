@@ -7,7 +7,10 @@ const fs: any = require('graceful-fs');
 const url = require('url');
 const request = require('request');
 const requestpromise = require('request-promise');
-const jsdom = require("node-jsdom");
+
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+
 const _ = require('lodash');
 
 
@@ -64,30 +67,24 @@ namespace HTMLScanner {
             }
         }
 
-        public ScanHtml(url: string): any {
+        public ScanHtml(source: string): any {
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                (errors, window) => {
-                    if (!errors) {
-                        //          this.callback(null, "each", url);
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(url, element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, "");
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(url, element, null);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, "");
+            }
         }
 
     }
@@ -214,45 +211,38 @@ namespace HTMLScanner {
 
         public ResolveDataSource(url: string, result: any): any {
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                (errors, window) => {
-                    if (!errors) {
-                        //         this.callback(null, "each", url);
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(url, element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
+            let dom = new JSDOM(url);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(url, element, null);
+                    });
+                }
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                Promise.all(this.datasource_target.map((doc: any): void => {
+                    let result = null;
+                    if (doc.promise) {
+                        result = doc.promise;
                     }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        Promise.all(this.datasource_target.map((doc: any): void => {
-                            let result = null;
-                            if (doc.promise) {
-                                result = doc.promise;
-                            }
-                            return result;
-                        })).then((resolved: any[]): void => {
-                            _.forEach(resolved, (entry, index) => {
-                                result[this.datasource_target[index].name] = entry;
+                    return result;
+                })).then((resolved: any[]): void => {
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.datasource_target[index].name] = entry;
 
 //                                result[this.datasource_target[index].name] = [{a:"a", b:[{c:"1"},{c:"2"}]}, {a:"b", b:[{c:"3"},{c:"4"}]}];
 
-                            });
-                            this.callback(null, result);
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
-                        });
-                    }
-                }
-            );
-        }
+                    });
+                    this.callback(null, result);
+                }).catch((error: any): void => {
+                    this.callback(error, null);
+                });
+            }
 
     }
 
@@ -321,41 +311,36 @@ namespace HTMLScanner {
 
         public ResolveUrl(url: string, result: any, data: any): any {
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                (errors, window) => {
-                    if (!errors) {
-                        //            this.callback(null, "each", url);
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(url, element, data);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        Promise.all(this.datasource_target.map((doc: any): void => {
-                            let result = null;
-                            if (doc.promise) {
-                                result = doc.promise;
-                            }
-                            return result;
-                        })).then((resolved: any[]): void => {
-                            _.forEach(resolved, (entry, index) => {
-                                result[this.datasource_target[index].name] = entry;
-                            });
-                            this.callback(null, result);
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
-                        });
-                    }
+            let dom = new JSDOM(url);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(url, element, data);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                Promise.all(this.datasource_target.map((doc: any): void => {
+                    let result = null;
+                    if (doc.promise) {
+                        result = doc.promise;
+                    }
+                    return result;
+                })).then((resolved: any[]): void => {
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.datasource_target[index].name] = entry;
+                    });
+                    this.callback(null, result);
+                }).catch((error: any): void => {
+                    this.callback(error, null);
+                });
+            }
+
         }
 
     }
@@ -541,28 +526,23 @@ namespace HTMLScanner {
         public ExpandHtml(url: string, fragments: any[]): any {
             this.fragments = fragments;
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                (errors, window) => {
-                    if (!errors) {
-                        //            this.callback(null, "each", url);
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(url, element, null);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, this.html);
-                    }
+            let dom = new JSDOM(url);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(url, element, null);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, this.html);
+            }
+
         }
     }
 

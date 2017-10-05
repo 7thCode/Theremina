@@ -40,7 +40,7 @@ export namespace PageRouter {
     }]);
 
     router.get("/front", [analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/front/index", {
+        response.render("services/front/index", {
             config: config,
             user: request.user,
             message: message,
@@ -95,121 +95,8 @@ export namespace PageRouter {
         response.send(robots);
     }]);
 
-    //self
-    router.get("/self", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/self/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    router.get('/dialogs/save_done_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/self/dialogs/save_done_dialog', {message: message});
-    }]);
-
-    //start
     router.get("/start", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/start/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    //data
-    router.get("/data", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/data/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    router.get('/dialogs/self_update_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/data/dialogs/self_update_dialog', {message: message});
-    }]);
-
-    router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/data/dialogs/delete_confirm_dialog', {message: message});
-    }]);
-
-    router.get('/data/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/data/dialogs/create_dialog', {message: message});
-    }]);
-
-    router.get('/pages/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/pages/dialogs/create_dialog', {message: message});
-    }]);
-
-    router.get('/pages/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/pages/dialogs/open_dialog', {message: message});
-    }]);
-
-    router.get('/pages/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-
-        let items = [];
-        if (applications_config.sites) {
-            let keys = Object.keys(applications_config.sites);
-
-            keys.forEach((key:string):void => {
-                items.push(applications_config.sites[key].description);
-            });
-        }
-
-        result.render('applications/pages/dialogs/build_site_dialog',
-            {
-                message: message,
-                items: items
-            });
-    }]);
-
-    /*
-    [
-                    {
-                        class: "item active",
-                        img: "/000000000000000000000000/verb/doc/img/img_3.jpg",
-                        name: "verb"
-                    },
-                    {
-                        class: "item",
-                        img: "/000000000000000000000000/verb/doc/img/img_4.jpg",
-                        name: "story"
-                    },
-                    {
-                        class: "item",
-                        img: "/000000000000000000000000/verb/doc/img/img_5.jpg",
-                        name: "words"
-                    }
-                ]
-
-
-    */
-
-    router.get('/pages/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/pages/dialogs/delete_confirm_dialog', {message: message});
-    }]);
-
-    //pages
-    router.get("/pages", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/pages/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    //photo
-    router.get("/photo", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/photo/index", {
+        response.render("services/start/index", {
             config: config,
             user: request.user,
             message: message,
@@ -219,7 +106,7 @@ export namespace PageRouter {
     }]);
 
     router.get("/signup", [analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/signup/index", {
+        response.render("services/signup/index", {
             config: config,
             user: request.user,
             message: message,
@@ -227,65 +114,6 @@ export namespace PageRouter {
             fonts: webfonts
         });
     }]);
-
-    //SVG
-    router.get("/svg", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/svg/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    router.get('/svg/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/svg/dialogs/create_dialog', {message: message});
-    }]);
-
-    router.get('/svg/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/svg/dialogs/open_dialog', {message: message});
-    }]);
-
-    router.get('/svg/dialogs/saveas_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/svg/dialogs/saveas_dialog', {message: message});
-    }]);
-
-    router.get('/svg/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/svg/dialogs/delete_confirm_dialog', {message: message});
-    }]);
-
-    //blob
-    router.get("/blob", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("applications/blob/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    router.get('/blob/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        result.render('applications/blob/dialogs/delete_confirm_dialog', {message: message});
-    }]);
-
-    // Members
-    router.get("/members", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
-        response.render("applications/members/index", {
-            config: config,
-            user: request.user,
-            message: message,
-            status: 200,
-            fonts: webfonts
-        });
-    }]);
-
-    router.get('/members/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (request: any, response: any, next: any) => {
-        response.render("applications/members/dialogs/open_dialog", {message: message});
-    }]);
-
-    // localhost:8000/site/000000000000000000000000/test1&q={}&o={}
 
     router.get("/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
         let redirect_to = applications_config.redirect[request.params.name];
@@ -296,7 +124,7 @@ export namespace PageRouter {
         }
     }]);
 
-    // New Render
+    // Render
 
     let Error = (error: { code: number, message: string }, request: any, response: any) => {
         switch (error.code) {
@@ -384,10 +212,6 @@ export namespace PageRouter {
     router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         render_html(request, response);
     }]);
-
-    //  router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-    //      render_html(request, response);
-    //  }]);
 
     router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {

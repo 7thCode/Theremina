@@ -10,12 +10,12 @@ let Services: angular.IModule = angular.module('Services', []);
 
 Services.factory('MailSend', ['$resource',
     ($resource: any): any => {
-        return $resource('/api/mailsend', {}, {});
+        return $resource('/mailer/api/mailsend', {}, {});
     }]);
 
 Services.factory('AssetCreate', ['$resource',
     ($resource: any): any => {
-        return $resource('/api/createasset', {}, {});
+        return $resource('/assets/api/createasset', {}, {});
     }]);
 
 Services.service('MailerService', ["MailSend",

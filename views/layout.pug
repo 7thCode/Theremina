@@ -19,7 +19,7 @@ html(lang="ja")
         include ./systems/common/stylesheets
         include ./services/common/stylesheets
         include ./plugins/common/stylesheets
-        include ./applications/common/stylesheets
+
 
         include ./plugins/common/google_analytics
 
@@ -33,14 +33,13 @@ html(lang="ja")
     body.hold-transition.skin-white.sidebar-mini.fixed#body(ng-app="FrontApplication")
         .wrapper(style="overflow:scroll;")
             header.main-header(style="margin-top:1rem;")
-                include applications/front/partial/front_sidebar
+                include services/front/partial/front_sidebar
             .content-wrapper(style="height:auto;overflow:scroll;")
                 block content
 
 include ./systems/common/scripts
 include ./services/common/scripts
 include ./plugins/common/scripts
-include ./applications/common/scripts
 
 // AdminLTE
 script(src='/bower_components/jquery-slimscroll/jquery.slimscroll.js')

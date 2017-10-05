@@ -5,38 +5,34 @@
  */
 
 "use strict";
-//import forEach = require("lodash/forEach");
 
 let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
-    'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar',
+    'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable','angular-loading-bar',
 
     'ngSanitize',
     'textAngular',
 
     "Services",
+    'FrontControllers',
     "TemplateServices",
     "LayoutServices",
     "LayoutsProviders",
     'ImageControllers',
     'BuilderControllers',
     'PlayerControllers',
+
     "BackOfficeControllers",
     'FileServices',
     'FileControllers',
     "AuthServices",
     'AuthControllers',
-    "ResourcesProviders",
-    "ResourceBuilderServices",
-    'ResourceBuilderControllers',
-    'ResourcePlayerServices',
-    'ResourcePlayerControllers',
     "GroupControllers",
     "GroupServices",
     "FormsProviders",
-    "FormBuilderServices",
-    'FormBuilderControllers',
     'FormPlayerServices',
     'FormPlayerControllers',
+    "FormBuilderServices",
+    'FormBuilderControllers',
     'AccountServices',
     'AccountControllers',
     'AnalysisServices',
@@ -49,12 +45,24 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     "GoogleServices",
     "YahooServices",
     "PublicKeyServices",
+    "ResourcesProviders",
+    "ResourceBuilderServices",
+    'ResourceBuilderControllers',
+    'ResourcePlayerServices',
+    'ResourcePlayerControllers',
     "MailerControllers",
     "MailerServices",
     "RobotControllers",
     "RobotServices",
     "GoogleServices",
-    "GoogleControllers"
+    "GoogleControllers",
+    "NamespaceControllers",
+    "NamespaceServices",
+    "MembersControllers",
+    "MembersServices",
+    "PagesControllers",
+    "PicturesControllers",
+    "BlobControllers"
 ]);
 
 BackOfficeApplication.run(['$rootScope',
@@ -72,14 +80,13 @@ BackOfficeApplication.config(['$compileProvider', '$httpProvider',
         $httpProvider.defaults.headers.common['If-Modified-Since'] = 'Thu, 01 Jun 1970 00:00:00 GMT'; //マイクロソフトのバグ対応！！！
     }]);
 
-
-BackOfficeApplication.config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+BackOfficeApplication.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
     cfpLoadingBarProvider.parentSelector = '#body';
     cfpLoadingBarProvider.spinnerTemplate = '<div style="z-index:20000;position:fixed;top:50%;left:50%;margin-top:-70px;margin-left:-75px;"><div id="progress"><div id="rond"><div id="test"></div></div><div id="load"></div></div></div>';
     cfpLoadingBarProvider.latencyThreshold = 500;
 }]);
 
-BackOfficeApplication.config(['ShapeEditProvider', function (ShapeEditProvider: any): void {
+BackOfficeApplication.config(['ShapeEditProvider', function (ShapeEditProvider:any):void {
     ShapeEditProvider.configure({
         wrapper: 'wrapper',
         canvas: 'canvas',
@@ -88,11 +95,11 @@ BackOfficeApplication.config(['ShapeEditProvider', function (ShapeEditProvider: 
     });
 }]);
 
-BackOfficeApplication.config(['$sceDelegateProvider', function ($sceDelegateProvider: any): void {
+BackOfficeApplication.config(['$sceDelegateProvider',function($sceDelegateProvider:any):void {
     $sceDelegateProvider.resourceUrlWhitelist(['**']);
 }]);
 
-BackOfficeApplication.filter('limit', [(): any => {
+BackOfficeApplication.filter('limit', [():any => {
     return (text: string, limit: number): string => {
         let result = "";
         if (text) {
@@ -105,16 +112,13 @@ BackOfficeApplication.filter('limit', [(): any => {
     };
 }]);
 
-BackOfficeApplication.filter('round', [():any => {
-    return (value: any): string => {
-        let result = value;
-        if (!isNaN(value)) {
-            result = Math.round(value);
-        }
-        return result;
-    };
-}]);
+BackOfficeApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
+    ($scope: any, $uibModalInstance: any, items: any): void => {
 
+        $scope.message = items;
 
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
 
-
+    }]);

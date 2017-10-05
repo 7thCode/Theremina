@@ -11,6 +11,14 @@
   {
    "type": "required",
    "path": "/services/",
+   "name": "data",
+   "description": {
+    "display": "Data"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
    "name": "backoffice",
    "description": {
     "display": "Backoffice"
@@ -24,6 +32,15 @@
     "display": "Forms"
    }
   },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "pages",
+   "description": {
+    "display": "Pages"
+   }
+  },
+
   {
    "type": "required",
    "path": "/services/",
@@ -43,11 +60,68 @@
   {
    "type": "required",
    "path": "/services/",
+   "name": "assets",
+   "description": {
+    "display": "Assets"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
    "name": "layouts",
    "description": {
     "display": "Layouts"
    }
   },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "pictures",
+   "description": {
+    "display": "Pictures"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "members",
+   "description": {
+    "display": "Members"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "namespace",
+   "description": {
+    "display": "Namespaces"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "svg",
+   "description": {
+    "display": "SVG"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "blob",
+   "description": {
+    "display": "Blob"
+   }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "self",
+   "description": {
+    "display": "Self"
+   }
+  },
+
   {
    "type": "required",
    "path": "/services/",

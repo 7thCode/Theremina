@@ -64,7 +64,7 @@ FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$
             }
         }, error_handler);
 
-
+/*
         let SelfInit: (self: any) => void = (self: any): void => {
 
             let modalRegist: any = $uibModal.open({
@@ -90,7 +90,7 @@ FrontControllers.controller('FrontController', ['$scope', '$log', '$compile', '$
             }, (): void => {
             });
         };
-
++/
         /*
         $scope.Notify = (message: any): void => {
             Socket.emit("server", {value: message}, (): void => {
@@ -209,7 +209,7 @@ FrontControllers.controller('SelfController', ['$scope', '$log', "$uibModal", "P
 
             let modalRegist: any = $uibModal.open({
                 controller: 'SaveDoneController',
-                templateUrl: '/dialogs/save_done_dialog',
+                templateUrl: '/self/dialogs/save_done_dialog',
                 resolve: {
                     items: (): any => {
                     }
@@ -704,7 +704,7 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
             if (current_id) {
                 let modalRegist: any = $uibModal.open({
                     controller: 'DataDeleteConfirmController',
-                    templateUrl: '/dialogs/delete_confirm_dialog',
+                    templateUrl: '/data/dialogs/delete_confirm_dialog',
                     resolve: {
                         items: (): any => {
                         }
@@ -904,6 +904,19 @@ FrontControllers.controller('DataController', ['$scope', '$log', '$document', '$
                 ];
                 */
 
+
+
+      //  $(".resizeable-box").resizable({
+      //      handleSelector: ".win-size-grip"
+      //  });
+
+//        $(".panel-left").resizable({
+//            handleSelector: ".splitter",
+//            resizeHeight: false
+  //      });
+
+
+
     }]);
 
 FrontControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',
@@ -929,688 +942,6 @@ FrontControllers.controller('DataDeleteConfirmController', ['$scope', '$uibModal
     ($scope: any, $uibModalInstance: any, items: any, ArticleService: any): void => {
 
         $scope.name = ArticleService.current_article.name;
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.answer = (): void => {
-            $uibModalInstance.close({});
-        };
-
-    }]);
-
-//Leaflet
-
-FrontControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$document", "$log", "$uibModal", "ResourceBuilderService",
-    function ($scope: any,$rootScope:any, $q: any, $document: any, $log: any, $uibModal: any, ResourceBuilderService: any): void {
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
-            });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
-
-        $document.on('drop dragover', (e: any): void => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        window.addEventListener('beforeunload', (e) => {
-            if (!editor.session.getUndoManager().isClean()) {
-                e.returnValue = '';
-                return '';
-            }
-        }, false);
-
-        let editor = null;
-        let document = null;
-
-        let Draw = (text) => {
-            switch (ResourceBuilderService.current.content.type) {
-                case "text/html":
-                    if (document) {
-                        document.open();
-                        document.write(text);
-                        document.close();
-                    }
-                    break;
-                default:
-            }
-        };
-
-        let Query = (): any => {
-            progress(true);
-            // template query
-        //    ResourceBuilderService.AddQuery({type: 21});
-            ResourceBuilderService.Query((result: any): void => {
-                ResourceBuilderService.InitQuery(null);
-                if (result) {
-                    $scope.templates = result;
-                    //pages query
-
-                    ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
-
-                    ResourceBuilderService.Query((result: any): void => {
-                        if (result) {
-                            $scope.pages = result;
-                            localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
-                        }
-                        ResourceBuilderService.Over((hasnext) => {
-                            $scope.over = !hasnext;
-                        });
-                        ResourceBuilderService.Under((hasprev) => {
-                            $scope.under = !hasprev;
-                        });
-                        progress(false);
-                    }, error_handler);
-                    //pages query
-                }
-            }, error_handler);
-            // template query
-        };
-
-        let _Find = (key: string, value: any): any => {
-            progress(true);
-
-            ResourceBuilderService.RemoveQuery(key);
-            if (value) {
-                let query = {};
-                query[key] = value;
-                ResourceBuilderService.AddQuery(query);
-            } else {
-                ResourceBuilderService.RemoveQuery(key);
-            }
-
-            ResourceBuilderService.Query((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                    localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
-                }
-                ResourceBuilderService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ResourceBuilderService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        $scope.find_name = localStorage.getItem("pages_find_name");
-        let Find = (name: string): any => {
-            _Find("name", {$regex: name});
-            localStorage.setItem("pages_find_name", name);
-        };
-
-        $scope.type = localStorage.getItem("pages_find_type");
-        let FindType = (type: number): any => {
-            _Find("type", type);
-            localStorage.setItem("pages_find_type", "" + type);
-        };
-
-        $scope.mimetype = localStorage.getItem("pages_find_mime");
-        let FindMime = (mime: string): any => {
-            _Find("content.type", mime);
-            localStorage.setItem("pages_find_mime", mime);
-        };
-
-        $scope.content = localStorage.getItem("pages_find_resource");
-        let FindResource = (value: string): any => {
-            _Find("content.resource", {$regex: value});
-            localStorage.setItem("pages_find_resource", value);
-        };
-
-        let Count = (): void => {
-            ResourceBuilderService.Count((result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Next = (): void => {
-            progress(true);
-            ResourceBuilderService.Next((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                ResourceBuilderService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ResourceBuilderService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        let Prev = (): void => {
-            progress(true);
-            ResourceBuilderService.Prev((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                ResourceBuilderService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ResourceBuilderService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        let Get = (resource: any): void => {
-            progress(true);
-            ResourceBuilderService.Get(resource._id, (content: any): void => {
-                if (content) {
-                    $scope.resource = content.resource;
-                    $scope.name = ResourceBuilderService.current.name;
-                    $scope.userid = ResourceBuilderService.current.userid;
-                    switch (ResourceBuilderService.current.content.type) {
-                        case "text/html":
-                            editor.getSession().setMode("ace/mode/html");
-                            break;
-                        case "text/css":
-                            editor.getSession().setMode("ace/mode/css");
-                            break;
-                        case "text/javascript":
-                            editor.getSession().setMode("ace/mode/javascript");
-                            break;
-                        default:
-                    }
-                } else {
-                    $scope.resource = "";
-                }
-                editor.session.getUndoManager().markClean();
-                $scope.opened = true;
-                progress(false);
-            }, error_handler);
-        };
-
-        let Close = (): void => {
-            if (!editor.session.getUndoManager().isClean()) {
-                if (window.confirm('保存されていません。閉じますか？')) {
-                    $scope.opened = false;
-                }
-            } else {
-                $scope.opened = false;
-            }
-        };
-
-        $scope.aceOption = {
-            theme: "chrome",
-            onLoad: (_ace) => {
-                editor = _ace;
-
-                let session = _ace.getSession();
-
-                editor.$blockScrolling = Infinity;
-                editor.setOptions({
-                    enableBasicAutocompletion: true,
-                    enableSnippets: true,
-                    enableLiveAutocompletion: true
-                });
-
-                session.setUndoManager(new ace.UndoManager());
-
-                editor.container.addEventListener("drop", function (event) {
-
-                });
-
-            },
-            onChange: (e) => {
-                Draw($scope.resource);
-            }
-        };
-
-        $scope.Undo = () => {
-            let session = editor.getSession();
-            let undo = session.getUndoManager();
-            undo.undo(true);
-        };
-
-        $scope.Paste = (id) => {
-            progress(true);
-            let current = ResourceBuilderService.current;
-            ResourceBuilderService.Get(id, (result: any): void => {
-                progress(false);
-                ResourceBuilderService.current = current;
-                editor.insert(result.resource);
-                Draw(result.resource);
-            }, error_handler);
-        };
-
-        let OpenPreview = () => {
-            //         preview_window = window.open("", "", "width=1024,height=800");
-            //         document = preview_window.document;
-            //         Draw(ResourceBuilderService.current.content.resource);
-        };
-
-        let ClosePreview = () => {
-            //        if (preview_window) {
-            //            document = preview_window.close();
-            //        }
-        };
-
-        let CreatePages = (files: any): void => {
-            progress(true);
-            let promises = [];
-            _.forEach(files, (local_file) => {
-                let deferred = $q.defer();
-                let fileReader: any = new FileReader();
-                fileReader.onload = (event: any): void => {
-
-                    let modalInstance: any = $uibModal.open({
-                        controller: 'PagesCreateDialogController',
-                        templateUrl: '/pages/dialogs/create_dialog',
-                        resolve: {
-                            items: {parent_scope: $scope, file: local_file.file, target: event.target}
-                        }
-                    });
-
-                    modalInstance.result.then((answer: any): void => { // Answer
-                        deferred.resolve(true);
-                    }, (): void => { // Error
-                        deferred.reject(false);
-                    });
-
-                };
-
-                fileReader.readAsText(local_file.file);
-                promises.push(deferred.promise);
-            });
-
-            $q.all(promises).then((result) => {
-                progress(false);
-                files.forEach((file) => {
-                    file.cancel();
-                });
-
-                $rootScope.$emit('change_files', {});
-                Query();
-            }).finally(() => {
-            });
-        };
-
-        let Create = (): void => {
-
-            let modalRegist: any = $uibModal.open({
-                controller: 'PagesCreateDialogController',
-                templateUrl: '/pages/dialogs/create_dialog',
-                resolve: {
-                    items: {parent_scope: $scope, file: null, target: null}
-                }
-            });
-
-            modalRegist.result.then((resource: any): void => {
-                $scope.resource = "";
-                $scope.name = ResourceBuilderService.current.name;
-                $scope.userid = ResourceBuilderService.current.userid;
-                switch (ResourceBuilderService.current.content.type) {
-                    case "text/html":
-                        editor.getSession().setMode("ace/mode/html");
-                        break;
-                    case "text/css":
-                        editor.getSession().setMode("ace/mode/css");
-                        break;
-                    case "text/javascript":
-                        editor.getSession().setMode("ace/mode/javascript");
-                        break;
-                    default:
-                }
-
-                $rootScope.$emit('change_files', {});
-                Query();
-                editor.session.getUndoManager().markClean();
-                $scope.opened = true;
-            }, (): void => {
-            });
-        };
-
-        let Open = (): void => {
-
-            let modalRegist: any = $uibModal.open({
-                controller: 'PagesOpenDialogController',
-                templateUrl: '/pages/dialogs/open_dialog',
-                resolve: {
-                    items: $scope
-                }
-            });
-
-            modalRegist.result.then((content: any): void => {
-                if (content.resource) {
-                    $scope.resource = content.resource;
-                    $scope.name = ResourceBuilderService.current.name;
-                    $scope.userid = ResourceBuilderService.current.userid;
-                    switch (ResourceBuilderService.current.content.type) {
-                        case "text/html":
-                            editor.getSession().setMode("ace/mode/html");
-                            break;
-                        case "text/css":
-                            editor.getSession().setMode("ace/mode/css");
-                            break;
-                        case "text/javascript":
-                            editor.getSession().setMode("ace/mode/javascript");
-                            break;
-                        default:
-                    }
-
-                    editor.session.getUndoManager().markClean();
-                    $scope.opened = true;
-
-                }
-            }, (): void => {
-            });
-        };
-
-        let Update = (): void => {
-            if (ResourceBuilderService.current) {
-                progress(true);
-                ResourceBuilderService.current.content.resource = $scope.resource;
-                ResourceBuilderService.Put((result: any): void => {
-                    editor.session.getUndoManager().markClean();
-                    progress(false);
-                }, error_handler);
-            }
-        };
-
-        let Delete = (): void => {
-            if (ResourceBuilderService.current) {
-                let modalRegist: any = $uibModal.open({
-                    controller: 'PagesDeleteConfirmController',
-                    templateUrl: '/pages/dialogs/delete_confirm_dialog',
-                    resolve: {
-                        items: (): any => {
-                            return ResourceBuilderService.current;
-                        }
-                    }
-                });
-
-                modalRegist.result.then((content): void => {
-                    progress(true);
-                    ResourceBuilderService.Delete((result: any): void => {
-                        ClosePreview();
-                        $rootScope.$emit('change_files', {});
-                        Query();
-                        $scope.name = "";
-                        progress(false);
-                        $scope.opened = false;
-                    }, error_handler);
-                }, (): void => {
-                });
-            }
-        };
-
-        let BuildSite = (): void => {
-
-            let modalRegist: any = $uibModal.open({
-                controller: 'BuildSiteDialogController',
-                templateUrl: '/pages/dialogs/build_site_dialog',
-                resolve: {
-                    items: $scope
-                }
-            });
-
-            modalRegist.result.then((resource: any): void => {
-                $rootScope.$emit('change_files', {});
-                Query();
-            }, (): void => {
-            });
-        };
-
-        $rootScope.$on('get_namespaces', (event, value): void => {
-    ///        $scope.namespaces = value;
-        });
-
-        $rootScope.$on('change_namespace', (event, value): void => {
-
-            $scope.$evalAsync(      // $apply
-                ($scope: any): void => {
-                    $scope.namespace = value;
-                }
-            );
-
-            Query();
-        });
-
-        $scope.opened = false;
-
-        $scope.Get = Get;
-        $scope.Query = Query;
-        $scope.Count = Count;
-        $scope.Next = Next;
-        $scope.Prev = Prev;
-        $scope.Find = Find;
-        $scope.FindType = FindType;
-        $scope.FindMime = FindMime;
-        $scope.FindResource = FindResource;
-
-        $scope.Close = Close;
-
-        $scope.CreatePages = CreatePages;
-        $scope.Create = Create;
-        $scope.Open = Open;
-        $scope.Update = Update;
-        $scope.Delete = Delete;
-
-        $scope.BuildSite = BuildSite;
-
-
-
-        //$scope.OpenPreview = OpenPreview;
-
-
-
-    }]);
-
-FrontControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'ResourceBuilderService', 'items',
-    ($scope: any, $log: any, $uibModalInstance: any, ResourceBuilderService: any, items: any): void => {
-
-        let file = items.file;
-        let target = items.target;
-        let parent_scope = items.parent_scope;
-
-        if (file) {
-            $scope.title = file.name;
-            $scope.mimetype = file.type;
-        }
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            parent_scope.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-        };
-
-        $scope.type = 20;
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.answer = (): void => {
-
-            progress(true);
-            ResourceBuilderService.Init();
-            ResourceBuilderService.current.content.type = $scope.mimetype;
-            if (target) {
-                ResourceBuilderService.current.content.resource = target.result;
-            }
-            ResourceBuilderService.Create($scope.title, $scope.type, (result: any): void => {
-                progress(false);
-                $scope.message = "";
-                $uibModalInstance.close(result);
-            }, error_handler);
-
-        };
-
-    }]);
-
-FrontControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ResourceBuilderService',
-    ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, ResourceBuilderService: any): void => {
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            items.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
-            });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
-
-        let Query = (): any => {
-            progress(true);
-            ResourceBuilderService.InitQuery(null, 20);
-            ResourceBuilderService.Query((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Find = (name: string): any => {
-            progress(true);
-            ResourceBuilderService.InitQuery(null, 20);
-            if (name) {
-                ResourceBuilderService.AddQuery({name: {$regex: name}});
-
-                //            ResourceBuilderService.SetQuery({name: {$regex: name}}, 20);
-            }
-            ResourceBuilderService.Query((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Count = (): void => {
-            ResourceBuilderService.Count((result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Next = (): void => {
-            progress(true);
-            ResourceBuilderService.Next((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Prev = (): void => {
-            progress(true);
-            ResourceBuilderService.Prev((result: any): void => {
-                if (result) {
-                    $scope.pages = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Get = (resource: any): void => {
-            progress(true);
-            ResourceBuilderService.Get(resource._id, (result: any): void => {
-                progress(false);
-                $scope.message = "";
-                $uibModalInstance.close(result);
-            }, error_handler);
-        };
-
-        let hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        let cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        let LayoutQuery = (): any => Query;
-
-        $scope.Count = Count;
-        $scope.Next = Next;
-        $scope.Prev = Prev;
-        $scope.Find = Find;
-        $scope.Get = Get;
-        $scope.hide = hide;
-        $scope.cancel = cancel;
-        $scope.LayoutQuery = (): any => Query;
-
-        Query();
-
-    }]);
-
-FrontControllers.controller('PagesDeleteConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope: any, $uibModalInstance: any, items: any): void => {
-
-        $scope.title = items.name;
 
         $scope.hide = (): void => {
             $uibModalInstance.close();
@@ -1675,775 +1006,198 @@ FrontControllers.controller('BuildSiteDialogController', ['$scope', '$log', '$ui
 
     }]);
 
-//Photo(resizeable/cropable)
-
-//  2000 < key < 3999
-
-interface IControl {
-    name: string;
-    label: string;
-    model: string;
-    type: string;
-}
-
-interface IPictureControl extends IControl {
-    path: string;
-    height: number;
-    width: number;
-}
-
-FrontControllers.controller('PhotoController', ['$scope','$rootScope', '$q', '$document', '$uibModal', '$log', 'ProfileService', 'SessionService', 'FileService', 'ImageService',
-    ($scope: any,$rootScope:any, $q: any, $document: any, $uibModal: any, $log: any, ProfileService: any, SessionService: any, FileService: any, ImageService: any): void => {
-
-        FileService.option = {limit: 20, skip: 0};
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
-            });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
-
-        $document.on('drop dragover', (e: any): void => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        let Type = (mimetype): string => {
-            let result = "";
-            let nameparts: string[] = mimetype.split("/");
-            if (nameparts.length == 2) {
-                result = nameparts[0].toLowerCase();
-            }
-            return result;
-        };
-
-        let Draw = () => {
-            FileService.Query((result: any) => {
-                if (result) {
-                    $scope.randam = Math.floor(Math.random() * 100);
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-            }, error_handler);
-        };
-
-        let Exist = (query: any): void => {
-            FileService.Exist(query, (result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Count = (): void => {
-            FileService.Count((result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Next = () => {
-            progress(true);
-            FileService.Next((result) => {
-                if (result) {
-                    $scope.randam = Math.floor(Math.random() * 100);
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        let Prev = () => {
-            progress(true);
-            FileService.Prev((result) => {
-                if (result) {
-                    $scope.randam = Math.floor(Math.random() * 100);
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-
-        let createPhoto = (files: any): void => {
-            progress(true);
-            let promises = [];
-            _.forEach(files, (local_file) => {
-                let deferred = $q.defer();
-                //            FileService.Exist({"filename":local_file.name}, (exist) => {
-                //               if (!exist) {
-
-                let fileReader: any = new FileReader();
-                fileReader.onload = (event: any): void => {
-                    ImageService.DecodeImage(event.target.result, (image: any, type: string): void => {
-                        switch (type) {
-                            case "image/jpeg":
-                            case "image/jpg":
-                                let modalInstance: any = $uibModal.open({
-                                    controller: 'PhotoResizeDialogController',
-                                    templateUrl: '/images/dialogs/image_resize_dialog',
-                                    resolve: {
-                                        items: (): any => {
-                                            return {
-                                                name: local_file.name,
-                                                image: event.target.result,
-                                                width: image.width,
-                                                height: image.height
-                                            };
-                                        }
-                                    }
-                                });
-
-                                modalInstance.result.then((answer: any): void => { // Answer
-                                    if (answer.deformation) {
-                                        ImageService.ResizeImage(event.target.result, answer.width, answer.height, (resized: any): void => {
-                                            ImageService.RotateImage(resized, answer.resize, answer.orientation, (rotate: any): void => {
-                                                ImageService.Brightness(rotate, answer.brightness, (brightness: any): void => {
-                                                    FileService.Create(brightness, local_file.name, 2000, (brightness: any) => {
-                                                        deferred.resolve(true);
-                                                    }, (code: number, message: string) => {
-                                                        deferred.reject(false);
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    } else {
-                                        FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
-                                            deferred.resolve(true);
-                                        }, (code: number, message: string) => {
-                                            deferred.reject(false);
-                                        });
-                                    }
-                                }, (): void => { // Error
-                                });
-                                break;
-                            default:
-                                FileService.Create(event.target.result, local_file.name, 2000, (result: any) => {
-                                    deferred.resolve(true);
-                                }, (code: number, message: string) => {
-                                    deferred.reject(false);
-                                });
-                        }
-                    });
-                };
-                //          } else {
-                //              alert("already found.");
-                //          }
-                //         });
-                fileReader.readAsDataURL(local_file.file);
-                promises.push(deferred.promise);
-            });
-
-            $q.all(promises).then((result) => {
-                files.forEach((file) => {
-                    file.cancel();
-                });
-                progress(false);
-                Draw();
-            }).finally(() => {
-            });
-        };
-
-        let editPhoto = (filename: string): void => {
-
-            FileService.Get(filename, (result: any) => {
-
-                ImageService.DecodeImage(result, (image: any, type: string): void => {
-                    switch (type) {
-                        case "image/jpeg":
-                        case "image/jpg":
-                            let modalInstance: any = $uibModal.open({
-                                controller: 'PhotoResizeDialogController',
-                                templateUrl: '/images/dialogs/image_resize_dialog',
-                                resolve: {
-                                    items: (): any => {
-                                        return {
-                                            name: filename,
-                                            image: result,
-                                            width: image.width,
-                                            height: image.height
-                                        };
-                                    }
-                                }
-                            });
-
-                            modalInstance.result.then((answer: any): void => { // Answer
-                                if (answer.deformation) {
-                                    ImageService.ResizeImage(result, answer.width, answer.height, (resized: any): void => {
-                                        ImageService.RotateImage(resized, answer.resize, answer.orientation, (rotate: any): void => {
-                                            ImageService.Brightness(rotate, answer.brightness, (brightness: any): void => {
-                                                FileService.Update(brightness, filename, 2000, (brightness: any) => {
-                                                    Draw();
-                                                }, error_handler);
-                                            });
-                                        });
-                                    });
-                                }
-                            }, (): void => { // Error
-                            });
-                            break;
-                        default:
-                    }
-                });
-            }, error_handler);
-
-        };
-
-        let showPhoto = (url: any): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'ImageShowDialogController',
-                templateUrl: '/images/dialogs/image_show_dialog',
-                resolve: {
-                    items: (): any => {
-                        return url;
-                    }
-                }
-            });
-
-            modalInstance.result.then((answer: any): void => { // Answer
-            }, (): void => { // Error
-            });
-        };
-
-        let deletePhoto = (filename: any): void => {
-
-            let modalInstance = $uibModal.open({
-                controller: 'PhotoDeleteDialogController',
-                templateUrl: '/files/dialogs/file_delete_dialog',
-            });
-
-            modalInstance.result.then((answer: any): void => { // Answer
-                FileService.Delete(filename, 2000, (result: any) => {
-                    $scope.files = [];
-                    Draw();
-                }, error_handler);
-            }, (): void => { // Error
-            });
-        };
-
-        FileService.SetQuery({"metadata.type": {$regex: "image/"}}, 2000);
-        let Find = (name: string): void => {
-            if (!name) {
-                name = "";
-            }
-            FileService.SetQuery({$and: [{filename: {$regex: name}}, {"metadata.type": {$regex: "image/"}}]}, 2000);
-            Draw();
-        };
-
-        let CreateProfile = (files: any): void => {
-            progress(true);
-            let local_file = files[0];
-            let fileReader: any = new FileReader();
-            let image: any = new Image();
-            $scope.userid = "";     // $scope trick for redraw
-
-            fileReader.onload = (event: any): void => {
-                let uri: any = event.target.result;
-                image.src = uri;
-                image.onload = (): void => {
-                    ProfileService.Get((self: any): void => {
-                        if (self) {
-                            FileService.Delete(self.username, 1999, (result: any) => {
-                                    FileService.Create(event.target.result, self.username, 1999, (result: any) => {
-                                        ProfileService.Get((self: any): void => {
-                                            if (self) {
-                                                $scope.$evalAsync(      // $apply
-                                                    ($scope: any): void => {
-                                                        $scope.userid = self.userid; // $scope trick for redraw
-                                                        progress(false);
-                                                    }
-                                                );
-                                            }
-                                        }, error_handler);
-                                    }, error_handler);
-                                },
-                                FileService.Create(event.target.result, self.username, 1999, (result: any) => {
-                                    ProfileService.Get((self: any): void => {
-                                        if (self) {
-                                            $scope.$evalAsync(      // $apply
-                                                ($scope: any): void => {
-                                                    $scope.userid = self.userid; // $scope trick for redraw
-                                                    progress(false);
-                                                }
-                                            );
-                                        }
-                                    }, error_handler);
-                                }, error_handler)
-                            );
-                        }
-                    }, error_handler);
-                };
-            };
-            fileReader.readAsDataURL(local_file.file);
-        };
-
-        ProfileService.Get((self: any): void => {
-            if (self) {
-                $scope.userid = self.userid;
-            }
-        }, error_handler);
-
-
-        $rootScope.$on('get_namespaces', (event, value): void => {
-    //        $scope.namespaces = value;
-        });
-
-        $rootScope.$on('change_namespace', (event, value): void => {
-            $scope.namespace = value;
-            Draw();
-        });
-
-        $scope.createProfile = CreateProfile;
-        $scope.Type = Type;
-        $scope.Next = Next;
-        $scope.Prev = Prev;
-        $scope.createPhoto = createPhoto;
-        $scope.editPhoto = editPhoto;
-        $scope.showPhoto = showPhoto;
-        $scope.deletePhoto = deletePhoto;
-        $scope.Find = Find;
-
-        // Guidance
-
-        $scope.next = (): void => {
-            $scope.step++;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.prev = (): void => {
-            $scope.step--;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.to = (step: number): void => {
-            $scope.step = step;
-            SessionService.Put({guidance: {photo: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        SessionService.Get((session: any): void => {
-            if (session) {
-                $scope.step = 0;
-                let _data = session.data;
-                if (_data) {
-                    let guidance = _data.guidance;
-                    if (guidance) {
-                        let photo = guidance.photo;
-                        if (photo) {
-                            $scope.step = photo.step;
-                        }
-                    }
-                }
-            }
-        }, error_handler);
-
-        /*
-        $scope.scenario = [
-            {
-                outer: {
-                    top: -250, left: 360, width: 500, height: 500,
-                    background: "/applications/img/balloon/right.svg",
-                    target: "create"
-                },
-                inner: {
-                    top: 50, left: 150, width: 300, height: 300,
-                    content: "<h3>ニックネーム</h3>" +
-                    "<br>" +
-                    "<p>ニックネームを入力してください</p>" +
-                    "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                },
-                _class: "shake",
-                style: "animation-duration:1s;animation-delay:0.3s;"
-            }
-        ];
-        */
-
-    }]);
-
-FrontControllers.controller('PhotoDeleteDialogController', ['$scope', '$uibModalInstance',
-    ($scope: any, $uibModalInstance: any): void => {
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.answer = (answer: any): void => {
-            $uibModalInstance.close($scope);
-        };
-
-    }]);
-
-FrontControllers.controller('PhotoResizeDialogController', ['$scope', '$uibModalInstance', 'items', 'ImageService',
-    ($scope: any, $uibModalInstance: any, items: any, ImageService): void => {
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
-
-        let result = {width: 0, height: 0, orientation: 1, resize: false, brightness: 0, deformation: false};
-        result.width = items.width;
-        result.height = items.height;
-
-        $scope.name = items.name;
-        $scope.image = items.image;
-        $scope.width = result.width;
-        $scope.height = result.height;
-        $scope.ratio = 100;
-        $scope.aspect = 1;
-        $scope.brightness = 0;
-
-        // var image = document.getElementById('cropper');
-        /*       var image =  $document[0].getElementById('cropper');
-               var cropper = new Cropper(image, {
-                   aspectRatio: 16 / 9,
-                   crop: function(e) {
-                       console.log(e.detail.x);
-                       console.log(e.detail.y);
-                       console.log(e.detail.width);
-                       console.log(e.detail.height);
-                       console.log(e.detail.rotate);
-                       console.log(e.detail.scaleX);
-                       console.log(e.detail.scaleY);
-                   }
-               });
-        */
-        /*
-         ImageService.ImageExif(items.image, (exif) => {
-         let exifs = [];
-         Object.keys(exif).forEach((key) => {
-         exifs.push(key + ":" + exif[key]);
-         });
-         $scope.exif = exifs;
-         });
-         */
-
-        let index = 0;
-
-        let orientations: any[] = [
-            {direction: 0, resize: false},
-            {direction: 0.5, resize: true},
-            {direction: 1, resize: false},
-            {direction: 1.5, resize: true}
-        ];
-
-        let current_size = {width: 0, height: 0, orientation: orientations[0], brightness: 0};
-
-        let Deformation = (callback: () => void) => {
-            ImageService.ResizeImage(items.image, current_size.width, current_size.height, (resized: any): void => {
-                ImageService.RotateImage(resized, current_size.orientation.resize, current_size.orientation.direction, (rotate: any): void => {
-                    ImageService.Brightness(rotate, current_size.brightness, (brightness: any): void => {
-                        $scope.$evalAsync(      // $apply
-                            ($scope: any): void => {
-                                $scope.image = brightness;
-                                $scope.width = current_size.width;
-                                $scope.height = current_size.height;
-                                result.width = current_size.width;
-                                result.height = current_size.height;
-                                result.orientation = current_size.orientation.direction;
-                                result.resize = current_size.orientation.resize;
-                                result.brightness = current_size.brightness;
-                                result.deformation = true;
-                                callback();
-                            }
-                        );
-                    });
-                });
-            });
-        };
-
-        let SetOrientation = () => {
-            let ratio = $scope.ratio;
-            let aspect = $scope.aspect;
-            let brightness = $scope.brightness;
-            current_size.width = items.width * (ratio / 100) * aspect;
-            current_size.height = items.height * (ratio / 100);
-            current_size.brightness = brightness;
-        };
-
-        $scope.SizeChange = () => {
-            progress(true);
-            SetOrientation();
-            Deformation(() => {
-                progress(false)
-            });
-        };
-
-        /*  $scope.RatioChange = () => {
-              progress(true);
-              SetOrientation();
-              Deformation(() => {
-                  progress(false)
-              });
-          };*/
-
-        $scope.Rotate = (n: number) => {
-            progress(true);
-            index += 1;
-            current_size.orientation = orientations[Math.abs(index % 4)];
-            SetOrientation();
-            Deformation(() => {
-                progress(false)
-            });
-        };
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.answer = (answer: any): void => {
-            $uibModalInstance.close(result);
-        };
-
-    }]);
-
 //blob
 
 //  4000 < key < 5999
 
-FrontControllers.controller('BlobController', ['$scope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
-    function ($scope: any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
-            });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
-
-        $document.on('drop dragover', (e: any): void => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        let Type = (mimetype): string => {
-            let result = "";
-            let nameparts: string[] = mimetype.split("/");
-            if (nameparts.length == 2) {
-                result = nameparts[0].toLowerCase();
-            }
-            return result;
-        };
-
-        let Draw = () => {
-            FileService.Query((result: any) => {
-                if (result) {
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-            }, error_handler);
-        };
-
-        let Exist = (query: any): void => {
-            FileService.Exist(query, (result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Count = (): void => {
-            FileService.Count((result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Next = () => {
-            progress(true);
-            FileService.Next((result) => {
-                if (result) {
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        let Prev = () => {
-            progress(true);
-            FileService.Prev((result) => {
-                if (result) {
-                    $scope.files = result;
-                }
-                FileService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                FileService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        let createBlob = (files: any): void => {
-            progress(true);
-            let promises = [];
-            _.forEach(files, (local_file) => {
-                let deferred = $q.defer();
-                let fileReader: any = new FileReader();
-                fileReader.onload = (event: any): void => {
-                    FileService.Create(event.target.result, local_file.name, 4000, (result: any) => {
-                        deferred.resolve(true);
-                    }, (code: number, message: string) => {
-                        deferred.reject(false);
-                    });
-                };
-                fileReader.readAsDataURL(local_file.file);
-                promises.push(deferred.promise);
-            });
-
-            $q.all(promises).then(function (result) {
-                progress(false);
-                files.forEach((file) => {
-                    file.cancel();
-                });
-                Draw();
-            }).finally(() => {
-            });
-        };
-
-        let deleteBlob = (filename: any): void => {
-
-            let modalInstance = $uibModal.open({
-                controller: 'BlobDeleteDialogController',
-                templateUrl: '/blob/dialogs/delete_confirm_dialog',
-            });
-
-            modalInstance.result.then((answer: any): void => { // Answer
-                FileService.Delete(filename, 4000, (result: any) => {
-                    $scope.files = [];
-                    Draw();
-                }, error_handler);
-            }, (): void => { // Error
-            });
-        };
-
-        FileService.SetQuery({}, 4000);
-        let Find = (name: string): void => {
-            if (!name) {
-                name = "";
-            }
-            FileService.SetQuery({filename: {$regex: name}}, 4000);
-            Draw();
-        };
-
-        $scope.Type = Type;
-        $scope.Count = Count;
-        $scope.Next = Next;
-        $scope.Prev = Prev;
-        $scope.createBlob = createBlob;
-        $scope.deleteBlob = deleteBlob;
-        $scope.Find = Find;
-
-        Draw();
-    }]);
-
-FrontControllers.controller('BlobDeleteDialogController', ['$scope', '$uibModalInstance',
-    ($scope: any, $uibModalInstance: any): void => {
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-        $scope.answer = (answer: any): void => {
-            $uibModalInstance.close($scope);
-        };
-
-    }]);
+//FrontControllers.controller('BlobController', ['$scope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
+//    function ($scope: any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
+//
+//        let progress = (value) => {
+//            $scope.$emit('progress', value);
+//        };
+//
+//        $scope.$on('progress', (event, value) => {
+//            $scope.progress = value;
+//        });
+//
+//        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+//            progress(false);
+//            $scope.message = message;
+//            $log.error(message);
+//            alert(message);
+//        };
+//
+//        let alert = (message): void => {
+//            let modalInstance: any = $uibModal.open({
+//                controller: 'AlertDialogController',
+//                templateUrl: '/common/dialogs/alert_dialog',
+//                resolve: {
+//                    items: (): any => {
+//                        return message;
+//                    }
+//                }
+//            });
+//            modalInstance.result.then((answer: any): void => {
+//            }, (): void => {
+//            });
+//        };
+//
+//        $document.on('drop dragover', (e: any): void => {
+//            e.stopPropagation();
+//            e.preventDefault();
+//        });
+//
+//        let Type = (mimetype): string => {
+//            let result = "";
+//            let nameparts: string[] = mimetype.split("/");
+//            if (nameparts.length == 2) {
+//                result = nameparts[0].toLowerCase();
+//            }
+//            return result;
+//        };
+//
+//        let Draw = () => {
+//            FileService.Query((result: any) => {
+//                if (result) {
+//                    $scope.files = result;
+//                }
+//                FileService.Over((hasnext) => {
+//                    $scope.over = !hasnext;
+//                });
+//                FileService.Under((hasprev) => {
+//                    $scope.under = !hasprev;
+//                });
+//            }, error_handler);
+//        };
+//
+//        let Exist = (query: any): void => {
+//            FileService.Exist(query, (result: any): void => {
+//                if (result) {
+//                    $scope.count = result;
+//                }
+//            }, error_handler);
+//        };
+//
+//        let Count = (): void => {
+//            FileService.Count((result: any): void => {
+//                if (result) {
+//                    $scope.count = result;
+//                }
+//            }, error_handler);
+//        };
+//
+//        let Next = () => {
+//            progress(true);
+//            FileService.Next((result) => {
+//                if (result) {
+//                    $scope.files = result;
+//                }
+//                FileService.Over((hasnext) => {
+//                    $scope.over = !hasnext;
+//                });
+//                FileService.Under((hasprev) => {
+//                    $scope.under = !hasprev;
+//                });
+//                progress(false);
+//            }, error_handler);
+//        };
+//
+//        let Prev = () => {
+//            progress(true);
+//            FileService.Prev((result) => {
+//                if (result) {
+//                    $scope.files = result;
+//                }
+//                FileService.Over((hasnext) => {
+//                    $scope.over = !hasnext;
+//                });
+//                FileService.Under((hasprev) => {
+//                    $scope.under = !hasprev;
+//                });
+//                progress(false);
+//            }, error_handler);
+//        };
+//
+//        let createBlob = (files: any): void => {
+//            progress(true);
+//            let promises = [];
+//            _.forEach(files, (local_file) => {
+//                let deferred = $q.defer();
+//                let fileReader: any = new FileReader();
+//                fileReader.onload = (event: any): void => {
+//                    FileService.Create(event.target.result, local_file.name, 4000, (result: any) => {
+//                        deferred.resolve(true);
+//                    }, (code: number, message: string) => {
+//                        deferred.reject(false);
+//                    });
+//                };
+//                fileReader.readAsDataURL(local_file.file);
+//                promises.push(deferred.promise);
+//            });
+//
+//            $q.all(promises).then(function (result) {
+//                progress(false);
+//                files.forEach((file) => {
+//                    file.cancel();
+//                });
+//                Draw();
+//            }).finally(() => {
+//            });
+//        };
+//
+//        let deleteBlob = (filename: any): void => {
+//
+//            let modalInstance = $uibModal.open({
+//                controller: 'BlobDeleteDialogController',
+//                templateUrl: '/blob/dialogs/delete_confirm_dialog',
+//            });
+//
+//            modalInstance.result.then((answer: any): void => { // Answer
+//                FileService.Delete(filename, 4000, (result: any) => {
+//                    $scope.files = [];
+//                    Draw();
+//                }, error_handler);
+//            }, (): void => { // Error
+//            });
+//        };
+//
+//        FileService.SetQuery({}, 4000);
+//        let Find = (name: string): void => {
+//            if (!name) {
+//                name = "";
+//            }
+//            FileService.SetQuery({filename: {$regex: name}}, 4000);
+//            Draw();
+//        };
+//
+//        $scope.Type = Type;
+//        $scope.Count = Count;
+//        $scope.Next = Next;
+//        $scope.Prev = Prev;
+//        $scope.createBlob = createBlob;
+//        $scope.deleteBlob = deleteBlob;
+//        $scope.Find = Find;
+//
+//        Draw();
+//    }]);
+//
+//FrontControllers.controller('BlobDeleteDialogController', ['$scope', '$uibModalInstance',
+//    ($scope: any, $uibModalInstance: any): void => {
+//
+//        $scope.hide = (): void => {
+//            $uibModalInstance.close();
+//        };
+//
+//        $scope.cancel = (): void => {
+//            $uibModalInstance.dismiss();
+//        };
+//
+//        $scope.answer = (answer: any): void => {
+//            $uibModalInstance.close($scope);
+//        };
+//
+//    }]);
 
 //SVG
 
@@ -3611,134 +2365,6 @@ FrontControllers.controller('SVGDeleteConfirmController', ['$scope', '$uibModalI
 
     }]);
 
-//Member
-
-FrontControllers.controller('MemberController', ['$scope', '$document', '$log', '$uibModal', 'MemberService',
-    ($scope: any, $document: any, $log: any, $uibModal: any, MemberService: any): void => {
-
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
-
-        $scope.$on('progress', (event, value): void => {
-            $scope.progress = value;
-        });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message: string): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
-            });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
-
-        $document.on('drop dragover', (e: any): void => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-
-        let Draw = () => {
-            MemberService.Query((result: any): void => {
-                if (result) {
-                    $scope.accounts = result;
-                }
-            }, error_handler);
-        };
-
-        let Count = (): void => {
-            MemberService.Count((result: any): void => {
-                if (result) {
-                    $scope.count = result;
-                }
-            }, error_handler);
-        };
-
-        let Next = () => {
-            progress(true);
-            MemberService.Next((result): void => {
-                if (result) {
-                    $scope.accounts = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Prev = () => {
-            progress(true);
-            MemberService.Prev((result): void => {
-                if (result) {
-                    $scope.accounts = result;
-                }
-                progress(false);
-            }, error_handler);
-        };
-
-        let Find = (name): void => {
-            if (name) {
-                MemberService.query = {username: {$regex: name}};
-            }
-            Draw();
-            Count();
-        };
-
-        let Open = (acount: any): void => {
-            let modalRegist: any = $uibModal.open({
-                controller: 'MemberOpenDialogController',
-                templateUrl: '/members/dialogs/open_dialog',
-                resolve: {
-                    items: acount
-                }
-            });
-
-            modalRegist.result.then((group: any): void => {
-                $scope.layout = group;
-                $scope.name = group.name;
-                $scope.opened = true;
-            }, (): void => {
-            });
-
-        };
-
-        $scope.Next = Next;
-        $scope.Prev = Prev;
-        $scope.Count = Count;
-        $scope.Find = Find;
-        $scope.Open = Open;
-
-        Find(null);
-
-    }]);
-
-FrontControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope: any, $uibModalInstance: any, items: any): void => {
-
-        $scope.items = items;
-
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
-
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
-
-    }]);
-
-
 FrontControllers.controller('UserSettingController', ['$scope','$rootScope', '$q', '$document', '$uibModal', '$log', 'ProfileService',"SessionService", 'DataService',
     ($scope: any,$rootScope:any, $q: any, $document: any, $uibModal: any, $log: any, ProfileService,SessionService, DataService: any): void => {
 
@@ -3807,65 +2433,4 @@ FrontControllers.controller('UserSettingController', ['$scope','$rootScope', '$q
 
     }]);
 
-
-FrontControllers.controller('NamespacesController', ['$scope',"$rootScope", "$log",'SessionService', 'NamespaceService',
-    ($scope: any,$rootScope, $log, SessionService: any, NamespaceService: any): void => {
-
-        let progress = (value): void => {
-            $scope.$emit('progress', value);
-        };
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-        };
-
-        let GetNamespaces = (): void => {
-            NamespaceService.Get(
-                (namespaces) => {
-                    $scope.namespaces = namespaces;
-                    $rootScope.$emit('get_namespaces', namespaces);
-                    GetNamespace();
-                }, error_handler);
-        };
-
-        $scope.SetNamespace = (namespace: string): void => {
-            SessionService.Put({namespace: namespace}, (data: any): void => {
-                $scope.namespace = namespace;
-                $rootScope.$emit('change_namespace', data.namespace);
-            }, error_handler);
-        };
-
-        let GetNamespace = (): void => {
-            SessionService.Get((session: any): void => {
-                if (session) {
-                    let data = session.data;
-                    if (data) {
-                        $rootScope.$emit('change_namespace', data.namespace);
-                    }
-                }
-            }, error_handler);
-        };
-
-        $rootScope.$on('change_files', (event, value): void => {
-            GetNamespaces();
-      //      GetNamespace();
-        });
-
-        window.onfocus = () => {
-            GetNamespaces();
-      //      GetNamespace();
-        };
-
-        $scope.GetNamespace = GetNamespace;
-
-        GetNamespaces();
-
-    }]);
-
-
-
-
 /*! Controllers  */
-
