@@ -289,8 +289,8 @@ export namespace FileModule {
                             if (!error) {
                                 if (collection) {
 
-                                    let query: any = Wrapper.Decode(request.params.query);
-                                    let option: any = Wrapper.Decode(request.params.option);
+                                    let query: any = Wrapper.Decode(request.params.query) || {};
+                                    let option: any = Wrapper.Decode(request.params.option) || {};
 
                                     let limit = 10;
                                     if (option.limit) {

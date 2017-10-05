@@ -63,7 +63,8 @@ var ArticleModule;
             }
         }
         static make_query(id, userid) {
-            return { $and: [{ _id: id }, { userid: userid }] };
+            let namespace = "";
+            return { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] };
         }
         /**
          * @param request
@@ -85,6 +86,9 @@ var ArticleModule;
                             else {
                                 article.content[key].value = content.value;
                             }
+                        }
+                        else if (content.type == "html") {
+                            article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
                         }
                     });
                     article.open = true;
@@ -124,7 +128,8 @@ var ArticleModule;
          */
         delete_own(request, response) {
             let userid = Article.userid(request);
-            Wrapper.Delete(response, 1300, ArticleModel, { userid: userid }, (response) => {
+            let namespace = "";
+            Wrapper.Delete(response, 1300, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }] }, (response) => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -151,9 +156,10 @@ var ArticleModule;
          */
         get_article_query_query(request, response) {
             let userid = Article.userid(request);
+            let namespace = "";
             let query = Wrapper.Decode(request.params.query);
             let option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1500, ArticleModel, { $and: [{ userid: userid }, { type: 0 }, query] }, {}, option, (response, articles) => {
+            Wrapper.Find(response, 1500, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, {}, option, (response, articles) => {
                 _.forEach(articles, (article) => {
                     article.content = null;
                 });
@@ -179,8 +185,9 @@ var ArticleModule;
          */
         get_article_count(request, response) {
             let userid = Article.userid(request);
+            let namespace = "";
             let query = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, 2800, ArticleModel, { $and: [{ userid: userid }, { type: 0 }, query] }, (response, count) => {
+            Wrapper.Count(response, 2800, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, (response, count) => {
                 Wrapper.SendSuccess(response, count);
             });
         }

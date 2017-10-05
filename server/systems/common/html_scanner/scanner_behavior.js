@@ -4,7 +4,6 @@
 var ScannerBehavior;
 (function (ScannerBehavior) {
     const url = require('url');
-    const jsdom = require("node-jsdom");
     const moment = require("moment");
     const _ = require('lodash');
     const requestpromise = require('request-promise');
@@ -78,13 +77,14 @@ var ScannerBehavior;
         }
     }
     class CustomBehavior {
-        constructor(parent_name, name, id, params, isdocument, models) {
+        constructor(parent_name, name, id, namespace, params, isdocument, models) {
             this.name = "";
             this.parent_name = "";
             this.id = "";
             this.parent_name = parent_name;
             this.name = name;
             this.id = id;
+            this.namespace = namespace;
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
@@ -230,6 +230,9 @@ var ScannerBehavior;
                     case "{#userid}":
                         appender = this.id;
                         break;
+                    case "{#namespace}":
+                        appender = this.namespace;
+                        break;
                     case "{#query:self}":
                         appender = this.Query(this.page_params);
                         break;
@@ -239,7 +242,7 @@ var ScannerBehavior;
             });
             return result;
         }
-        FieldValue(object, params, parent) {
+        FieldValue(object, params, position, parent) {
             let result = null;
             let full_params = params.trim();
             if (full_params) {
@@ -297,6 +300,12 @@ var ScannerBehavior;
                                 case "#userid":
                                     result = this.id;
                                     break;
+                                case "#position":
+                                    result = position;
+                                    break;
+                                case "#namespace":
+                                    result = this.namespace;
+                                    break;
                                 case "#query":
                                     switch (postfix) {
                                         case "next":
@@ -315,6 +324,9 @@ var ScannerBehavior;
                                         switch (postfix) {
                                             case "page":
                                                 result = Search(object, 0);
+                                                if (!result) {
+                                                    result = "";
+                                                }
                                                 break;
                                             case "index":
                                                 result = object.index;
@@ -486,7 +498,7 @@ var ScannerBehavior;
             }
             return result;
         }
-        ResolveFormat(data, value, parent) {
+        ResolveFormat(data, value, position, parent) {
             let result = "";
             this.SplitFormat(value.content, (element) => {
                 let appender = element;
@@ -494,7 +506,7 @@ var ScannerBehavior;
                 if (data) {
                     if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
                         let sliceed = trimed.slice(1, -1);
-                        appender = this.FieldValue(data, sliceed.trim(), parent); // fragment, model
+                        appender = this.FieldValue(data, sliceed.trim(), position, parent); // fragment, model
                     }
                 }
                 result += appender;

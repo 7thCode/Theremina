@@ -1,0 +1,10 @@
+extends ../../layout
+
+block content
+    section.content-header
+        .h5.text-gray #{message.begin}
+    section.content
+        include ../common/navbar
+
+    guidance(scenario="{{scenario}}")
+

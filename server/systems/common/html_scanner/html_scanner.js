@@ -4,8 +4,9 @@
 var HTMLScanner;
 (function (HTMLScanner) {
     const url = require('url');
-    const jsdom = require("node-jsdom");
     const _ = require('lodash');
+    const jsdom = require("jsdom");
+    const { JSDOM } = jsdom;
     const PREFIX = "ds";
     class NodeScanner {
         constructor(callback) {
@@ -26,14 +27,14 @@ var HTMLScanner;
             let splited_name = name.toLowerCase().split(":");
             return splited_name[splited_name.length - 1];
         }
-        ScanChild(node, data) {
+        ScanChild(node, data, position) {
             if (node) {
                 let childnodes = node.childNodes;
                 this.depth++;
                 if (childnodes) {
                     _.forEach(childnodes, (node, index) => {
                         this.position = index;
-                        this.ScanNode(node, data);
+                        this.ScanNode(node, data, position);
                     });
                 }
                 this.depth--;
@@ -42,29 +43,28 @@ var HTMLScanner;
                 this.callback({ code: 1 }, null);
             }
         }
-        ScanNode(node, data) {
-            this.ScanChild(node, data);
+        ScanNode(node, data, position) {
+            this.ScanChild(node, data, position);
         }
-        ScanHtml(url) {
+        ScanHtml(source) {
             this.document_depth++;
-            jsdom.env(url, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null);
-                        });
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
                 }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    this.callback(null, "");
-                }
-            });
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, "");
+            }
         }
     }
     HTMLScanner.NodeScanner = NodeScanner;
@@ -93,7 +93,7 @@ var HTMLScanner;
                 }
             }
         }
-        ScanNode(node, data) {
+        ScanNode(node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1:
@@ -102,12 +102,12 @@ var HTMLScanner;
                                 this.ScanLinks(node, data);
                                 break;
                             default:
-                                this.ScanChild(node, data);
+                                this.ScanChild(node, data, position);
                                 break;
                         }
                         break;
                     default:
-                        this.ScanChild(node, data);
+                        this.ScanChild(node, data, position);
                 }
             }
             else {
@@ -152,7 +152,7 @@ var HTMLScanner;
             }
             return result;
         }
-        ScanNode(node, data) {
+        ScanNode(node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1:
@@ -161,12 +161,25 @@ var HTMLScanner;
                             let prefix = DataSourceResolver.prefix(tagname);
                             let localname = DataSourceResolver.localName(tagname);
                             switch (localname) {
+                                case "meta":
+                                    if (node.attributes) {
+                                        if (node.attributes["query"]) {
+                                            let query = node.attributes["query"];
+                                            this.datasource_promises.push({
+                                                name: query.nodeValue,
+                                                promise: this.PromisedDataSource(node),
+                                                count: this.PromisedDataCount(node),
+                                                resolved: ""
+                                            });
+                                        }
+                                    }
+                                    break;
                                 case "resolve":
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
-                                                let query = node.attributes.query;
+                                            if (node.attributes["query"]) {
+                                                let query = node.attributes["query"];
                                                 this.datasource_promises.push({
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
@@ -180,7 +193,7 @@ var HTMLScanner;
                                 default:
                                     break;
                             }
-                            this.ScanChild(node, data);
+                            this.ScanChild(node, data, position);
                         }
                         else {
                             this.callback({ code: 1 }, null);
@@ -195,88 +208,50 @@ var HTMLScanner;
         }
         ResolveDataSource(source, result) {
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null);
-                        });
-                    }
-                }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    // resolve all [record reference] in document.
-                    Promise.all(this.datasource_promises.map((doc) => {
-                        let result = null;
-                        if (doc.promise) {
-                            result = doc.promise;
-                        }
-                        return result;
-                    })).then((resolved) => {
-                        _.forEach(resolved, (entry, index) => {
-                            result[this.datasource_promises[index].name] = { content: entry, count: 0 };
-                        });
-                        Promise.all(this.datasource_promises.map((doc) => {
-                            let result = null;
-                            if (doc.count) {
-                                result = doc.count;
-                            }
-                            return result;
-                        })).then((resolved) => {
-                            _.forEach(resolved, (count, index) => {
-                                result[this.datasource_promises[index].name].count = count;
-                            });
-                            this.callback(null, result);
-                        }).catch((error) => {
-                            this.callback(error, null);
-                        });
-                    }).catch((error) => {
-                        this.callback(error, null);
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
                     });
                 }
-            });
-        }
-        // todo:1path
-        ResolveDataSource2(childnodes, result) {
-            if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null);
-                });
             }
-            // resolve all [record reference] in document.
-            Promise.all(this.datasource_promises.map((doc) => {
-                let result = null;
-                if (doc.promise) {
-                    result = doc.promise;
-                }
-                return result;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.datasource_promises[index].name] = { content: entry, count: 0 };
-                });
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                // resolve all [record reference] in document.
                 Promise.all(this.datasource_promises.map((doc) => {
                     let result = null;
-                    if (doc.count) {
-                        result = doc.count;
+                    if (doc.promise) {
+                        result = doc.promise;
                     }
                     return result;
                 })).then((resolved) => {
-                    _.forEach(resolved, (count, index) => {
-                        result[this.datasource_promises[index].name].count = count;
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.datasource_promises[index].name] = { content: entry, count: 0 };
                     });
-                    this.callback(null, result);
+                    Promise.all(this.datasource_promises.map((doc) => {
+                        let result = null;
+                        if (doc.count) {
+                            result = doc.count;
+                        }
+                        return result;
+                    })).then((resolved) => {
+                        _.forEach(resolved, (count, index) => {
+                            result[this.datasource_promises[index].name].count = count;
+                        });
+                        this.callback(null, result);
+                    }).catch((error) => {
+                        this.callback(error, null);
+                    });
                 }).catch((error) => {
                     this.callback(error, null);
                 });
-            }).catch((error) => {
-                this.callback(error, null);
-            });
+            }
         }
     }
     HTMLScanner.DataSourceResolver = DataSourceResolver;
@@ -327,7 +302,7 @@ var HTMLScanner;
                 }
             }
         }
-        ScanNode(node, data) {
+        ScanNode(node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1:
@@ -360,7 +335,7 @@ var HTMLScanner;
                                 default:
                                     break;
                             }
-                            this.ScanChild(node, data);
+                            this.ScanChild(node, data, position);
                         }
                         break;
                     default:
@@ -372,60 +347,36 @@ var HTMLScanner;
         }
         ResolveUrl(source, result) {
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null);
-                        });
-                    }
-                }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    Promise.all(this.url_promises.map((doc) => {
-                        let promise = null;
-                        if (doc.promise) {
-                            promise = doc.promise;
-                        }
-                        return promise;
-                    })).then((resolved) => {
-                        _.forEach(resolved, (entry, index) => {
-                            result[this.url_promises[index].name] = { content: entry, count: 1 };
-                        });
-                        this.callback(null, result);
-                    }).catch((error) => {
-                        this.callback(error, null);
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
                     });
                 }
-            });
-        }
-        // todo:1path
-        ResolveUrl2(childnodes, result) {
-            if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null);
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                Promise.all(this.url_promises.map((doc) => {
+                    let promise = null;
+                    if (doc.promise) {
+                        promise = doc.promise;
+                    }
+                    return promise;
+                })).then((resolved) => {
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.url_promises[index].name] = { content: entry, count: 1 };
+                    });
+                    this.callback(null, result);
+                }).catch((error) => {
+                    this.callback(error, null);
                 });
             }
-            Promise.all(this.url_promises.map((doc) => {
-                let promise = null;
-                if (doc.promise) {
-                    promise = doc.promise;
-                }
-                return promise;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.url_promises[index].name] = { content: entry, count: 1 };
-                });
-                this.callback(null, result);
-            }).catch((error) => {
-                this.callback(error, null);
-            });
         }
     }
     HTMLScanner.UrlResolver = UrlResolver;
@@ -450,7 +401,7 @@ var HTMLScanner;
         }
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        Include(node, data) {
+        Meta(node, data, position) {
             let resolved = false;
             if (node.attributes) {
                 let number = node.attributes.length;
@@ -459,18 +410,61 @@ var HTMLScanner;
                     let prefix = Expander.prefix(attribute.name);
                     let localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
-                        if (localname == "include") {
-                            this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
-                            resolved = true;
+                        switch (localname) {
+                            case "include":
+                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], position, this);
+                                resolved = true;
+                                break;
+                            case "title":
+                                {
+                                    let query_attribute = node.attributes["query"];
+                                    if (query_attribute) {
+                                        let datas = data[query_attribute.nodeValue];
+                                        if (datas.content.length > 0) {
+                                            let first_data = datas.content[0];
+                                            this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
+                                                content: attribute.value,
+                                                count: 1
+                                            }, position, this) + '</title>';
+                                        }
+                                        resolved = true;
+                                    }
+                                }
+                                break;
+                            case "content":
+                                {
+                                    let query_attribute = node.attributes["query"];
+                                    if (query_attribute) {
+                                        let datas = data[query_attribute.nodeValue];
+                                        if (datas.content.length > 0) {
+                                            let first_data = datas.content[0];
+                                            let name_attribute = node.attributes["name"];
+                                            let name = "";
+                                            if (name_attribute) {
+                                                name = 'name="' + name_attribute.nodeValue + '"';
+                                            }
+                                            this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
+                                                content: attribute.value,
+                                                count: 1
+                                            }, position, this) + '"/>';
+                                        }
+                                        resolved = true;
+                                    }
+                                }
+                                break;
                         }
+                        //     if (localname == "include") {
+                        //         this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
+                        //         resolved = true;
+                        //     }
                     }
                 }
             }
             if (!resolved) {
-                this.NodeToElement(node, data);
+                this.NodeToElement(node, data, position);
             }
         }
-        NodeToElement(node, data) {
+        NodeToElement(node, data, position) {
             let tagname = node.localName;
             let attribute_string = "";
             if (node.attributes) {
@@ -483,7 +477,7 @@ var HTMLScanner;
                         attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
                             count: 1
-                        }, this) + '"';
+                        }, position, this) + '"';
                     }
                     else {
                         attribute_string += ' ' + attribute.name + '="' + attribute.value + '"';
@@ -497,7 +491,7 @@ var HTMLScanner;
             }
             if (node.childNodes.length > 0) {
                 this.html += "<" + localname + attribute_string + ">";
-                this.ScanChild(node, data);
+                this.ScanChild(node, data, position);
                 this.html += "</" + localname + ">";
             }
             else {
@@ -513,13 +507,13 @@ var HTMLScanner;
                 }
             }
         }
-        ResolveChildren(node, result) {
+        ResolveChildren(node, result, position) {
             _.forEach(node.childNodes, (childnode, index) => {
                 this.position = index;
-                this.ScanNode(childnode, result);
+                this.ScanNode(childnode, result, position);
             });
         }
-        ScanNode(node, data) {
+        ScanNode(node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1:
@@ -532,35 +526,35 @@ var HTMLScanner;
                                 case "head":
                                 case "body":
                                     if (this.datasource.isdocument) {
-                                        this.NodeToElement(node, data);
+                                        this.NodeToElement(node, data, position);
                                     }
                                     else {
-                                        this.ScanChild(node, data);
+                                        this.ScanChild(node, data, position);
                                     }
                                     break;
                                 case "meta":
-                                    this.Include(node, data);
+                                    this.Meta(node, data, position);
                                     break;
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
-                                                let query = node.attributes.query;
+                                            if (node.attributes["query"]) {
+                                                let query = node.attributes["query"];
                                                 let result = this.fragments[query.nodeValue].content;
                                                 if (result) {
-                                                    _.forEach(result, (resolved_data, index) => {
-                                                        this.ResolveChildren(node, resolved_data);
+                                                    _.forEach(result, (resolved_data, position) => {
+                                                        this.ResolveChildren(node, resolved_data, position);
                                                     });
                                                 }
                                             }
                                             else if (node.attributes.scope) {
                                                 if (data) {
                                                     let scope = node.attributes.scope;
-                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, this); //fragment
+                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, position, this); //fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
-                                                            _.forEach(result, (resolved_data, index) => {
-                                                                this.ResolveChildren(node, resolved_data);
+                                                            _.forEach(result, (resolved_data, position) => {
+                                                                this.ResolveChildren(node, resolved_data, position);
                                                             });
                                                         }
                                                     }
@@ -574,7 +568,7 @@ var HTMLScanner;
                                         if (node.attributes) {
                                             if (node.attributes.src) {
                                                 let src = node.attributes.src;
-                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], this);
+                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], position, this);
                                             }
                                         }
                                     }
@@ -582,12 +576,12 @@ var HTMLScanner;
                                 case "resolve":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
-                                                let query = node.attributes.query;
+                                            if (node.attributes["query"]) {
+                                                let query = node.attributes["query"];
                                                 let current_datasource = this.fragments[query.nodeValue].content;
                                                 _.forEach(node.childNodes, (childnode, index) => {
                                                     this.position = index;
-                                                    this.ScanNode(childnode, current_datasource[0]);
+                                                    this.ScanNode(childnode, current_datasource[0], 0);
                                                 });
                                             }
                                             else if (node.attributes.field) {
@@ -595,20 +589,20 @@ var HTMLScanner;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
-                                                }, this);
+                                                }, position, this);
                                             }
                                             else if (node.attributes.scope) {
                                                 if (data) {
                                                     let scope = node.attributes.scope;
-                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, this);
+                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, position, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
-                                                                this.ResolveChildren(node, result[0]);
+                                                                this.ResolveChildren(node, result[0], 0);
                                                             }
                                                         }
                                                         else {
-                                                            this.ResolveChildren(node, result);
+                                                            this.ResolveChildren(node, result, position);
                                                         }
                                                     }
                                                 }
@@ -621,9 +615,9 @@ var HTMLScanner;
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist = node.attributes.exist;
-                                                let result = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
                                                 if (result) {
-                                                    this.ResolveChildren(node, data);
+                                                    this.ResolveChildren(node, data, position);
                                                 }
                                             }
                                         }
@@ -634,16 +628,16 @@ var HTMLScanner;
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist = node.attributes.exist;
-                                                let result = this.datasource.FieldValue(data, exist.nodeValue, this); //model
+                                                let result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
                                                 if (!result) {
-                                                    this.ResolveChildren(node, data);
+                                                    this.ResolveChildren(node, data, position);
                                                 }
                                             }
                                         }
                                     }
                                     break;
                                 default:
-                                    this.NodeToElement(node, data);
+                                    this.NodeToElement(node, data, position);
                                     break;
                             }
                         }
@@ -653,7 +647,7 @@ var HTMLScanner;
                             let parent_name = node.parentNode.localName;
                             let prefix = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
-                                this.html += this.datasource.ResolveFormat(data, { content: node.data, count: 1 }, this);
+                                this.html += this.datasource.ResolveFormat(data, { content: node.data, count: 1 }, position, this);
                             }
                             else {
                                 this.html += node.data;
@@ -678,31 +672,30 @@ var HTMLScanner;
         ExpandHtml(source, fragments) {
             this.fragments = fragments;
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, fragments);
-                        });
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, fragments, 0);
+                    });
                 }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    this.callback(null, this.html);
-                }
-            });
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, this.html);
+            }
         }
         // todo:1path
-        ExpandHtml2(childnodes, fragments) {
+        ExpandHtml2(childnodes, fragments, position) {
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
-                    this.ScanNode(element, fragments);
+                    this.ScanNode(element, fragments, position);
                 });
             }
         }
@@ -792,20 +785,19 @@ var HTMLScanner;
                 datasource_resolver.datasource_promises.push(page_init);
                 datasource_resolver.ResolveDataSource2(source, {});
             };
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (datasource.page_params) {
-                        build(childnodes, datasource, page_init, callback);
-                    }
-                    else {
-                        build(childnodes, datasource, {}, callback);
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (datasource.page_params) {
+                    build(childnodes, datasource, page_init, callback);
                 }
                 else {
-                    callback(errors, null);
+                    build(childnodes, datasource, {}, callback);
                 }
-            });
+            }
+            else {
+                callback({ code: 1, message: "" }, null);
+            }
         }
         ;
     }

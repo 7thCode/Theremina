@@ -4,12 +4,12 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-//import forEach = require("lodash/forEach");
 let BackOfficeApplication = angular.module('BackOfficeApplication', [
     'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar',
     'ngSanitize',
     'textAngular',
     "Services",
+    'FrontControllers',
     "TemplateServices",
     "LayoutServices",
     "LayoutsProviders",
@@ -21,18 +21,13 @@ let BackOfficeApplication = angular.module('BackOfficeApplication', [
     'FileControllers',
     "AuthServices",
     'AuthControllers',
-    "ResourcesProviders",
-    "ResourceBuilderServices",
-    'ResourceBuilderControllers',
-    'ResourcePlayerServices',
-    'ResourcePlayerControllers',
     "GroupControllers",
     "GroupServices",
     "FormsProviders",
-    "FormBuilderServices",
-    'FormBuilderControllers',
     'FormPlayerServices',
     'FormPlayerControllers',
+    "FormBuilderServices",
+    'FormBuilderControllers',
     'AccountServices',
     'AccountControllers',
     'AnalysisServices',
@@ -45,12 +40,24 @@ let BackOfficeApplication = angular.module('BackOfficeApplication', [
     "GoogleServices",
     "YahooServices",
     "PublicKeyServices",
+    "ResourcesProviders",
+    "ResourceBuilderServices",
+    'ResourceBuilderControllers',
+    'ResourcePlayerServices',
+    'ResourcePlayerControllers',
     "MailerControllers",
     "MailerServices",
     "RobotControllers",
     "RobotServices",
     "GoogleServices",
-    "GoogleControllers"
+    "GoogleControllers",
+    "NamespaceControllers",
+    "NamespaceServices",
+    "MembersControllers",
+    "MembersServices",
+    "PagesControllers",
+    "PicturesControllers",
+    "BlobControllers"
 ]);
 BackOfficeApplication.run(['$rootScope',
     function ($rootScope) {
@@ -92,13 +99,11 @@ BackOfficeApplication.filter('limit', [() => {
             return result;
         };
     }]);
-BackOfficeApplication.filter('round', [() => {
-        return (value) => {
-            let result = value;
-            if (!isNaN(value)) {
-                result = Math.round(value);
-            }
-            return result;
+BackOfficeApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
+    ($scope, $uibModalInstance, items) => {
+        $scope.message = items;
+        $scope.cancel = () => {
+            $uibModalInstance.dismiss();
         };
     }]);
 //# sourceMappingURL=backoffice_application.js.map

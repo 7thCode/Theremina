@@ -1,0 +1,61 @@
+.modal-content
+    .modal-header
+        span.h5.modal-title #{message.build}
+    .modal-body
+        ng-form(name="validate")
+            .row
+                //.col-xs-10
+                    .form-group
+                        label(for="name") #{message.name}
+                        span(ng-messages="validate.name.$error")
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="maxlength") #{message.long}
+                        input.form-control.no-zoom#name(ng-model="name", type="text", name='name', required, ng-maxlength="50")
+
+                .col-xs-12
+                    #sites.carousel.slide(data-ride='carousel')
+                        .carousel-inner(role='listbox')
+                            each item in items
+                                div(class=item.class)
+                                    img(src=item.img)
+                                    .carousel-caption
+                                        h1 #{item.name}
+                                        p #{item.text}
+                                        button.btn.btn-primary(type="button", ng-click='answer("' + item.name +'");', aria-label="") #{message.ok}
+
+
+                            //.item.active
+                                img(src='/000000000000000000000000/verb/doc/img/img_3.jpg', alt='verb')
+                                .carousel-caption
+                                    h1 verb
+                                    p aaaaaaaaaaaaaaaaaaaaaaa
+                                    button.btn.btn-primary(type="button", ng-click='answer("verb");', aria-label="") #{message.ok}
+                            //.item
+                                img(src='/000000000000000000000000/verb/doc/img/img_4.jpg', alt='story')
+                                .carousel-caption
+                                    h1 story
+                                    p aaaaaaaaaaaaaaaaaaaaaaa
+                                    button.btn.btn-primary(type="button", ng-click='answer("story");', aria-label="") #{message.ok}
+                            //.item
+                                img(src='/000000000000000000000000/verb/doc/img/img_5.jpg', alt='words')
+                                .carousel-caption
+                                    h1 words
+                                    p aaaaaaaaaaaaaaaaaaaaaaa
+                                    button.btn.btn-primary(type="button", ng-click='answer("words");', aria-label="") #{message.ok}
+
+                        a.left.carousel-control(href='#sites', role='button', data-slide='prev')
+                            span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                            span.sr-only Previous
+                        a.right.carousel-control(href='#sites', role='button', data-slide='next')
+                            span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                            span.sr-only Next
+
+                .col-xs-12
+                    include ../../../systems/common/error_message
+
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") #{message.cancel}
+                //    button.btn.btn-primary(type="button", ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}

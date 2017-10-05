@@ -14,7 +14,7 @@ var FileModule;
     const share = require(process.cwd() + '/server/systems/common/share');
     const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
+    //  const logger = share.logger;
     const result = require(share.Server('systems/common/result'));
     class Files {
         constructor() {
@@ -41,17 +41,26 @@ var FileModule;
             }
             return result;
         }
-        static namespace(name) {
-            let result = "";
-            if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
+        /*
+                static namespace(name: string): string {
+                    let result = "";
+                    if (name) {
+                        let names = name.split("#");
+                        let delimmiter = "";
+                        names.forEach((name, index) => {
+                            if (index < (names.length - 1)) {
+                                result += delimmiter + name;
+                                delimmiter = ":";
+                            }
+                        })
                     }
-                });
+                    return result;
+                }
+        */
+        static namespace(request) {
+            let result = "";
+            if (request.user.data) {
+                result = request.user.data.namespace;
             }
             return result;
         }
@@ -73,12 +82,26 @@ var FileModule;
         static username(request) {
             return request.user.username;
         }
-        static from_local(gfs, path_from, namespace, key, name, mimetype, callback) {
+        static from_local(gfs, path_from, namespace, userid, key, name, mimetype, callback) {
             try {
+                /*
+                                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                
+                                let writestream = bucket.openUploadStream(name, {
+                                    contentType: "binary/octet-stream",
+                                    metadata: {
+                                        userid: config.systems.userid,
+                                        key: key,
+                                        type: mimetype,
+                                        namespace: namespace,
+                                        parent: null
+                                    }
+                                });
+                */
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
-                        userid: config.systems.userid,
+                        userid: userid,
                         key: key,
                         type: mimetype,
                         namespace: namespace,
@@ -136,7 +159,7 @@ var FileModule;
          *
          * @returns none
          */
-        create_init_files(initfiles, callback) {
+        create_init_files(userid, initfiles, callback) {
             if (initfiles) {
                 if (initfiles.length > 0) {
                     let conn = Files.connect(config.db.user);
@@ -161,17 +184,11 @@ var FileModule;
                                                                 let namespace = doc.namespace;
                                                                 let mimetype = doc.content.type;
                                                                 let type = doc.type;
-                                                                let query = {};
-                                                                if (config.structured) {
-                                                                    query = { $and: [{ filename: filename }, { "metadata.namespace": "" }, { "metadata.userid": config.systems.userid }] };
-                                                                }
-                                                                else {
-                                                                    query = { $and: [{ filename: filename }, { "metadata.userid": config.systems.userid }] };
-                                                                }
+                                                                let query = { $and: [{ filename: filename }, { "metadata.userid": userid }] };
                                                                 collection.findOne(query, (error, item) => {
                                                                     if (!error) {
                                                                         if (!item) {
-                                                                            Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
+                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error, file) => {
                                                                                 if (!error) {
                                                                                     resolve(file);
                                                                                 }
@@ -181,19 +198,20 @@ var FileModule;
                                                                             });
                                                                         }
                                                                         else {
-                                                                            collection.remove({ _id: item._id }, (error, result) => {
+                                                                            resolve({});
+                                                                        } /*else {
+                                                                            collection.remove({_id: item._id}, (error, result) => {
                                                                                 if (!error) {
-                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
+                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
                                                                                         if (!error) {
                                                                                             resolve(file);
-                                                                                        }
-                                                                                        else {
+                                                                                        } else {
                                                                                             reject(error);
                                                                                         }
                                                                                     });
                                                                                 }
-                                                                            });
-                                                                        }
+                                                                            })
+                                                                        }*/
                                                                     }
                                                                     else {
                                                                         reject(error);
@@ -248,56 +266,47 @@ var FileModule;
             let number = 27000;
             let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
+            let namespace = Files.namespace(request);
             if (conn) {
                 conn.once('open', (error) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error, collection) => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = Wrapper.Decode(request.params.query);
-                                        let option = Wrapper.Decode(request.params.option);
-                                        let limit = 10;
-                                        if (option.limit) {
-                                            limit = option.limit;
-                                        }
-                                        let skip = 0;
-                                        if (option.skip) {
-                                            skip = option.skip;
-                                        }
-                                        collection.find({ $and: [query, { "metadata.userid": userid }] }).limit(limit).skip(skip).toArray((error, docs) => {
-                                            if (!error) {
-                                                conn.db.close();
-                                                Wrapper.SendSuccess(response, docs);
-                                            }
-                                            else {
-                                                conn.db.close();
-                                                Wrapper.SendError(response, error.code, error.message, error);
-                                            }
-                                        });
+                        conn.db.collection('fs.files', (error, collection) => {
+                            if (!error) {
+                                if (collection) {
+                                    let query = Wrapper.Decode(request.params.query) || {};
+                                    let option = Wrapper.Decode(request.params.option) || {};
+                                    let limit = 10;
+                                    if (option.limit) {
+                                        limit = option.limit;
                                     }
-                                    else {
-                                        conn.db.close();
-                                        Wrapper.SendFatal(response, number + 30, "no collection", {
-                                            code: number + 30,
-                                            message: "no collection"
-                                        });
+                                    let skip = 0;
+                                    if (option.skip) {
+                                        skip = option.skip;
                                     }
+                                    collection.find({ $and: [query, { "metadata.namespace": namespace }, { "metadata.userid": userid }] }).limit(limit).skip(skip).toArray((error, docs) => {
+                                        if (!error) {
+                                            conn.db.close();
+                                            Wrapper.SendSuccess(response, docs);
+                                        }
+                                        else {
+                                            conn.db.close();
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 }
                                 else {
                                     conn.db.close();
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, number + 30, "no collection", {
+                                        code: number + 30,
+                                        message: "no collection"
+                                    });
                                 }
-                            });
-                        }
-                        else {
-                            conn.db.close();
-                            Wrapper.SendFatal(response, number + 20, "gfs error", {
-                                code: number + 20,
-                                message: "gfs error"
-                            });
-                        }
+                            }
+                            else {
+                                conn.db.close();
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     }
                     else {
                         conn.db.close();
@@ -322,47 +331,38 @@ var FileModule;
             let number = 28000;
             let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
+            let namespace = Files.namespace(request);
             if (conn) {
                 conn.once('open', (error) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error, collection) => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = Wrapper.Decode(request.params.query);
-                                        collection.find({ $and: [query, { "metadata.userid": userid }] }).count((error, count) => {
-                                            if (!error) {
-                                                conn.db.close();
-                                                Wrapper.SendSuccess(response, count);
-                                            }
-                                            else {
-                                                conn.db.close();
-                                                Wrapper.SendError(response, error.code, error.message, error);
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        conn.db.close();
-                                        Wrapper.SendFatal(response, number + 30, "no collection", {
-                                            code: number + 30,
-                                            message: "no collection"
-                                        });
-                                    }
+                        conn.db.collection('fs.files', (error, collection) => {
+                            if (!error) {
+                                if (collection) {
+                                    let query = Wrapper.Decode(request.params.query);
+                                    collection.find({ $and: [query, { "metadata.namespace": namespace }, { "metadata.userid": userid }] }).count((error, count) => {
+                                        if (!error) {
+                                            conn.db.close();
+                                            Wrapper.SendSuccess(response, count);
+                                        }
+                                        else {
+                                            conn.db.close();
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 }
                                 else {
                                     conn.db.close();
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, number + 30, "no collection", {
+                                        code: number + 30,
+                                        message: "no collection"
+                                    });
                                 }
-                            });
-                        }
-                        else {
-                            conn.db.close();
-                            Wrapper.SendFatal(response, number + 20, "gfs error", {
-                                code: number + 20,
-                                message: "gfs error"
-                            });
-                        }
+                            }
+                            else {
+                                conn.db.close();
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     }
                     else {
                         conn.db.close();
@@ -381,13 +381,66 @@ var FileModule;
          *
          * @param request
          * @param response
+         * @returns none
+         */
+        namespaces(userid, callback) {
+            let number = 27000;
+            let conn = Files.connect(config.db.user);
+            if (conn) {
+                conn.once('open', (error) => {
+                    if (!error) {
+                        conn.db.collection('fs.files', (error, collection) => {
+                            if (!error) {
+                                if (collection) {
+                                    collection.find({ "metadata.userid": userid }, { "metadata.namespace": 1, "_id": 0 }).toArray((error, docs) => {
+                                        if (!error) {
+                                            conn.db.close();
+                                            let result = [];
+                                            _.forEach(docs, (page) => {
+                                                if (page.metadata.namespace) {
+                                                    result.push(page.metadata.namespace);
+                                                }
+                                            });
+                                            callback(null, _.uniqBy(result));
+                                        }
+                                        else {
+                                            callback(error, null);
+                                            conn.db.close();
+                                        }
+                                    });
+                                }
+                                else {
+                                    callback({ message: "", code: 1 }, null);
+                                    conn.db.close();
+                                }
+                            }
+                            else {
+                                callback(error, null);
+                                conn.db.close();
+                            }
+                        });
+                    }
+                    else {
+                        callback(error, null);
+                        conn.db.close();
+                    }
+                });
+            }
+            else {
+                callback({ message: "2", code: 1 }, null);
+            }
+        }
+        /**
+         *
+         * @param request
+         * @param response
          * @param next
          * @returns none
          */
         get_file(request, response, next) {
             try {
                 let conn = Files.connect(config.db.user);
-                let namespace = Files.namespace(request.params.name);
+                let namespace = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = request.params.userid;
                 conn.once('open', (error) => {
@@ -397,13 +450,7 @@ var FileModule;
                             conn.db.collection('fs.files', (error, collection) => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {};
-                                        if (config.structured) {
-                                            query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
-                                        }
-                                        else {
-                                            query = { $and: [{ filename: name }, { "metadata.userid": userid }] };
-                                        }
+                                        let query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
                                         collection.findOne(query, (error, item) => {
                                             if (!error) {
                                                 if (item) {
@@ -474,7 +521,8 @@ var FileModule;
         get_file_data_name(request, response, next) {
             try {
                 let conn = Files.connect(config.db.user);
-                let namespace = Files.namespace(request.params.name);
+                // let namespace: string = request.params.namespace;
+                let namespace = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = Files.userid(request);
                 let BinaryToBase64 = (str) => {
@@ -487,13 +535,7 @@ var FileModule;
                             conn.db.collection('fs.files', (error, collection) => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {};
-                                        if (config.structured) {
-                                            query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
-                                        }
-                                        else {
-                                            query = { $and: [{ filename: name }, { "metadata.userid": userid }] };
-                                        }
+                                        let query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
                                         collection.findOne(query, (error, item) => {
                                             if (!error) {
                                                 if (item) {
@@ -515,12 +557,18 @@ var FileModule;
                                                     }
                                                     else {
                                                         conn.db.close();
-                                                        Wrapper.SendError(response, 10000, "no stream", { code: 10000, message: "no stream" });
+                                                        Wrapper.SendError(response, 10000, "no stream", {
+                                                            code: 10000,
+                                                            message: "no stream"
+                                                        });
                                                     }
                                                 }
                                                 else {
                                                     conn.db.close();
-                                                    Wrapper.SendFatal(response, 10000, "no item", { code: 10000, message: "no item" });
+                                                    Wrapper.SendFatal(response, 10000, "no item", {
+                                                        code: 10000,
+                                                        message: "no item"
+                                                    });
                                                 }
                                             }
                                             else {
@@ -531,7 +579,10 @@ var FileModule;
                                     }
                                     else {
                                         conn.db.close();
-                                        Wrapper.SendFatal(response, 10000, "no collection", { code: 10000, message: "no collection" });
+                                        Wrapper.SendFatal(response, 10000, "no collection", {
+                                            code: 10000,
+                                            message: "no collection"
+                                        });
                                     }
                                 }
                                 else {
@@ -564,7 +615,7 @@ var FileModule;
         post_file_name(request, response) {
             let number = 24000;
             let conn = Files.connect(config.db.user);
-            let namespace = Files.namespace(request.params.name);
+            let namespace = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let key = request.params.key;
             let userid = Files.userid(request);
@@ -579,13 +630,7 @@ var FileModule;
                                     conn.db.collection('fs.files', (error, collection) => {
                                         if (!error) {
                                             if (collection) {
-                                                let query = {};
-                                                if (config.structured) {
-                                                    query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
-                                                }
-                                                else {
-                                                    query = { $and: [{ filename: name }, { "metadata.userid": userid }] };
-                                                }
+                                                let query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
                                                 collection.findOne(query, (error, item) => {
                                                     if (!error) {
                                                         if (!item) {
@@ -702,7 +747,7 @@ var FileModule;
         put_file_name(request, response) {
             let number = 25000;
             let conn = Files.connect(config.db.user);
-            let namespace = Files.namespace(request.params.name);
+            let namespace = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let key = request.params.key;
             let userid = Files.userid(request);
@@ -730,13 +775,7 @@ var FileModule;
                             conn.db.collection('fs.files', (error, collection) => {
                                 if (!error) {
                                     if (collection) {
-                                        let query = {};
-                                        if (config.structured) {
-                                            query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
-                                        }
-                                        else {
-                                            query = { $and: [{ filename: name }, { "metadata.userid": userid }] };
-                                        }
+                                        let query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
                                         collection.findOne(query, (error, item) => {
                                             if (!error) {
                                                 if (item) {
@@ -850,73 +889,57 @@ var FileModule;
         delete_file_name(request, response) {
             let number = 26000;
             let conn = Files.connect(config.db.user);
-            let namespace = Files.namespace(request.params.name);
+            let namespace = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let userid = Files.userid(request);
             if (conn) {
                 conn.once('open', (error) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error, collection) => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = {};
-                                        if (config.structured) {
-                                            query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
-                                        }
-                                        else {
-                                            query = { $and: [{ filename: name }, { "metadata.userid": userid }] };
-                                        }
-                                        collection.findOne(query, (error, item) => {
-                                            if (!error) {
-                                                if (item) {
-                                                    collection.remove({ _id: item._id }, (error) => {
-                                                        if (!error) {
-                                                            conn.db.close();
-                                                            Wrapper.SendSuccess(response, {});
-                                                        }
-                                                        else {
-                                                            conn.db.close();
-                                                            Wrapper.SendError(response, error.code, error.message, error);
-                                                        }
-                                                    });
-                                                }
-                                                else {
-                                                    conn.db.close();
-                                                    Wrapper.SendWarn(response, number + 1, "not found", {
-                                                        code: number + 1,
-                                                        message: "not found"
-                                                    });
-                                                }
+                        conn.db.collection('fs.files', (error, collection) => {
+                            if (!error) {
+                                if (collection) {
+                                    let query = { $and: [{ filename: name }, { "metadata.namespace": namespace }, { "metadata.userid": userid }] };
+                                    collection.findOne(query, (error, item) => {
+                                        if (!error) {
+                                            if (item) {
+                                                collection.remove({ _id: item._id }, (error) => {
+                                                    if (!error) {
+                                                        conn.db.close();
+                                                        Wrapper.SendSuccess(response, {});
+                                                    }
+                                                    else {
+                                                        conn.db.close();
+                                                        Wrapper.SendError(response, error.code, error.message, error);
+                                                    }
+                                                });
                                             }
                                             else {
                                                 conn.db.close();
-                                                Wrapper.SendError(response, error.code, error.message, error);
+                                                Wrapper.SendWarn(response, number + 1, "not found", {
+                                                    code: number + 1,
+                                                    message: "not found"
+                                                });
                                             }
-                                        });
-                                    }
-                                    else {
-                                        conn.db.close();
-                                        Wrapper.SendFatal(response, number + 30, "no collection", {
-                                            code: number + 30,
-                                            message: "no collection"
-                                        });
-                                    }
+                                        }
+                                        else {
+                                            conn.db.close();
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 }
                                 else {
                                     conn.db.close();
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, number + 30, "no collection", {
+                                        code: number + 30,
+                                        message: "no collection"
+                                    });
                                 }
-                            });
-                        }
-                        else {
-                            conn.db.close();
-                            Wrapper.SendFatal(response, number + 20, "gfs error", {
-                                code: number + 20,
-                                message: "gfs error"
-                            });
-                        }
+                            }
+                            else {
+                                conn.db.close();
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     }
                     else {
                         conn.db.close();
@@ -944,43 +967,33 @@ var FileModule;
             if (conn) {
                 conn.once('open', (error) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error, collection) => {
-                                if (!error) {
-                                    if (collection) {
-                                        collection.remove({ "metadata.userid": userid }, (error) => {
-                                            if (!error) {
-                                                conn.db.close();
-                                                Wrapper.SendSuccess(response, {});
-                                            }
-                                            else {
-                                                conn.db.close();
-                                                Wrapper.SendError(response, error.code, error.message, error);
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        conn.db.close();
-                                        Wrapper.SendFatal(response, number + 30, "no collection", {
-                                            code: number + 30,
-                                            message: "no connection"
-                                        });
-                                    }
+                        conn.db.collection('fs.files', (error, collection) => {
+                            if (!error) {
+                                if (collection) {
+                                    collection.remove({ "metadata.userid": userid }, (error) => {
+                                        if (!error) {
+                                            conn.db.close();
+                                            Wrapper.SendSuccess(response, {});
+                                        }
+                                        else {
+                                            conn.db.close();
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 }
                                 else {
                                     conn.db.close();
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, number + 30, "no collection", {
+                                        code: number + 30,
+                                        message: "no connection"
+                                    });
                                 }
-                            });
-                        }
-                        else {
-                            conn.db.close();
-                            Wrapper.SendFatal(response, number + 20, "gfs error", {
-                                code: number + 20,
-                                message: "gfs error"
-                            });
-                        }
+                            }
+                            else {
+                                conn.db.close();
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     }
                     else {
                         conn.db.close();

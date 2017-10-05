@@ -1,0 +1,64 @@
+aside.main-sidebar.sidebar-color(ng-controller='LoginController')
+    section.sidebar(style="margin-top:12px;")
+        if user
+            .user-panel
+                .pull-left.image
+                    img.img-circle(src="/files/api/" + user.userid + "/" + user.username, style="width:5rem;height:5rem;", alt='')
+                .pull-left.info
+                    p
+                        a(href='#') #{user.local.nickname}
+                    p
+                        a(href='#')
+                            i.fa.fa-circle.text-success
+                            |  #{user.type}
+            ul.sidebar-menu(style="font-weight: 500")
+                li
+                    a(href='/self')
+                        i.fa.fa-user-circle.text-primary
+                        span #{message.profile}
+                li
+                    a(href="/pages")
+                        i.fa.fa-file-text.text-success
+                        span #{message.page}
+                li
+                    a(href="/data")
+                        i.fa.fa-database.text-primary
+                        span #{message.article}
+                li
+                    a(href="/pictures")
+                        i.fa.fa-file.text-success
+                        span #{message.picture}
+                li
+                    a(href="/svg")
+                        i.fa.fa-file-image-o.text-info
+                        span #{message.illust}
+                li
+                    a(href="/blob")
+                        i.fa.fa-file-text.text-info
+                        span #{message.blob}
+                if config.regist.member
+                    li
+                        a(href="/members")
+                            i.fa.fa-user-plus.fa-fw.text-warning
+                            span #{message.member}
+
+                if user.provider == "local"
+                    li
+                        a(href='#', ng-click="showPasswordDialog()")
+                            i.fa.fa-key.fa-fw.text-danger
+                            span #{message.password}
+                if user.type == "System"
+                    li
+                        a(href='/backoffice')
+                            span.fa-stack
+                                i.fa.fa-cog.fa-spin.text-info
+                                i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
+                            span #{message.backoffice}
+                li
+                    a(href='#', ng-click="Logout()")
+                        i.fa.fa-sign-out
+                        span #{message.logout}
+                //li
+                    a(href='#')
+                        input(type="checkbox" data-layout="sidebar-collapse")
+                        span &nbsp;&nbsp;#{message.close}

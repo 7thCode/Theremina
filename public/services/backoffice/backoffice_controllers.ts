@@ -8,11 +8,36 @@
 
 let BackOfficeControllers: angular.IModule = angular.module('BackOfficeControllers', []);
 
-BackOfficeControllers.controller('BackOfficeController', ['$scope', '$document','$log','LocationService','PluginsSettingService','Socket',
-    ($scope: any, $document: any,$log:any, LocationService:any,PluginsSettingService:any, Socket:any): void => {
+//Front
+BackOfficeControllers.controller('EventController', ['$scope',
+    ($scope: any): void => {
 
-        let map;
+   //     $scope.$on('change_controller', (event, value) => {
+   //         $scope.controller_name = value;
+   //     });
 
+    }]);
+
+BackOfficeControllers.controller('BackOfficeController', ['$scope',
+    ($scope: any): void => {
+/*
+        $scope.Notify = (message:any):void => {
+            Socket.emit("server", {value: message}, ():void => {
+                let hoge = 1;
+            });
+        };
+
+        Socket.on("client", (data:any):void => {
+            let notifier = new NotifierModule.Notifier();
+            notifier.Pass(data);
+        });
+
+        $scope.update_site = (message:string):void => {
+            Socket.emit("server", {value: message}, ():void => {
+                let hoge = 1;
+            });
+        };
+*/
         let progress = (value) => {
             $scope.$emit('progress', value);
         };
@@ -20,29 +45,5 @@ BackOfficeControllers.controller('BackOfficeController', ['$scope', '$document',
         $scope.$on('progress', (event, value) => {
             $scope.progress = value;
         });
-
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-        };
-
-        $scope.Notify = (message: any): void => {
-            Socket.emit("server", {value: message}, (): void => {
-                let hoge = 1;
-            });
-        };
-
-        Socket.on("client", (data: any): void => {
-            let notifier = new NotifierModule.Notifier();
-            notifier.Pass(data);
-        });
-
-        $scope.update_site = (message: string): void => {
-            Socket.emit("server", {value: message}, (): void => {
-
-            });
-        };
-
 
     }]);

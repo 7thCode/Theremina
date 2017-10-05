@@ -22,37 +22,24 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
                         i.fa.fa-list.fa-fw
                         span Articles
 
-                li.treeview
-                    a(href='#')
-                        i.fa.fa-th-large
-                        span Forms
-                        span.pull-right-container
-                            i.fa.fa-angle-left.pull-right
-                    ul.treeview-menu
-                        li
-                            a(href='/forms/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
-                                i.fa.fa-pencil
-                                | Builder
-                        li
-                            a(href='/forms' data-toggle="tooltip" data-placement="bottom" title="Player")
-                                i.fa.fa-eye
-                                | Player
+                li
+                    a(href='/forms/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                        i.fa.fa-pencil
+                        | Forms Builder
+                li
+                    a(href='/forms' data-toggle="tooltip" data-placement="bottom" title="Player")
+                        i.fa.fa-eye
+                        | Forms Player
 
-                li.treeview
-                    a(href='#')
-                        i.fa.fa-th-large
-                        span Layouts
-                        span.pull-right-container
-                            i.fa.fa-angle-left.pull-right
-                    ul.treeview-menu
-                        li
-                            a(href='/layouts/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
-                                i.fa.fa-pencil
-                                span Builder
-                        li
-                            a(href='/layouts' data-toggle="tooltip" data-placement="bottom" title="Player")
-                                i.fa.fa-eye
-                                span Player
+
+                li
+                    a(href='/layouts/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                        i.fa.fa-pencil
+                        span Layouts Builder
+                li
+                    a(href='/layouts' data-toggle="tooltip" data-placement="bottom" title="Player")
+                        i.fa.fa-eye
+                        span Layouts Player
 
                 //li
                     a(href="/images" data-toggle="tooltip" data-placement="bottom" title="Images")
@@ -64,61 +51,41 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
                         i.fa.fa-users.fa-fw
                         span #{message.groups}
 
-                li.treeview
-                    a(href='#')
-                        i.fa.fa-th-large
-                        span #{message.plugins}
-                        span.pull-right-container
-                            i.fa.fa-angle-left.pull-right
-                    ul.treeview-menu
-                        each module in config.modules
-                            if module.type == "optional"
-                                if module.description.display
-                                    li
-                                        a(href='/' + module.name data-toggle="tooltip" data-placement="bottom" title='${module.description.display}')
-                                            i.fa.fa-eye
-                                            span #{module.description.display}
 
-                li.treeview
-                    a(href='#')
-                        i.fa.fa-th-large
-                        span #{message.system}
-                        span.pull-right-container
-                            i.fa.fa-angle-left.pull-right
-                    ul.treeview-menu
-                        li.treeview
-                            a(href='#')
-                                i.fa.fa-th-large
-                                span #{message.resources}
-                                span.pull-right-container
-                                    i.fa.fa-angle-left.pull-right
-                            ul.treeview-menu
-                                li
-                                    a(href='/resources/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
-                                        i.fa.fa-pencil
-                                        span #{message.builder}
-                                //li
-                                    a(href='/resources' data-toggle="tooltip" data-placement="bottom" title="Player")
-                                        i.fa.fa-eye
-                                        | Player
-                        li
-                            a(href="/files" data-toggle="tooltip" data-placement="bottom" title="Files")
-                                i.fa.fa-picture-o.fa-fw
-                                span #{message.files}
+                each module in config.modules
+                    if module.type == "optional"
+                        if module.description.display
+                            li
+                                a(href='/' + module.name data-toggle="tooltip" data-placement="bottom" title='${module.description.display}')
+                                    i.fa.fa-eye
+                                    span #{module.description.display}
 
-                        li
-                            a(href="/accounts" data-toggle="tooltip" data-placement="bottom" title="Accounts")
-                                i.fa.fa-user.fa-fw
-                                span #{message.accounts}
+                li
+                    a(href='/resources/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                        i.fa.fa-pencil
+                        span #{message.resources} #{message.builder}
+                //li
+                    a(href='/resources' data-toggle="tooltip" data-placement="bottom" title="Player")
+                        i.fa.fa-eye
+                        | Player
+                li
+                    a(href="/files" data-toggle="tooltip" data-placement="bottom" title="Files")
+                        i.fa.fa-picture-o.fa-fw
+                        span #{message.system} #{message.files}
 
-                        li
-                            a(href="/analysis" data-toggle="tooltip" data-placement="bottom" title="Analysis")
-                                i.fa.fa-line-chart.fa-fw
-                                span #{message.analysis}
-                        li
-                            a(href="/setting" data-toggle="tooltip" data-placement="bottom" title="Setting")
-                                i.fa.fa-sliders.fa-fw
-                                span #{message.setting}
+                li
+                    a(href="/accounts" data-toggle="tooltip" data-placement="bottom" title="Accounts")
+                        i.fa.fa-user.fa-fw
+                        span #{message.system} #{message.accounts}
+
+                li
+                    a(href="/analysis" data-toggle="tooltip" data-placement="bottom" title="Analysis")
+                        i.fa.fa-line-chart.fa-fw
+                        span #{message.system} #{message.analysis}
+                li
+                    a(href="/setting" data-toggle="tooltip" data-placement="bottom" title="Setting")
+                        i.fa.fa-sliders.fa-fw
+                        span #{message.system} #{message.setting}
                 li
                     a(href="#", ng-click="showMemberDialog();" data-placement="bottom" data-toggle="tooltip" title="Members")
                         i.fa.fa-user-plus.fa-fw
@@ -137,9 +104,9 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
                     li
                         a(href='/backoffice' data-toggle="tooltip" data-placement="bottom" title="BackOffice")
                             span.fa-stack
-                                i.fa.fa-cog.fa-spin.text-info
-                                i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
-                            span BackOffice
+                            i.fa.fa-cog.fa-spin.text-info
+                            i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
+                        span BackOffice
                 li
                     a(href='#', ng-click="Logout()" data-toggle="tooltip" data-placement="bottom" title="Logout")
                         i.fa.fa-sign-out

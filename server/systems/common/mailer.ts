@@ -132,7 +132,7 @@ export namespace MailerModule {
 
             this.mailgun.messages().send(data, (error: any, body: any): void => {
                 if (!error) {
-                    callback(error);
+                    callback(null);
                 } else {
                     callback(error);
                 }

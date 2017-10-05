@@ -5,32 +5,38 @@
  */
 "use strict";
 let BackOfficeControllers = angular.module('BackOfficeControllers', []);
-BackOfficeControllers.controller('BackOfficeController', ['$scope', '$document', '$log', 'LocationService', 'PluginsSettingService', 'Socket',
-    ($scope, $document, $log, LocationService, PluginsSettingService, Socket) => {
-        let map;
+//Front
+BackOfficeControllers.controller('EventController', ['$scope',
+    ($scope) => {
+        //     $scope.$on('change_controller', (event, value) => {
+        //         $scope.controller_name = value;
+        //     });
+    }]);
+BackOfficeControllers.controller('BackOfficeController', ['$scope',
+    ($scope) => {
+        /*
+                $scope.Notify = (message:any):void => {
+                    Socket.emit("server", {value: message}, ():void => {
+                        let hoge = 1;
+                    });
+                };
+        
+                Socket.on("client", (data:any):void => {
+                    let notifier = new NotifierModule.Notifier();
+                    notifier.Pass(data);
+                });
+        
+                $scope.update_site = (message:string):void => {
+                    Socket.emit("server", {value: message}, ():void => {
+                        let hoge = 1;
+                    });
+                };
+        */
         let progress = (value) => {
             $scope.$emit('progress', value);
         };
         $scope.$on('progress', (event, value) => {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-        };
-        $scope.Notify = (message) => {
-            Socket.emit("server", { value: message }, () => {
-                let hoge = 1;
-            });
-        };
-        Socket.on("client", (data) => {
-            let notifier = new NotifierModule.Notifier();
-            notifier.Pass(data);
-        });
-        $scope.update_site = (message) => {
-            Socket.emit("server", { value: message }, () => {
-            });
-        };
     }]);
 //# sourceMappingURL=backoffice_controllers.js.map

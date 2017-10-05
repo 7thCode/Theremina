@@ -5,8 +5,10 @@
 namespace HTMLScanner {
 
     const url = require('url');
-    const jsdom = require("node-jsdom");
     const _ = require('lodash');
+
+    const jsdom = require("jsdom");
+    const { JSDOM } = jsdom;
 
     const PREFIX: string = "ds";
 
@@ -55,30 +57,24 @@ namespace HTMLScanner {
             this.ScanChild(node, data,position);
         }
 
-        public ScanHtml(url: string): any {
+        public ScanHtml(source: string): any {
             this.document_depth++;
-            jsdom.env(
-                url,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, null, 0);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, "");
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, "");
+            }
         }
 
     }
@@ -227,62 +223,58 @@ namespace HTMLScanner {
         }
 
         public ResolveDataSource(source: string, result: any): any {
+
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes: any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, null, 0);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {// Promise all(record) then Prmise All(count)
-
-                        // resolve all [record reference] in document.
-                        Promise.all(this.datasource_promises.map((doc: any): void => {
-                            let result: any = null;
-                            if (doc.promise) {
-                                result = doc.promise;
-                            }
-                            return result;
-                        })).then((resolved: any[]): void => {
-
-                            _.forEach(resolved, (entry: any, index: number): void => {
-                                result[this.datasource_promises[index].name] = {content: entry, count: 0};
-                            });
-
-                            Promise.all(this.datasource_promises.map((doc: any): void => {
-                                let result: any = null;
-                                if (doc.count) {
-                                    result = doc.count;
-                                }
-                                return result;
-                            })).then((resolved: any[]): void => {
-                                _.forEach(resolved, (count: any, index: number): void => {
-                                    result[this.datasource_promises[index].name].count = count;
-                                });
-                                this.callback(null, result);
-                            }).catch((error: any): void => {
-                                this.callback(error, null);
-                            });
-
-
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
-                        });
-
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes: any = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {// Promise all(record) then Prmise All(count)
+
+                // resolve all [record reference] in document.
+                Promise.all(this.datasource_promises.map((doc: any): void => {
+                    let result: any = null;
+                    if (doc.promise) {
+                        result = doc.promise;
+                    }
+                    return result;
+                })).then((resolved: any[]): void => {
+
+                    _.forEach(resolved, (entry: any, index: number): void => {
+                        result[this.datasource_promises[index].name] = {content: entry, count: 0};
+                    });
+
+                    Promise.all(this.datasource_promises.map((doc: any): void => {
+                        let result: any = null;
+                        if (doc.count) {
+                            result = doc.count;
+                        }
+                        return result;
+                    })).then((resolved: any[]): void => {
+                        _.forEach(resolved, (count: any, index: number): void => {
+                            result[this.datasource_promises[index].name].count = count;
+                        });
+                        this.callback(null, result);
+                    }).catch((error: any): void => {
+                        this.callback(error, null);
+                    });
+
+
+                }).catch((error: any): void => {
+                    this.callback(error, null);
+                });
+
+            }
+
         }
 
         // todo:1path
@@ -437,41 +429,36 @@ namespace HTMLScanner {
 
         public ResolveUrl(source: string, result: any): any {
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes: any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element: any, index: number): void => {
-                                this.position = index;
-                                this.ScanNode(element, null, 0);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        Promise.all(this.url_promises.map((doc: any): void => {
-                            let promise: any = null;
-                            if (doc.promise) {
-                                promise = doc.promise;
-                            }
-                            return promise;
-                        })).then((resolved: any[]): void => {
-                            _.forEach(resolved, (entry: any, index: number): void => {
-                                result[this.url_promises[index].name] = {content: entry, count: 1};
-                            });
-                            this.callback(null, result);
-                        }).catch((error: any): void => {
-                            this.callback(error, null);
-                        });
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes: any = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element: any, index: number): void => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                Promise.all(this.url_promises.map((doc: any): void => {
+                    let promise: any = null;
+                    if (doc.promise) {
+                        promise = doc.promise;
+                    }
+                    return promise;
+                })).then((resolved: any[]): void => {
+                    _.forEach(resolved, (entry: any, index: number): void => {
+                        result[this.url_promises[index].name] = {content: entry, count: 1};
+                    });
+                    this.callback(null, result);
+                }).catch((error: any): void => {
+                    this.callback(error, null);
+                });
+            }
+
         }
 
         // todo:1path
@@ -803,28 +790,23 @@ namespace HTMLScanner {
         public ExpandHtml(source: string, fragments: { content: string, count: number }[]): any {
             this.fragments = fragments;
             this.document_depth++;
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes: any = window.document.childNodes;
-                        if (childnodes) {
-                            _.forEach(childnodes, (element, index) => {
-                                this.position = index;
-                                this.ScanNode(element, fragments, 0);
-                            });
-                        }
-                    } else {
-                        this.callback(errors, null);
-                    }
-                    this.document_depth--;
-                    if (this.document_depth == 0) {
-                        this.callback(null, this.html);
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes: any = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, fragments, 0);
+                    });
                 }
-            );
+            } else {
+                this.callback({code:1,message:""}, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, this.html);
+            }
+
         }
 
         // todo:1path
@@ -923,25 +905,17 @@ namespace HTMLScanner {
                 datasource_resolver.ResolveDataSource2(source, {});
             };
 
-            jsdom.env(
-                source,
-                [],
-                {},
-                (errors, window) => {
-                    if (!errors) {
-                        let childnodes = window.document.childNodes;
-                        if (datasource.page_params) {
-                            build(childnodes, datasource, page_init, callback);
-                        } else {
-                            build(childnodes, datasource, {}, callback);
-                        }
-
-                    } else {
-                        callback(errors, null);
-                    }
-
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes: any = dom.window.document.childNodes;
+                if (datasource.page_params) {
+                    build(childnodes, datasource, page_init, callback);
+                } else {
+                    build(childnodes, datasource, {}, callback);
                 }
-            );
+            } else {
+                callback({code:1,message:""}, null);
+            }
 
         };
 
