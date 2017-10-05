@@ -1,23 +1,50 @@
-extends ../../backoffice_layout
+doctype html
+html(lang="ja")
+    head
+        meta(charset="utf-8")
+        meta(name="format-detection", content="telephone=no")
+        meta(name="msapplication-tap-highlight", content="no")
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(http-equiv="Content-Type" content="text/html")
+        meta(name="viewport", content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height")
+        title #{message.brand}
+        include ../../systems/common/favicon
 
-block content
-    div
-        if user
-            section.content-header
-                .h5.text-gray #{message.front}
-            section.content(style="height:95vh;overflow:scroll;")
-                include ./partial/navbar
-                h1#title.wf-nicomoji(style="text-align:left;font-size: 14.0vw;font-weight: 700;margin: 5vw 0 2vw 0;") #{status}
-                    p.wf-nikukyu(style='margin: 2vw 0 2vw 0;font-size: 6vw;color:#d0d0d0;text-shadow: 0 0.3rem 0 #7f8c8d;font-weight: 100;') #{message.welcome}
+        link(rel='stylesheet', href='/bower_components/AdminLTE/dist/css/AdminLTE.min.css')
 
-        else
-            section.content-header
-                .h1.text-gray #{message.front}
-                ol.breadcrumb.hidden-xs.hidden-sm
-                    li
-                        a.text-gray(href='/backoffice')
-                            i.fa.fa-dashboard
-                            |  #{message.home}
-            section.content(style="height:95vh;overflow:scroll;")
-                include ./partial/navbar
+        include ../../systems/common/webfonts
 
+        include ../../systems/common/stylesheets
+        include ../../services/common/stylesheets
+        include ../../plugins/common/stylesheets
+
+        include ../../plugins/common/google_analytics
+
+        != '\n<!--[if lte IE 9]>'
+        p(class="browserupgrade") お使いのブラウザはHTML5未対応です。
+        p 機能が足りません。アップデートしてください。
+        p
+        a(href="//browsehappy.com/") update
+        != '\n<![endif]-->\n'
+
+    body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController",style="background:#eeeeee;")
+        .wrapper
+            header.main-header(style="margin-top:1rem;")
+            if user
+                include ./partial/front_sidebar
+                .content-wrapper(style="padding-top: 50px;overflow:scroll;")
+                    include ../common/navbar
+                    include ./partial/logged
+            else
+                div
+                    include ../common/no_logged_navbar
+                    include ./partial/no_logged
+
+                guidance(scenario="{{scenario}}")
+
+
+include ../../systems/common/scripts
+include ../../services/common/scripts
+include ../../plugins/common/scripts
+
+script(src='/bower_components/AdminLTE/dist/js/app.min.js')

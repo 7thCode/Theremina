@@ -4,8 +4,9 @@
 var HTMLScanner;
 (function (HTMLScanner) {
     const url = require('url');
-    const jsdom = require("node-jsdom");
     const _ = require('lodash');
+    const jsdom = require("jsdom");
+    const { JSDOM } = jsdom;
     const PREFIX = "ds";
     class NodeScanner {
         constructor(callback) {
@@ -45,26 +46,25 @@ var HTMLScanner;
         ScanNode(node, data, position) {
             this.ScanChild(node, data, position);
         }
-        ScanHtml(url) {
+        ScanHtml(source) {
             this.document_depth++;
-            jsdom.env(url, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null, 0);
-                        });
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
                 }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    this.callback(null, "");
-                }
-            });
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, "");
+            }
         }
     }
     HTMLScanner.NodeScanner = NodeScanner;
@@ -208,51 +208,50 @@ var HTMLScanner;
         }
         ResolveDataSource(source, result) {
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null, 0);
-                        });
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
+                    });
+                }
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                // resolve all [record reference] in document.
+                Promise.all(this.datasource_promises.map((doc) => {
+                    let result = null;
+                    if (doc.promise) {
+                        result = doc.promise;
                     }
-                }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    // resolve all [record reference] in document.
+                    return result;
+                })).then((resolved) => {
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+                    });
                     Promise.all(this.datasource_promises.map((doc) => {
                         let result = null;
-                        if (doc.promise) {
-                            result = doc.promise;
+                        if (doc.count) {
+                            result = doc.count;
                         }
                         return result;
                     })).then((resolved) => {
-                        _.forEach(resolved, (entry, index) => {
-                            result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+                        _.forEach(resolved, (count, index) => {
+                            result[this.datasource_promises[index].name].count = count;
                         });
-                        Promise.all(this.datasource_promises.map((doc) => {
-                            let result = null;
-                            if (doc.count) {
-                                result = doc.count;
-                            }
-                            return result;
-                        })).then((resolved) => {
-                            _.forEach(resolved, (count, index) => {
-                                result[this.datasource_promises[index].name].count = count;
-                            });
-                            this.callback(null, result);
-                        }).catch((error) => {
-                            this.callback(error, null);
-                        });
+                        this.callback(null, result);
                     }).catch((error) => {
                         this.callback(error, null);
                     });
-                }
-            });
+                }).catch((error) => {
+                    this.callback(error, null);
+                });
+            }
         }
     }
     HTMLScanner.DataSourceResolver = DataSourceResolver;
@@ -348,37 +347,36 @@ var HTMLScanner;
         }
         ResolveUrl(source, result) {
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, null, 0);
-                        });
-                    }
-                }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    Promise.all(this.url_promises.map((doc) => {
-                        let promise = null;
-                        if (doc.promise) {
-                            promise = doc.promise;
-                        }
-                        return promise;
-                    })).then((resolved) => {
-                        _.forEach(resolved, (entry, index) => {
-                            result[this.url_promises[index].name] = { content: entry, count: 1 };
-                        });
-                        this.callback(null, result);
-                    }).catch((error) => {
-                        this.callback(error, null);
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, null, 0);
                     });
                 }
-            });
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                Promise.all(this.url_promises.map((doc) => {
+                    let promise = null;
+                    if (doc.promise) {
+                        promise = doc.promise;
+                    }
+                    return promise;
+                })).then((resolved) => {
+                    _.forEach(resolved, (entry, index) => {
+                        result[this.url_promises[index].name] = { content: entry, count: 1 };
+                    });
+                    this.callback(null, result);
+                }).catch((error) => {
+                    this.callback(error, null);
+                });
+            }
         }
     }
     HTMLScanner.UrlResolver = UrlResolver;
@@ -674,24 +672,23 @@ var HTMLScanner;
         ExpandHtml(source, fragments) {
             this.fragments = fragments;
             this.document_depth++;
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (childnodes) {
-                        _.forEach(childnodes, (element, index) => {
-                            this.position = index;
-                            this.ScanNode(element, fragments, 0);
-                        });
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (childnodes) {
+                    _.forEach(childnodes, (element, index) => {
+                        this.position = index;
+                        this.ScanNode(element, fragments, 0);
+                    });
                 }
-                else {
-                    this.callback(errors, null);
-                }
-                this.document_depth--;
-                if (this.document_depth == 0) {
-                    this.callback(null, this.html);
-                }
-            });
+            }
+            else {
+                this.callback({ code: 1, message: "" }, null);
+            }
+            this.document_depth--;
+            if (this.document_depth == 0) {
+                this.callback(null, this.html);
+            }
         }
         // todo:1path
         ExpandHtml2(childnodes, fragments, position) {
@@ -788,20 +785,19 @@ var HTMLScanner;
                 datasource_resolver.datasource_promises.push(page_init);
                 datasource_resolver.ResolveDataSource2(source, {});
             };
-            jsdom.env(source, [], {}, (errors, window) => {
-                if (!errors) {
-                    let childnodes = window.document.childNodes;
-                    if (datasource.page_params) {
-                        build(childnodes, datasource, page_init, callback);
-                    }
-                    else {
-                        build(childnodes, datasource, {}, callback);
-                    }
+            let dom = new JSDOM(source);
+            if (dom) {
+                let childnodes = dom.window.document.childNodes;
+                if (datasource.page_params) {
+                    build(childnodes, datasource, page_init, callback);
                 }
                 else {
-                    callback(errors, null);
+                    build(childnodes, datasource, {}, callback);
                 }
-            });
+            }
+            else {
+                callback({ code: 1, message: "" }, null);
+            }
         }
         ;
     }

@@ -82,7 +82,7 @@ var FileModule;
         static username(request) {
             return request.user.username;
         }
-        static from_local(gfs, path_from, namespace, key, name, mimetype, callback) {
+        static from_local(gfs, path_from, namespace, userid, key, name, mimetype, callback) {
             try {
                 /*
                                 let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
@@ -101,7 +101,7 @@ var FileModule;
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
-                        userid: config.systems.userid,
+                        userid: userid,
                         key: key,
                         type: mimetype,
                         namespace: namespace,
@@ -159,7 +159,7 @@ var FileModule;
          *
          * @returns none
          */
-        create_init_files(initfiles, callback) {
+        create_init_files(userid, initfiles, callback) {
             if (initfiles) {
                 if (initfiles.length > 0) {
                     let conn = Files.connect(config.db.user);
@@ -184,11 +184,11 @@ var FileModule;
                                                                 let namespace = doc.namespace;
                                                                 let mimetype = doc.content.type;
                                                                 let type = doc.type;
-                                                                let query = { $and: [{ filename: filename }, { "metadata.userid": config.systems.userid }] };
+                                                                let query = { $and: [{ filename: filename }, { "metadata.userid": userid }] };
                                                                 collection.findOne(query, (error, item) => {
                                                                     if (!error) {
                                                                         if (!item) {
-                                                                            Files.from_local(gfs, path, namespace, type, filename, mimetype, (error, file) => {
+                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error, file) => {
                                                                                 if (!error) {
                                                                                     resolve(file);
                                                                                 }
@@ -273,8 +273,8 @@ var FileModule;
                         conn.db.collection('fs.files', (error, collection) => {
                             if (!error) {
                                 if (collection) {
-                                    let query = Wrapper.Decode(request.params.query);
-                                    let option = Wrapper.Decode(request.params.option);
+                                    let query = Wrapper.Decode(request.params.query) || {};
+                                    let option = Wrapper.Decode(request.params.option) || {};
                                     let limit = 10;
                                     if (option.limit) {
                                         limit = option.limit;

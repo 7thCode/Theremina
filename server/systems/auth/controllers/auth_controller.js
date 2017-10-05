@@ -168,6 +168,13 @@ var AuthModule;
                 Wrapper.SendError(response, 403, "Forbidden.", { code: 403, message: "Forbidden." });
             }
         }
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
         is_enabled_regist_user(request, response, next) {
             let user = request.user;
             if (user) {
@@ -187,6 +194,13 @@ var AuthModule;
                 }
             }
         }
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
         is_enabled_regist_member(request, response, next) {
             let user = request.user;
             if (user) {

@@ -63,7 +63,7 @@ var ResourcesModule;
          * @param initresources
          * @returns none
          */
-        create_init_resources(initresources, callback) {
+        create_init_resources(userid, initresources, callback) {
             if (initresources) {
                 if (initresources.length > 0) {
                     let save = (doc) => {
@@ -71,7 +71,6 @@ var ResourcesModule;
                             let filename = process.cwd() + doc.path + '/' + doc.name;
                             let namespace = doc.namespace; // Resource.namespace(doc.name);
                             let localname = Resource.localname(doc.name);
-                            let userid = doc.userid;
                             let type = doc.type;
                             let content = doc.content;
                             Wrapper.FindOne(null, 1000, ResourceModel, Resource.make_query(userid, type, localname, namespace), (response, page) => {

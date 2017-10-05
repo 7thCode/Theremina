@@ -5,7 +5,6 @@
 namespace ScannerBehavior {
 
     const url = require('url');
-    const jsdom = require("node-jsdom");
     const moment = require("moment");
     const _ = require('lodash');
     const requestpromise = require('request-promise');

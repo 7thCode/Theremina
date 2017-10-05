@@ -1,0 +1,27 @@
+.box.box-info(style="margin-top:12px;" flow-init)
+    .box-header.with-border
+        .row
+            .col-xs-12
+                div
+                    .box-tools.pull-right
+                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                            i.fa.fa-minus
+                div
+                    .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createBlob($files);")
+                        button.btn.btn-xs.btn-box-tool(flow-btn type="file")
+                            i.fa.fa-plus-circle.text-primary
+            .col-xs-12
+                include ../../../systems/common/next_prev
+
+    .box-body(style="height:auto;min-height:80vh;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop, data-toggle="tooltip" data-placement="top" title=message.filedrop)
+        ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
+            li(ng-repeat="file in files")
+                div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
+                    button.btn.btn-danger.btn-xs(ng-click="deleteBlob(file.filename);", style="position:relative;top:10px;left:10px;border-radius: 10px") x
+                    div(style="height:8rem;",data-toggle="tooltip" data-placement="top" title="{{file.filename}}")
+                        a(download ng-href="/files/api/{{file.metadata.userid}}/{{file.filename}}" target="_blank")
+                            img.center-block.thumbnail(ng-src="{{file.metadata.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+                    div(style="height:8rem;text-align:center;")
+                        .row
+                            .col-xs-12
+                                div(style="word-wrap: break-word;", ng-bind="file.filename | filename:10")

@@ -1,0 +1,14 @@
+.modal-content
+    .modal-header
+        .h3 #{message.savedone}
+    .modal-body
+        .row
+            .col-xs-12
+                div #{message.savedone}
+            .col-xs-12
+                include ../../../systems/common/error_message
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="") #{message.ok}

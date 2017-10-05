@@ -1,14 +1,14 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var BackOfficeApiRouter;
-(function (BackOfficeApiRouter) {
+var BackofficeApiRouter;
+(function (BackofficeApiRouter) {
     const express = require('express');
-    BackOfficeApiRouter.router = express.Router();
-})(BackOfficeApiRouter = exports.BackOfficeApiRouter || (exports.BackOfficeApiRouter = {}));
-module.exports = BackOfficeApiRouter.router;
+    BackofficeApiRouter.router = express.Router();
+})(BackofficeApiRouter = exports.BackofficeApiRouter || (exports.BackofficeApiRouter = {}));
+module.exports = BackofficeApiRouter.router;
 //# sourceMappingURL=api.js.map

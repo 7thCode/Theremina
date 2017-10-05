@@ -98,7 +98,7 @@ var MailerModule;
             };
             this.mailgun.messages().send(data, (error, body) => {
                 if (!error) {
-                    callback(error);
+                    callback(null);
                 }
                 else {
                     callback(error);
