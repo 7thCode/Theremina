@@ -26,7 +26,7 @@ NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "
             NamespaceService.Get(
                 (namespaces) => {
                     $scope.namespaces = namespaces;
-                    $rootScope.$emit('get_namespaces', namespaces);
+                //    $rootScope.$emit('get_namespaces', namespaces);
                     GetNamespace();
                 }, error_handler);
         };

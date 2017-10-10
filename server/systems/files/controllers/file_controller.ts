@@ -217,19 +217,7 @@ export namespace FileModule {
                                                                             });
                                                                         } else {
                                                                             resolve({});
-                                                                        } /*else {
-                                                                            collection.remove({_id: item._id}, (error, result) => {
-                                                                                if (!error) {
-                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
-                                                                                        if (!error) {
-                                                                                            resolve(file);
-                                                                                        } else {
-                                                                                            reject(error);
-                                                                                        }
-                                                                                    });
-                                                                                }
-                                                                            })
-                                                                        }*/
+                                                                        }
                                                                     } else {
                                                                         reject(error);
                                                                     }
@@ -269,6 +257,91 @@ export namespace FileModule {
                 }
             }
         }
+
+
+        /**
+         *
+         * @returns none
+         */
+        public create_files(userid:string, namespace:string, initfiles: any[], callback: (error:any, result:any) => void): void {
+            if (initfiles) {
+                if (initfiles.length > 0) {
+                    let conn = Files.connect(config.db.user);
+                    if (conn) {
+                        conn.once('open', (error: any): void => {
+                            if (!error) {
+                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                                if (gfs) {
+                                    conn.db.collection('fs.files', (error: any, collection: any): void => {
+                                        if (!error) {
+                                            if (collection) {
+                                                collection.ensureIndex({
+                                                    "filename": 1,
+                                                    "metadata.namespace": 1,
+                                                    "metadata.userid": 1
+                                                }, (error) => {
+                                                    if (!error) {
+                                                        let save = (doc: any): any => {
+                                                            return new Promise((resolve: any, reject: any): void => {
+                                                                let path = process.cwd() + doc.path;
+                                                                let filename = doc.name;
+                                                                let mimetype = doc.content.type;
+                                                                let type: number = doc.type;
+                                                                let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
+
+                                                                collection.findOne(query, (error: any, item: any): void => {
+                                                                    if (!error) {
+                                                                        if (!item) {
+                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
+                                                                                if (!error) {
+                                                                                    resolve(file);
+                                                                                } else {
+                                                                                    reject(error);
+                                                                                }
+                                                                            });
+                                                                        } else {
+                                                                            resolve({});
+                                                                        }
+                                                                    } else {
+                                                                        reject(error);
+                                                                    }
+                                                                });
+                                                            });
+                                                        };
+
+                                                        let docs = initfiles;
+                                                        Promise.all(docs.map((doc: any): void => {
+                                                            return save(doc);
+                                                        })).then((results: any[]): void => {
+                                                            conn.db.close();
+                                                            callback(null, results);
+                                                        }).catch((error: any): void => {
+                                                            conn.db.close();
+                                                            callback(error, null);
+                                                        });
+                                                    }
+                                                });
+                                            } else {
+                                                conn.db.close();
+                                            }
+                                        } else {
+                                            conn.db.close();
+                                        }
+                                    });
+                                } else {
+                                    conn.db.close();
+                                }
+                            } else {
+                                conn.db.close();
+                            }
+                        });
+                    }
+                } else {
+                    callback(null, null);
+                }
+            }
+        }
+
 
         /**
          *

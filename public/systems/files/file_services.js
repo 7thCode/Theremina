@@ -88,10 +88,11 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
     function (File, FileData, FileQuery, FileCount, Upload) {
         this.SetQuery = (query, type = 0) => {
             this.option.skip = 0;
-            this.query = { "metadata.key": { $gte: type, $lt: type + 2000 } };
-            if (query) {
-                this.query = { $and: [{ "metadata.key": { $gte: type, $lt: type + 2000 } }, query] };
-            }
+            //    this.query = {"metadata.key": {$gte: type, $lt: type + 2000}};
+            //    if (query) {
+            //       this.query = {$and:[{"metadata.key": {$gte: type, $lt: type + 2000}},query]};
+            //   }
+            this.query = query;
         };
         let init = () => {
             this.option = { limit: 40, skip: 0 };

@@ -278,14 +278,14 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        /*
+
         public ResolveDataSource2(childnodes: string, result: any): any {
 
 
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
-                    this.ScanNode(element, null);
+                    this.ScanNode(element, null, 0);
                 });
             }
 
@@ -326,7 +326,7 @@ namespace HTMLScanner {
 
 
         }
-*/
+
     }
 
     /* UrlResolver
@@ -462,7 +462,7 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        /*
+
         public ResolveUrl2(childnodes: any, result: any): any {
 
 
@@ -470,7 +470,7 @@ namespace HTMLScanner {
             if (childnodes) {
                 _.forEach(childnodes, (element:any, index:number):void => {
                     this.position = index;
-                    this.ScanNode(element, null);
+                    this.ScanNode(element, null, 0);
                 });
             }
 
@@ -492,7 +492,7 @@ namespace HTMLScanner {
 
 
         }
-        */
+
 
     }
 
@@ -816,6 +816,7 @@ namespace HTMLScanner {
                     this.position = index;
                     this.ScanNode(element, fragments, position);
                 });
+                this.callback(null, this.html);
             }
         }
     }
@@ -919,6 +920,16 @@ namespace HTMLScanner {
 
         };
 
+        static Resolve2(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string) => void): void {
+            let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
+                if (!error) {
+                    callback(null, expand_result);
+                } else {
+                    callback(error, null);
+                }
+            });
+            expander.ExpandHtml(source, url_result);
+        }
     }
 
 }

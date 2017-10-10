@@ -24,15 +24,11 @@ export namespace PagesModule {
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
-    const applications_config: any = share.applications_config;
-    const Wrapper: any = share.Wrapper;
 
-    const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
-    const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
 
     const ArticleModel: any = require(share.Models("services/articles/article"));
-    //const AssetModel: any = require(share.Models("plugins/asset/asset"));
+
     const validator: any = require('validator');
     const url: any = require('url');
 
@@ -69,6 +65,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
+        /*
         static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
 
             let number: number = 27000;
@@ -129,7 +126,7 @@ export namespace PagesModule {
                 callback({code: number + 40, message: "db error"});
             }
         }
-
+*/
         /**
          *  let userid = Pages.userid(request);
          * @param userid
@@ -137,6 +134,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
+        /*
         static get_article_all(userid: string, tmp_path: string, callback: (error) => void): void {
             let namespace = "";
             ArticleModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
@@ -147,7 +145,7 @@ export namespace PagesModule {
                 callback(error);
             });
         }
-
+*/
         /**
          *  let userid = Pages.userid(request);
          * @param userid
@@ -155,6 +153,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
+        /*
         static get_resource_all(userid: string, tmp_path: string, callback: (error) => void): void {
             let namespace = "";
             ResourceModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
@@ -165,7 +164,7 @@ export namespace PagesModule {
                 callback(error);
             });
         }
-
+*/
         /**
          *  let userid = Pages.userid(request);
          * @param work
@@ -173,6 +172,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
+        /*
         static zip(work: string, target: string, callback: (error) => void) {
 
             let zip_file_name = work + "/" + target + ".zip";
@@ -197,13 +197,14 @@ export namespace PagesModule {
             archive.finalize();
 
         }
-
+*/
         /**
          *  let userid = Pages.userid(request);
          * @param request
          * @param response
          * @returns none
          */
+        /*
         public get_all(request: any, response: any): void {
             let userid = Pages.userid(request);
             let tmp_path = path.join("/tmp", request.sessionID);
@@ -257,7 +258,7 @@ export namespace PagesModule {
 
         public put_all(request: any, response: any): void {
         }
-
+*/
         public create_init_user_file(user: any): void {
             let userid = user.userid;
             let conn = Pages.connect(config.db.user);
@@ -405,7 +406,7 @@ export namespace PagesModule {
          * @param response
          * @returns none
          */
-
+/*
         public build(request: any, response: any): void {
             let userid = Pages.userid(request);
             let name = request.params.name;
@@ -434,7 +435,7 @@ export namespace PagesModule {
                 }
             }
         }
-
+*/
     }
 
 

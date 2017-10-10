@@ -355,9 +355,9 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
         }, error_handler);
 
 
-        $rootScope.$on('get_namespaces', (event, value): void => {
+     //   $rootScope.$on('get_namespaces', (event, value): void => {
     //        $scope.namespaces = value;
-        });
+     //   });
 
         $rootScope.$on('change_namespace', (event, value): void => {
             $scope.namespace = value;
