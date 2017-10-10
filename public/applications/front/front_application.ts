@@ -41,8 +41,11 @@ let FrontApplication: any = angular.module('FrontApplication', [
     "MembersServices",
     "PagesControllers",
     "PicturesControllers",
-    "BlobControllers"
-
+    "BlobControllers",
+    "SVGControllers",
+    "DataControllers",
+    "DataServices",
+    "SelfControllers"
 ]);
 
 FrontApplication.run(['$rootScope',

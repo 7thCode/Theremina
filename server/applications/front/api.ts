@@ -18,18 +18,13 @@ export namespace ApiRouter {
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 
-    const FrontModule: any = require(share.Server("services/pages/controllers/pages_controller"));
-    const pages: any = new FrontModule.Pages;
+    const FrontModule: any = require(share.Server("applications/front/controllers/front_controller"));
+    const front: any = new FrontModule.Front;
 
-    const PicturesModule: any = require(share.Server("services/pictures/controllers/pictures_controller"));
-    const pictures: any = new PicturesModule.Pictures;
+    router.put('/api/upload/:name', [exception.exception, exception.authenticate,front.put_all]);
+    router.get('/api/download', [exception.exception, exception.authenticate, front.get_all]);
 
-    router.get('/:userid/:namespace/doc/img/:name', pictures.get_picture);
-
-    router.put('/api/upload/:name', [exception.exception, exception.authenticate,pages.put_all]);
-    router.get('/api/download', [exception.exception, exception.authenticate, pages.get_all]);
-
-    router.post('/api/buildsite/:name', pages.build);
+    router.post('/api/buildsite/:name/:namespace', front.build);
 
     event.emitter.on('register', (param: any): void => {
     //    pages.create_init_user_resources(param.user);

@@ -741,10 +741,10 @@ header .fh5co-navbar-brand .fh5co-social-icon a {
 }
 #fh5co-hero .flexslider .slider-text > .slider-text-inner .desc {
   padding: 5em;
-  background: rgba(83, 157, 219, 0.9);
-  -webkit-box-shadow: 0px 10px 30px -13px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 10px 30px -13px rgba(0, 0, 0, 0.75);
-  box-shadow: 0px 10px 30px -13px rgba(0, 0, 0, 0.75);
+  background: rgba(188, 83, 219, 0.59);
+  -webkit-box-shadow: 0px 10px 30px -13px rgba(87, 86, 230, 0.75);
+  -moz-box-shadow: 0px 10px 30px -13px rgba(87, 86, 230, 0.75);
+  box-shadow: 0px 10px 30px -13px rgba(87, 86, 230, 0.75);
 }
 @media screen and (max-width: 992px) {
   #fh5co-hero .flexslider .slider-text > .slider-text-inner .desc {

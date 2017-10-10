@@ -35,10 +35,6 @@ export namespace PageRouter {
 
     let message = config.message;
 
-    router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        response.redirect(302, applications_config.redirect["/"]);
-    }]);
-
     router.get("/front", [analysis.page_view, (request: any, response: any): void => {
         response.render("services/front/index", {
             config: config,
@@ -115,14 +111,48 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-        let redirect_to = applications_config.redirect[request.params.name];
+    router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        let userid = config.systems.userid;
+        let redirect_to = "/" + userid + "/" + applications_config.redirect["/"];
         if (redirect_to) {
             response.redirect(302, redirect_to);
         } else {
             next();
         }
     }]);
+
+    router.get("/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        let userid = config.systems.userid;
+        let redirect_to = "/" + userid + "/" + applications_config.redirect[request.params.name];
+        if (redirect_to) {
+            response.redirect(302, redirect_to);
+        } else {
+            next();
+        }
+    }]);
+
+    router.get("/:userid/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        let userid = request.params.userid;
+        if (userid) {
+            let redirect_to = "/" + userid + "/" + applications_config.redirect[request.params.name];
+            if (redirect_to) {
+                response.redirect(302, redirect_to);
+            } else {
+                next();
+            }
+        } else {
+            next();
+        }
+    }]);
+
+
+    // Picture
+
+    const PicturesModule: any = require(share.Server("services/pictures/controllers/pictures_controller"));
+    const pictures: any = new PicturesModule.Pictures;
+
+    router.get('/:userid/:namespace/doc/img/:name', pictures.get_picture);
+
 
     // Render
 
@@ -225,6 +255,23 @@ export namespace PageRouter {
         });
     }]);
 
+    router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
+
+        let items = [];
+        if (applications_config.sites) {
+            let keys = Object.keys(applications_config.sites);
+
+            keys.forEach((key:string):void => {
+                items.push(applications_config.sites[key].description);
+            });
+        }
+
+        result.render('applications/front/dialogs/build_site_dialog',
+            {
+                message: message,
+                items: items
+            });
+    }]);
 }
 
 module.exports = PageRouter.router;

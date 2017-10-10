@@ -15,39 +15,18 @@ FrontServices.factory('UploadData', ['$resource',
         });
     }]);
 
-FrontServices.service('DataService', ['UploadData',
-    function (UploadData: any): void {
-
-        this.Upload = (url: string, filename: string, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            let data = new UploadData();
-            data.url = url;
-            data.$put({name: filename}, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        callback(result.value);
-                    } else {
-                        error(result.code, result.message);
-                    }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        }
-    }]);
-
-
 FrontServices.factory('BuildSite', ['$resource',
     ($resource: any): any => {
-        return $resource('/api/buildsite/:name', {name:"@name"}, {});
+        return $resource('/api/buildsite/:name/:namespace', {name:"@name",namespace:"@namespace"}, {});
     }]);
-
 
 FrontServices.service('SiteService', ['BuildSite',
     function (BuildSite: any): void {
 
-        this.Build = (name:string, callback:(result: any) => void, error: (code: number, message: string) => void):void => {
+        this.Build = (name:string,namespace:string, callback:(result: any) => void, error: (code: number, message: string) => void):void => {
             let site = new BuildSite();
             site.name = name;
+            site.namespace = namespace;
             site.$save({}, (result: any): void => {
                 if (result) {
                     if (result.code === 0) {
