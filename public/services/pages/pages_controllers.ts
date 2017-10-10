@@ -321,7 +321,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 });
 
                 $rootScope.$emit('change_files', {});
-                Query();
+            //    Query();
             }).finally(() => {
             });
         };
@@ -354,7 +354,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 }
 
                 $rootScope.$emit('change_files', {});
-                Query();
+             //   Query();
                 editor.session.getUndoManager().markClean();
                 $scope.opened = true;
             }, (): void => {
@@ -425,7 +425,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                     ResourceBuilderService.Delete((result: any): void => {
                         ClosePreview();
                         $rootScope.$emit('change_files', {});
-                        Query();
+                  //      Query();
                         $scope.name = "";
                         progress(false);
                         $scope.opened = false;
@@ -434,7 +434,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 });
             }
         };
-
+/*
         let BuildSite = (): void => {
 
             let modalRegist: any = $uibModal.open({
@@ -447,14 +447,18 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
 
             modalRegist.result.then((resource: any): void => {
                 $rootScope.$emit('change_files', {});
-                Query();
+              //  Query();
             }, (): void => {
             });
         };
+*/
+           $rootScope.$on('change_files', (event, value): void => {
+               Query();
+           });
 
-        $rootScope.$on('get_namespaces', (event, value): void => {
+     //   $rootScope.$on('get_namespaces', (event, value): void => {
     ///        $scope.namespaces = value;
-        });
+     //   });
 
         $rootScope.$on('change_namespace', (event, value): void => {
 
@@ -487,13 +491,9 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
         $scope.Update = Update;
         $scope.Delete = Delete;
 
-        $scope.BuildSite = BuildSite;
-
-
+      //  $scope.BuildSite = BuildSite;
 
         //$scope.OpenPreview = OpenPreview;
-
-
 
     }]);
 

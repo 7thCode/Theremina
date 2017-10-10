@@ -24,11 +24,10 @@ export namespace PagesPageRouter {
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    const applications_config = share.applications_config;
+  ///  const applications_config = share.applications_config;
 
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resources = new ResourcesModule.Pages;
-
 
     let message = config.message;
 
@@ -50,7 +49,7 @@ export namespace PagesPageRouter {
     router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/open_dialog', {message: message});
     }]);
-
+/*
     router.get('/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
 
         let items = [];
@@ -68,7 +67,7 @@ export namespace PagesPageRouter {
                 items: items
             });
     }]);
-
+*/
     /*
     [
                     {

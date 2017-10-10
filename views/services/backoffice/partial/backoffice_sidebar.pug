@@ -14,32 +14,41 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
 
             ul.sidebar-menu
                 li
-                    a(href="/profile" data-toggle="tooltip" data-placement="bottom" title="Profile")
+                    a(href="/profile", data-toggle="tooltip", data-placement="bottom", title="Profile")
                         i.fa.fa-user.fa-fw
                         span Profile
                 li
-                    a(href="/articles" data-toggle="tooltip" data-placement="bottom" title="Articles")
+                    a(href="/articles", data-toggle="tooltip", data-placement="bottom", title="Articles")
                         i.fa.fa-list.fa-fw
                         span Articles
 
                 li
-                    a(href='/forms/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                    a(data-toggle="collapse", data-target="#Forms")
                         i.fa.fa-pencil
-                        | Forms Builder
-                li
-                    a(href='/forms' data-toggle="tooltip" data-placement="bottom" title="Player")
-                        i.fa.fa-eye
-                        | Forms Player
+                        | Forms
+                        ul(id="Forms", class="collapse")
+                            li
+                                a(href='/forms/builder', data-toggle="tooltip", data-placement="bottom", title="Builder")
+                                    i.fa.fa-pencil
+                                    | Forms Builder
+                            li
+                                a(href='/forms' data-toggle="tooltip", data-placement="bottom", title="Player")
+                                    i.fa.fa-eye
+                                    | Forms Player
 
-
                 li
-                    a(href='/layouts/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                    a(data-toggle="collapse", data-target="#Layouts")
                         i.fa.fa-pencil
-                        span Layouts Builder
-                li
-                    a(href='/layouts' data-toggle="tooltip" data-placement="bottom" title="Player")
-                        i.fa.fa-eye
-                        span Layouts Player
+                        | Layouts
+                        ul(id="Layouts", class="collapse")
+                            li
+                                a(href='/layouts/builder', data-toggle="tooltip", data-placement="bottom", title="Builder")
+                                    i.fa.fa-pencil
+                                    span Layouts Builder
+                            li
+                                a(href='/layouts', data-toggle="tooltip", data-placement="bottom", title="Player")
+                                    i.fa.fa-eye
+                                    span Layouts Player
 
                 //li
                     a(href="/images" data-toggle="tooltip" data-placement="bottom" title="Images")
@@ -47,49 +56,52 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
                         span Images
 
                 li
-                    a(href="/groups" data-toggle="tooltip" data-placement="bottom" title="Groups")
+                    a(href="/groups", data-toggle="tooltip", data-placement="bottom", title="Groups")
                         i.fa.fa-users.fa-fw
                         span #{message.groups}
-
 
                 each module in config.modules
                     if module.type == "optional"
                         if module.description.display
                             li
-                                a(href='/' + module.name data-toggle="tooltip" data-placement="bottom" title='${module.description.display}')
+                                a(href='/' + module.name data-toggle="tooltip", data-placement="bottom", title='${module.description.display}')
                                     i.fa.fa-eye
                                     span #{module.description.display}
 
                 li
-                    a(href='/resources/builder' data-toggle="tooltip" data-placement="bottom" title="Builder")
+                    a(href='/resources/builder', data-toggle="tooltip", data-placement="bottom", title="Builder")
                         i.fa.fa-pencil
                         span #{message.resources} #{message.builder}
                 //li
                     a(href='/resources' data-toggle="tooltip" data-placement="bottom" title="Player")
                         i.fa.fa-eye
                         | Player
-                li
-                    a(href="/files" data-toggle="tooltip" data-placement="bottom" title="Files")
-                        i.fa.fa-picture-o.fa-fw
-                        span #{message.system} #{message.files}
 
                 li
-                    a(href="/accounts" data-toggle="tooltip" data-placement="bottom" title="Accounts")
-                        i.fa.fa-user.fa-fw
-                        span #{message.system} #{message.accounts}
-
-                li
-                    a(href="/analysis" data-toggle="tooltip" data-placement="bottom" title="Analysis")
-                        i.fa.fa-line-chart.fa-fw
-                        span #{message.system} #{message.analysis}
-                li
-                    a(href="/setting" data-toggle="tooltip" data-placement="bottom" title="Setting")
-                        i.fa.fa-sliders.fa-fw
-                        span #{message.system} #{message.setting}
-                li
-                    a(href="#", ng-click="showMemberDialog();" data-placement="bottom" data-toggle="tooltip" title="Members")
-                        i.fa.fa-user-plus.fa-fw
-                        span #{message.members}
+                    a(data-toggle="collapse" data-target="#Systems")
+                        i.fa.fa-pencil
+                        | Systems
+                        ul(id="Systems" class="collapse")
+                            li
+                                a(href="/files" data-toggle="tooltip" data-placement="bottom" title="Files")
+                                    i.fa.fa-picture-o.fa-fw
+                                    span #{message.system} #{message.files}
+                            li
+                                a(href="/accounts" data-toggle="tooltip" data-placement="bottom" title="Accounts")
+                                    i.fa.fa-user.fa-fw
+                                    span #{message.system} #{message.accounts}
+                            li
+                                a(href="/analysis" data-toggle="tooltip" data-placement="bottom" title="Analysis")
+                                    i.fa.fa-line-chart.fa-fw
+                                    span #{message.system} #{message.analysis}
+                            li
+                                a(href="/setting" data-toggle="tooltip" data-placement="bottom" title="Setting")
+                                    i.fa.fa-sliders.fa-fw
+                                    span #{message.system} #{message.setting}
+                            li
+                                a(href="#", ng-click="showMemberDialog();" data-placement="bottom" data-toggle="tooltip" title="Members")
+                                    i.fa.fa-user-plus.fa-fw
+                                    span #{message.members}
                 if user.provider == "local"
                     li
                         a(href='#', ng-click="showPasswordDialog()" data-placement="bottom" data-toggle="tooltip" title="Password")
@@ -122,16 +134,16 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
 
             ul.sidebar-menu
                 li
-                    a(href="#", ng-click="showLoginDialog()" data-toggle="tooltip" data-placement="bottom" title="Login")
+                    a(href="#", ng-click="showLoginDialog()", data-toggle="tooltip", data-placement="bottom", title="Login")
                         i.fa.fa-sign-in.fa-fw
                         span #{message.login}
                 li
-                    a(href='#', ng-click="showPasswordDialog()" data-placement="bottom" data-toggle="tooltip" title="Password")
+                    a(href='#', ng-click="showPasswordDialog()", data-placement="bottom", data-toggle="tooltip", title="Password")
                         i.fa.fa-key.fa-fw
                         span #{message.password}
 
                 if config.regist.user
                     li
-                        a(href="#", ng-click="showRegisterDialog({})" data-toggle="tooltip" data-placement="bottom" title="Regist")
+                        a(href="#", ng-click="showRegisterDialog({})", data-toggle="tooltip", data-placement="bottom", title="Regist")
                             i.fa.fa-user-plus.fa-fw
                             span #{message.regist}

@@ -158,6 +158,91 @@ export namespace ResourcesModule {
         }
 
         /**
+         * @param initresources
+         * @returns none
+         */
+        public create_resources(userid:string,namespace:string, initresources: any[], callback: (error: any, result: any) => void): void {
+            if (initresources) {
+                if (initresources.length > 0) {
+                    let save = (doc: any): any => {
+                        return new Promise((resolve: any, reject: any): void => {
+
+                            let filename = process.cwd() + doc.path + '/' + doc.name;
+                        //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
+                            let localname: string = Resource.localname(doc.name);
+                            let type: string = doc.type;
+                            let content: any = doc.content;
+
+                            Wrapper.FindOne(null, 1000, ResourceModel, Resource.make_query(userid, type, localname, namespace), (response: any, page: any): void => {
+                                if (!page) {
+                                    let page: any = new ResourceModel();
+                                    page.userid = userid;
+                                    page.namespace = namespace;
+                                    page.name = localname;
+                                    page.type = type;
+                                    let resource = "";
+                                    try {
+                                        fs.statSync(filename);
+                                        resource = fs.readFileSync(filename, 'utf-8');
+                                    } catch (e) {
+                                        reject(e);
+                                    }
+                                    page.content = {type: content.type, resource: resource};
+                                    page.open = true;
+                                    page.save().then(() => {
+                                        resolve({});
+                                    }).catch((error): void => {
+                                        reject(error);
+                                    });
+                                }  else {
+                                    resolve({});
+                                }
+
+                                /*      else {
+                                          page.remove().then(() => {
+                                              let page: any = new ResourceModel();
+                                              page.userid = userid;
+                                              page.namespace = namespace;
+                                              page.name = localname;
+                                              page.type = type;
+                                              let resource = "";
+                                              try {
+                                                  fs.statSync(filename);
+                                                  resource = fs.readFileSync(filename, 'utf-8');
+                                              } catch (e) {
+                                                  reject(e);
+                                              }
+                                              page.content = {type: content.type, resource: resource};
+                                              page.open = true;
+                                              page.save().then(() => {
+                                                  resolve({});
+                                              }).catch((error): void => {
+                                                  reject(error);
+                                              });
+                                          }).catch((error: any): void => {
+                                              reject(error);
+                                          });
+                                      }*/
+                            });
+                        })
+                    };
+                    let docs = initresources;
+                    Promise.all(docs.map((doc: any): void => {
+                        return save(doc);
+                    })).then((results: any[]): void => {
+                        callback(null, results);
+                    }).catch((error: any): void => {
+                        callback(error, null);
+                    });
+                } else {
+                    callback(null, null);
+                }
+            }
+
+        }
+
+
+        /**
          * @param request
          * @param response
          * @returns none

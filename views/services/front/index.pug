@@ -27,7 +27,7 @@ html(lang="ja")
         a(href="//browsehappy.com/") update
         != '\n<![endif]-->\n'
 
-    body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController",style="background:#eeeeee;")
+    body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController", style="background:#eeeeee;")
         .wrapper
             header.main-header(style="margin-top:1rem;")
             if user
@@ -40,11 +40,11 @@ html(lang="ja")
                     include ../common/no_logged_navbar
                     include ./partial/no_logged
 
-                guidance(scenario="{{scenario}}")
+                //guidance(scenario="{{scenario}}")
 
 
 include ../../systems/common/scripts
 include ../../services/common/scripts
 include ../../plugins/common/scripts
 
-script(src='/bower_components/AdminLTE/dist/js/app.min.js')
+//script(src='/bower_components/AdminLTE/dist/js/app.min.js')
