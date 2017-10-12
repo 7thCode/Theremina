@@ -7,11 +7,11 @@
 let Services = angular.module('Services', []);
 Services.factory('MailSend', ['$resource',
     ($resource) => {
-        return $resource('/api/mailsend', {}, {});
+        return $resource('/mailer/api/mailsend', {}, {});
     }]);
 Services.factory('AssetCreate', ['$resource',
     ($resource) => {
-        return $resource('/api/createasset', {}, {});
+        return $resource('/assets/api/createasset', {}, {});
     }]);
 Services.service('MailerService', ["MailSend",
     function (MailSend) {

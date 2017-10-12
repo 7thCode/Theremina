@@ -29,6 +29,7 @@ gulp.task('copy', ['clean'], () => {
         'public/js/**/*.js',
         'public/vendor/**/*',
         'public/favicons/**/*',
+        'public/applications/front/files/**/*',
         'public/systems/common/shape_edit/image/*',
         'server/systems/common/shape_edit/image/*',
         'public/systems/resources/files/**/*',

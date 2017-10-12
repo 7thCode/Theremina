@@ -5,29 +5,29 @@
  */
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModule;
-(function (CoreModule) {
+var ReferencePointModule;
+(function (ReferencePointModule) {
     const root_path = process.cwd();
-    CoreModule.share = require(root_path + "/server/systems/common/share");
-    const AuthController = require(CoreModule.share.Server("systems/auth/controllers/auth_controller"));
-    CoreModule.auth = new AuthController.Auth();
-    const ExceptionController = require(CoreModule.share.Server("systems/common/controllers/exception_controller"));
-    CoreModule.exception = new ExceptionController.Exception();
-    const AccountController = require(CoreModule.share.Server("systems/accounts/controllers/account_controller"));
-    CoreModule.account = new AccountController.Accounts();
-    const FileController = require(CoreModule.share.Server("systems/files/controllers/file_controller"));
-    CoreModule.file = new FileController.Files();
-    const ResourceController = require(CoreModule.share.Server("systems/resources/controllers/resource_controller"));
-    CoreModule.resource = new ResourceController.Resource();
-    const AnalysisController = require(CoreModule.share.Server("systems/analysis/controllers/analysis_controller"));
-    CoreModule.analysis = new AnalysisController.Analysis();
-    CoreModule.LocalAccount = require(CoreModule.share.Models("/systems/accounts/account"));
-    CoreModule.ShapeEditModule = require(CoreModule.share.Server("systems/common/shape_edit/shape_edit"));
-    CoreModule.ServerModule = require(CoreModule.share.Server("systems/common/shape_edit/server_canvas"));
-    CoreModule.AdaptorModule = require(CoreModule.share.Server("systems/common/shape_edit/adaptor"));
-    class Core {
+    ReferencePointModule.share = require(root_path + "/server/systems/common/share");
+    const ExceptionController = require(ReferencePointModule.share.Server("systems/common/controllers/exception_controller"));
+    ReferencePointModule.exception = new ExceptionController.Exception();
+    const AccountController = require(ReferencePointModule.share.Server("systems/accounts/controllers/account_controller"));
+    ReferencePointModule.account = new AccountController.Accounts();
+    const AnalysisController = require(ReferencePointModule.share.Server("systems/analysis/controllers/analysis_controller"));
+    ReferencePointModule.analysis = new AnalysisController.Analysis();
+    const AuthController = require(ReferencePointModule.share.Server("systems/auth/controllers/auth_controller"));
+    ReferencePointModule.auth = new AuthController.Auth();
+    const FileController = require(ReferencePointModule.share.Server("systems/files/controllers/file_controller"));
+    ReferencePointModule.file = new FileController.Files();
+    const ResourceController = require(ReferencePointModule.share.Server("systems/resources/controllers/resource_controller"));
+    ReferencePointModule.resource = new ResourceController.Resource();
+    ReferencePointModule.LocalAccount = require(ReferencePointModule.share.Models("/systems/accounts/account"));
+    ReferencePointModule.ShapeEditModule = require(ReferencePointModule.share.Server("systems/common/shape_edit/shape_edit"));
+    ReferencePointModule.ServerModule = require(ReferencePointModule.share.Server("systems/common/shape_edit/server_canvas"));
+    ReferencePointModule.AdaptorModule = require(ReferencePointModule.share.Server("systems/common/shape_edit/adaptor"));
+    class ReferencePoint {
     }
-    CoreModule.Core = Core;
-})(CoreModule = exports.CoreModule || (exports.CoreModule = {}));
-module.exports = CoreModule;
+    ReferencePointModule.ReferencePoint = ReferencePoint;
+})(ReferencePointModule = exports.ReferencePointModule || (exports.ReferencePointModule = {}));
+module.exports = ReferencePointModule;
 //# sourceMappingURL=gs.js.map

@@ -29,7 +29,18 @@ let FrontApplication = angular.module('FrontApplication', [
     "MailerControllers",
     "MailerServices",
     "GoogleServices",
-    "GoogleControllers"
+    "GoogleControllers",
+    "NamespaceControllers",
+    "NamespaceServices",
+    "MembersControllers",
+    "MembersServices",
+    "PagesControllers",
+    "PicturesControllers",
+    "BlobControllers",
+    "SVGControllers",
+    "DataControllers",
+    "DataServices",
+    "SelfControllers"
 ]);
 FrontApplication.run(['$rootScope',
     function ($rootScope) {
