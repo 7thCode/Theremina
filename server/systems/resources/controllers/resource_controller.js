@@ -142,6 +142,88 @@ var ResourcesModule;
             }
         }
         /**
+         * @param initresources
+         * @returns none
+         */
+        create_resources(userid, namespace, initresources, callback) {
+            if (initresources) {
+                if (initresources.length > 0) {
+                    let save = (doc) => {
+                        return new Promise((resolve, reject) => {
+                            let filename = process.cwd() + doc.path + '/' + doc.name;
+                            //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
+                            let localname = Resource.localname(doc.name);
+                            let type = doc.type;
+                            let content = doc.content;
+                            Wrapper.FindOne(null, 1000, ResourceModel, Resource.make_query(userid, type, localname, namespace), (response, page) => {
+                                if (!page) {
+                                    let page = new ResourceModel();
+                                    page.userid = userid;
+                                    page.namespace = namespace;
+                                    page.name = localname;
+                                    page.type = type;
+                                    let resource = "";
+                                    try {
+                                        fs.statSync(filename);
+                                        resource = fs.readFileSync(filename, 'utf-8');
+                                    }
+                                    catch (e) {
+                                        reject(e);
+                                    }
+                                    page.content = { type: content.type, resource: resource };
+                                    page.open = true;
+                                    page.save().then(() => {
+                                        resolve({});
+                                    }).catch((error) => {
+                                        reject(error);
+                                    });
+                                }
+                                else {
+                                    resolve({});
+                                }
+                                /*      else {
+                                          page.remove().then(() => {
+                                              let page: any = new ResourceModel();
+                                              page.userid = userid;
+                                              page.namespace = namespace;
+                                              page.name = localname;
+                                              page.type = type;
+                                              let resource = "";
+                                              try {
+                                                  fs.statSync(filename);
+                                                  resource = fs.readFileSync(filename, 'utf-8');
+                                              } catch (e) {
+                                                  reject(e);
+                                              }
+                                              page.content = {type: content.type, resource: resource};
+                                              page.open = true;
+                                              page.save().then(() => {
+                                                  resolve({});
+                                              }).catch((error): void => {
+                                                  reject(error);
+                                              });
+                                          }).catch((error: any): void => {
+                                              reject(error);
+                                          });
+                                      }*/
+                            });
+                        });
+                    };
+                    let docs = initresources;
+                    Promise.all(docs.map((doc) => {
+                        return save(doc);
+                    })).then((results) => {
+                        callback(null, results);
+                    }).catch((error) => {
+                        callback(error, null);
+                    });
+                }
+                else {
+                    callback(null, null);
+                }
+            }
+        }
+        /**
          * @param request
          * @param response
          * @returns none

@@ -30,6 +30,10 @@ export namespace FrontModule {
     const validator: any = require('validator');
     const url: any = require('url');
 
+    const ResourceModel: any = require(share.Models("systems/resources/resource"));
+
+    const ArticleModel: any = require(share.Models("services/articles/article"));
+
     export class Front {
 
         static connect(user): any {
@@ -59,7 +63,7 @@ export namespace FrontModule {
         static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
 
             let number: number = 27000;
-            let conn = Pages.connect(config.db.user);
+            let conn = Front.connect(config.db.user);
             if (conn) {
                 conn.once('open', (error: any): void => {
                     if (!error) {
