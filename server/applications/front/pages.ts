@@ -121,6 +121,7 @@ export namespace PageRouter {
         }
     }]);
 
+    /*
     router.get("/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
         let userid = config.systems.userid;
         let redirect_to = "/" + userid + "/" + applications_config.redirect[request.params.name];
@@ -130,7 +131,7 @@ export namespace PageRouter {
             next();
         }
     }]);
-
+*/
     router.get("/:userid/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
         let userid = request.params.userid;
         if (userid) {
@@ -145,6 +146,23 @@ export namespace PageRouter {
         }
     }]);
 
+    router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
+
+        let items = [];
+        if (applications_config.sites) {
+            let keys = Object.keys(applications_config.sites);
+
+            keys.forEach((key: string): void => {
+                items.push(applications_config.sites[key].description);
+            });
+        }
+
+        result.render('applications/front/dialogs/build_site_dialog',
+            {
+                message: message,
+                items: items
+            });
+    }]);
 
     // Picture
 
@@ -152,7 +170,6 @@ export namespace PageRouter {
     const pictures: any = new PicturesModule.Pictures;
 
     router.get('/:userid/:namespace/doc/img/:name', pictures.get_picture);
-
 
     // Render
 
@@ -255,23 +272,14 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
 
-        let items = [];
-        if (applications_config.sites) {
-            let keys = Object.keys(applications_config.sites);
 
-            keys.forEach((key: string): void => {
-                items.push(applications_config.sites[key].description);
-            });
-        }
+    const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 
-        result.render('applications/front/dialogs/build_site_dialog',
-            {
-                message: message,
-                items: items
-            });
+    router.get("/:userid/:namespace/svg/:name", [exception.page_catch, (request: any, response: any): void => {
+        LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
     }]);
+
 }
 
 module.exports = PageRouter.router;
