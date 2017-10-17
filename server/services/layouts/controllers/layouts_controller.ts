@@ -55,11 +55,20 @@ export namespace LayoutsModule {
 
         /**
          * @param request
+         * @param requestQ
          * @param response
          * @returns none
          */
         public create_layout(request: any, response: any): void {
             Layout.create(request, response, 2);
+        }
+
+        static namespace(request: any): string {
+            let result = "";
+            if (request.user.data) {
+                result = request.user.data.namespace;
+            }
+            return result;
         }
 
         /**
@@ -73,7 +82,7 @@ export namespace LayoutsModule {
         static create(request: any, response: any, layout_type: number): void {
             const number: number = 2000;
             let userid = Layout.userid(request);
-            let namespace = "";
+            const namespace: string = request.body.namespace;
             let name = request.body.name;
             if (name) {
                 if (name.indexOf('/') == -1) {
@@ -82,6 +91,7 @@ export namespace LayoutsModule {
                             let layout: any = new LayoutModel();
                             layout.userid = userid;
                             layout.name = name;
+                            layout.namespace = namespace;
                             layout.content = request.body.content;
                             layout.open = true;
                             layout.type = layout_type;
@@ -132,7 +142,7 @@ export namespace LayoutsModule {
         static put(request: any, response: any, layout_type: number): void {
             const number: number = 2000;
             let userid = Layout.userid(request);
-            let namespace = "";
+            const namespace: string = request.body.namespace;
             let name = request.body.name;
             if (name) {
                 Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, exists: any): void => {
@@ -192,7 +202,7 @@ export namespace LayoutsModule {
         static delete(request: any, response: any, layout_type: number): void {
             const number: number = 2200;
             let userid = Layout.userid(request);
-            let namespace = "";
+            let namespace: string = Layout.namespace(request);
             let id = request.params.id;
             Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, layout: any): void => {
                 if (layout) {
@@ -213,9 +223,30 @@ export namespace LayoutsModule {
         public delete_own(request: any, response: any): void {
             const number: number = 2300;
             let userid = Layout.userid(request);
-            let namespace = "";
+            let namespace: string = Layout.namespace(request);
             Wrapper.Delete(response, number, LayoutModel, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
+            });
+        }
+
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public namespaces(userid:string, callback:any): void {
+            const number: number = 1400;
+            LayoutModel.find( {userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
+                let result = [];
+                _.forEach(pages, (page) => {
+                    if (page.namespace) {
+                        result.push(page.namespace);
+                    }
+                });
+                callback(null, _.uniqBy(result));
+            }).catch((error: any): void => {
+                callback(error, null);
             });
         }
 
@@ -227,7 +258,7 @@ export namespace LayoutsModule {
         public get_template(request: any, response: any): void {
             const number: number = 2400;
             let userid = Layout.userid(request);
-            let namespace = "";
+            let namespace: string = Layout.namespace(request);
             let id = request.params.id;
             Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: 1}, {$or: [{userid: userid}, {userid: builder_userid}]}]}, (response: any, layout: any): void => {
                 if (layout) {
@@ -246,7 +277,7 @@ export namespace LayoutsModule {
         public get_layout(request: any, response: any): void {
             const number: number = 2500;
             let userid = Layout.userid(request);
-            let namespace = "";
+            let namespace: string = Layout.namespace(request);
             let id = request.params.id;
             Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: 2},{namespace:namespace}, {userid: userid}]}, (response: any, layout: any): void => {
                 if (layout) {
@@ -265,13 +296,15 @@ export namespace LayoutsModule {
         public get_template_query(request: any, response: any): void {
             const number: number = 2600;
             let userid = Layout.userid(request);
+            let namespace: string = Layout.namespace(request);
+         // request.params.namespace;
             //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
             //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
 
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
-            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 1}, {$or: [{userid: userid}, {userid: builder_userid}]}, query]}, {}, option, (response: any, layouts: any): any => {
+            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 1},{namespace:namespace}, {$or: [{userid: userid}, {userid: builder_userid}]}, query]}, {}, option, (response: any, layouts: any): any => {
 
                 let _layouts = [];
                 _.forEach(layouts, (layout) => {
@@ -294,7 +327,7 @@ export namespace LayoutsModule {
         public get_layout_query(request: any, response: any): void {
             const number: number = 2700;
             let userid = Layout.userid(request);
-            let namespace = "";
+            let namespace: string = Layout.namespace(request);
             //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
             //    let option: any = JSON.parse(decodeURIComponent(request.params.option));
 
@@ -383,7 +416,8 @@ export namespace LayoutsModule {
          */
         static get_svg(request: any, response: any, userid: string, name: string, layout_type: number): void {
             const number: number = 3000;
-            let namespace = "";
+         //   const namespace: string = request.params.namespace;
+            let namespace: string = Layout.namespace(request);
             // layout_type
             //     1   --- system template
             //   other --- own

@@ -11,11 +11,19 @@
                     .row
                         .col-xs-6
                             .form-group
-                                label.h6(for="name") #{message.title}
+                                label.h6(for="namespace") #{message.namespace}
+                                span(ng-messages="validate.namespace.$error")
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#namespace(ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
+                        .col-xs-6
+                            .form-group
+                                label.h6(for="name") #{message.name}
                                 span(ng-messages="validate.title.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
+                    .row
                         .col-xs-6
                             .form-group
                                 label.h6(for="author") #{message.auther}
@@ -23,8 +31,7 @@
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#author(ng-model="author", type="text", name='author', required, ng-maxlength="50")
-                    .row
-                        .col-xs-12
+                        .col-xs-6
                             .form-group
                                 label.h6(for="subject") #{message.subject}
                                 span(ng-messages="validate.subject.$error")

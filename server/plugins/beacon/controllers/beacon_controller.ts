@@ -18,8 +18,6 @@ export namespace BeaconModule {
 
     const config = share.config;
     const Cipher = share.Cipher;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     export class Beacon {
 
@@ -37,19 +35,6 @@ export namespace BeaconModule {
             }
             return result;
         }
-
-
-        /*
-
-         let data = {
-         time: now,
-         address: request.connection.remoteAddress,
-         user: "",
-         headers: request.headers['user-agent'],
-         referer: ""
-         };
-
-         */
 
         /**
          * @param request

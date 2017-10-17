@@ -199,19 +199,95 @@ var FileModule;
                                                                         }
                                                                         else {
                                                                             resolve({});
-                                                                        } /*else {
-                                                                            collection.remove({_id: item._id}, (error, result) => {
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        reject(error);
+                                                                    }
+                                                                });
+                                                            });
+                                                        };
+                                                        let docs = initfiles;
+                                                        Promise.all(docs.map((doc) => {
+                                                            return save(doc);
+                                                        })).then((results) => {
+                                                            conn.db.close();
+                                                            callback(null, results);
+                                                        }).catch((error) => {
+                                                            conn.db.close();
+                                                            callback(error, null);
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                conn.db.close();
+                                            }
+                                        }
+                                        else {
+                                            conn.db.close();
+                                        }
+                                    });
+                                }
+                                else {
+                                    conn.db.close();
+                                }
+                            }
+                            else {
+                                conn.db.close();
+                            }
+                        });
+                    }
+                }
+                else {
+                    callback(null, null);
+                }
+            }
+        }
+        /**
+         *
+         * @returns none
+         */
+        create_files(userid, namespace, initfiles, callback) {
+            if (initfiles) {
+                if (initfiles.length > 0) {
+                    let conn = Files.connect(config.db.user);
+                    if (conn) {
+                        conn.once('open', (error) => {
+                            if (!error) {
+                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                                if (gfs) {
+                                    conn.db.collection('fs.files', (error, collection) => {
+                                        if (!error) {
+                                            if (collection) {
+                                                collection.ensureIndex({
+                                                    "filename": 1,
+                                                    "metadata.namespace": 1,
+                                                    "metadata.userid": 1
+                                                }, (error) => {
+                                                    if (!error) {
+                                                        let save = (doc) => {
+                                                            return new Promise((resolve, reject) => {
+                                                                let path = process.cwd() + doc.path;
+                                                                let filename = doc.name;
+                                                                let mimetype = doc.content.type;
+                                                                let type = doc.type;
+                                                                let query = { $and: [{ filename: filename }, { "metadata.userid": userid }] };
+                                                                collection.findOne(query, (error, item) => {
+                                                                    if (!error) {
+                                                                        if (!item) {
+                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error, file) => {
                                                                                 if (!error) {
-                                                                                    Files.from_local(gfs, path, namespace, type, filename, mimetype, (error: any, file: any): void => {
-                                                                                        if (!error) {
-                                                                                            resolve(file);
-                                                                                        } else {
-                                                                                            reject(error);
-                                                                                        }
-                                                                                    });
+                                                                                    resolve(file);
                                                                                 }
-                                                                            })
-                                                                        }*/
+                                                                                else {
+                                                                                    reject(error);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        else {
+                                                                            resolve({});
+                                                                        }
                                                                     }
                                                                     else {
                                                                         reject(error);

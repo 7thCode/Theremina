@@ -3,17 +3,65 @@
 ##Overview
 
     TODO
+    
+    
+    基本
+    
+    ページとアーティクル
+    
+    ページとは、表示されるHTMLの雛形となるHTMLテンプレートです。
+    通常のHTMLには存在しない要素を使用することで、通常ではちょっと
+    厄介なページの内容（動的なHTMLモジュール、可変長リスト、ページネーションなど)が
+    簡単に実現できます。
+    
+    アーティクルは、ページに表示される内容を納めるためのレコードセットです。
+    アーティクルは名前と値のセットで、アーティクル編集機能で作成/変更/削除が簡単に行えます。
+    
+    簡単に言うと、ページに指定された各種情報(クエリー、フィールド名など)から導かれるアーティクルを所定の
+    位置に展開することで、実際のHTMLドキュメントを作り出して返すという
+    
+    
+    
+    
+    しかし実際のところ、アーティクルの構造自体はあまり重要ではありません。
+    
+    
+    
 
 ##Getting Started
 
-    TODO
+
+
+
+    まず、最もシンプルなページを作ってみましょう。
+    
+   
+   
+   
+   
+   
+   
+   
+    アーティクルを一つ登録
+    
+    
+    
+   
+    
+        <html>
+            <body>
+                <ds:foreach scope="#init">
+                    <ds:div>{content.title.value}</ds:div>
+                </ds:foreach>
+            </body>
+        </html>
+            
+    
+    
 
 ###Install
 
     TODO
-
-
-
 
 
 
@@ -25,27 +73,31 @@
     
 ###URL
     
-    
     USERID --|
-             |-----doc--------|
+             |
+             |             
+             |-----doc--------|　展開内容は再帰的に評価/展開される。　
              |                |
-             |                |----img------|
+             |                |
+             |                |                          
+             |                |----img------|　展開内容は単純に展開される。
              |                |             |
              |                |
              |                |             
-             |                |----static---|
+             |                |----static---|　展開内容は単純に展開される。
              |                |             |
              |                |
              |                |             
-             |                |----img------|
+             |                |----img------|　展開内容は単純に展開される。
              |                |             |    
              |                |
              |                |             
-             |                |----js-------|
+             |                |----js-------|　展開内容は単純に展開される。
              |                              |        
              |                              
              |
-             |----fragment----|
+             |             
+             |----fragment----|　展開内容は再帰的に評価/展開される。
                               |
              
              
@@ -119,6 +171,7 @@
         #name:document
         #userid
         #query:self
+        #position
         #pager
         
             #pager:page
@@ -158,6 +211,9 @@
         <LINK rel="stylesheet" href="/direct/000000000000000000000000/style.css">
     
         と展開される。
+####Position
+
+    特殊なfield_name”#position”は、クエリーデータのシーケンスを返す。
     
 ####Query
 
@@ -207,51 +263,61 @@
 #####Include
 
     HEAD要素内
+    
         <meta ds:include="url"/>
         
-    BODY要素内    
+    BODY要素内
+    
         <ds:include src='url'></ds:include>
         
         
-        
-    
+       
 #####resolve    
     
-    <ds:resolve query='query'></ds:resolve>
+    HEAD要素内
     
-    <ds:resolve scope='field_name'>
-
-    <ds:resolve field='field_formula'></ds:resolve>
+        <meta name="xx" query="query" ds:content="field_element" />   ->    <meta name="keywords" content="XXXXXX" />
+       
+        <meta query='query' ds:title="field_element">                 ->    <title>XXXXXXXXX</title>
     
-    <hoge ds:attr='field_formula'>
-
-    例1
-    
-        <ds:resolve scope='content'>
-            <img ds:src="{image.value}"/>
-        </ds:resolve>
         
-        query結果が{content:{image:{value:"X"}}}の場合、
+    BODY要素内 
+    
+        <ds:resolve query='query'></ds:resolve>
+    
+        <ds:resolve scope='field_name'>
+
+        <ds:resolve field='field_formula'></ds:resolve>
+    
+        <hoge ds:attr='field_formula'>
+
+        例1
+    
+            <ds:resolve scope='content'>
+                <img ds:src="{image.value}"/>
+            </ds:resolve>
+        
+            query結果が{content:{image:{value:"X"}}}の場合、
                 
-        <img src='X'/>
+            <img src='X'/>
                     
-        と展開される。
+            と展開される。
         
-    例2    
+        例2    
         
-        <ds:resolve query='query'>
-            <div ds:class="{a}|{b.a}">
-                <ds:resolve field="{a}|{b.a}|{b.b}"></ds:resolve>
+            <ds:resolve query='query'>
+                <div ds:class="{a}|{b.a}">
+                    <ds:resolve field="{a}|{b.a}|{b.b}"></ds:resolve>
+                </div>
+            </ds:resolve>
+    
+            query結果が[{a:"X", b:{a:"Y", b:"Z"}},......]の場合、
+        
+            <div class='XY'>
+                XYZ
             </div>
-        </ds:resolve>
     
-        query結果が[{a:"X", b:{a:"Y", b:"Z"}},......]の場合、
-        
-        <div class='XY'>
-             XYZ
-        </div>
-    
-        と展開される。
+            と展開される。
     
   
 #####foreach
@@ -299,72 +365,72 @@
     
         <!DOCTYPE html>
         <html lang="ja">
-            <head>
-                <meta ds:include="/|{#userid}|/fragment/|{#name:self}|/head"/>
-            </head>
-        	<body>
-        	    <ds:include src='/|{#userid}|/fragment/|{#name:self}|/nav|{#query:self}'></ds:include>
-        	    <div class="container" style="margin-top:70px;">
-        	        <div class="jumbotron jumbotron-fluid">
-                        <div class="container">
-                            <h1 class="display-3">Fluid jumbotron</h1>
-                            <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-                            <img src="img/img16.jpg?w=100&h=100"/>
-                        </div>
-                    </div>
-        	        <div class="card">
-        	            <div class="card-header">query from url</div>
-        	            <div class="card-body">
-        	                <div class="row" style="column-count: 3;">
-        	                    <ds:foreach scope='#init'>
-        	                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-        	                            <div class="card">
-        	                                <ds:resolve scope='content'>
-                                                <img class="card-img-top" ds:src="{image.value}">
-                                                <div class="card-body">
-                                                    <ds:if exist='title.value'>
-        	                                            <div ds:style="{klass.value}">
-        	                                                <ds:h4 class="card-title">{title.value}</ds:h4>
-        	                                            </div> 
-        	                                        </ds:if>
-                                                    <ds:div class="card-text" style="font-size:1vw">{desc.value}</ds:div>
-                                                </div>
-                                            </ds:resolve>
-                                            <div class="card-footer d-flex justify-content-end">
-                                                <ds:small class="text-muted">{create == date("MM月DD日")}</ds:small>
-                                            </div>
-                                        </div>
-                                    </div>
-        	                    </ds:foreach>
-        	                </div>
-        	            </div>
-        	            <div class="d-flex justify-content-center">
-        	                <ds:include src='/|{#userid}|/fragment/|{#name:self}|/pagenator|{#query:self}'></ds:include>
-                        </div>
-        	        </div>
-        	        <div class="card">
-        	            <div class="card-header">static query</div>
-        	            <div class="card-body">     
-        	                <ds:foreach query='q::{"content.title.value":"jjjjjjjj"};'>
-        	                <div class="card">
-        	                    <ds:resolve scope='content'>
-                                    <img class="card-img-top" ds:src="{image.value}">
-                                    <div class="card-body">
-                                        <ds:if exist='title.value'>
-        	                                <div ds:style="{klass.value}">
-        	                                    <ds:h4 class="card-title">{title.value}</ds:h4>
-        	                                </div> 
-        	                            </ds:if>
-                                        <ds:p class="card-text">{desc.value}</ds:p>
-                                    </div>
-                                </ds:resolve>
-                            </div>
-        	                </ds:foreach>
-        	            </div>
-        	        </div>
-                </div>
-                <ds:include src='/|{#userid}|/fragment/|{#name:self}|/scripts'></ds:include>
-            </body>
+        <head>
+        	<meta ds:include="/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/head.html"/>
+        </head>
+        <body>
+        <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/nav.html|{#query:self}'></ds:include>
+        <div class="container" style="margin-top:70px;">
+        	<div class="jumbotron jumbotron-fluid">
+        		<div class="container">
+        			<h1 class="display-3">Fluid jumbotron</h1>
+        			<p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+        			<img src="img/img16.jpg?w=100&h=100"/>
+        		</div>
+        	</div>
+        	<div class="card">
+        		<div class="card-header">query from url</div>
+        		<div class="card-body">
+        			<div class="row" style="column-count: 3;">
+        				<ds:foreach scope='#init'>
+        					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        						<div class="card">
+        							<ds:resolve scope='content'>
+        								<img class="card-img-top" ds:src="{image.value}">
+        								<div class="card-body">
+        									<ds:if exist='title.value'>
+        										<div ds:style="{klass.value}">
+        											<ds:h4 class="card-title">{#position}|. |{title.value}</ds:h4>
+        										</div>
+        									</ds:if>
+        									<ds:div class="card-text" style="font-size:1vw">{desc.value}</ds:div>
+        								</div>
+        							</ds:resolve>
+        							<div class="card-footer d-flex justify-content-end">
+        								<ds:small class="text-muted">{create == date("MM月DD日")}</ds:small>
+        							</div>
+        						</div>
+        					</div>
+        				</ds:foreach>
+        			</div>
+        		</div>
+        		<div class="d-flex justify-content-center">
+                     <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/pagenator.html|{#query:self}'></ds:include>
+        		</div>
+        	</div>
+        	<div class="card">
+        		<div class="card-header">static query</div>
+        		<div class="card-body">
+        			<ds:foreach query='q::{"content.title.value":"a"};'>
+        				<div class="card">
+        					<ds:resolve scope='content'>
+        						<img class="card-img-top" ds:src="{image.value}">
+        						<div class="card-body">
+        							<ds:if exist='title.value'>
+        								<div ds:style="{klass.value}">
+        									<ds:h4 class="card-title">{title.value}</ds:h4>
+        								</div>
+        							</ds:if>
+        							<ds:p class="card-text">{desc.value}</ds:p>
+        						</div>
+        					</ds:resolve>
+        				</div>
+        			</ds:foreach>
+        		</div>
+        	</div>
+        </div>
+        <ds:include src='/|{#userid}|/|{#namespace}|/static/scripts.html'></ds:include>
+        </body>
         </html>
     
     
@@ -425,61 +491,55 @@
     	    
 ######フラグメント"head"	    
     
-	    <meta charset="utf-8" >
-	    <meta http-equiv="X-UA-Compatible"  content="IE=edge">
-	    <title></title>
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
-	    <meta name="description" content="" >
-	    <meta name="keywords" content="">
-        <meta name="Robots" content="index,follow">
-	    <meta name="author" content="">
-	    
-	    <meta property="og:title" content="" >
-	    <meta property="og:image" content="" >
-	    <meta property="og:url" content="" >
-	    <meta property="og:site_name" content="" >
-	    <meta property="og:description" content="" >
-	    <meta name="twitter:title" content="" >
-	    <meta name="twitter:image" content="" >
-	    <meta name="twitter:url" content="" >
-	    <meta name="twitter:card" content="" >
-    
-	    <LINK href="https://fonts.googleapis.com/earlyaccess/sawarabimincho.css" rel="stylesheet" async>
-	    <LINK href="https://fonts.googleapis.com/earlyaccess/sawarabigothic.css" rel="stylesheet" async>
-	    <LINK href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" async>
-	    <LINK href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" async>
-	    <LINK href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
-	    <LINK href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700"  rel="stylesheet">
-	    <LINK rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css">
-	    <LINK rel="stylesheet" href="css/icomoon.css">
-	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-	    <LINK rel="stylesheet" href="css/style.css">
-	    <SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" ></SCRIPT>
-    	
+	    	<meta charset="utf-8">
+        	<meta http-equiv="X-UA-Compatible"  content="IE=edge">
+        
+        	<meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        	<meta query='q::{"content.type.value":"free"};' ds:title="{content.title.value}">
+        	<meta name="description" query='q::{"content.type.value":"free"};' ds:content="{content.title.value}" />
+        	<meta name="keywords" query='q::{"content.type.value":"free"};' ds:content="{content.title.value}" />
+        		
+            <meta name="Robots" content="index,follow">
+        	<meta name="author" content="">
+        	
+        	<meta property="og:title" content="" >
+        	<meta property="og:image" content="" >
+        	<meta property="og:url" content="" >
+        	<meta property="og:site_name" content="" >
+        	<meta property="og:description" content="" >
+        	<meta name="twitter:title" content="" >
+        	<meta name="twitter:image" content="" >
+        	<meta name="twitter:url" content="" >
+        	<meta name="twitter:card" content="" >
+        
+        	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabimincho.css" rel="stylesheet" async>
+        	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabigothic.css" rel="stylesheet" async>
+        	<LINK href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" async>
+        	<LINK href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" async>
+        	<LINK href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
+        	<LINK href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700"  rel="stylesheet">
+        	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        	<LINK rel="stylesheet" href="css/style.css">
+        	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" ></SCRIPT>
     
     
 ######フラグメント"script"
     
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-	    <script type="text/javascript" src="/bower_components/lodash/dist/lodash.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular/angular.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-resource/angular-resource.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-animate/angular-animate.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-messages/angular-messages.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-aria/angular-aria.min.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-i18n/angular-locale_ja-jp.js"></script>
-        <script type="text/javascript" src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-        <script type="text/javascript" src="/js/application.js"></script>
-        <script type="text/javascript" src="/js/controllers.js"></script>
-        <script type="text/javascript" src="/js/services.js"></script>
-	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-	    <script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="js/main.js"></script>
     	
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 ###resource
@@ -706,7 +766,8 @@
     see http://qiita.com/takuyakojima/items/780b3b3133a17cceb175
 ## mongodb Install
 ### Ubuntu
-    apt-get install mongodb
+    sudo apt install mongodb
+    sudo apt install mongo-tools
 ### Mac(Homebrew)
     brew install mongodb
 ### Windows
@@ -1222,6 +1283,18 @@
 
 ####いつか使う
 
+        
+  node-config
+  
+        すぐにもできるけども。。。
+        
+        https://github.com/lorenwest/node-config
+              
+  GraphQL
+  
+        どーなんかなあ。。。
+        サーバ・クライアント間で型安全。
+              
   ECMAScript パーサー
     
         http://esprima.org/

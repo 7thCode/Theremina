@@ -1024,7 +1024,7 @@ BuilderControllers.controller('BuilderCreateDialogController', ['$scope','$log',
                 format: TemplateService.format,
             };
 
-            TemplateService.Create($scope.title, content, (result: any): void => {
+            TemplateService.Create($scope.namespace,$scope.title, content, (result: any): void => {
                 TemplateService.current_layout = result;
                 TemplateService.format = result.content.format;
                 ShapeEdit.Load(result.content.text);

@@ -79,7 +79,7 @@ export namespace MailerModule {
                                             create: "",
                                             modify: "",
                                             content: request.body.content
-                                        }, (error: any, doc: string) => {
+                                        }, (error: any, doc: string):void => {
                                             if (!error) {
                                                 mailer.send(report_to, report_title, doc, (error: any): void => {
                                                     if (!error) {
@@ -92,7 +92,7 @@ export namespace MailerModule {
                                                                     content: request.body.content
                                                                 }, (error: any, doc: string): void => {
                                                                     if (!error) {
-                                                                        mailer.send(thanks_to, thanks_title, doc, (error: any) => {
+                                                                        mailer.send(thanks_to, thanks_title, doc, (error: any) :void => {
                                                                             if (!error) {
                                                                                 Wrapper.SendSuccess(response, {
                                                                                     code: 0,
@@ -114,6 +114,8 @@ export namespace MailerModule {
                                                         Wrapper.SendError(response, 300, error.message, error);
                                                     }
                                                 });
+                                            } else {
+                                                Wrapper.SendError(response, 300, error.message, error);
                                             }
                                         });
                                     } else {
@@ -137,9 +139,6 @@ export namespace MailerModule {
             }
         }
     }
-
-
-
 }
 
 module.exports = MailerModule;

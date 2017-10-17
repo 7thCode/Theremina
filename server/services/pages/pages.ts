@@ -24,8 +24,6 @@ export namespace PagesPageRouter {
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-  ///  const applications_config = share.applications_config;
-
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resources = new ResourcesModule.Pages;
 
@@ -49,46 +47,6 @@ export namespace PagesPageRouter {
     router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/open_dialog', {message: message});
     }]);
-/*
-    router.get('/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-
-        let items = [];
-        if (applications_config.sites) {
-            let keys = Object.keys(applications_config.sites);
-
-            keys.forEach((key:string):void => {
-                items.push(applications_config.sites[key].description);
-            });
-        }
-
-        result.render('services/pages/dialogs/build_site_dialog',
-            {
-                message: message,
-                items: items
-            });
-    }]);
-*/
-    /*
-    [
-                    {
-                        class: "item active",
-                        img: "/000000000000000000000000/verb/doc/img/img_3.jpg",
-                        name: "verb"
-                    },
-                    {
-                        class: "item",
-                        img: "/000000000000000000000000/verb/doc/img/img_4.jpg",
-                        name: "story"
-                    },
-                    {
-                        class: "item",
-                        img: "/000000000000000000000000/verb/doc/img/img_5.jpg",
-                        name: "words"
-                    }
-                ]
-
-
-    */
 
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/delete_confirm_dialog', {message: message});

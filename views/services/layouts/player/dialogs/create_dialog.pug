@@ -37,15 +37,21 @@ div
                                         div.hidden-xs(style="font-size:0.5rem;") {{layout.modify | date:'yyyy/MM/dd' }}
 
         .row
-            .col-xs-12
-                ng-form(name="validate" ng-show="HasSelectedTemplate()")
+            ng-form(name="validate" ng-show="HasSelectedTemplate()")
+                .col-xs-6
+                    .form-group
+                        label.control-label(for="namespace") namespace
+                        span(ng-messages="validate.namespace.$error")
+                            span.error-message(ng-message="required") #{message.required}
+                            span.error-message(ng-message="maxlength") #{message.long}
+                        input.form-control.no-zoom#namespace(ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
+                .col-xs-6
                     .form-group
                         label.control-label(for="name") Name
                         span(ng-messages="validate.name.$error")
                             span.error-message(ng-message="required") #{message.required}
                             span.error-message(ng-message="maxlength") #{message.long}
                         input.form-control.no-zoom#name(ng-model="name", type="text", name='name', required, ng-maxlength="50")
-
         .row
             .col-xs-12
                 include ../../../../systems/common/error_message
@@ -55,3 +61,8 @@ div
             .col-xs-12.text-center(style="margin:2rem;")
                 button.btn.btn-warning(type="button",ng-click='cancel()', aria-label="", ng-disabled="progress") #{message.cancel}
                 button.btn.btn-primary(type="button",ng-click="Create()",aria-label="",ng-disabled="progress") Create...
+
+
+
+
+

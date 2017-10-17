@@ -197,6 +197,12 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
                         }
                     });
                 };
+
+                fileReader.onerror = (event: any): void => {
+                    deferred.reject(false);
+                };
+
+
                 //          } else {
                 //              alert("already found.");
                 //          }
@@ -345,6 +351,10 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
                     }, error_handler);
                 };
             };
+
+            fileReader.onerror = (event: any): void => {
+            };
+
             fileReader.readAsDataURL(local_file.file);
         };
 
@@ -450,8 +460,8 @@ PicturesControllers.controller('PictureDeleteDialogController', ['$scope', '$uib
 
     }]);
 
-PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uibModalInstance', 'items', 'ImageService',
-    ($scope: any, $uibModalInstance: any, items: any, ImageService): void => {
+PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uibModalInstance', 'items', 'ImageService','SessionService',
+    ($scope: any, $uibModalInstance: any, items: any, ImageService:any,SessionService:any): void => {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -460,6 +470,12 @@ PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uib
         $scope.$on('progress', (event, value) => {
             $scope.progress = value;
         });
+
+        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+            progress(false);
+            $scope.message = message;
+            $log.error(message);
+        };
 
         let result = {width: 0, height: 0, orientation: 1, resize: false, brightness: 0, deformation: false};
         result.width = items.width;
@@ -578,5 +594,20 @@ PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uib
         $scope.answer = (answer: any): void => {
             $uibModalInstance.close(result);
         };
+
+
+        let GetNamespace = (callback:() => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = session.data;
+                    if (data) {
+                        $scope.namespace = data.namespace;
+                        callback();
+                    }
+                }
+            }, error_handler);
+        };
+
+        GetNamespace(() => {});
 
     }]);

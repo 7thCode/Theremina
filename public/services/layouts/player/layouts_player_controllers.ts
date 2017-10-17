@@ -789,8 +789,9 @@ PlayerControllers.controller('PlayerCreateDialogController', ['$scope', '$log', 
         let Create = (): void => {
             progress(true);
             let name = $scope.name;
+            let namespace = $scope.namespace;
             let content = TemplateService.current_layout.content;
-            LayoutService.Create(name, content, (new_layout: any): void => {
+            LayoutService.Create(namespace, name, content, (new_layout: any): void => {
                 LayoutService.format = new_layout.content.format;
                 ShapeEdit.Load(new_layout.content.text);
                 progress(false);

@@ -9,3 +9,11 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
                 a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav
+                    if user
+                        li.dropdown(ng-controller="NamespaceController")
+                            a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                                | #{message.namespace} ( {{namespace}} )
+                            ul.dropdown-menu(role="menu")
+                                li(ng-repeat="name in namespaces" ng-class="{active: name == namespace}")
+                                    a(ng-click="SetNamespace(name)") {{name}}
+

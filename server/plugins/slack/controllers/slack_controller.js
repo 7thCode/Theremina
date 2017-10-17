@@ -11,9 +11,6 @@ var SlackModule;
     const Botkit = require('botkit');
     const core = require(process.cwd() + '/gs');
     const share = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
     const plugins_config = share.plugins_config;
     let controller = null;
     class Slack {

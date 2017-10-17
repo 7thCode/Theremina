@@ -152,10 +152,11 @@ LayoutServices.service('LayoutService', [ '$log', "LayoutCreate", "Layout", 'Lay
             });
         };
 
-        this.Create = (name: string, content: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+        this.Create = (namespace:string,name: string, content: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             init();
             let layout = new LayoutCreate();
             layout.name = name;
+            layout.namespace = namespace;
             layout.content = content;
             layout.$save({}, (result: any): void => {
                 if (result) {

@@ -9,9 +9,17 @@
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
                 ng-form(name="validate")
                     .row
-                        .col-xs-10
+                        .col-xs-6(ng-controller="NamespaceController")
                             .form-group
-                                label(for="name") #{message.title}
+                                label.control-label(for="namespace") #{message.namespace}
+                                span(ng-messages="validate.namespace.$error")
+                                    span.error-message(ng-message="required") #{message.required}
+                                    span.error-message(ng-message="maxlength") #{message.long}
+                                input.form-control.no-zoom#namespace(ng-change="SetNamespace(namespace)", ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
+
+                        .col-xs-6
+                            .form-group
+                                label.control-label(for="name") #{message.title}
                                 span(ng-messages="validate.title.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
@@ -26,7 +34,7 @@
                     .row
                         .col-xs-4
                             .form-group
-                                label(for="type") #{message.type}
+                                label.control-label(for="type") #{message.type}
                                 span(ng-messages="validate.type.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                 select.form-control.no-zoom#type(ng-model="type" required)
@@ -35,7 +43,7 @@
                                     //option(value="22") #{message.module}
                         .col-xs-4
                             .form-group
-                                label(for="presettype") select type
+                                label.control-label(for="presettype") select type
                                 select.form-control.no-zoom#presettype(ng-model="presettype" ng-change="mimetype = presettype;")
                                     option text/html
                                     option text/css
@@ -43,7 +51,7 @@
                                     option application/json
                         .col-xs-4
                             .form-group
-                                label(for="mimetype") #{message.mimetype}
+                                label.control-label(for="mimetype") #{message.mimetype}
                                 span(ng-messages="validate.mimetype.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}

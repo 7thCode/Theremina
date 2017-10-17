@@ -13,7 +13,6 @@ export namespace AuthModule {
     const fs = require('graceful-fs');
 
     const mongoose: any = require('mongoose');
-    //mongoose.Promise = require('q').Promise;
     mongoose.Promise = global.Promise;
 
     const passport: any = require('passport');
@@ -36,7 +35,6 @@ export namespace AuthModule {
 
     const MailerModule: any = require('../../common/mailer');
 
-    //const HtmlEditModule: any = require("../../common/html_edit/html_edit");
     const HtmlScannerModule: any = require("../../common/html_scanner/html_scanner");
     const ScannerBehaviorModule: any = require("../../common/html_scanner/scanner_behavior");
 
