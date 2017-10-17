@@ -9,9 +9,6 @@ var FacebookModule;
 (function (FacebookModule) {
     const core = require(process.cwd() + '/gs');
     const share = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
     const plugins_config = share.plugins_config;
     const request = require('request');
     class Facebook {

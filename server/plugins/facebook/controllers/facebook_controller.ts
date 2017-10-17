@@ -10,9 +10,6 @@ export namespace FacebookModule {
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const plugins_config = share.plugins_config;
 
@@ -54,18 +51,18 @@ export namespace FacebookModule {
                     // To be expanded in later sections
                 };
 
-                let sendTextMessage = (recipientId:any, messageText:string):void => {
+                let sendTextMessage = (recipientId: any, messageText: string): void => {
 
-                    let callSendAPI = (messageData):void => {
+                    let callSendAPI = (messageData): void => {
                         request({
                             uri: 'https://graph.facebook.com/v2.7/me/messages',
-                            qs: { access_token: token },
+                            qs: {access_token: token},
                             method: 'POST',
                             json: {
-                                recipient: {id:recipientId},
+                                recipient: {id: recipientId},
                                 message: messageData,
                             }
-                        },  (error, response, body):void => {
+                        }, (error, response, body): void => {
                             if (!error && response.statusCode == 200) {
                                 var recipientId = body.recipient_id;
                                 var messageId = body.message_id;
@@ -119,10 +116,10 @@ export namespace FacebookModule {
 
             let data = req.body;
             if (data.object === 'page') {
-                data.entry.forEach(function(entry) {
+                data.entry.forEach(function (entry) {
                     let pageID = entry.id;
                     let timeOfEvent = entry.time;
-                    entry.messaging.forEach(function(event) {
+                    entry.messaging.forEach(function (event) {
                         if (event.message) {
                             receivedMessage(event);
                         } else {

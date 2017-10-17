@@ -766,7 +766,8 @@
     see http://qiita.com/takuyakojima/items/780b3b3133a17cceb175
 ## mongodb Install
 ### Ubuntu
-    apt-get install mongodb
+    sudo apt install mongodb
+    sudo apt install mongo-tools
 ### Mac(Homebrew)
     brew install mongodb
 ### Windows
@@ -1282,6 +1283,18 @@
 
 ####いつか使う
 
+        
+  node-config
+  
+        すぐにもできるけども。。。
+        
+        https://github.com/lorenwest/node-config
+              
+  GraphQL
+  
+        どーなんかなあ。。。
+        サーバ・クライアント間で型安全。
+              
   ECMAScript パーサー
     
         http://esprima.org/

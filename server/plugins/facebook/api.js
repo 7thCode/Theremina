@@ -20,7 +20,6 @@ var FacebookApiRouter;
         const facebook = new FacebookModule.Facebook;
         FacebookApiRouter.router.get("/webhook/", [exception.exception, facebook.bot_hook]);
         FacebookApiRouter.router.post("/webhook/", [exception.exception, jsonParser, facebook.bot_push]);
-        //router.get("/push/:message", [exception.exception, line.bot_push]);
     }
 })(FacebookApiRouter = exports.FacebookApiRouter || (exports.FacebookApiRouter = {}));
 module.exports = FacebookApiRouter.router;

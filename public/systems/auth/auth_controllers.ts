@@ -43,10 +43,10 @@ AuthControllers.controller('LoginController', ["$scope", "$rootScope", "$documen
             });
         };
 
-      //  $document.on('drop dragover', (e: any): void => {
-      //      e.stopPropagation();
-      //      e.preventDefault();
-      //  });
+        //  $document.on('drop dragover', (e: any): void => {
+        //      e.stopPropagation();
+        //      e.preventDefault();
+        //  });
 
         let confirmAccount = () => {
             let modalRegistConfirm = $uibModal.open({
@@ -237,7 +237,7 @@ AuthControllers.controller('LoginDialogController', ['$scope', '$window', '$uibM
  * @param target  Comment for parameter ´target´.
  * @returns       Comment for return value.
  */
-AuthControllers.controller('RegisterDialogController', ['$scope', '$uibModalInstance', 'AuthService','items',
+AuthControllers.controller('RegisterDialogController', ['$scope', '$uibModalInstance', 'AuthService', 'items',
     ($scope: any, $uibModalInstance: any, AuthService: any, items): void => {
 
         let progress = (value) => {

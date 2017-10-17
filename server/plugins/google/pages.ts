@@ -27,7 +27,6 @@ export namespace GooglePageRouter {
         const GoogleModule: any = require(share.Server("plugins/google/controllers/google_controller"));
         const calendar: any = new GoogleModule.Calendar(plugins_config.google_api.calendar);
 
-
         //step1
         router.get('/auth', (request: any, response: any): void => {
             let user: any = request.session.req.user;

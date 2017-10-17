@@ -14,7 +14,6 @@ export namespace AssetsApiRouter {
     const core = require(process.cwd() + "/gs");
     const share: any = core.share;
 
-
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 

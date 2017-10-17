@@ -38,7 +38,7 @@ if (config_seed) {
         const core = require(process.cwd() + '/gs');
         const share: any = core.share;
         const config: any = share.config;
-   //     const logger:any = share.logger;
+        //     const logger:any = share.logger;
 
         app.use("/", require("./server/utility/installer/api"));
         app.use("/", require("./server/utility/installer/pages"));
@@ -63,7 +63,7 @@ if (config_seed) {
         const _ = require("lodash");
 
         const mongoose: any = require("mongoose");
-       // mongoose.Promise = Q.Promise;
+        // mongoose.Promise = Q.Promise;
         mongoose.Promise = global.Promise;
 
         const favicon = require('serve-favicon');
@@ -88,21 +88,21 @@ if (config_seed) {
         app.use(helmet());
         app.use(helmet.hidePoweredBy({setTo: 'JSF/1.2'})); // Impersonation
         // helmet
-/*
-        const minifyhtml = require('express-minify-html');
-        app.use(minifyhtml({
-            override:      true,
-            exception_url: false,
-            htmlMinifier: {
-                removeComments:            true,
-                collapseWhitespace:        true,
-                collapseBooleanAttributes: true,
-                removeAttributeQuotes:     true,
-                removeEmptyAttributes:     false,
-                minifyJS:                  false
-            }
-        }));
-*/
+        /*
+                const minifyhtml = require('express-minify-html');
+                app.use(minifyhtml({
+                    override:      true,
+                    exception_url: false,
+                    htmlMinifier: {
+                        removeComments:            true,
+                        collapseWhitespace:        true,
+                        collapseBooleanAttributes: true,
+                        removeAttributeQuotes:     true,
+                        removeEmptyAttributes:     false,
+                        minifyJS:                  false
+                    }
+                }));
+        */
 
         const core = require(process.cwd() + '/gs');
         const share: any = core.share;
@@ -128,6 +128,16 @@ if (config_seed) {
 
         //passport
         const session = require('express-session');
+
+        if (config.csrfsecret) {
+            const csrf = require('csurf');
+            app.use(session({secret: config.csrfsecret}));
+            app.use(csrf({cookie: true}));
+            app.use((req, res, next) => {
+                res.locals.csrftoken = req.csrfToken();
+                next()
+            });
+        }
 
         // view engine setup
         app.set('views', path.join(__dirname, 'views'));
@@ -180,14 +190,14 @@ if (config_seed) {
             mongoose.connect("mongodb://" + config.db.address + "/" + config.db.name, options);
         }
 
-   //     process.on('uncaughtException', (error: any): void => {
-   //         console.log(error);
-   //         logger.error('Stop.   ' + error);
-   //     });
+        //     process.on('uncaughtException', (error: any): void => {
+        //         console.log(error);
+        //         logger.error('Stop.   ' + error);
+        //     });
 
-     //   process.on('exit', (code: number): void => {
-     //       logger.info('Stop.   ' + code);
-     //   });
+        //   process.on('exit', (code: number): void => {
+        //       logger.info('Stop.   ' + code);
+        //   });
 
         app.use(session({
             name: config.sessionname,
@@ -210,15 +220,15 @@ if (config_seed) {
         app.use(passport.session());
         //passport
 
-        let load_module = (root:string,modules:any):void => {
-                if (modules) {
-                    modules.forEach((module) => {
-                        let path = root + module.path;
-                        let name = module.name;
-                        app.use("/" + name, require(path + name + "/api"));
-                        app.use("/" + name, require(path + name + "/pages"));
-                    });
-                }
+        let load_module = (root: string, modules: any): void => {
+            if (modules) {
+                modules.forEach((module) => {
+                    let path = root + module.path;
+                    let name = module.name;
+                    app.use("/" + name, require(path + name + "/api"));
+                    app.use("/" + name, require(path + name + "/pages"));
+                });
+            }
         };
 
         load_module("./server", config.modules);
@@ -324,10 +334,10 @@ if (config_seed) {
         auth.create_init_user(applications_config.initusers);
 
         const file: any = core.file;
-        file.create_init_files(config.systems.userid,config.initfiles, (error, result) => {
-            file.create_init_files(config.systems.userid,services_config.initfiles, (error, result) => {
-                file.create_init_files(config.systems.userid,plugins_config.initfiles, (error, result) => {
-                    file.create_init_files(config.systems.userid,applications_config.initfiles, (error, result) => {
+        file.create_init_files(config.systems.userid, config.initfiles, (error, result) => {
+            file.create_init_files(config.systems.userid, services_config.initfiles, (error, result) => {
+                file.create_init_files(config.systems.userid, plugins_config.initfiles, (error, result) => {
+                    file.create_init_files(config.systems.userid, applications_config.initfiles, (error, result) => {
 
                     });
                 });
@@ -335,10 +345,10 @@ if (config_seed) {
         });
 
         const resource: any = core.resource;
-        resource.create_init_resources(config.systems.userid,config.initresources, (error, result) => {
-            resource.create_init_resources(config.systems.userid,services_config.initresources,(error, result) => {
-                resource.create_init_resources(config.systems.userid,plugins_config.initresources,(error, result) => {
-                    resource.create_init_resources(config.systems.userid,applications_config.initresources,(error, result) => {
+        resource.create_init_resources(config.systems.userid, config.initresources, (error, result) => {
+            resource.create_init_resources(config.systems.userid, services_config.initresources, (error, result) => {
+                resource.create_init_resources(config.systems.userid, plugins_config.initresources, (error, result) => {
+                    resource.create_init_resources(config.systems.userid, applications_config.initresources, (error, result) => {
 
                     });
                 });
@@ -352,18 +362,18 @@ if (config_seed) {
         //services
 
         // DAV
-    // //   if (config.dav) {
-     //       let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
-     //       let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
-     //       let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
-     //       jsDAV.createServer({
-     //           node: path.join(__dirname, 'public'),
-     //           locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
-     //           authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
-     //           realm: "jsdavtest"
-     //       }, 8001);
-     //       require('cozy-jsdav-fork/lib/CalDAV/plugin');
-     //   }
+        // //   if (config.dav) {
+        //       let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
+        //       let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
+        //       let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
+        //       jsDAV.createServer({
+        //           node: path.join(__dirname, 'public'),
+        //           locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
+        //           authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
+        //           realm: "jsdavtest"
+        //       }, 8001);
+        //       require('cozy-jsdav-fork/lib/CalDAV/plugin');
+        //   }
         // DAV
 
         // Slack Bot
@@ -390,7 +400,7 @@ if (config_seed) {
          */
         // Slack Bot
 
-        event.emitter.on('mail', (mail):void => {
+        event.emitter.on('mail', (mail): void => {
             //       let a = mail;
         });
 
@@ -402,7 +412,7 @@ if (config_seed) {
                 (error) => {
                     let a = error;
                 },
-                (message, body):void => {
+                (message, body): void => {
                     let a = message;
                     let subject = body.subject;
                     let text = body.text;
@@ -430,28 +440,32 @@ if (config_seed) {
         }
 
         app.use((err, req, res, next): void => {
-            res.status(err.status || 500);
-            res.render('error', {
-                message: err.message,
-                error: {}
-            });
+            if (req.xhr) {
+                res.status(500).send(err);
+            } else {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: {}
+                });
+            }
         });
 
-        process.on('SIGINT', () :void => { // for pm2 cluster.
+        process.on('SIGINT', (): void => { // for pm2 cluster.
             logger.info('Stop by SIGINT.');
-            process.exit( 0);
+            process.exit(0);
         });
 
-        process.on('message', (msg) :void => {  // for pm2 cluster on windows.
+        process.on('message', (msg): void => {  // for pm2 cluster on windows.
             if (msg == 'shutdown') {
                 logger.info('Stop by shutdown.');
-                setTimeout(function() {
+                setTimeout(function () {
                     process.exit(0);
                 }, 1500);
             }
         });
 
-        event.emitter.on('socket', (data):void => {
+        event.emitter.on('socket', (data): void => {
 
         });
 
@@ -567,7 +581,8 @@ function Serve(config, app: any): any {
             : 'port ' + addr.port;
         debug('Listening on ' + bind);
 
-        process.send = process.send || function () {};  // for pm2 cluster.
+        process.send = process.send || function () {
+        };  // for pm2 cluster.
         process.send('ready');
     }
 

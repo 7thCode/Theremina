@@ -30,6 +30,9 @@ export namespace NamespsceModule {
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resource = new ResourcesModule.Resource;
 
+    const LayoutModule = require(share.Server("services/layouts/controllers/layouts_controller"));
+    const layout = new LayoutModule.Layout;
+
     export class Namespsces {
 
         static userid(request): string {
@@ -42,7 +45,14 @@ export namespace NamespsceModule {
                 if (!error) {
                     resource.namespaces(userid, (error, resource_namespaces): void => {
                         if (!error) {
-                            Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces)));
+                            layout.namespaces(userid, (error, layout_namespaces): void => {
+                                if (!error) {
+                                    Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces,layout_namespaces)));
+                                } else {
+                                    Wrapper.SendError(response, 200, error.message, error);
+                                }
+                            });
+
                         } else {
                             Wrapper.SendError(response, 200, error.message, error);
                         }

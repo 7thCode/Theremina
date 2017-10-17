@@ -43,6 +43,7 @@ NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "
                 if (session) {
                     let data = session.data;
                     if (data) {
+                        $scope.namespace = data.namespace;
                         $rootScope.$emit('change_namespace', data.namespace);
                     }
                 }

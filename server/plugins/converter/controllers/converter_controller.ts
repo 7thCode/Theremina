@@ -44,7 +44,7 @@ export namespace ConverterModule {
                     {header: 'Nickname', key: 'nickname', width: 20},
                     {header: 'Magazine', key: 'send', width: 10}
                 ],
-                transform: (from):any => {
+                transform: (from): any => {
                     let result: any = {};
                     result.username = from.username;
                     if (from.local) {
@@ -74,7 +74,7 @@ export namespace ConverterModule {
                 let tmp_path = '/tmp/' + request.sessionID;
                 let tmp_file = '/' + filename;
                 let original_mask = process.umask(0);
-                fs.mkdir(tmp_path,'0777', () => {
+                fs.mkdir(tmp_path, '0777', () => {
                     workbook.xlsx.writeFile(tmp_path + tmp_file).then(function () {
                         process.umask(original_mask);
                         Wrapper.SendSuccess(response, {});

@@ -29,10 +29,6 @@ export namespace DataPageRouter {
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resources = new ResourcesModule.Pages;
 
-    const LocalAccount: any = require(share.Models("systems/accounts/account"));
-    const ResourceModel: any = require(share.Models("systems/resources/resource"));
-    const ArticleModel: any = require(share.Models("services/articles/article"));
-
     let message = config.message;
 
     //data
@@ -53,7 +49,6 @@ export namespace DataPageRouter {
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/data/dialogs/delete_confirm_dialog', {message: message});
     }]);
-
 
 }
 

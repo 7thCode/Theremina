@@ -497,8 +497,8 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
 
     }]);
 
-PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'ResourceBuilderService', 'items',
-    ($scope: any, $log: any, $uibModalInstance: any, ResourceBuilderService: any, items: any): void => {
+PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'SessionService','ResourceBuilderService', 'items',
+    ($scope: any, $log: any, $uibModalInstance: any,SessionService:any, ResourceBuilderService: any, items: any): void => {
 
         let file = items.file;
         let target = items.target;
@@ -549,9 +549,23 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
 
         };
 
+        let GetNamespace = (callback:() => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = session.data;
+                    if (data) {
+                        $scope.namespace = data.namespace;
+                        callback();
+                    }
+                }
+            }, error_handler);
+        };
+
+        GetNamespace(() => {});
+
     }]);
 
-PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ResourceBuilderService',
+PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items','ResourceBuilderService',
     ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, ResourceBuilderService: any): void => {
 
         let progress = (value) => {
@@ -667,7 +681,7 @@ PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$ui
         $scope.cancel = cancel;
         $scope.LayoutQuery = (): any => Query;
 
-        Query();
+
 
     }]);
 

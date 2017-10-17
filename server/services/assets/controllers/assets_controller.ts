@@ -14,7 +14,6 @@ export namespace AssetsModule {
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;

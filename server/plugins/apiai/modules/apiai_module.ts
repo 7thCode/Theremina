@@ -14,9 +14,6 @@ export namespace ApiAiModule {
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
 
     const plugins_config = share.plugins_config;
     const ai = apiai(plugins_config.apiai.token);

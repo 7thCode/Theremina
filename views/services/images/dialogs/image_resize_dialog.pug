@@ -13,6 +13,13 @@ div
                         .box.box-info
                             .box-body
                                 .row.ng-form(name="validate")
+                                    .col-xs-12(ng-controller="NamespaceController")
+                                        .form-group
+                                            label.control-label(for="namespace") #{message.namespace}
+                                            span(ng-messages="validate.namespace.$error")
+                                                span.error-message(ng-message="required") #{message.required}
+                                                span.error-message(ng-message="maxlength") #{message.long}
+                                            input.form-control.no-zoom#namespace(ng-change="SetNamespace(namespace)", ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
                                     .col-xs-12
                                         .form-group
                                             label.control-label(for="ratio") #{message.sizeratio}
@@ -34,7 +41,7 @@ div
                                     .col-xs-4.h7 H: {{height| number:0}}
                                 .row
                                     .col-xs-12(style="position: relative;height:300px;")
-                                        img.img-responsive(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
+                                        img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
         .row
             .col-xs-12
                 .progress(ng-show="progress")

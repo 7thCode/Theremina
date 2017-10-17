@@ -915,8 +915,8 @@ SVGControllers.controller('SVGController', ["$scope", '$document', '$log', '$win
         Font_Display();
     }]);
 
-SVGControllers.controller('SVGCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'LayoutService', 'ShapeEdit', 'items',
-    ($scope: any, $log: any, $uibModalInstance: any, TemplateService: any, ShapeEdit: any, items: any): void => {
+SVGControllers.controller('SVGCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'LayoutService','SessionService', 'ShapeEdit', 'items',
+    ($scope: any, $log: any, $uibModalInstance: any, TemplateService: any,SessionService:any, ShapeEdit: any, items: any): void => {
 
         $scope.dpi = 800;
         $scope.ratio = 1.414;
@@ -1017,7 +1017,7 @@ SVGControllers.controller('SVGCreateDialogController', ['$scope', '$log', '$uibM
                 format: TemplateService.format,
             };
 
-            TemplateService.Create($scope.title, content, (result: any): void => {
+            TemplateService.Create($scope.namespace,$scope.title, content, (result: any): void => {
                 TemplateService.current_layout = result;
                 TemplateService.format = result.content.format;
                 ShapeEdit.Load(result.content.text);
@@ -1026,10 +1026,23 @@ SVGControllers.controller('SVGCreateDialogController', ['$scope', '$log', '$uibM
             }, error_handler);
         };
 
+        let GetNamespace = (callback:() => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = session.data;
+                    if (data) {
+                        $scope.namespace = data.namespace;
+                        callback();
+                    }
+                }
+            }, error_handler);
+        };
+
+        GetNamespace(() => {});
     }]);
 
-SVGControllers.controller('SVGOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ShapeEdit', 'LayoutService',
-    ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, ShapeEdit: any, TemplateService: any): void => {
+SVGControllers.controller('SVGOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ShapeEdit', 'LayoutService','SessionService',
+    ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, ShapeEdit: any, TemplateService: any,SessionService:any): void => {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -1112,8 +1125,26 @@ SVGControllers.controller('SVGOpenDialogController', ['$scope', '$log', '$uibMod
         $scope.cancel = cancel;
         $scope.LayoutQuery = (): any => Query;
 
-        Count();
-        Query();
+
+        let GetNamespace = (callback:() => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = session.data;
+                    if (data) {
+                        $scope.namespace = data.namespace;
+                        callback();
+                    }
+                }
+            }, error_handler);
+        };
+
+        GetNamespace(() => {
+            Count();
+            Query();
+        });
+
+
+
     }]);
 
 SVGControllers.controller('SVGSaveAsDialogController', ['$scope', '$log', '$uibModalInstance', 'LayoutService', 'ShapeEdit', 'items',

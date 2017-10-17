@@ -2,7 +2,7 @@ extends ../../layout
 
 block content
     section.content(ng-controller="PictureController")
-        include ../common/navbar
+        include partial/navbar
         .flex-row
             .flex-column
                 div(style="font-size:2rem;color:#607D8B") #{message.picture}

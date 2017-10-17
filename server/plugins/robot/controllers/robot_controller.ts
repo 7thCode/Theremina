@@ -10,18 +10,10 @@ export namespace RobotModule {
 
     const _ = require('lodash');
 
-    const mongoose = require('mongoose');
-    const Grid = require('gridfs-stream');
-
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const config = share.config;
-    const Cipher = share.Cipher;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
-
-    const ArticleModel: any = require(share.Models("services/articles/article"));
 
     const CrawlerModule: any = require('../../../systems/common/crawler');
     const crawler: any = new CrawlerModule.Crawler();
@@ -50,6 +42,24 @@ export namespace RobotModule {
             const number: number = 1300;
             let url = decodeURIComponent(request.params.url);
             let path = decodeURIComponent(request.params.path);
+
+            crawler.Crawl(url, "",[], []).then((result: any): void => {
+                    let nodes = result._value.nodes;
+                    let urls: any[] = [];
+                    nodes.forEach((node) => {
+                        if (node._nodeValue) {
+                            urls.push(node._nodeValue);
+                        } else if (node._data) {
+                            urls.push(node._data);
+                        }
+                    });
+                    let unique_urls = _.uniq(urls);
+                    Wrapper.SendSuccess(response, unique_urls);
+            } ).catch((error) => {
+                Wrapper.SendError(response, error.code, error.message, error);
+            });
+
+            /*
             crawler.Crawl(url, path, 0, (error: any, result: any): void => {
                 if (!error) {
                     let nodes = result._value.nodes;
@@ -67,15 +77,16 @@ export namespace RobotModule {
                     Wrapper.SendError(response, error.code, error.message, error);
                 }
             });
+            */
         }
 
-        public Crawl(url: string, path: string, type: any, callback: () => void) {
-            crawler.Crawl(url, path, type, callback);
-        }
+       // public Crawl(url: string, path: string, type: any, callback: () => void) {
+       //     crawler.Crawl(url, path, type, callback);
+       // }
 
         public LinkUrls(url: string, callback: (error: any, result: any) => void) {
             let path = '/html/body//a/@href';
-            crawler.Crawl(url, path, this.type.ANY_TYPE, (error: any, result: any): void => {
+             crawler.Crawl(url, "",[], []).then((result: any): void => {
                 let nodes = result._value.nodes;
                 let urls: any[] = [];
                 nodes.forEach((node) => {

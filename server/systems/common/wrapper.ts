@@ -14,6 +14,12 @@ export namespace Promised {
     const fs = require('graceful-fs');
     const _ = require("lodash");
     const result: any = require("./result");
+
+//    const core = require(process.cwd() + '/gs');
+//    const share: any = core.share;
+//    const config: any = share.config;
+//    const logger = share.logger;
+
     const config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
     const log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");

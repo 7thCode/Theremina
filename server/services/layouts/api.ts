@@ -22,7 +22,6 @@ export namespace LayoutsApiRouter {
     const layout: any = new LayoutsModule.Layout();
 
     // for template
-
     router.get("/template/svg/:name", [layout.get_template_svg]);
 
     router.post("/template/create", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.create_template]);
@@ -34,7 +33,6 @@ export namespace LayoutsApiRouter {
     router.get("/template/:id", [layout.get_template]);
     router.put("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.put_template]);
     router.delete("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.delete_template]);
-
 
 
     // for layout

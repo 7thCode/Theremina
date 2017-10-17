@@ -14,8 +14,6 @@ var BeaconModule;
     const share = core.share;
     const config = share.config;
     const Cipher = share.Cipher;
-    const Wrapper = share.Wrapper;
-    const logger = share.logger;
     class Beacon {
         constructor() {
         }
@@ -30,17 +28,6 @@ var BeaconModule;
             }
             return result;
         }
-        /*
-
-         let data = {
-         time: now,
-         address: request.connection.remoteAddress,
-         user: "",
-         headers: request.headers['user-agent'],
-         referer: ""
-         };
-
-         */
         /**
          * @param request
          * @param response

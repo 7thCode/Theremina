@@ -20,14 +20,12 @@ gulp.task('clean', (cb) => {
 gulp.task('copy', ['clean'], () => {
     return gulp.src(
         [
-            'bin/*',
             'config/systems/config.json',
             'config/systems/logs.json',
             'config/services/**/*',
             'config/plugins/**/*',
             'config/applications/**/*',
             'config/utility/**/*',
-            'persistent/**/*',
             'logs/*',
             'models/**/*.json',
             'public/css/**/*.css',

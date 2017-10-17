@@ -2,10 +2,10 @@
   "apps" : [{
     "name"        : "app",
     "script"      : "app.js",
-    "instances"  :  "max",
+    "instances"  :  "1",
     "exec_mode"  : "cluster_mode",
     "args"        : [],
-    "node_args"   : "--optimize_for_size --max_old_space_size=720 --gc_interval=100",
+    "node_args"   : "--optimize_for_size --max_old_space_size=920 --gc_interval=100",
     "env": {
       "NODE_ENV": "development"
     },

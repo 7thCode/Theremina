@@ -25,7 +25,7 @@ export namespace FacebookApiRouter {
 
         router.get("/webhook/", [exception.exception, facebook.bot_hook]);
         router.post("/webhook/", [exception.exception, jsonParser, facebook.bot_push]);
-        //router.get("/push/:message", [exception.exception, line.bot_push]);
+
     }
 }
 
