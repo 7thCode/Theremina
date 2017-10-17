@@ -127,6 +127,14 @@
    "description": {
     "display": "Profile"
    }
+  },
+  {
+   "type": "required",
+   "path": "/services/",
+   "name": "mailer",
+   "description": {
+    "display": "Mailer"
+   }
   }
  ],
  "initusers": [],
