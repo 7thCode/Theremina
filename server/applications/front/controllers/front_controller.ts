@@ -31,7 +31,6 @@ export namespace FrontModule {
     const url: any = require('url');
 
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
-
     const ArticleModel: any = require(share.Models("services/articles/article"));
 
     export class Front {

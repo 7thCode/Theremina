@@ -21,15 +21,15 @@ export namespace ApiRouter {
     const FrontModule: any = require(share.Server("applications/front/controllers/front_controller"));
     const front: any = new FrontModule.Front;
 
-    router.put('/api/upload/:name', [exception.exception, exception.authenticate,front.put_all]);
+    router.put('/api/upload/:name', [exception.exception, exception.authenticate, front.put_all]);
     router.get('/api/download', [exception.exception, exception.authenticate, front.get_all]);
 
     router.post('/api/buildsite/:name/:namespace', front.build);
 
     event.emitter.on('register', (param: any): void => {
-    //    pages.create_init_user_resources(param.user);
-    //    pages.create_init_user_file(param.user);
-     //   pages.create_init_user_articles(param.user);
+        //   pages.create_init_user_resources(param.user);
+        //   pages.create_init_user_file(param.user);
+        //   pages.create_init_user_articles(param.user);
     });
 
 }

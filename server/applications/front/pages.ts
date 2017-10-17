@@ -261,7 +261,7 @@ export namespace PageRouter {
         if (applications_config.sites) {
             let keys = Object.keys(applications_config.sites);
 
-            keys.forEach((key:string):void => {
+            keys.forEach((key: string): void => {
                 items.push(applications_config.sites[key].description);
             });
         }
