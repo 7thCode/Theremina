@@ -121,6 +121,15 @@ export namespace PageRouter {
         }
     }]);
 
+    router.get("/index", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        let redirect_to = applications_config.redirect["/index"];
+        if (redirect_to) {
+            response.redirect(302, redirect_to);
+        } else {
+            next();
+        }
+    }]);
+
     /*
     router.get("/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
         let userid = config.systems.userid;
