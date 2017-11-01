@@ -140,6 +140,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
             _Find("type", type);
             localStorage.setItem("pages_find_type", "" + type);
         };
+      
 
         $scope.mimetype = localStorage.getItem("pages_find_mime");
         let FindMime = (mime: string): any => {
@@ -497,8 +498,8 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
 
     }]);
 
-PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'SessionService','ResourceBuilderService', 'items',
-    ($scope: any, $log: any, $uibModalInstance: any,SessionService:any, ResourceBuilderService: any, items: any): void => {
+PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'SessionService','ResourceBuilderService', 'items','$timeout', '$window',
+    ($scope: any, $log: any, $uibModalInstance: any, SessionService:any, ResourceBuilderService: any, items: any,$timeout: any, $window: any): void => {
 
         let file = items.file;
         let target = items.target;
@@ -506,7 +507,11 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
 
         if (file) {
             $scope.title = file.name;
+            $scope.presettype = file.type;
             $scope.mimetype = file.type;
+        } else {
+            $scope.presettype = "text/html";
+            $scope.mimetype = "text/html";
         }
 
         let progress = (value) => {
@@ -560,6 +565,20 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
                 }
             }, error_handler);
         };
+
+      //  let d = document;
+      //  let f = d.getElementById("validate");
+
+        $timeout(() => {
+            let element = $window.document.getElementById("name");
+            if (element) {
+                element.focus();
+            }
+        });
+
+      //  focus('name');
+      //  document.validate.title.focus();
+     //   angular.element(document.getElementById( 'name' ) ).select();
 
         GetNamespace(() => {});
 

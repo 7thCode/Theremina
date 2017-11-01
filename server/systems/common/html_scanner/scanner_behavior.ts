@@ -243,15 +243,18 @@ namespace ScannerBehavior {
 
         public GetUrl(target_url_string: string, parent: any): any {// url
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
-            let target_url: any = url.parse(resolved_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
-            let host: string = target_url.host;
-            if (host) {
-                host_string = host;
-            }
-            let url_string: string = host_string + resolved_url_string;
+            let target_url: any = url.resolve(host_string, resolved_url_string);
+
+            //let target_url: any = url.parse(resolved_url_string);
+
+          //  let host: string = target_url.host;
+          //  if (host) {
+          //      host_string = host;
+          //  }
+          //  let url_string: string = host_string + resolved_url_string;
             let options: any = {
-                uri: url_string,
+                uri: target_url,
                 method: "GET",
                 timeout: parent.config.timeout,
                 headers: {

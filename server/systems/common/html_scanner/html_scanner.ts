@@ -49,7 +49,7 @@ namespace HTMLScanner {
                 }
                 this.depth--;
             } else {
-                this.callback({code: 1}, null);
+                this.callback({code: 1,message:"ScanChild node is null."}, null);
             }
         }
 
@@ -69,7 +69,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:""}, null);
+                this.callback({code:1,message:"ScanHTML dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -122,7 +122,7 @@ namespace HTMLScanner {
                         this.ScanChild(node, data,position);
                 }
             } else {
-                this.callback({code: 1}, null);
+                this.callback({code: 1,message:"ScanNode node is null,"}, null);
             }
         }
 
@@ -153,7 +153,7 @@ namespace HTMLScanner {
                 let query: any = node.attributes.query.nodeValue;
                 result = this.datasource.GetDatasource(query, this);
             } catch (e) {
-                this.callback({code: 1}, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -164,7 +164,7 @@ namespace HTMLScanner {
                 let query: any = node.attributes.query.nodeValue;
                 result = this.datasource.GetCount(query, this);
             } catch (e) {
-                this.callback({code: 1}, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -212,13 +212,13 @@ namespace HTMLScanner {
                             }
                             this.ScanChild(node, data,position);
                         } else {
-                            this.callback({code: 1}, null);
+                            this.callback({code: 1,message:"ScanNode tagname is null"}, null);
                         }
                         break;
                     default:
                 }
             } else {
-                this.callback({code: 1}, null);
+                this.callback({code: 2,message:"ScanNode node is null"}, null);
             }
         }
 
@@ -235,18 +235,18 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:""}, null);
+                this.callback({code:1,message:"ResolveDataSource dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {// Promise all(record) then Prmise All(count)
 
                 // resolve all [record reference] in document.
                 Promise.all(this.datasource_promises.map((doc: any): void => {
-                    let result: any = null;
+                    let result1: any = null;
                     if (doc.promise) {
-                        result = doc.promise;
+                        result1 = doc.promise;
                     }
-                    return result;
+                    return result1;
                 })).then((resolved: any[]): void => {
 
                     _.forEach(resolved, (entry: any, index: number): void => {
@@ -254,11 +254,11 @@ namespace HTMLScanner {
                     });
 
                     Promise.all(this.datasource_promises.map((doc: any): void => {
-                        let result: any = null;
+                        let result2: any = null;
                         if (doc.count) {
-                            result = doc.count;
+                            result2 = doc.count;
                         }
-                        return result;
+                        return result2;
                     })).then((resolved: any[]): void => {
                         _.forEach(resolved, (count: any, index: number): void => {
                             result[this.datasource_promises[index].name].count = count;
@@ -292,11 +292,11 @@ namespace HTMLScanner {
 
             // resolve all [record reference] in document.
             Promise.all(this.datasource_promises.map((doc: any): void => {
-                let result:any = null;
+                let result1:any = null;
                 if (doc.promise) {
-                    result = doc.promise;
+                    result1 = doc.promise;
                 }
-                return result;
+                return result1;
             })).then((resolved: any[]): void => {
 
                 _.forEach(resolved, (entry: any, index: number): void => {
@@ -304,11 +304,11 @@ namespace HTMLScanner {
                 });
 
                 Promise.all(this.datasource_promises.map((doc: any): void => {
-                    let result:any = null;
+                    let result2:any = null;
                     if (doc.count) {
-                        result = doc.count;
+                        result2 = doc.count;
                     }
-                    return result;
+                    return result2;
                 })).then((resolved: any[]): void => {
                     _.forEach(resolved, (count: any, index: number): void => {
                         result[this.datasource_promises[index].name].count = count;
@@ -356,7 +356,7 @@ namespace HTMLScanner {
             try {
                 result = this.datasource.GetUrl(target_url_string, this);
             } catch (e) {
-                this.callback({code: 1}, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -423,7 +423,7 @@ namespace HTMLScanner {
                     default:
                 }
             } else {
-                this.callback({code: 1}, null);
+                this.callback({code: 1,message:"ScanNode node is null."}, null);
             }
         }
 
@@ -439,7 +439,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:""}, null);
+                this.callback({code:1,message:"ResolveUrl dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -455,7 +455,15 @@ namespace HTMLScanner {
                     });
                     this.callback(null, result);
                 }).catch((error: any): void => {
-                    this.callback(error, null);
+                    switch (error.statusCode) {
+                        case 404:
+                            this.callback({code:404, message:error.options.uri}, null);
+                            break;
+                        default:
+                            this.callback(error, null);
+                    }
+
+
                 });
             }
 
@@ -465,15 +473,12 @@ namespace HTMLScanner {
 
         public ResolveUrl2(childnodes: any, result: any): any {
 
-
-
             if (childnodes) {
                 _.forEach(childnodes, (element:any, index:number):void => {
                     this.position = index;
                     this.ScanNode(element, null, 0);
                 });
             }
-
 
             Promise.all(this.url_promises.map((doc: any): void => {
                 let promise:any = null;
@@ -557,11 +562,27 @@ namespace HTMLScanner {
                                     let datas = data[query_attribute.nodeValue];
                                     if (datas.content.length > 0) {
                                         let first_data = datas.content[0];
+
+  /*
                                         let name_attribute: any = node.attributes["name"];
                                         let name = "";
                                         if (name_attribute) {
                                             name = 'name="' + name_attribute.nodeValue + '"';
                                         }
+*/
+                                        let name = "";
+                                        let number: number = node.attributes.length;
+                                        for (var index: number = 0; index < number; index++) {
+                                            let attribute: any = node.attributes[index];
+                                            let prefix: string = Expander.prefix(attribute.name);
+                                            let localname: string = Expander.localName(attribute.name);
+                                            if (prefix != PREFIX) {
+                                                if (localname != "query") {
+                                                    name = attribute.name + '="' + attribute.nodeValue + '" ';
+                                                }
+                                            }
+                                        }
+
                                         this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
                                             content: attribute.value,
                                             count: 1
@@ -783,7 +804,7 @@ namespace HTMLScanner {
                     default:
                 }
             } else {
-                this.callback({code: 1}, null);
+                this.callback({code: 1,message:"ScanNode node is null."}, null);
             }
         }
 
@@ -800,7 +821,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:""}, null);
+                this.callback({code:1,message:"ExpandHtml dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {

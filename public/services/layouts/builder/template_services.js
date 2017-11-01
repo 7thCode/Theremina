@@ -144,10 +144,11 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Create = (name, content, callback, error) => {
+        this.Create = (namespace, name, content, callback, error) => {
             init();
             let layout = new TemplateCreate();
             layout.name = name;
+            layout.namespace = namespace;
             layout.content = content;
             layout.$save({}, (result) => {
                 if (result) {

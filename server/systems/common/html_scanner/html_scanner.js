@@ -40,7 +40,7 @@ var HTMLScanner;
                 this.depth--;
             }
             else {
-                this.callback({ code: 1 }, null);
+                this.callback({ code: 1, message: "ScanChild node is null." }, null);
             }
         }
         ScanNode(node, data, position) {
@@ -59,7 +59,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "" }, null);
+                this.callback({ code: 1, message: "ScanHTML dom is null." }, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -111,7 +111,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1 }, null);
+                this.callback({ code: 1, message: "ScanNode node is null," }, null);
             }
         }
     }
@@ -137,7 +137,7 @@ var HTMLScanner;
                 result = this.datasource.GetDatasource(query, this);
             }
             catch (e) {
-                this.callback({ code: 1 }, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -148,7 +148,7 @@ var HTMLScanner;
                 result = this.datasource.GetCount(query, this);
             }
             catch (e) {
-                this.callback({ code: 1 }, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -196,14 +196,14 @@ var HTMLScanner;
                             this.ScanChild(node, data, position);
                         }
                         else {
-                            this.callback({ code: 1 }, null);
+                            this.callback({ code: 1, message: "ScanNode tagname is null" }, null);
                         }
                         break;
                     default:
                 }
             }
             else {
-                this.callback({ code: 1 }, null);
+                this.callback({ code: 2, message: "ScanNode node is null" }, null);
             }
         }
         ResolveDataSource(source, result) {
@@ -219,27 +219,27 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "" }, null);
+                this.callback({ code: 1, message: "ResolveDataSource dom is null." }, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
                 // resolve all [record reference] in document.
                 Promise.all(this.datasource_promises.map((doc) => {
-                    let result = null;
+                    let result1 = null;
                     if (doc.promise) {
-                        result = doc.promise;
+                        result1 = doc.promise;
                     }
-                    return result;
+                    return result1;
                 })).then((resolved) => {
                     _.forEach(resolved, (entry, index) => {
                         result[this.datasource_promises[index].name] = { content: entry, count: 0 };
                     });
                     Promise.all(this.datasource_promises.map((doc) => {
-                        let result = null;
+                        let result2 = null;
                         if (doc.count) {
-                            result = doc.count;
+                            result2 = doc.count;
                         }
-                        return result;
+                        return result2;
                     })).then((resolved) => {
                         _.forEach(resolved, (count, index) => {
                             result[this.datasource_promises[index].name].count = count;
@@ -263,21 +263,21 @@ var HTMLScanner;
             }
             // resolve all [record reference] in document.
             Promise.all(this.datasource_promises.map((doc) => {
-                let result = null;
+                let result1 = null;
                 if (doc.promise) {
-                    result = doc.promise;
+                    result1 = doc.promise;
                 }
-                return result;
+                return result1;
             })).then((resolved) => {
                 _.forEach(resolved, (entry, index) => {
                     result[this.datasource_promises[index].name] = { content: entry, count: 0 };
                 });
                 Promise.all(this.datasource_promises.map((doc) => {
-                    let result = null;
+                    let result2 = null;
                     if (doc.count) {
-                        result = doc.count;
+                        result2 = doc.count;
                     }
-                    return result;
+                    return result2;
                 })).then((resolved) => {
                     _.forEach(resolved, (count, index) => {
                         result[this.datasource_promises[index].name].count = count;
@@ -313,7 +313,7 @@ var HTMLScanner;
                 result = this.datasource.GetUrl(target_url_string, this);
             }
             catch (e) {
-                this.callback({ code: 1 }, null);
+                this.callback(e, null);
             }
             return result;
         }
@@ -379,7 +379,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1 }, null);
+                this.callback({ code: 1, message: "ScanNode node is null." }, null);
             }
         }
         ResolveUrl(source, result) {
@@ -395,7 +395,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "" }, null);
+                this.callback({ code: 1, message: "ResolveUrl dom is null." }, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -411,7 +411,13 @@ var HTMLScanner;
                     });
                     this.callback(null, result);
                 }).catch((error) => {
-                    this.callback(error, null);
+                    switch (error.statusCode) {
+                        case 404:
+                            this.callback({ code: 404, message: error.options.uri }, null);
+                            break;
+                        default:
+                            this.callback(error, null);
+                    }
                 });
             }
         }
@@ -498,10 +504,24 @@ var HTMLScanner;
                                         let datas = data[query_attribute.nodeValue];
                                         if (datas.content.length > 0) {
                                             let first_data = datas.content[0];
-                                            let name_attribute = node.attributes["name"];
+                                            /*
+                                                                                  let name_attribute: any = node.attributes["name"];
+                                                                                  let name = "";
+                                                                                  if (name_attribute) {
+                                                                                      name = 'name="' + name_attribute.nodeValue + '"';
+                                                                                  }
+                                          */
                                             let name = "";
-                                            if (name_attribute) {
-                                                name = 'name="' + name_attribute.nodeValue + '"';
+                                            let number = node.attributes.length;
+                                            for (var index = 0; index < number; index++) {
+                                                let attribute = node.attributes[index];
+                                                let prefix = Expander.prefix(attribute.name);
+                                                let localname = Expander.localName(attribute.name);
+                                                if (prefix != PREFIX) {
+                                                    if (localname != "query") {
+                                                        name = attribute.name + '="' + attribute.nodeValue + '" ';
+                                                    }
+                                                }
                                             }
                                             this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
                                                 content: attribute.value,
@@ -726,7 +746,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1 }, null);
+                this.callback({ code: 1, message: "ScanNode node is null." }, null);
             }
         }
         ExpandHtml(source, fragments) {
@@ -743,7 +763,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "" }, null);
+                this.callback({ code: 1, message: "ExpandHtml dom is null." }, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
