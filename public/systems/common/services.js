@@ -198,7 +198,31 @@ Services.service("SessionService", ['Session', function (Session) {
         };
     }]);
 Services.service("GuidanceService", ['Session', function (Session) {
+        /*
+        Services.factory('focus', function($timeout, $window) {
+                return function(id) {
+                    $timeout(function() {
+                        var element = $window.document.getElementById(id);
+                        if(element)
+                            element.focus();
+                    });
+                };
+            });
+        */
     }]);
+/*
+Services.directive('eventFocus', function(focus) {
+    return function(scope, elem, attr) {
+        elem.on(attr.eventFocus, function() {
+            focus(attr.eventFocusId);
+        });
+
+        scope.$on('$destroy', function() {
+            elem.off(attr.eventFocus);
+        });
+    };
+});
+*/
 Services.directive("compareTo", () => {
     return {
         require: "ngModel",

@@ -7,6 +7,14 @@
     
     基本
     
+    
+    2種類のデータソース
+    
+    1.データベース
+    
+    2.ファイル
+    
+    
     ページとアーティクル
     
     ページとは、表示されるHTMLの雛形となるHTMLテンプレートです。
@@ -20,9 +28,7 @@
     簡単に言うと、ページに指定された各種情報(クエリー、フィールド名など)から導かれるアーティクルを所定の
     位置に展開することで、実際のHTMLドキュメントを作り出して返すという
     
-    
-    
-    
+     
     しかし実際のところ、アーティクルの構造自体はあまり重要ではありません。
     
     
@@ -30,24 +36,32 @@
 
 ##Getting Started
 
-
-
-
-    まず、最もシンプルなページを作ってみましょう。
+    まず、シンプルなページを作ってみましょう。
+    ２つの
     
-   
-   
-   
-   
-   
-   
-   
+    	from.txt
+    	
+    	    Hello world!
+    	
+    	
+    
+    	to.html
+    	
+            <html>
+                <body>
+                    <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/from.txt'></ds:include>
+                </body>
+            </html>
+    
+    
+    
+    
+    
+    
+    
     アーティクルを一つ登録
     
-    
-    
-   
-    
+        
         <html>
             <body>
                 <ds:foreach scope="#init">
@@ -57,14 +71,9 @@
         </html>
             
     
-    
-
 ###Install
 
     TODO
-
-
-
 
 ##View Template
 
@@ -1290,6 +1299,18 @@
         
         https://github.com/lorenwest/node-config
               
+              
+  WebDriver
+  
+        インストール(Mac Homebrew)
+        
+        brew install selenium-server-standalone
+        brew install chromedriver
+
+        起動(Mac Homebrew)
+        
+        java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/Cellar/selenium-server-standalone/3.6.0/libexec/selenium-server-standalone-3.6.0.jar
+
   GraphQL
   
         どーなんかなあ。。。

@@ -17,7 +17,6 @@ var Adaptor;
         var request = require('request');
         var url = require('url');
         var fs = require('fs');
-        var Q = require('q');
         var crypto = require('crypto');
     }
     class SVGAdaptor {

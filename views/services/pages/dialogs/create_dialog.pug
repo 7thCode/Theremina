@@ -23,7 +23,7 @@
                                 span(ng-messages="validate.title.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
-                                input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
+                                input.form-control.no-zoom#name(ng-selected="true" ng-model="title", type="text", name='title', required, ng-maxlength="50")
                         //.col-xs-2
                             .form-group
                                 label(for="name") タイプ(type)
