@@ -24,7 +24,7 @@ export namespace ApiRouter {
     router.put('/api/upload/:name', [exception.exception, exception.authenticate, front.put_all]);
     router.get('/api/download', [exception.exception, exception.authenticate, front.get_all]);
 
-    router.post('/api/buildsite/:name/:namespace', front.build);
+    router.post('/api/buildsite/:name/:namespace', [exception.exception, exception.authenticate, front.build]);
 
     event.emitter.on('register', (param: any): void => {
         //   pages.create_init_user_resources(param.user);
