@@ -77,7 +77,7 @@ export namespace ResourcesModule {
          * @param initresources
          * @returns none
          */
-        public create_init_resources(userid:string,initresources: any[], callback: (error: any, result: any) => void): void {
+        public create_init_resources(userid: string, initresources: any[], callback: (error: any, result: any) => void): void {
             if (initresources) {
                 if (initresources.length > 0) {
                     let save = (doc: any): any => {
@@ -110,91 +110,7 @@ export namespace ResourcesModule {
                                     }).catch((error): void => {
                                         reject(error);
                                     });
-                                }  else {
-                                    resolve({});
-                                }
-
-                          /*      else {
-                                    page.remove().then(() => {
-                                        let page: any = new ResourceModel();
-                                        page.userid = userid;
-                                        page.namespace = namespace;
-                                        page.name = localname;
-                                        page.type = type;
-                                        let resource = "";
-                                        try {
-                                            fs.statSync(filename);
-                                            resource = fs.readFileSync(filename, 'utf-8');
-                                        } catch (e) {
-                                            reject(e);
-                                        }
-                                        page.content = {type: content.type, resource: resource};
-                                        page.open = true;
-                                        page.save().then(() => {
-                                            resolve({});
-                                        }).catch((error): void => {
-                                            reject(error);
-                                        });
-                                    }).catch((error: any): void => {
-                                        reject(error);
-                                    });
-                                }*/
-                            });
-                        })
-                    };
-                    let docs = initresources;
-                    Promise.all(docs.map((doc: any): void => {
-                        return save(doc);
-                    })).then((results: any[]): void => {
-                        callback(null, results);
-                    }).catch((error: any): void => {
-                        callback(error, null);
-                    });
-                } else {
-                    callback(null, null);
-                }
-            }
-
-        }
-
-        /**
-         * @param initresources
-         * @returns none
-         */
-        public create_resources(userid:string,namespace:string, initresources: any[], callback: (error: any, result: any) => void): void {
-            if (initresources) {
-                if (initresources.length > 0) {
-                    let save = (doc: any): any => {
-                        return new Promise((resolve: any, reject: any): void => {
-
-                            let filename = process.cwd() + doc.path + '/' + doc.name;
-                        //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
-                            let localname: string = Resource.localname(doc.name);
-                            let type: string = doc.type;
-                            let content: any = doc.content;
-
-                            Wrapper.FindOne(null, 1000, ResourceModel, Resource.make_query(userid, type, localname, namespace), (response: any, page: any): void => {
-                                if (!page) {
-                                    let page: any = new ResourceModel();
-                                    page.userid = userid;
-                                    page.namespace = namespace;
-                                    page.name = localname;
-                                    page.type = type;
-                                    let resource = "";
-                                    try {
-                                        fs.statSync(filename);
-                                        resource = fs.readFileSync(filename, 'utf-8');
-                                    } catch (e) {
-                                        reject(e);
-                                    }
-                                    page.content = {type: content.type, resource: resource};
-                                    page.open = true;
-                                    page.save().then(() => {
-                                        resolve({});
-                                    }).catch((error): void => {
-                                        reject(error);
-                                    });
-                                }  else {
+                                } else {
                                     resolve({});
                                 }
 
@@ -241,6 +157,89 @@ export namespace ResourcesModule {
 
         }
 
+        /**
+         * @param initresources
+         * @returns none
+         */
+        public create_resources(userid: string, namespace: string, initresources: any[], callback: (error: any, result: any) => void): void {
+            if (initresources) {
+                if (initresources.length > 0) {
+                    let save = (doc: any): any => {
+                        return new Promise((resolve: any, reject: any): void => {
+
+                            let filename = process.cwd() + doc.path + '/' + doc.name;
+                            //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
+                            let localname: string = Resource.localname(doc.name);
+                            let type: string = doc.type;
+                            let content: any = doc.content;
+
+                            Wrapper.FindOne(null, 1000, ResourceModel, Resource.make_query(userid, type, localname, namespace), (response: any, page: any): void => {
+                                if (!page) {
+                                    let page: any = new ResourceModel();
+                                    page.userid = userid;
+                                    page.namespace = namespace;
+                                    page.name = localname;
+                                    page.type = type;
+                                    let resource = "";
+                                    try {
+                                        fs.statSync(filename);
+                                        resource = fs.readFileSync(filename, 'utf-8');
+                                    } catch (e) {
+                                        reject(e);
+                                    }
+                                    page.content = {type: content.type, resource: resource};
+                                    page.open = true;
+                                    page.save().then(() => {
+                                        resolve({});
+                                    }).catch((error): void => {
+                                        reject(error);
+                                    });
+                                } else {
+                                    resolve({});
+                                }
+
+                                /*      else {
+                                          page.remove().then(() => {
+                                              let page: any = new ResourceModel();
+                                              page.userid = userid;
+                                              page.namespace = namespace;
+                                              page.name = localname;
+                                              page.type = type;
+                                              let resource = "";
+                                              try {
+                                                  fs.statSync(filename);
+                                                  resource = fs.readFileSync(filename, 'utf-8');
+                                              } catch (e) {
+                                                  reject(e);
+                                              }
+                                              page.content = {type: content.type, resource: resource};
+                                              page.open = true;
+                                              page.save().then(() => {
+                                                  resolve({});
+                                              }).catch((error): void => {
+                                                  reject(error);
+                                              });
+                                          }).catch((error: any): void => {
+                                              reject(error);
+                                          });
+                                      }*/
+                            });
+                        })
+                    };
+                    let docs = initresources;
+                    Promise.all(docs.map((doc: any): void => {
+                        return save(doc);
+                    })).then((results: any[]): void => {
+                        callback(null, results);
+                    }).catch((error: any): void => {
+                        callback(error, null);
+                    });
+                } else {
+                    callback(null, null);
+                }
+            }
+
+        }
 
         /**
          * @param request
@@ -374,7 +373,7 @@ export namespace ResourcesModule {
             const number: number = 1400;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
-            let query: any =  Wrapper.Decode(request.params.query);
+            let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, number, ResourceModel, {$and: [{namespace: namespace}, {userid: userid}, query]}, {}, option, (response: any, pages: any): any => {
                 _.forEach(pages, (page) => {
@@ -404,15 +403,14 @@ export namespace ResourcesModule {
             });
         }
 
-
         /**
          * @param request
          * @param response
          * @returns none
          */
-        public namespaces(userid:string, callback:any): void {
+        public namespaces(userid: string, callback: any): void {
             const number: number = 1400;
-            ResourceModel.find( {userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
+            ResourceModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
                 let result = [];
                 _.forEach(pages, (page) => {
                     if (page.namespace) {
@@ -422,6 +420,31 @@ export namespace ResourcesModule {
                 callback(null, _.uniqBy(result));
             }).catch((error: any): void => {
                 callback(error, null);
+            });
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public get_all_mimetypes(request: any, response: any): void {
+            const number: number = 2800;
+            let userid: string = Resource.userid(request);
+            let namespace: string = Resource.namespace(request);
+            ResourceModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {
+                "content.type": 1,
+                "_id": 0
+            }, {}).then((pages: any): void => {
+                let result = [];
+                _.forEach(pages, (page) => {
+                    if (page.content.type) {
+                        result.push(page.content.type);
+                    }
+                });
+                Wrapper.SendSuccess(response, _.uniqBy(result));
+            }).catch((error: any): void => {
+                Wrapper.SendError(response, 2, "mimetype", error);
             });
         }
 
@@ -468,7 +491,7 @@ export namespace ResourcesModule {
                     ResourceModel.findOne({$and: [{name: page_name}, {namespace: namespace}, {userid: userid}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
                             let content = doc.content.resource;
-                            let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid,namespace, params, true, {
+                            let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
                                 "Default": ArticleModel,
                                 "Account": LocalAccount,
                                 "Article": ArticleModel
@@ -515,7 +538,7 @@ export namespace ResourcesModule {
                     ResourceModel.findOne({$and: [{name: page_name}, {userid: userid}, {namespace: namespace}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
                             let content = doc.content.resource;
-                            let datasource = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid,namespace, params, false, {
+                            let datasource = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid, namespace, params, false, {
                                 "Default": ArticleModel,
                                 "Account": LocalAccount,
                                 "Article": ArticleModel
@@ -548,7 +571,7 @@ export namespace ResourcesModule {
             });
         }
 
-        public render_direct(request: { params: { userid: string,page: string, namespace: string } }, callback: (error: { code: number, message: string }, result: any) => void): void {
+        public render_direct(request: { params: { userid: string, page: string, namespace: string } }, callback: (error: { code: number, message: string }, result: any) => void): void {
             let userid: string = request.params.userid;
             let namespace: string = request.params.namespace;
             Pages.retrieve_account(userid, (error, account) => {
@@ -576,7 +599,7 @@ export namespace ResourcesModule {
             let namespace = "";
             ResourceModel.findOne({$and: [{userid: userid}, {namespace: namespace}, {name: page_name}, {type: 20}]}).then((doc: any): void => {
                 if (doc) {
-                    let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid,namespace, null, true, {});
+                    let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, null, true, {});
                     HtmlScannerModule.Builder.Resolve(doc.content.resource, datasource, object, (error: { code: number, message: string }, result: string): void => {
                         if (!error) {
                             callback(null, {content: result, type: "text/html"})

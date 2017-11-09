@@ -185,9 +185,15 @@ if (config_seed) {
         const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
 
         if (config.db.user) {
-            mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
+            mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options)
+                .catch((error) => {
+                    console.log(error.message);
+                });
         } else {
-            mongoose.connect("mongodb://" + config.db.address + "/" + config.db.name, options);
+            mongoose.connect("mongodb://" + config.db.address + "/" + config.db.name, options)
+                .catch((error) => {
+                    console.log(error.message);
+                });
         }
 
         //     process.on('uncaughtException', (error: any): void => {

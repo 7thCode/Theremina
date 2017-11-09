@@ -190,7 +190,8 @@ export namespace FileModule {
                                     conn.db.collection('fs.files', (error: any, collection: any): void => {
                                         if (!error) {
                                             if (collection) {
-                                                collection.ensureIndex({
+                                                // ensureIndex
+                                                collection.createIndex({
                                                     "filename": 1,
                                                     "metadata.namespace": 1,
                                                     "metadata.userid": 1
@@ -275,7 +276,8 @@ export namespace FileModule {
                                     conn.db.collection('fs.files', (error: any, collection: any): void => {
                                         if (!error) {
                                             if (collection) {
-                                                collection.ensureIndex({
+                                                // ensureIndex
+                                                collection.createIndex({
                                                     "filename": 1,
                                                     "metadata.namespace": 1,
                                                     "metadata.userid": 1
@@ -287,7 +289,7 @@ export namespace FileModule {
                                                                 let filename = doc.name;
                                                                 let mimetype = doc.content.type;
                                                                 let type: number = doc.type;
-                                                                let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
+                                                                let query = {$and: [{filename: filename}, {namespace:namespace}, {"metadata.userid": userid}]};
 
                                                                 collection.findOne(query, (error: any, item: any): void => {
                                                                     if (!error) {
