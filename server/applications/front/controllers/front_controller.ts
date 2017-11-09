@@ -279,7 +279,11 @@ export namespace FrontModule {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
+                } else {
+                    Wrapper.SendError(response, 200,"resource not found.", {code:200, message:"resource not found."});
                 }
+            } else {
+                Wrapper.SendError(response, 100,"resource set not found.", {code:100, message:"resource set not found."});
             }
         }
     }

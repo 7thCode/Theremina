@@ -44,47 +44,47 @@ export namespace PageRouter {
             fonts: webfonts
         });
     }]);
+    /*
+        router.get("/sitemap.xml", [(request: any, response: any): void => {
+            let result = "";
 
-    router.get("/sitemap.xml", [(request: any, response: any): void => {
-        let result = "";
-
-        function MakeSitemap() {
-            return new Promise((resolve, reject): void => {
-                LocalAccount.find().then((accounts: any): void => {
-                    _.forEach(accounts, (account) => {
-                        ResourceModel.find({$and: [{type: 20}, {"content.type": "text/html"}, {userid: account.userid}]}).then((pages: any): void => {
-                            ArticleModel.find({$and: [{type: 0}, {userid: account.userid}]}).then((docs: any): void => {
-                                _.forEach(pages, (page: any): void => {
-                                    _.forEach(docs, (doc: any): void => {
-                                        let url = config.protocol + "://" + config.domain + "/" + account.userid + "/doc/" + page.name + "/" + doc.name;
-                                        let priority = "1.0";
-                                        result += '<url><loc>' + url + '</loc><priority>' + priority + '</priority></url>';
+            function MakeSitemap() {
+                return new Promise((resolve, reject): void => {
+                    LocalAccount.find().then((accounts: any): void => {
+                        _.forEach(accounts, (account) => {
+                            ResourceModel.find({$and: [{type: 20}, {"content.type": "text/html"}, {userid: account.userid}]}).then((pages: any): void => {
+                           //     ArticleModel.find({$and: [{type: 0}, {userid: account.userid}]}).then((docs: any): void => {
+                                    _.forEach(pages, (page: any): void => {
+                                      //  _.forEach(docs, (doc: any): void => {
+                                            let url = config.protocol + "://" + config.domain + "/" + account.userid + "/doc/" + page.name;
+                                            let priority = "1.0";
+                                            result += '<url><loc>' + url + '</loc><priority>' + priority + '</priority></url>';
+                                      //  });
                                     });
-                                });
-                                resolve(result);
+                                    resolve(result);
+                         //       });
+                            }).catch((error: any): void => {
+                                reject(error);
                             });
-                        }).catch((error: any): void => {
-                            reject(error);
                         });
+                    }).catch((error: any): void => {
+                        reject(error);
                     });
-                }).catch((error: any): void => {
-                    reject(error);
                 });
+            }
+
+            MakeSitemap().then((value: any): void => {
+                let r = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+                    result
+                    + '</urlset>';
+                response.setHeader('Content-Type', 'text/xml');
+                response.send(r);
+            }).catch((error: any): void => {
+
             });
-        }
 
-        MakeSitemap().then((value: any): void => {
-            let r = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
-                result
-                + '</urlset>';
-            response.setHeader('Content-Type', 'text/xml');
-            response.send(r);
-        }).catch((error: any): void => {
-
-        });
-
-    }]);
-
+        }]);
+    */
     router.get("/robots.txt", [(request: any, response: any): void => {
         let robots = "User-agent: *\n\nSitemap: " + config.protocol + "://" + config.domain + "/sitemap.xml";
         response.setHeader('Content-Type', 'text/plain');
@@ -120,9 +120,18 @@ export namespace PageRouter {
             next();
         }
     }]);
-
-    router.get("/index", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-        let redirect_to = applications_config.redirect["/index"];
+    /*
+        router.get("/index", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+            let redirect_to = applications_config.redirect["/index"];
+            if (redirect_to) {
+                response.redirect(302, redirect_to);
+            } else {
+                next();
+            }
+        }]);
+    */
+    router.get("/entry", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        let redirect_to = applications_config.redirect["entry"];
         if (redirect_to) {
             response.redirect(302, redirect_to);
         } else {
@@ -140,7 +149,7 @@ export namespace PageRouter {
             next();
         }
     }]);
-*/
+
     router.get("/:userid/:name", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
         let userid = request.params.userid;
         if (userid) {
@@ -154,18 +163,15 @@ export namespace PageRouter {
             next();
         }
     }]);
-
+*/
     router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-
         let items = [];
         if (applications_config.sites) {
             let keys = Object.keys(applications_config.sites);
-
             keys.forEach((key: string): void => {
                 items.push(applications_config.sites[key].description);
             });
         }
-
         result.render('applications/front/dialogs/build_site_dialog',
             {
                 message: message,
@@ -280,7 +286,6 @@ export namespace PageRouter {
             }
         });
     }]);
-
 
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
