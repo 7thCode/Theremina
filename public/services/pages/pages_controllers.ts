@@ -140,7 +140,6 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
             _Find("type", type);
             localStorage.setItem("pages_find_type", "" + type);
         };
-      
 
         $scope.mimetype = localStorage.getItem("pages_find_mime");
         let FindMime = (mime: string): any => {
@@ -148,6 +147,23 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
             localStorage.setItem("pages_find_mime", mime);
         };
 
+        $scope.all_mimetypes = [];
+        let AllMimeType = () => {
+            ResourceBuilderService.MimeTypes((result) => {
+                $scope.all_mimetypes = result;
+            }, error_handler);
+        };
+        AllMimeType();
+
+  /*
+        $scope.all_mimetypes = [
+            "all",
+            "text/html",
+            "text/css",
+            "text/javascript",
+            "application/json"
+        ];
+*/
         $scope.content = localStorage.getItem("pages_find_resource");
         let FindResource = (value: string): any => {
             _Find("content.resource", {$regex: value});

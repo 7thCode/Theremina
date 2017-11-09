@@ -57,7 +57,11 @@ let BackOfficeApplication = angular.module('BackOfficeApplication', [
     "MembersServices",
     "PagesControllers",
     "PicturesControllers",
-    "BlobControllers"
+    "BlobControllers",
+    "SVGControllers",
+    "DataControllers",
+    "DataServices",
+    "SelfControllers"
 ]);
 BackOfficeApplication.run(['$rootScope',
     function ($rootScope) {

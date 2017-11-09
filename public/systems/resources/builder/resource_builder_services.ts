@@ -36,11 +36,17 @@ ResourceBuilderServices.factory('ResourceCount', ['$resource',
         });
     }]);
 
-ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount",
-    function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any): void {
+ResourceBuilderServices.factory('MimeTypes', ['$resource',
+    ($resource: any): any => {
+        return $resource('/resources/api/mime/types', {}, {
+            get: {method: 'GET'}
+        });
+    }]);
+
+ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount","MimeTypes",
+    function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any,MimeTypes:any): void {
 
         this.InitQuery = (query: any, type: number = 0, pagesize: number = 40) => {
-
             this.option.skip = 0;
             this.option.limit = pagesize;
 
@@ -84,7 +90,6 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
             }
         };
 
-
         let init = () => {
             this.option = {limit: 40, skip: 0};
             this.InitQuery();
@@ -116,6 +121,20 @@ ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "Resource
             ResourceCount.get({
                 query: encodeURIComponent(JSON.stringify(this.query))
             }, (result: any): void => {
+                if (result) {
+                    if (result.code === 0) {
+                        callback(result.value);
+                    } else {
+                        error(result.code, result.message);
+                    }
+                } else {
+                    error(10000, "network error");
+                }
+            });
+        };
+
+        this.MimeTypes = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+            MimeTypes.get({}, (result: any): void => {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);

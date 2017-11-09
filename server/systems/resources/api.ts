@@ -23,6 +23,8 @@ export namespace ResourceApiRouter {
 
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, resource.delete_own]);
 
+    router.get("/api/mime/types", [resource.get_all_mimetypes]);
+
     router.post("/api/create", [exception.exception, exception.guard, exception.authenticate, resource.create_resource]);
     router.get("/api/query/:query/:option", [resource.get_resource_query]);
     router.get('/api/count/:query', [resource.get_resource_count]);
