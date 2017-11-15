@@ -47,7 +47,7 @@
     "mecab-async": "^0.1.0",
     "moment": "^2.18.1",
     "mongodb": "2.2.26",
-    "mongoose": "^4.12.3",
+    "mongoose": "^4.13.1",
     "morgan": "~1.7.0",
     "node-schedule": "^1.1.1",
     "nodemailer": "^3.0.2",

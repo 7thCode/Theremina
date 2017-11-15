@@ -134,14 +134,27 @@ namespace ScannerBehavior {
             this.default_query = {"userid": this.id};
 
             this.filters = {
-                date: (result: string, param: string) => {
+                date: (result: string, param: string):string => {
                     try {
                         let format: string = "MM/DD";
                         if (param) {
                             format = param;
                         }
+                        moment.locale("ja", {
+                            weekdays: ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
+                            weekdaysShort: ["日", "月", "火", "水", "木", "金", "土"]
+                        });
+                        moment.locale("ja");
                         let date: any = moment(result);
                         result = date.format(format);
+                    } catch (e) {
+
+                    }
+                    return result;
+                },
+                substr: (result: string, param: string):string => {
+                    try {
+                        result = result.substr(0,parseInt(param)) + "...";
                     } catch (e) {
 
                     }
@@ -161,7 +174,7 @@ namespace ScannerBehavior {
             }
             return result;
         }
-
+//{"content.date.value":{"$gte":ISODate("2014-04-01T12:34:55+09:00"),"$lte":ISODate("2014-04-01T12:34:57+09:00")}}
         public GetDatasource(query: any, parent: any): any {// db query
 
             let query_object: any = this.ParseQueryFormat(query);
@@ -169,9 +182,9 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = {"$and": [this.default_query, JSON.parse(query_object.q)]};
+                   _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
-
+let a = 1;
                 }
             }
 
@@ -222,7 +235,7 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                    _query = {"$and": [this.default_query, JSON.parse(query_object.q)]};
+                    _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
 
                 }

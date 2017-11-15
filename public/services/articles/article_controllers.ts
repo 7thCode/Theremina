@@ -150,6 +150,9 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                                             case "html" :
                                                 type = "html";
                                                 break;
+                                            case "date" :
+                                                type = "date";
+                                                break;
                                             default:
                                                 type = "quoted";
                                         }
@@ -161,6 +164,9 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                                         switch (control.type) {
                                             case "html" :
                                                 type = "html";
+                                                break;
+                                            case "date" :
+                                                type = "date";
                                                 break;
                                             default:
                                                 type = "quoted";
