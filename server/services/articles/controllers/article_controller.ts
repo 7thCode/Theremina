@@ -95,6 +95,8 @@ export namespace ArticleModule {
                             }
                         } else if (content.type == "html") {
                             article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
+                        } else if (content.type == "date") {
+                            article.content[key].value = new Date(content.value);
                         }
                     });
                     article.open = true;

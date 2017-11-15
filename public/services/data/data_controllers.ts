@@ -144,6 +144,9 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                                                 case "html" :
                                                     type = "html";
                                                     break;
+                                                case "date" :
+                                                    type = "date";
+                                                    break;
                                                 default:
                                             }
                                         }

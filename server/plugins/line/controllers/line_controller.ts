@@ -16,20 +16,20 @@ export namespace LineModule {
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const Wrapper = share.Wrapper;
 
+    const Watson: any = require(share.Server("plugins/watson/modules/watson_module")).Watson;
     const ContextModel: any = require(share.Models("plugins/context/context"));
     const plugins_config = share.plugins_config;
 
-    const watson = require('watson-developer-cloud');
-
+ //   const watson = require('watson-developer-cloud');
+/*
     const conversation = watson.conversation({
         username: "e10b9084-d755-4b1b-bcd7-58f14aad1eb5",
         password: "PZJDFO5nq8pd",
         version: 'v1',
         version_date: '2017-05-26'
     });
-
+*/
     export class Line {
 
         constructor() {
@@ -55,14 +55,14 @@ export namespace LineModule {
          * @param callback
          * @returns none
          */
-        static tell_watson(message: string, context: any, callback: (error: any, watson_response: any) => void): void {
+ /*       static tell_watson(message: string, context: any, callback: (error: any, watson_response: any) => void): void {
             conversation.message({
-                workspace_id: "45e5e0ef-b7d8-494b-b926-e03b3e1b3311",
+                workspace_id: "07cd3b4e-438f-443e-beea-97ec7bba71e4",
                 input: {'text': message},
                 context: context
             }, callback);
         }
-
+*/
         /**
          * @param request
          * @param response
@@ -84,9 +84,9 @@ export namespace LineModule {
                         ContextModel.findOne({$and: [{userid: line_event.source.userId}, {type: "line"}]})
                             .then((result: any): void => {
 
-                                Line.tell_watson(line_event.message.text, result.context, (error: any, watson_response: any) => {
+                                Watson.tell(line_event.message.text, result.context, (error: any, watson_response: any) => {
+                            //    Line.tell_watson(line_event.message.text, result.context, (error: any, watson_response: any) => {
                                     if (!error) {
-
                                         if (result) {
                                             result.context = watson_response.context;
                                         } else {// firsttime
