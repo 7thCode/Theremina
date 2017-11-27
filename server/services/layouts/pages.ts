@@ -77,14 +77,9 @@ export namespace LayoutsPageRouter {
         result.render('services/layouts/builder/dialogs/delete_confirm_dialog', {message: message});
     }]);
 
-
-
-
     router.get("/render/:userid/:name", [exception.page_catch, (request: any, response: any): void => {
         LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
     }]);
-
-
 
     // router.get('/dialogs/send_confirm_dialog', (req: any, result: any, next: any) => {
     //     result.render('systems/layouts/dialogs/send_confirm_dialog', {});

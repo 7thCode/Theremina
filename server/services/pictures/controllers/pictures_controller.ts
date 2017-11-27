@@ -107,7 +107,7 @@ export namespace PicturesModule {
          * @param next
          * @returns none
          */
-        public get_picture(request: any, response: any, next: any): void {
+        public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
             try {
                 let conn = Pictures.connect(config.db.user);
                 let namespace: string = request.params.namespace;

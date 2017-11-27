@@ -428,6 +428,38 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                 }
             }
         }, error_handler);
+
+
+
+        //tinymce
+        $scope.tinymceOptions =
+            {
+                selector: "textarea",  // change this value according to your HTML
+                height: 500,
+                theme: 'modern',
+                plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+                toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+                menubar: "table"
+            };
+            /*{
+            selector: 'textarea',
+            height: 500,
+            theme: 'modern',
+            plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+            toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+            image_advtab: true,
+            templates: [],
+            content_css: ['//fonts.googleapis.com/css?family=Lato:300,300i,400,400i'],
+            menubar: "table tools",
+            toolbar: "code"
+        } */
+
+        //froala
+    //    $scope.froalaOptions = {
+    //        toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+    //    };
+
+
         /*
                 $scope.scenario = [
                     {

@@ -10,7 +10,9 @@ let BackOfficeApplication: any = angular.module('BackOfficeApplication', [
     'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable','angular-loading-bar',
 
     'ngSanitize',
-    'textAngular',
+    'textAngular',//textAngular
+    'ui.tinymce',//tinyMCE
+    //'froala',//froala
 
     "Services",
     'FrontControllers',

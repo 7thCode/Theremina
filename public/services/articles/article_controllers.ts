@@ -392,6 +392,23 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             });
         };
 
+        //tinymce
+        $scope.tinymceOptions = {
+            onChange: function(e) {
+                // put logic here for keypress and cut/paste changes
+            },
+            inline: false,
+            plugins : 'advlist autolink link image lists charmap print preview',
+            skin: 'lightgray',
+            theme : 'modern'
+        };
+
+
+        //froala
+  //      $scope.froalaOptions = {
+   //         toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+   //     };
+
         $scope.opened = false;
         //    $scope.Notify = Notify;
         $scope.Selected = Selected;

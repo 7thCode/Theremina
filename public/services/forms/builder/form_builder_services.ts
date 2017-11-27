@@ -1263,12 +1263,13 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             return new_field;
         };
 
+        /*
         this.HtmlElement = (label: string, validator: any): any => {
             let parent_id: any = FormBuilderService.ParentId("root");
             let id = FormBuilderService.CreateId("root");
 
             let attribute = (id, val) => {
-                return {class:"", "text-angular":"true", "ng-model": id, type: "text", style: {}};
+                return {class:"", "ui-tinymce":" tinymceOptions", "ng-model": id, type: "text", style: {}};
             };
 
             let new_field: any = {
@@ -1321,6 +1322,130 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_field;
         };
+
+*/
+        this.HtmlElement = (label: string, validator: any): any => {
+            let parent_id: any = FormBuilderService.ParentId("root");
+            let id = FormBuilderService.CreateId("root");
+
+            let attribute = (id, val) => {
+
+                let result = {class: "form-control no-zoom textarea-control","ui-tinymce":" tinymceOptions", "ng-model": id, type: "text", name: id, style: {}};
+
+                if (val.max.message) {
+                    result["ng-maxlength"] = val.max.value;
+                }
+                if (val.min.message) {
+                    result["ng-minlength"] = val.min.value;
+                }
+                if (val.required.message) {
+                    result["required"] = val.required.value;
+                }
+
+                return result;
+            };
+
+            let new_field: any = {
+                kind: "control",
+                type: "html",
+                id: id,
+                value: validator,
+                elements: [
+                    {
+                        type: "div",
+                        id: id,
+                        parent: parent_id,
+                        editable: true,
+
+                        label: "",
+                        attributes: {class: "form-group", style: {}},
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "label",
+                        id: id + "_fieldlabel",
+                        parent: id,
+
+                        label: "",
+                        attributes: {for: id + "_fieldinput", class:"textarea-label"},
+                        contents: label,
+                        events: {}
+                    },
+                    {
+                        type: "span",
+                        id: id + "_fielderrors",
+                        parent: id,
+
+                        label: "",
+                        attributes: {"ng-messages": "validate." + id + ".$error"},
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "textarea",
+                        id: id + "_textarea",
+                        parent: id,
+                        label: label,
+                        attributes: attribute(id, validator),
+                        //attributes: {class: "form-control no-zoom", "ng-model": id, type: "text", name: id, style: {},"ng-maxlength": "2000", "ng-minlength": "1", required: "true"},
+                        contents: [],
+                        events: {}
+                    }
+                ]
+            };
+
+            if (validator.min) {
+                let min: any = {
+                    type: "span",
+                    id: id + "_fielderror_min",
+                    parent: id + "_fielderrors",
+
+                    label: "",
+                    attributes: {"ng-message": "minlength", class: "error-message"},
+                    contents: validator.min.message,
+                    events: {}
+                };
+                new_field.elements.push(min);
+            }
+
+            if (validator.max) {
+                let max: any = {
+                    type: "span",
+                    id: id + "_fielderror_max",
+                    parent: id + "_fielderrors",
+
+                    label: "",
+                    attributes: {
+                        "ng-message": "maxlength", class: "error-message"
+                    }
+                    ,
+                    contents: validator.max.message,
+                    events: {}
+                };
+                new_field.elements.push(max);
+            }
+
+            if (validator.required) {
+                let required: any = {
+                    type: "span",
+                    id: id + "_fielderror_required",
+                    parent: id + "_fielderrors",
+
+                    label: "",
+                    attributes: {
+                        "ng-message": "required", class: "error-message"
+                    }
+                    ,
+                    contents: validator.required.message,
+                    events: {}
+                };
+                new_field.elements.push(required);
+            }
+
+            return new_field;
+        };
+
 
         this.Img = (label: string, property:any): any => {
             let parent_id = FormBuilderService.ParentId("root");
