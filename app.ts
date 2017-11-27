@@ -364,7 +364,7 @@ if (config_seed) {
         //services
         const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
         const form: any = new FormsController.Form();
-        form.create_init_forms(services_config.initforms);
+        form.create_init_forms(applications_config.initforms);
         //services
 
         // DAV

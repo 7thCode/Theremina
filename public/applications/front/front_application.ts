@@ -10,7 +10,9 @@ let FrontApplication: any = angular.module('FrontApplication', [
     'ngMessages', "ngResource", 'ngAnimate', 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable','angular-loading-bar',
 
     'ngSanitize',
-    'textAngular',
+    'textAngular',//textAngular
+    'ui.tinymce',//tinyMCE
+    //'froala',//froala
 
     "Services",
     "AuthServices",
@@ -55,6 +57,7 @@ FrontApplication.run(['$rootScope',
         });
     }
 ]);
+
 
 FrontApplication.config(['$compileProvider', '$httpProvider',
     ($compileProvider: any, $httpProvider: any): void => {
