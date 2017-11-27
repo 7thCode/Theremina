@@ -387,7 +387,7 @@ FormPlayerServices.service('FormPlayerService', ["HtmlEdit", "FormCreate", "Form
                         break;
                 }
 
-                let hoge = HtmlEdit.toHtml(field, "");
+           //     let hoge = HtmlEdit.toHtml(field, "");
 
                 let angular_element = angular.element(HtmlEdit.toHtml(field, ""));
                 angular.element("#" + parent).append(angular_element);

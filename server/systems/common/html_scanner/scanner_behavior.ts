@@ -12,9 +12,11 @@ namespace ScannerBehavior {
     export interface Behavior {
         isdocument: boolean;
 
-        GetDatasource(query: any, parent): any;
+        GetDatasource(query: any, parent: any): any;
 
-        GetCount(query: any, parent): any;
+        GetCount(query: any, parent: any): any;
+
+        Aggregate(query: any, parent: any): any;
 
         GetUrl(target_url_string: string, parent): any;
 
@@ -134,7 +136,7 @@ namespace ScannerBehavior {
             this.default_query = {"userid": this.id};
 
             this.filters = {
-                date: (result: string, param: string):string => {
+                date: (result: string, param: string): string => {
                     try {
                         let format: string = "MM/DD";
                         if (param) {
@@ -152,9 +154,9 @@ namespace ScannerBehavior {
                     }
                     return result;
                 },
-                substr: (result: string, param: string):string => {
+                substr: (result: string, param: string): string => {
                     try {
-                        result = result.substr(0,parseInt(param)) + "...";
+                        result = result.substr(0, parseInt(param)) + "...";
                     } catch (e) {
 
                     }
@@ -163,10 +165,33 @@ namespace ScannerBehavior {
             }
         }
 
-        private ParseQueryFormat(query: any) {
+
+        private ParseQueryFormat(query: string) {
             let result = null;
-            if (query == "#query:self") {
-                result = this.page_params;
+            if (query[0] == "#") {
+                let field_name: string = "";
+                let postfix: string = "";
+                let split_field_name: string[] = query.split(":");
+                if (split_field_name) {
+                    field_name = split_field_name[0];
+                    if (split_field_name.length == 2) {
+                        postfix = split_field_name[1];
+                    }
+                }
+                switch (field_name) {
+                    case "#query" :
+                        switch (postfix) {
+                            case "self":
+                                result = this.page_params;
+                                break;
+                            default:
+                                let params: any = new Params();
+                                params.FromQueryFormat(this.page_params[postfix]);
+                                result = params.ToParams();
+                        }
+                        break;
+                    default:
+                }
             } else {
                 let params: any = new Params();
                 params.FromQueryFormat(query);
@@ -174,6 +199,7 @@ namespace ScannerBehavior {
             }
             return result;
         }
+
 //{"content.date.value":{"$gte":ISODate("2014-04-01T12:34:55+09:00"),"$lte":ISODate("2014-04-01T12:34:57+09:00")}}
         public GetDatasource(query: any, parent: any): any {// db query
 
@@ -182,9 +208,9 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-                   _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
+                    _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
-let a = 1;
+
                 }
             }
 
@@ -254,6 +280,34 @@ let a = 1;
             return model.count(_query).exec();
         }
 
+        public Aggregate(query: any, parent: any): any {// db query
+
+            let query_object: any = this.ParseQueryFormat(query);
+
+            let _query: any = this.default_query;
+            let aggrigate: any = [{$match:_query}];
+            if (query_object.ag) {
+                try {
+                    JSON.parse(query_object.ag).forEach((filter) => {
+                        aggrigate.push(filter);
+                    });
+                } catch (e) {
+                }
+            }
+
+            let collection: any = "";
+            if (query_object.co) {
+                collection = query_object.co;
+            }
+
+            let model: any = this.models[collection];
+            if (!model) {
+                model = this.models["Default"];
+            }
+
+            return model.aggregate(aggrigate).exec();
+        }
+
         public GetUrl(target_url_string: string, parent: any): any {// url
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
@@ -261,11 +315,11 @@ let a = 1;
 
             //let target_url: any = url.parse(resolved_url_string);
 
-          //  let host: string = target_url.host;
-          //  if (host) {
-          //      host_string = host;
-          //  }
-          //  let url_string: string = host_string + resolved_url_string;
+            //  let host: string = target_url.host;
+            //  if (host) {
+            //      host_string = host;
+            //  }
+            //  let url_string: string = host_string + resolved_url_string;
             let options: any = {
                 uri: target_url,
                 method: "GET",
@@ -393,10 +447,10 @@ let a = 1;
                                         case "prev":
                                             result = this.Prev(this.page_params);
                                             break;
-
                                         case "self":
-                                        default:
                                             result = this.Query(this.page_params);
+                                            break;
+                                        default:
                                     }
                                     break;
                                 case "#pager" : {
@@ -482,6 +536,10 @@ let a = 1;
 
             if (query_object.so) {
                 params.push("so=" + encodeURIComponent(query_object.so));
+            }
+
+            if (query_object.ag) {
+                params.push("ag=" + encodeURIComponent(query_object.ag));
             }
 
             if (query_object.l) {

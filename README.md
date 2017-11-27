@@ -228,7 +228,9 @@
 
     特殊なfield_name”#query:self”は、現在参照されているpageのURLに含まれるqueryフィールドと置換される。
     ドキュメント内で使用可能 
-    参照URL内で使用可能        
+    参照URL内で使用可能 
+    
+    "#query:hoge"は、参照URLの"hoge"クエリーフィールドを参照する。（クエリー継承)   
      
 #####Pagenation
 
@@ -258,7 +260,7 @@
       
       特殊なfield_name"#hasnext"は、現在のクエリーによって得られる結果の後に要素がある場合は真となる
                      
-                                    
+                                   
 ####クエリー式
 
     現状は、公開されたcollection名とMongoDBのクエリー式,limit,skip,sortを以下のように連結したもの。
@@ -268,6 +270,37 @@
     を一つの要素とし、複数の要素を連結する。
     
     co::Article;q::{"content.type.value":"a"};l::10;s::2;so::{"name":1};      
+    
+    
+####クエリー継承
+
+    "#query:hoge"によって参照URLの"hoge"クエリーフィールドを参照可能。（クエリー継承)   
+      
+    http://xxxx.xxxx.xxxx/xxxx.html?s=4&**hoge**=q::{"content.theme.value":"theme3"}
+    
+    で示されるテンプレート内で、
+    
+      <ds:foreach query='#query:hoge'>
+         <ds:div>{content.theme.value}</ds:div>
+      </ds:foreach> 
+    
+    は
+    
+       <ds:foreach query='q::{"content.theme.value":"theme3"}'>
+            <ds:div>{content.theme.value}</ds:div>
+       </ds:foreach>
+          
+          
+          
+####アグリゲーション式
+
+    現状は、公開されたcollection名とMongoDBのクエリー式,limit,skip,sortを以下のように連結したもの。
+    
+    key::name;
+    
+    を一つの要素とし、複数の要素を連結する。
+    
+    co::Article;ag::[{"$group": {"_id":"$content.theme.value", "count": {"$sum": 1}}}];  
     
 #####Include
 
@@ -331,10 +364,15 @@
   
 #####foreach
     
-
+    query    
     <ds:foreach query='query'></ds:foreach>
     
+    scope
     <ds:foreach scope='field_name'></ds:foreach>
+    
+    aggrigation
+    <ds:foreach aggrigate='aggrigate'></ds:foreach>
+
 
     <hoge ds:attr='field_formula'>
 

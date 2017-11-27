@@ -26,8 +26,8 @@ export namespace DataPageRouter {
 
     const applications_config = share.applications_config;
 
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resources = new ResourcesModule.Pages;
+    //const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+    //const resources = new ResourcesModule.Pages;
 
     let message = config.message;
 

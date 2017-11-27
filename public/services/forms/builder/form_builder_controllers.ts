@@ -1204,6 +1204,25 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
         $scope.components = true;
         $scope.attributes = true;
 
+
+        //tinymce
+        $scope.tinymceOptions = {
+            onChange: function(e) {
+                // put logic here for keypress and cut/paste changes
+            },
+            inline: false,
+            plugins : 'advlist autolink link image lists charmap print preview',
+            skin: 'lightgray',
+            theme : 'modern'
+        };
+
+//froala
+   //     $scope.froalaOptions = {
+   //         toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+   //     };
+
+
+
     }]);
 
 FormBuilderControllers.controller('FormBuilderAddStyleDialogController', ['$uibModalInstance', 'items',

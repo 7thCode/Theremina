@@ -8,7 +8,7 @@ namespace HTMLScanner {
     const _ = require('lodash');
 
     const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
+    const {JSDOM} = jsdom;
 
     const PREFIX: string = "ds";
 
@@ -37,24 +37,24 @@ namespace HTMLScanner {
             return splited_name[splited_name.length - 1];
         }
 
-        protected ScanChild(node: any, data: any, position:number): void {
+        protected ScanChild(node: any, data: any, position: number): void {
             if (node) {
                 let childnodes: any[] = node.childNodes;
                 this.depth++;
                 if (childnodes) {
                     _.forEach(childnodes, (node: any, index: number): void => {
                         this.position = index;
-                        this.ScanNode(node, data,position);
+                        this.ScanNode(node, data, position);
                     });
                 }
                 this.depth--;
             } else {
-                this.callback({code: 1,message:"ScanChild node is null."}, null);
+                this.callback({code: 1, message: "ScanChild node is null."}, null);
             }
         }
 
-        protected ScanNode(node: any, data: any,position:number): void {
-            this.ScanChild(node, data,position);
+        protected ScanNode(node: any, data: any, position: number): void {
+            this.ScanChild(node, data, position);
         }
 
         public ScanHtml(source: string): any {
@@ -69,7 +69,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:"ScanHTML dom is null."}, null);
+                this.callback({code: 1, message: "ScanHTML dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -105,7 +105,7 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: any, data: any,position:number): void {
+        protected ScanNode(node: any, data: any, position: number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -119,10 +119,10 @@ namespace HTMLScanner {
                         }
                         break;
                     default:
-                        this.ScanChild(node, data,position);
+                        this.ScanChild(node, data, position);
                 }
             } else {
-                this.callback({code: 1,message:"ScanNode node is null,"}, null);
+                this.callback({code: 1, message: "ScanNode node is null,"}, null);
             }
         }
 
@@ -151,6 +151,8 @@ namespace HTMLScanner {
             let result: any = null;
             try {
                 let query: any = node.attributes.query.nodeValue;
+
+
                 result = this.datasource.GetDatasource(query, this);
             } catch (e) {
                 this.callback(e, null);
@@ -169,7 +171,18 @@ namespace HTMLScanner {
             return result;
         }
 
-        protected ScanNode(node: any, data: any,position:number): void {
+        private Aggregate(node: any): any {
+            let result: any = null;
+            try {
+                let aggrigate: any = node.attributes.aggrigate.nodeValue;
+                result = this.datasource.Aggregate(aggrigate, this);
+            } catch (e) {
+                this.callback(e, null);
+            }
+            return result;
+        }
+
+        protected ScanNode(node: any, data: any, position: number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -195,12 +208,20 @@ namespace HTMLScanner {
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) {
-                                                let query: any = node.attributes["query"];
+                                            if (node.attributes.query) {
+                                                let query: any = node.attributes.query;
                                                 this.datasource_promises.push({
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
                                                     count: this.PromisedDataCount(node),
+                                                    resolved: ""
+                                                });
+                                            } else if (node.attributes.aggrigate) {
+                                                let aggrigate: any = node.attributes.aggrigate;
+                                                this.datasource_promises.push({
+                                                    name: aggrigate.nodeValue,
+                                                    promise: this.Aggregate(node),
+                                                    count: null,
                                                     resolved: ""
                                                 });
                                             }
@@ -210,15 +231,15 @@ namespace HTMLScanner {
                                 default:
                                     break;
                             }
-                            this.ScanChild(node, data,position);
+                            this.ScanChild(node, data, position);
                         } else {
-                            this.callback({code: 1,message:"ScanNode tagname is null"}, null);
+                            this.callback({code: 1, message: "ScanNode tagname is null"}, null);
                         }
                         break;
                     default:
                 }
             } else {
-                this.callback({code: 2,message:"ScanNode node is null"}, null);
+                this.callback({code: 2, message: "ScanNode node is null"}, null);
             }
         }
 
@@ -235,7 +256,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:"ResolveDataSource dom is null."}, null);
+                this.callback({code: 1, message: "ResolveDataSource dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {// Promise all(record) then Prmise All(count)
@@ -292,7 +313,7 @@ namespace HTMLScanner {
 
             // resolve all [record reference] in document.
             Promise.all(this.datasource_promises.map((doc: any): void => {
-                let result1:any = null;
+                let result1: any = null;
                 if (doc.promise) {
                     result1 = doc.promise;
                 }
@@ -304,7 +325,7 @@ namespace HTMLScanner {
                 });
 
                 Promise.all(this.datasource_promises.map((doc: any): void => {
-                    let result2:any = null;
+                    let result2: any = null;
                     if (doc.count) {
                         result2 = doc.count;
                     }
@@ -322,9 +343,6 @@ namespace HTMLScanner {
             }).catch((error: any): void => {
                 this.callback(error, null);
             });
-
-
-
         }
 
     }
@@ -384,7 +402,7 @@ namespace HTMLScanner {
             }
         }
 
-        protected ScanNode(node: { nodeType: number, localName: string, attributes: { src: { nodeValue: string } } }, data: any, position:number): void {
+        protected ScanNode(node: { nodeType: number, localName: string, attributes: { src: { nodeValue: string } } }, data: any, position: number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -423,7 +441,7 @@ namespace HTMLScanner {
                     default:
                 }
             } else {
-                this.callback({code: 1,message:"ScanNode node is null."}, null);
+                this.callback({code: 1, message: "ScanNode node is null."}, null);
             }
         }
 
@@ -439,7 +457,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:"ResolveUrl dom is null."}, null);
+                this.callback({code: 1, message: "ResolveUrl dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -457,7 +475,7 @@ namespace HTMLScanner {
                 }).catch((error: any): void => {
                     switch (error.statusCode) {
                         case 404:
-                            this.callback({code:404, message:error.options.uri}, null);
+                            this.callback({code: 404, message: error.options.uri}, null);
                             break;
                         default:
                             this.callback(error, null);
@@ -474,20 +492,20 @@ namespace HTMLScanner {
         public ResolveUrl2(childnodes: any, result: any): any {
 
             if (childnodes) {
-                _.forEach(childnodes, (element:any, index:number):void => {
+                _.forEach(childnodes, (element: any, index: number): void => {
                     this.position = index;
                     this.ScanNode(element, null, 0);
                 });
             }
 
             Promise.all(this.url_promises.map((doc: any): void => {
-                let promise:any = null;
+                let promise: any = null;
                 if (doc.promise) {
                     promise = doc.promise;
                 }
                 return promise;
             })).then((resolved: any[]): void => {
-                _.forEach(resolved, (entry:any, index:number) :void => {
+                _.forEach(resolved, (entry: any, index: number): void => {
                     result[this.url_promises[index].name] = {content: entry, count: 1};
                 });
                 this.callback(null, result);
@@ -526,7 +544,7 @@ namespace HTMLScanner {
 
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        private Meta(node: any, data: any,position:number): void {
+        private Meta(node: any, data: any, position: number): void {
             let resolved: boolean = false;
             if (node.attributes) {
                 let number = node.attributes.length;
@@ -537,7 +555,7 @@ namespace HTMLScanner {
                     if (prefix == PREFIX) {
                         switch (localname) {
                             case "include":
-                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue],position, this);
+                                this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], position, this);
                                 resolved = true;
                                 break;
                             case "title": {
@@ -549,7 +567,7 @@ namespace HTMLScanner {
                                         this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
                                             content: attribute.value,
                                             count: 1
-                                        }, position,this) + '</title>';
+                                        }, position, this) + '</title>';
                                     }
                                     resolved = true;
                                 }
@@ -563,13 +581,13 @@ namespace HTMLScanner {
                                     if (datas.content.length > 0) {
                                         let first_data = datas.content[0];
 
-  /*
-                                        let name_attribute: any = node.attributes["name"];
-                                        let name = "";
-                                        if (name_attribute) {
-                                            name = 'name="' + name_attribute.nodeValue + '"';
-                                        }
-*/
+                                        /*
+                                                                              let name_attribute: any = node.attributes["name"];
+                                                                              let name = "";
+                                                                              if (name_attribute) {
+                                                                                  name = 'name="' + name_attribute.nodeValue + '"';
+                                                                              }
+                                      */
                                         let name = "";
                                         let number: number = node.attributes.length;
                                         for (var index: number = 0; index < number; index++) {
@@ -603,11 +621,11 @@ namespace HTMLScanner {
                 }
             }
             if (!resolved) {
-                this.NodeToElement(node, data,position);
+                this.NodeToElement(node, data, position);
             }
         }
 
-        private NodeToElement(node: any, data: any, position:number): void {
+        private NodeToElement(node: any, data: any, position: number): void {
             let tagname: string = node.localName;
             let attribute_string: string = "";
             if (node.attributes) {
@@ -620,7 +638,7 @@ namespace HTMLScanner {
                         attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
                             count: 1
-                        },position, this) + '"';
+                        }, position, this) + '"';
                     } else {
                         attribute_string += ' ' + attribute.name + '="' + attribute.value + '"';
                     }
@@ -652,14 +670,14 @@ namespace HTMLScanner {
             }
         }
 
-        private ResolveChildren(node: any, result: any, position:number): void {
+        private ResolveChildren(node: any, result: any, position: number): void {
             _.forEach(node.childNodes, (childnode: any, index): void => {
                 this.position = index;
                 this.ScanNode(childnode, result, position);
             })
         }
 
-        protected ScanNode(node: any, data: any,position:number): void {
+        protected ScanNode(node: any, data: any, position: number): void {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -672,33 +690,47 @@ namespace HTMLScanner {
                                 case "head":
                                 case "body":
                                     if (this.datasource.isdocument) {
-                                        this.NodeToElement(node, data,position);
+                                        this.NodeToElement(node, data, position);
                                     } else {
-                                        this.ScanChild(node, data,position);
+                                        this.ScanChild(node, data, position);
                                     }
                                     break;
                                 case "meta":
-                                    this.Meta(node, data,position);
+                                    this.Meta(node, data, position);
                                     break;
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) { // query="{}"
-                                                let query: any = node.attributes["query"];
+                                            if (node.attributes.query) { // query="{}"
+                                                let query: any = node.attributes.query;
                                                 let result: any = this.fragments[query.nodeValue].content;
                                                 if (result) {
                                                     _.forEach(result, (resolved_data, position) => {
                                                         this.ResolveChildren(node, resolved_data, position);
                                                     });
                                                 }
+                                            } else if (node.attributes.aggrigate) { // aggrigate
+                                                let aggrigate: any = node.attributes.aggrigate;
+                                                let result: any = this.fragments[aggrigate.nodeValue].content;
+                                                if (result) {
+                                                    _.forEach(result, (resolved_data, position) => {
+                                                        this.ResolveChildren(node, resolved_data, position);
+                                                    });
+                                                }
+                                            } else if (node.attributes.field) {  // field="{a.b.c}"
+                                                let field: any = node.attributes.field;
+                                                this.html += this.datasource.ResolveFormat(data, {
+                                                    content: field.nodeValue,
+                                                    count: 1
+                                                }, position, this);
                                             } else if (node.attributes.scope) { // scope="a.b.c"
                                                 if (data) {
                                                     let scope: any = node.attributes.scope;
-                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue,position, this);//fragment
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, position, this);//fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             _.forEach(result, (resolved_data, position) => {
-                                                                this.ResolveChildren(node, resolved_data,position);
+                                                                this.ResolveChildren(node, resolved_data, position);
                                                             });
                                                         }
                                                     }
@@ -707,36 +739,34 @@ namespace HTMLScanner {
                                         }
                                     }
                                     break;
-                                case "include":
-                                    if (prefix == PREFIX) {
-                                        if (node.attributes) {
-                                            if (node.attributes.src) {    // src="url"
-                                                let src: any = node.attributes.src;
-                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue],position, this);
-                                            }
-                                        }
-                                    }
-                                    break;
                                 case "resolve":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) {         // query="{}"
-                                                let query: any = node.attributes["query"];
+                                            if (node.attributes.query) {         // query="{}"
+                                                let query: any = node.attributes.query;
                                                 let current_datasource: any = this.fragments[query.nodeValue].content;
                                                 _.forEach(node.childNodes, (childnode: any, index: number): void => {
                                                     this.position = index;
                                                     this.ScanNode(childnode, current_datasource[0], 0);
                                                 })
+                                            } else if (node.attributes.aggrigate) { // aggrigate
+                                                let aggrigate: any = node.attributes.aggrigate;
+                                                let result: any = this.fragments[aggrigate.nodeValue].content;
+                                                if (result) {
+                                                    _.forEach(result, (resolved_data, position) => {
+                                                        this.ResolveChildren(node, resolved_data, position);
+                                                    });
+                                                }
                                             } else if (node.attributes.field) {  // field="{a.b.c}"
                                                 let field: any = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
-                                                },position, this);
+                                                }, position, this);
                                             } else if (node.attributes.scope) {  // scope="a.b.c"
                                                 if (data) {
                                                     let scope: any = node.attributes.scope;
-                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue,position, this);
+                                                    let result: any = this.datasource.FieldValue(data, scope.nodeValue, position, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
@@ -751,12 +781,24 @@ namespace HTMLScanner {
                                         }
                                     }
                                     break;
+
+
+                                case "include":
+                                    if (prefix == PREFIX) {
+                                        if (node.attributes) {
+                                            if (node.attributes.src) {    // src="url"
+                                                let src: any = node.attributes.src;
+                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], position, this);
+                                            }
+                                        }
+                                    }
+                                    break;
                                 case "if":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
-                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue,position, this); //model
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
                                                 if (result) {
                                                     this.ResolveChildren(node, data, position);
                                                 }
@@ -769,7 +811,7 @@ namespace HTMLScanner {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
-                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue,position, this); //model
+                                                let result: any = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
                                                 if (!result) {
                                                     this.ResolveChildren(node, data, position);
                                                 }
@@ -778,7 +820,7 @@ namespace HTMLScanner {
                                     }
                                     break;
                                 default:
-                                    this.NodeToElement(node, data,position);
+                                    this.NodeToElement(node, data, position);
                                     break;
                             }
                         }
@@ -788,7 +830,10 @@ namespace HTMLScanner {
                             let parent_name: string = node.parentNode.localName;
                             let prefix: string = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
-                                this.html += this.datasource.ResolveFormat(data, {content: node.data, count: 1},position, this);
+                                this.html += this.datasource.ResolveFormat(data, {
+                                    content: node.data,
+                                    count: 1
+                                }, position, this);
                             } else {
                                 this.html += node.data;
                             }
@@ -804,7 +849,7 @@ namespace HTMLScanner {
                     default:
                 }
             } else {
-                this.callback({code: 1,message:"ScanNode node is null."}, null);
+                this.callback({code: 1, message: "ScanNode node is null."}, null);
             }
         }
 
@@ -821,7 +866,7 @@ namespace HTMLScanner {
                     });
                 }
             } else {
-                this.callback({code:1,message:"ExpandHtml dom is null."}, null);
+                this.callback({code: 1, message: "ExpandHtml dom is null."}, null);
             }
             this.document_depth--;
             if (this.document_depth == 0) {
@@ -831,7 +876,7 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[], position:number): any {
+        public ExpandHtml2(childnodes: any, fragments: { content: string, count: number }[], position: number): any {
             if (childnodes) {
                 _.forEach(childnodes, (element, index) => {
                     this.position = index;
@@ -936,7 +981,7 @@ namespace HTMLScanner {
                     build(childnodes, datasource, {}, callback);
                 }
             } else {
-                callback({code:1,message:""}, null);
+                callback({code: 1, message: ""}, null);
             }
 
         };
