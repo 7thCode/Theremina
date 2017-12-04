@@ -151,8 +151,6 @@ namespace HTMLScanner {
             let result: any = null;
             try {
                 let query: any = node.attributes.query.nodeValue;
-
-
                 result = this.datasource.GetDatasource(query, this);
             } catch (e) {
                 this.callback(e, null);
