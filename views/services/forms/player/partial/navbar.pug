@@ -1,26 +1,26 @@
 nav.navbar.navbar-fixed-top.navbar-color-invert(role="navigation")
-        .container-fluid
-            .navbar-header
-                button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
-                    span.sr-only Toggle navigation
-                    span.icon-bar
-                    span.icon-bar
-                    span.icon-bar
-                a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
-            #bs-navbar.navbar-collapse.collapse
-                ul.nav.navbar-nav
-                    if user
-                        li.dropdown
-                            a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | #{message.form}
-                            ul.dropdown-menu(role="menu")
-                                li
-                                    a(href="", ng-click="Open();", role="menuitem") #{message.open}
-                        li.dropdown(ng-class="{disabled: !opened}")
-                            a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                                | #{message.article}
-                            ul.dropdown-menu(role="menu")
-                                li
-                                    a(href="", ng-click="CreateArticle();", role="menuitem") #{message.create}
-                                li
-                                    a(href="", ng-click="SaveArticle();", role="menuitem") #{message.save}
+    .container-fluid
+        .navbar-header
+            button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
+                span.sr-only Toggle navigation
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+            a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
+        #bs-navbar.navbar-collapse.collapse
+            ul.nav.navbar-nav
+                if user
+                    li.dropdown
+                        a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                            | #{message.form}
+                        ul.dropdown-menu(role="menu")
+                            li
+                                a(href="", ng-click="Open();", role="menuitem") #{message.open}
+                    li.dropdown(ng-class="{disabled: !opened}")
+                        a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                            | #{message.article}
+                        ul.dropdown-menu(role="menu")
+                            li
+                                a(href="", ng-click="CreateArticle();", role="menuitem") #{message.create}
+                            li
+                                a(href="", ng-click="SaveArticle();", role="menuitem") #{message.save}

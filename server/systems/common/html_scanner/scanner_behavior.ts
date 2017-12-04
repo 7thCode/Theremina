@@ -139,8 +139,8 @@ namespace ScannerBehavior {
                 date: (result: string, param: string): string => {
                     try {
                         let format: string = "MM/DD";
-                        if (param) {
-                            format = param;
+                        if (param[0]) {
+                            format = param[0];
                         }
                         moment.locale("ja", {
                             weekdays: ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
@@ -156,12 +156,30 @@ namespace ScannerBehavior {
                 },
                 substr: (result: string, param: string): string => {
                     try {
-                        result = result.substr(0, parseInt(param)) + "...";
+                        result = result.substr(0, parseInt(param[0])) + "...";
+                    } catch (e) {
+
+                    }
+                    return result;
+                },
+                convert: (result: string, param: string): string => {
+                    try {
+                        let param_object = JSON.parse(param[0]);
+                        result = param_object[result];
+                    } catch (e) {
+
+                    }
+                    return result;
+                },
+                add: (result: string, param: string): string => {
+                    try {
+                        result = String(parseInt(result, 10) + parseInt(param[0], 10));
                     } catch (e) {
 
                     }
                     return result;
                 }
+
             }
         }
 
@@ -283,15 +301,16 @@ namespace ScannerBehavior {
         public Aggregate(query: any, parent: any): any {// db query
 
             let query_object: any = this.ParseQueryFormat(query);
-
+            let parsed_query_object = Function("return " + query_object.ag)();
             let _query: any = this.default_query;
-            let aggrigate: any = [{$match:_query}];
-            if (query_object.ag) {
+            let aggrigate: any = [{$match: _query}];
+            if (parsed_query_object) {
                 try {
-                    JSON.parse(query_object.ag).forEach((filter) => {
+                    parsed_query_object.forEach((filter) => {
                         aggrigate.push(filter);
                     });
                 } catch (e) {
+                    let a = e;
                 }
             }
 
@@ -514,7 +533,7 @@ namespace ScannerBehavior {
 
                         let filter: (s1: string, s2: string[]) => void = this.filters[filter_name];
                         if (filter) {
-                            result = filter(result, filter_params[0]);
+                            result = filter(result, filter_params);
                         }
                     }
                 }
