@@ -2,8 +2,8 @@
 
 let Controllers: angular.IModule = angular.module('Controllers', []);
 
-Controllers.controller('InquiryController', ["$scope", "$log", 'MailerService', 'AssetService', 'ZipService',
-    function ($scope: any, $log: any, MailerService: any, AssetService: any, ZipService: any): void {
+Controllers.controller('InquiryController', ["$scope", "$log", 'MailerService', 'AssetService', 'ZipService','ArticleService',
+    function ($scope: any, $log: any, MailerService: any, AssetService: any, ZipService: any,ArticleService:any): void {
 
         $scope.form = {};
 
