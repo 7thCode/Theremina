@@ -27,6 +27,7 @@ export namespace ArticleApiRouter {
     router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.put_article]);
     router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.delete_article]);
 
+    router.get('/api/query/:query', [article.get_article_query]);
     router.get('/api/query/:query/:option', [article.get_article_query_query]);
     router.get("/api/count/:query", [article.get_article_count]);
 
