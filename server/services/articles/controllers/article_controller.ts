@@ -163,6 +163,20 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
+        public get_article_query(request: any, response: any): void {
+            let userid = Article.userid(request);
+            let namespace = "";
+            let query: any = Wrapper.Decode(request.params.query);
+            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace:namespace},{userid: userid}, {type: 0}, query]}, {}, {}, (response: any, articles: any): any => {
+                Wrapper.SendSuccess(response, articles);
+            });
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
         public get_article_query_query(request: any, response: any): void {
             let userid = Article.userid(request);
             let namespace = "";

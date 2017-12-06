@@ -62,8 +62,9 @@ export namespace MailerModule {
                 let referer_url = url.parse(referer);
                 let path = referer_url.pathname;
                 let separated_path = path.split("/");
-                let userid = separated_path[1];
-                let namespace = separated_path[2];
+
+                let userid = request.body.content.userid;
+                let namespace = request.body.content.namespace;
 
                 if (userid) {
                     if (request.body.content) {
@@ -71,7 +72,10 @@ export namespace MailerModule {
                             if (request.body.content.report) {
                                 let thanks_to = request.body.content.thanks;
                                 let report_to = request.body.content.report;
-
+                                let bcc = "";
+                                if (request.body.content.bcc) {
+                                    bcc = request.body.content.bcc;
+                                }
                                 ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
                                         let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});
@@ -81,7 +85,7 @@ export namespace MailerModule {
                                             content: request.body.content
                                         }, (error: any, doc: string):void => {
                                             if (!error) {
-                                                mailer.send(report_to, report_title, doc, (error: any): void => {
+                                                mailer.send(report_to,bcc, report_title, doc, (error: any): void => {
                                                     if (!error) {
                                                         ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
@@ -92,7 +96,7 @@ export namespace MailerModule {
                                                                     content: request.body.content
                                                                 }, (error: any, doc: string): void => {
                                                                     if (!error) {
-                                                                        mailer.send(thanks_to, thanks_title, doc, (error: any) :void => {
+                                                                        mailer.send(thanks_to,bcc, thanks_title, doc, (error: any) :void => {
                                                                             if (!error) {
                                                                                 Wrapper.SendSuccess(response, {
                                                                                     code: 0,

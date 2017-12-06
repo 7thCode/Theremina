@@ -292,7 +292,7 @@ export namespace AuthModule {
                                     let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid,"", null, true, {});
                                     HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
                                         if (!error) {
-                                            _mailer.send(username, message.registconfirmtext, doc, (error: any) => {
+                                            _mailer.send(username,"", message.registconfirmtext, doc, (error: any) => {
                                                 if (!error) {
                                                     Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                 } else {
@@ -460,7 +460,7 @@ export namespace AuthModule {
                                     let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid,"", null, true, {});
                                     HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
                                         if (!error) {
-                                            _mailer.send(username, message.memberconfirmtext, doc, (error: any) => {
+                                            _mailer.send(username,"", message.memberconfirmtext, doc, (error: any) => {
                                                 if (!error) {
                                                     Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                 } else {
@@ -620,7 +620,7 @@ export namespace AuthModule {
                                         let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid,"", null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
                                             if (!error) {
-                                                _mailer.send(username, message.usernameconfirmtext, doc, (error: any) => {
+                                                _mailer.send(username,"", message.usernameconfirmtext, doc, (error: any) => {
                                                     if (!error) {
                                                         Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                     } else {
@@ -722,7 +722,7 @@ export namespace AuthModule {
                                 let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid,"", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
                                     if (!error) {
-                                        _mailer.send(username, message.passwordconfirmtext, doc, (error: any) => {
+                                        _mailer.send(username,"", message.passwordconfirmtext, doc, (error: any) => {
                                             if (!error) {
                                                 Wrapper.SendSuccess(response, {code: 0, message: ""});
                                             } else {
