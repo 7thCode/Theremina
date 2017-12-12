@@ -171,6 +171,14 @@ namespace ScannerBehavior {
                     }
                     return result;
                 },
+                encodeURIComponent: (result: string, param: string): string => {
+                    try {
+                        result = encodeURIComponent(result);
+                    } catch (e) {
+
+                    }
+                    return result;
+                },
                 add: (result: string, param: string): string => {
                     try {
                         result = String(parseInt(result, 10) + parseInt(param[0], 10));

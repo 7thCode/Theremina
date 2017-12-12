@@ -10,7 +10,7 @@ let FrontApplication: any = angular.module('FrontApplication', [
     'ngMessages', "ngResource", 'ngAnimate', 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable','angular-loading-bar',
 
     'ngSanitize',
-    'textAngular',//textAngular
+
     'ui.tinymce',//tinyMCE
     //'froala',//froala
 
