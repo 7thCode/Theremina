@@ -17,7 +17,7 @@ namespace ContextModule {
         context:{}
     });
 
-    Context.index({type:1,userid: 1}, {unique: true, index: true});
+    Context.index({type:1,userid: 1}, {unique: true});
 
     module.exports = mongoose.model('Context', Context);
 }

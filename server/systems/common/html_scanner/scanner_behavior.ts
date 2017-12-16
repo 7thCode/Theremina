@@ -1,6 +1,10 @@
-/**
- * Created by oda on 2017/07/05.
+/**!
+ Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ This software is released under the MIT License.
+ //opensource.org/licenses/mit-license.php
  */
+
+"use strict";
 
 namespace ScannerBehavior {
 
@@ -156,7 +160,10 @@ namespace ScannerBehavior {
                 },
                 substr: (result: string, param: string): string => {
                     try {
-                        result = result.substr(0, parseInt(param[0])) + "...";
+                        let limit =  parseInt(param[0]);
+                        if (result.length > limit) {
+                            result = result.substr(0, limit) + "...";
+                        }
                     } catch (e) {
 
                     }
@@ -166,6 +173,14 @@ namespace ScannerBehavior {
                     try {
                         let param_object = JSON.parse(param[0]);
                         result = param_object[result];
+                    } catch (e) {
+
+                    }
+                    return result;
+                },
+                encodeURIComponent: (result: string, param: string): string => {
+                    try {
+                        result = encodeURIComponent(result);
                     } catch (e) {
 
                     }
@@ -226,6 +241,9 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
+              //      let query = new Function("value", "with (value) {return value;}")(query_object.q);
+              //      _query = {"$and": [this.default_query, query]};
+
                     _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
 
