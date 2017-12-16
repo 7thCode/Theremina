@@ -12,7 +12,8 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
                 if user
                     li.dropdown(ng-controller="NamespaceController" )
                         a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                            | #{message.namespace} - {{namespace}}
+                            | #{message.namespace} - {{namespace}} &nbsp;
+                            i.fa.fa-caret-down(aria-hidden="true")
                         ul.dropdown-menu(role="menu")
                             li(ng-repeat="name in namespaces" ng-class="{active: name == namespace}")
                                 a(ng-click="SetNamespace(name)") {{name}}

@@ -18,7 +18,7 @@ namespace ResourceModule {
     Resource.plugin(timestamp);
     Resource.plugin(userdata, {});
 
-    Resource.index({namespace: 1,name: 1, userid: 1, type: 1,status:1, version: 1}, {unique: true, index: true});
+    Resource.index({namespace: 1,name: 1, userid: 1, type: 1,status:1, version: 1}, {unique: true});
 
     module.exports = mongoose.model('Resource', Resource);
 }

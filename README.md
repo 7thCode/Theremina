@@ -698,7 +698,7 @@
 
 ###サーバサイドコントローラ
 
-        基本的には対象となるmodelに対するCRUDとQuery/Countで構成されるが、補助的なAPIを持つものもある。
+    基本的には対象となるmodelに対するCRUDとQuery/Countで構成されるが、補助的なAPIを持つものもある。
 
 ###サーバサイドモデル
       
@@ -870,6 +870,19 @@
       
     > sudo service mongod restart  
     
+##Mongo Auth
+    
+     Auth ON
+    
+    > cd /etc
+    > sudo nano mongod.conf
+       
+    追記
+       
+    auth = true
+    
+     > sudo service mongod restart
+    
 ### Ubuntu
     /var/log/mongodb
     rm mongo.log.2016*
@@ -890,11 +903,19 @@
     > sudo service mongodb restart
     
 ## mongodb 初期化
+    
+    DB全体の認証
+    
     $ mongo
     > use admin
     > db.createUser({user: "admin",pwd: "zz0101",roles:[{role: "userAdminAnyDatabase",db: "admin"}]})
+    
+
+    個々のDBの認証(auth-dbはtarget-db自体)
+    
     > use blog0
     > db.createUser({user:"blog0master", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
+
 ## Redis Clear
     $ redis-cli
     > AUTH zz0101
@@ -1051,23 +1072,41 @@
 
 ####full backup
     
-    > sudo service mongodb stop
-    > sudo mongodump --dbpath /var/lib/mongo
+    3.0 以前
+    // > sudo service mongodb stop
+    // > sudo mongodump --dbpath /var/lib/mongo
+    
+    
+    3.0以降
+    > sudo　mongodump --authenticationDatabase admin -u oda -p zz0101
+
 
 ####full restore
     
-    > sudo service mongodb stop
-    > sudo mongorestore --dbpath /var/lib/mongo dump
+    3.0 以前
+    // > sudo service mongodb stop
+    // > sudo mongorestore --dbpath /var/lib/mongo dump
 
+    3.0以降
 
+    フルリストアは不明。
+    
 ####buckup
-
-    > cd ......
-    > mongodump -u .... -p .....
+    
+    3.0以降 
+    > mongodump --authenticationDatabase **AUTH-DBNAME** -u **DBUSER** -p **DBPASS** -d **TARGET-DBNAME** -o "**OUTPUT-PATH**"  
     
 ####restore
 
-    > mongorestore --host localhost --db test_db ./dump/test_db
+
+    3.0以降
+    
+    > use **TARGET-DBNAME**
+    > db.createUser({user:"**DBUSER**", pwd:"**DBPASS**", roles:[ "readWrite", "dbOwner" ]})
+
+    で対象ユーザ作成後,
+    
+    > mongorestore --authenticationDatabase **AUTH-DBNAME** -u **DBUSER** -p **DBPASS** -d **TARGET-DBNAME** "**OUTPUT-PATH**"
 
 ####Zip
 
@@ -1370,3 +1409,25 @@
   Parser API
         
         https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API#Expressions
+        
+        
+        
+  chromeサービスワーカー
+   
+        止める
+             
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            // 登録されているworkerを全て削除する
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+        });
+        caches.keys().then(function(keys) {
+            var promises = [];
+            // キャッシュストレージを全て削除する
+            keys.forEach(function(cacheName) {
+                if (cacheName) {
+                    promises.push(caches.delete(cacheName));
+                }
+            });
+        });
