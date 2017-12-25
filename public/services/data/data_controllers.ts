@@ -11,7 +11,7 @@ let DataControllers: angular.IModule = angular.module('DataControllers', ['ui.bo
 DataControllers.controller('DataController', ['$scope', '$log', '$document', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
     ($scope: any, $log: any, $document: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
-        let pagesize = 100;
+        let pagesize = 40;
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -73,6 +73,9 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
             });
         };
 
+        $scope.Close = (): void => {
+            $scope.opened = false;
+        };
         /*
          resultで与えられたObjectのelementのlabelで示される値を取り出す。
          ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を設定する。
@@ -258,6 +261,7 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
             let new_record: any = Reduce();
             ArticleService.Put(current_id, new_record, (result: any): void => {
                 progress(false);
+        //        $scope.opened = false;
             }, error_handler);
         };
 
@@ -284,6 +288,21 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                 }, (): void => {
                 });
             }
+        };
+
+        $scope.FindArticles = (field:string, value: any): void => {
+
+            ArticleService.SetQuery(null);
+            if (field) {
+                if (value) {
+                    let query = {};
+                    query[field] = {$regex: value};
+                    ArticleService.SetQuery(query);
+                }
+            }
+
+            Draw(() => {
+            });
         };
 
         $scope.Find = (newValue: any): void => {
@@ -441,6 +460,11 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                 toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
                 menubar: "table"
             };
+
+
+
+
+
             /*{
             selector: 'textarea',
             height: 500,

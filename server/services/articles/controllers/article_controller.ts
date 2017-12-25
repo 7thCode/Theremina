@@ -69,10 +69,10 @@ export namespace ArticleModule {
             }
         }
 
-        static make_query(id: any, userid: any): any {
-            let namespace = "";
-            return {$and: [{_id: id}, {namespace:namespace},{userid: userid}]};
-        }
+        //      static make_query(id: any, userid: any): any {
+        //          let namespace = "";
+        //          return {$and: [{_id: id}, {namespace:namespace},{userid: userid}]};
+        //      }
 
         /**
          * @param request
@@ -82,8 +82,9 @@ export namespace ArticleModule {
          */
         public put_article(request: any, response: any): void {
             let userid = Article.userid(request);
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, 10000, ArticleModel, Article.make_query(id, userid), (response: any, article: any): void => {
+            Wrapper.FindOne(response, 10000, ArticleModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, article: any): void => {
                 if (article) {
                     article.content = request.body.content;
                     _.forEach(article.content, (content: any, key): void => {
@@ -117,8 +118,9 @@ export namespace ArticleModule {
          */
         public delete_article(request: any, response: any): void {
             let userid = Article.userid(request);
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, 10000, ArticleModel, Article.make_query(id, userid), (response: any, article: any): void => {
+            Wrapper.FindOne(response, 10000, ArticleModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, article: any): void => {
                 if (article) {
                     Wrapper.Remove(response, 1200, article, (response: any): void => {
                         Wrapper.SendSuccess(response, {});
@@ -137,7 +139,7 @@ export namespace ArticleModule {
         public delete_own(request: any, response: any): void {
             let userid = Article.userid(request);
             let namespace = "";
-            Wrapper.Delete(response, 1300, ArticleModel, {$and:[{namespace:namespace}, {userid: userid}]}, (response: any): void => {
+            Wrapper.Delete(response, 1300, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -148,8 +150,10 @@ export namespace ArticleModule {
          * @returns none
          */
         public get_article(request: any, response: any): void {
+            //     let userid = Article.userid(request);
+            let namespace = "";
             let id = request.params.id;
-            Wrapper.FindOne(response, 1400, ArticleModel, {_id: id}, (response: any, article: any): void => {
+            Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace},  {type: 0}, {_id: id}]}, (response: any, article: any): void => {
                 if (article) {
                     Wrapper.SendSuccess(response, article);
                 } else {
@@ -163,11 +167,29 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_query(request: any, response: any): void {
+        public get_article_json(request: any, response: any): void {
             let userid = Article.userid(request);
             let namespace = "";
+            let id = request.params.id;
+            Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, {_id: id}]}, (response: any, article: any): void => {
+                if (article) {
+                    response.jsonp(JSON.stringify(article));
+                } else {
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
+                }
+            });
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public get_article_query(request: any, response: any): void {
+            //     let userid = Article.userid(request);
+            let namespace = "";
             let query: any = Wrapper.Decode(request.params.query);
-            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace:namespace},{userid: userid}, {type: 0}, query]}, {}, {}, (response: any, articles: any): any => {
+            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, query]}, {}, {}, (response: any, articles: any): any => {
                 Wrapper.SendSuccess(response, articles);
             });
         }
@@ -178,16 +200,14 @@ export namespace ArticleModule {
          * @returns none
          */
         public get_article_query_query(request: any, response: any): void {
-            let userid = Article.userid(request);
+            //       let userid = Article.userid(request);
             let namespace = "";
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace:namespace},{userid: userid}, {type: 0}, query]}, {}, option, (response: any, articles: any): any => {
-
+            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, query]}, {}, option, (response: any, articles: any): any => {
                 _.forEach(articles, (article) => {
                     article.content = null;
                 });
-
                 Wrapper.SendSuccess(response, articles);
             });
         }
@@ -198,9 +218,11 @@ export namespace ArticleModule {
          * @returns none
          */
         public get_article_query_query_json(request: any, response: any): void {
+            let userid = Article.userid(request);
+            let namespace = "";
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1400, ArticleModel, query, {}, option, (response: any, articles: any): any => {
+            Wrapper.Find(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, {"_id": 0,"version":1,"status":1,"namespace":1,"modify":1,"create":1,"open":1,"content":1, "type": 1,"name": 1, "userid":1}, option, (response: any, articles: any): any => {
                 Wrapper.SendSuccess(response, articles);
             });
         }
@@ -212,9 +234,9 @@ export namespace ArticleModule {
          */
         public get_article_count(request: any, response: any): void {
             let userid = Article.userid(request);
-            let namespace = ""
+            let namespace = "";
             let query: any = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, 2800, ArticleModel, {$and: [{namespace:namespace},{userid: userid}, {type: 0}, query]}, (response: any, count: any): any => {
+            Wrapper.Count(response, 2800, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
         }

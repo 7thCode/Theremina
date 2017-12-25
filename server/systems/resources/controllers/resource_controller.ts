@@ -493,7 +493,7 @@ export namespace ResourcesModule {
                             let content = doc.content.resource;
                             let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
                                 "Default": ArticleModel,
-                                "Account": LocalAccount,
+
                                 "Article": ArticleModel
                             });
                             let query = datasource.ToQueryFormat();
@@ -540,7 +540,7 @@ export namespace ResourcesModule {
                             let content = doc.content.resource;
                             let datasource = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid, namespace, params, false, {
                                 "Default": ArticleModel,
-                                "Account": LocalAccount,
+                          //      "Account": LocalAccount,
                                 "Article": ArticleModel
                             });
                             let query = datasource.ToQueryFormat();
