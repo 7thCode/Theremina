@@ -25,7 +25,8 @@ block content
                                     ng-form(name="validate", ng-show="opened")
                                         .row
                                             .col-xs-12
-                                                button.btn.btn-info.pull-right(ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                                // ng-class="{disabled: !opened}"
+                                                button.btn.btn-info.pull-right(ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
                                                     i.fa.fa-cloud
                                                     span.hidden-xs.hidden-sm #{message.save}
                                         .row

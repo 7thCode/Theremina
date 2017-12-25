@@ -24,7 +24,7 @@ interface IPictureControl extends IControl {
 PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q', '$document', '$uibModal', '$log', 'ProfileService', 'SessionService', 'FileService', 'ImageService',
     ($scope: any,$rootScope:any, $q: any, $document: any, $uibModal: any, $log: any, ProfileService: any, SessionService: any, FileService: any, ImageService: any): void => {
 
-        FileService.option = {limit: 20, skip: 0};
+        FileService.option = {limit: 30, skip: 0};
 
         let progress = (value) => {
             $scope.$emit('progress', value);

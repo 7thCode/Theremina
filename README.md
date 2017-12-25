@@ -404,6 +404,59 @@
     </ds:if>
     
     
+    
+
+#####Elements
+
+    
+    <meta query='#query:self' ds:title="{x.y.z}">
+    <meta name="description" query='#query:self' ds:content="{x.y.z}"/>
+    <meta ds:include="/|{#userid}|/|{#namespace}|/static/styles.html"/>
+    
+    <ds:include src='/|{#userid}|/|{#namespace}|/static/measure_body.html'></ds:include>
+    <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/pagenator.html|{#query:self}'></ds:include>
+    
+    
+    <ds:resolve query='#query:self'></ds:resolve>
+    <ds:resolve scope='content'></ds:resolve>
+    
+    <ds:resolve aggrigate='ag::[{"$match":{"$and":[{"a.b.c":"x"},{"a.b.c":"x"}]}},{"$project":{"a":"$a.b.c"}},{"$unwind":"$a"},{"$group":{"_id":"a","a":{"$addToSet":{"item":"$a"}}}}];'>
+    </ds:resolve>
+    
+    <ds:foreach query='#query:seminar'></ds:foreach>
+    <ds:foreach query='#query:theme'></ds:foreach>
+    <ds:foreach query='#query:self'></ds:foreach>    
+    <ds:foreach query='q::{"$and":[{"x.y.z":"a"},{"x.y.z":"a"}]};s::0;l::10'></ds:foreach>
+    
+    
+    <ds:foreach scope='#pager:#init'></ds:foreach>
+    
+    <ds:foreach aggrigate='ag::[{"$match":{"$and":[{"a.b.c":"x"},{"a.b.c":"x"}]}},{"$project":{"ym":{"year":{"$year":"$content.from.value"},"month":{"$month":"$content.from.value"}}}},{"$group":{"_id":"$ym","count":{ "$sum" : 1 }}},{"$sort":{"_id.year":-1,"_id.month":-1}}];'></ds:foreach>
+    
+    <ds:foreach aggrigate='ag::[{"$match":{"$and":[{"a.b.c":"x"},{"a.b.c":"x"}]}},{"$project":{"content.theme.value":1,"result":{"$and":[{"$lt":["$content.from.value",new Date()]},{"$gt":["$content.from.value",new Date(new Date().setDate(new Date().getDate() - 7))]}]}}},{"$group": {"_id":"$content.theme.value", "new": {"$max":"$result" }, "count": {"$sum": 1}}}];'>
+    </ds:foreach>
+    
+    
+    
+    <ds:if exist='#hasprev:#init'></ds:if>
+    <ds:if exist='#pager:current'></ds:if>
+    
+    
+    <ds:ifn exist="x.y"></ds:ifn>
+    
+    
+    
+    
+    <ds:div>{x.y}</ds:div>
+    <ds:div>{x.y == substr("40")}</ds:div>
+    <ds:div>{x.y == date("YYYY年MM月DD日(ddd)")}</ds:div>
+    
+    ds:src="{x.y}"
+    ds:class='panel |{x.y == convert("{"セミナー":"panel-success","勉強会":"panel-warning"}")}' 
+                                                     
+                       
+    
+    
 #####例  
   
 ######ドキュメント”index”
@@ -1431,3 +1484,7 @@
                 }
             });
         });
+        
+   Google Map API Key
+   
+        https://developers.google.com/maps/web/      

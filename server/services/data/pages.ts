@@ -42,6 +42,16 @@ export namespace DataPageRouter {
         });
     }]);
 
+    router.get("/2", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
+        response.render("services/data2/index", {
+            config: config,
+            user: request.user,
+            message: message,
+            status: 200,
+            fonts: webfonts
+        });
+    }]);
+
     router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/data/dialogs/create_dialog', {message: message});
     }]);

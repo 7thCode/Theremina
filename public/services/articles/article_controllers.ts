@@ -284,6 +284,23 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             }, error_handler);
         };
 
+        let SelectArticle = (id: string): void => {
+            progress(true);
+            current_id = id;
+            page_name = "";
+            ArticleService.Get(current_id, (result: any): void => {
+                $scope.current_article = result;
+                $scope.opened = true;
+                if (result.content.type) {
+                    DrawPage(result.content.type.value, () => {
+                        Map(result.content);
+                        progress(false);
+                    });
+                }
+            }, error_handler);
+        };
+
+
         let ArticleSelected = (id: string): boolean => {
             return (current_id == id);
         };

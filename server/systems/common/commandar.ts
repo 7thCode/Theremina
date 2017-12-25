@@ -18,6 +18,8 @@ export namespace Commandar {
             this.backupdir =  process.cwd() + "/backup";
         }
 
+
+
         public Backup(config): string {
             let backup = "mongodump --authenticationDatabase " + config.name + " -u " + config.user + " -p " + config.password + " -d " + config.name + " -o " + '"' + this.backupdir + '"';
             console.log(backup);

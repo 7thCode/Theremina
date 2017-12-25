@@ -1,6 +1,10 @@
-/**
- * Created by oda on 2017/07/05.
+/**!
+ Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ This software is released under the MIT License.
+ //opensource.org/licenses/mit-license.php
  */
+
+"use strict";
 
 namespace HTMLScanner {
 
@@ -797,8 +801,21 @@ namespace HTMLScanner {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
                                                 let result: any = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
-                                                if (result) {
-                                                    this.ResolveChildren(node, data, position);
+                                                if (node.attributes.equal) {
+                                                    let equal: any = node.attributes.equal;
+                                                    let result2: any = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
+                                                    if (result == result2) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                } else if (node.attributes.match) {
+                                                    let match: any = node.attributes.match;
+                                                    if (result == match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                } else {
+                                                    if (result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
                                                 }
                                             }
                                         }
@@ -810,8 +827,21 @@ namespace HTMLScanner {
                                             if (node.attributes.exist) {
                                                 let exist: any = node.attributes.exist;
                                                 let result: any = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
-                                                if (!result) {
-                                                    this.ResolveChildren(node, data, position);
+                                                if (node.attributes.equal) {
+                                                    let equal: any = node.attributes.equal;
+                                                    let result2: any = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
+                                                    if (result != result2) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                } else if (node.attributes.match) {
+                                                    let match: any = node.attributes.match;
+                                                    if (result != match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                } else {
+                                                    if (!result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
                                                 }
                                             }
                                         }

@@ -1,0 +1,19 @@
+.modal-content
+    .modal-header
+        span.h5.modal-title #{message.open}
+        include ../../../systems/common/next_prev
+    .modal-body
+        .row
+            .col-xs-12
+                table.table.table-hover.table-striped(ng-cloak)
+                    tr(ng-repeat="page in pages")
+                        td(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", ng-click="Get(page)") {{page.name | limit:20 }}
+        .row
+            .col-xs-12
+                include ../../../systems/common/error_message
+
+    .modal-footer
+        .row
+            .col-xs-12
+                .text-center(style="margin:2rem;")
+                    button.btn.btn-warning(type="button", ng-click='cancel()', aria-label="") #{message.cancel}

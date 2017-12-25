@@ -438,7 +438,6 @@ export namespace PagesModule {
 */
     }
 
-
 }
 
 module.exports = PagesModule;
