@@ -34,10 +34,6 @@ export namespace PageRouter {
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 
-  //  const LocalAccount: any = require(share.Models("systems/accounts/account"));
-  //  const ResourceModel: any = require(share.Models("systems/resources/resource"));
-  //  const ArticleModel: any = require(share.Models("services/articles/article"));
-
     let message = config.message;
 
     let render_html = (request: any, response: any): void => {
@@ -183,12 +179,12 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/entry", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-        let redirect_to = applications_config.redirect["entry"];
-        if (redirect_to) {
-            response.redirect(302, redirect_to);
-        } else {
-            next();
+    router.get("/shortcut/:name", [exception.page_catch, (request: any, response: any): void => {
+        let urls = applications_config.redirect;
+
+        let url = urls[request.params.name];
+        if (url) {
+            response.redirect(302, urls[request.params.name]);
         }
     }]);
 
@@ -325,18 +321,14 @@ export namespace PageRouter {
         }, response);
     }]);
 
-
-
-
     router.get("/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
-
         render_static(request, response);
     }]);
 
@@ -345,10 +337,9 @@ export namespace PageRouter {
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
-
         render_static(request, response);
     }]);
 
@@ -357,10 +348,9 @@ export namespace PageRouter {
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
-
         render_static(request, response);
     }]);
 
@@ -377,7 +367,9 @@ export namespace PageRouter {
     }]);
 
     router.get("/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+
         let namespace = request.params.namespace;
+
         let userid = applications_config.first_responder["default"].userid;
         try {
             userid = applications_config.first_responder[namespace].userid;
@@ -424,7 +416,6 @@ export namespace PageRouter {
                 Error(error, request, response);
             }
         });
-
     }]);
 
     router.get("/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
@@ -452,7 +443,7 @@ export namespace PageRouter {
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
 
@@ -465,14 +456,14 @@ export namespace PageRouter {
         let userid = applications_config.first_responder["default"].userid;
         try {
             userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
 
         let page = applications_config.first_responder["default"].page;
         try {
             page = applications_config.first_responder[namespace].page;
-        } catch (e){
+        } catch (e) {
 
         }
 
@@ -513,11 +504,7 @@ export namespace PageRouter {
                 Error(error, request, response);
             }
         });
-
     }]);
-
-
-
 
     router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         render_static(request, response);
@@ -552,10 +539,6 @@ export namespace PageRouter {
     router.get("/:userid/:namespace/svg/:name", [exception.page_catch, (request: any, response: any): void => {
         LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
     }]);
-
-
-
-
 
     router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         let items = [];

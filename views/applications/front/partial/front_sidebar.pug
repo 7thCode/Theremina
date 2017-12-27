@@ -21,7 +21,7 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                         i.fa.fa-file-text.text-success
                         span #{message.page}
                 li
-                    a(href="/data")
+                    a(href="/data/2")
                         i.fa.fa-database.text-primary
                         span #{message.article}
                 li
@@ -54,6 +54,12 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                                 i.fa.fa-cog.fa-spin.text-info
                                 i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
                             span #{message.backoffice}
+
+                li
+                    a(href="/pages/getall")
+                        i.fa.fa-download.fa-fw.text-danger
+                        span Backup
+
                 li
                     a(href='#', ng-click="Logout()")
                         i.fa.fa-sign-out
