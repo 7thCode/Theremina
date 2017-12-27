@@ -7,47 +7,49 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ProfileModule;
 (function (ProfileModule) {
-    const fs = require('graceful-fs');
-    const Validator = require('jsonschema').Validator;
-    const validator = new Validator();
-    const _ = require('lodash');
-    const mongoose = require('mongoose');
+    var fs = require('graceful-fs');
+    var Validator = require('jsonschema').Validator;
+    var validator = new Validator();
+    var _ = require('lodash');
+    var mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const Wrapper = share.Wrapper;
-    const applications_config = share.applications_config;
-    const LocalAccount = require(share.Models("systems/accounts/account"));
-    let account_local_schema = {};
-    fs.open(share.Models('applications/accounts/schema.json'), 'ax+', 384, (error, fd) => {
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var Wrapper = share.Wrapper;
+    // const applications_config = share.applications_config;
+    var LocalAccount = require(share.Models("systems/accounts/account"));
+    var account_local_schema = {};
+    fs.open(share.Models('applications/accounts/schema.json'), 'ax+', 384, function (error, fd) {
         if (!error) {
-            fs.close(fd, (error) => {
+            fs.close(fd, function (error) {
                 account_local_schema = JSON.parse(fs.readFileSync(share.Models('applications/accounts/schema.json'), 'utf-8'));
             });
         }
     });
-    class Profile {
+    var Profile = (function () {
+        function Profile() {
+        }
         /**
          * @param request
          * @returns userid
          */
-        static userid(request) {
+        Profile.userid = function (request) {
             return request.user.userid;
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        put_profile(request, response) {
-            const number = 110000;
-            Wrapper.FindOne(response, number, LocalAccount, { username: request.user.username }, (response, self) => {
+        Profile.prototype.put_profile = function (request, response) {
+            var number = 110000;
+            Wrapper.FindOne(response, number, LocalAccount, { username: request.user.username }, function (response, self) {
                 if (self) {
-                    let validate_result = validator.validate(request.body.local, account_local_schema);
+                    var validate_result = validator.validate(request.body.local, account_local_schema);
                     if (validate_result.errors.length === 0) {
                         self.local = request.body.local;
                         self.open = true;
-                        Wrapper.Save(response, number, self, (response, object) => {
+                        Wrapper.Save(response, number, self, function (response, object) {
                             Wrapper.SendSuccess(response, object.local);
                         });
                     }
@@ -59,15 +61,15 @@ var ProfileModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_profile(request, response) {
-            const number = 111000;
-            Wrapper.FindOne(response, number, LocalAccount, { username: request.user.username }, (response, self) => {
+        Profile.prototype.get_profile = function (request, response) {
+            var number = 111000;
+            Wrapper.FindOne(response, number, LocalAccount, { username: request.user.username }, function (response, self) {
                 if (self) {
                     Wrapper.SendSuccess(response, {
                         provider: self.provider,
@@ -81,8 +83,9 @@ var ProfileModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
-    }
+        };
+        return Profile;
+    }());
     ProfileModule.Profile = Profile;
 })(ProfileModule = exports.ProfileModule || (exports.ProfileModule = {}));
 module.exports = ProfileModule;

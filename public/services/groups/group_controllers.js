@@ -4,129 +4,129 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let GroupControllers = angular.module('GroupControllers', ["ngResource"]);
+var GroupControllers = angular.module('GroupControllers', ["ngResource"]);
 GroupControllers.controller('GroupController', ['$scope', '$document', '$log', "$uibModal", 'GroupService',
-    ($scope, $document, $log, $uibModal, GroupService) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $uibModal, GroupService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let Draw = () => {
-            GroupService.Query((data) => {
+        var Draw = function () {
+            GroupService.Query(function (data) {
                 $scope.groups = data;
-                GroupService.Over((hasnext) => { $scope.over = !hasnext; });
-                GroupService.Under((hasprev) => { $scope.under = !hasprev; });
+                GroupService.Over(function (hasnext) { $scope.over = !hasnext; });
+                GroupService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        let Count = () => {
-            GroupService.Count((result) => {
+        var Count = function () {
+            GroupService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Own = () => {
-            let modalRegist = $uibModal.open({
+        var Own = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'GroupOwnDialogController',
                 templateUrl: '/groups/dialogs/create_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((group) => {
+            modalRegist.result.then(function (group) {
                 $scope.layout = group;
                 $scope.name = group.name;
                 $scope.opened = true;
                 Draw();
-            }, () => {
+            }, function () {
             });
         };
-        let Create = () => {
-            let modalRegist = $uibModal.open({
+        var Create = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'GroupCreateDialogController',
                 templateUrl: '/groups/dialogs/create_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((group) => {
+            modalRegist.result.then(function (group) {
                 $scope.layout = group;
                 $scope.name = group.name;
                 $scope.opened = true;
                 Draw();
-            }, () => {
+            }, function () {
             });
         };
-        let Open = (group) => {
-            let modalRegist = $uibModal.open({
+        var Open = function (group) {
+            var modalRegist = $uibModal.open({
                 controller: 'GroupOpenDialogController',
                 templateUrl: '/groups/dialogs/open_dialog',
                 resolve: {
                     items: group
                 }
             });
-            modalRegist.result.then((group) => {
+            modalRegist.result.then(function (group) {
                 $scope.layout = group;
                 $scope.name = group.name;
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
-        let Delete = (group) => {
-            let modalRegist = $uibModal.open({
+        var Delete = function (group) {
+            var modalRegist = $uibModal.open({
                 controller: 'GroupDeleteConfirmController',
                 templateUrl: '/groups/dialogs/delete_confirm_dialog',
                 resolve: {
                     items: group
                 }
             });
-            modalRegist.result.then((content) => {
+            modalRegist.result.then(function (content) {
                 $scope.name = "";
                 $scope.opened = false;
                 Draw();
-            }, () => {
+            }, function () {
             });
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            GroupService.Next((result) => {
+            GroupService.Next(function (result) {
                 if (result) {
                     $scope.groups = result;
                 }
-                GroupService.Over((hasnext) => { $scope.over = !hasnext; });
-                GroupService.Under((hasprev) => { $scope.under = !hasprev; });
+                GroupService.Over(function (hasnext) { $scope.over = !hasnext; });
+                GroupService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            GroupService.Prev((result) => {
+            GroupService.Prev(function (result) {
                 if (result) {
                     $scope.groups = result;
                 }
-                GroupService.Over((hasnext) => { $scope.over = !hasnext; });
-                GroupService.Under((hasprev) => { $scope.under = !hasprev; });
+                GroupService.Over(function (hasnext) { $scope.over = !hasnext; });
+                GroupService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             GroupService.query = {};
             if (name) {
                 GroupService.query = { name: { $regex: name } };
             }
-            GroupService.Over((hasnext) => { $scope.over = !hasnext; });
-            GroupService.Under((hasprev) => { $scope.under = !hasprev; });
+            GroupService.Over(function (hasnext) { $scope.over = !hasnext; });
+            GroupService.Under(function (hasprev) { $scope.under = !hasprev; });
             Draw();
         };
         $scope.Own = Own;
@@ -139,27 +139,27 @@ GroupControllers.controller('GroupController', ['$scope', '$document', '$log', "
         Draw();
     }]);
 GroupControllers.controller('GroupOwnDialogController', ['$scope', '$log', '$uibModalInstance', 'GroupService', 'items',
-    ($scope, $log, $uibModalInstance, GroupService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, GroupService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            GroupService.Own($scope.title, $scope.content, (result) => {
+            GroupService.Own($scope.title, $scope.content, function (result) {
                 progress(false);
                 $scope.title = result.name;
                 $scope.message = "";
@@ -168,27 +168,27 @@ GroupControllers.controller('GroupOwnDialogController', ['$scope', '$log', '$uib
         };
     }]);
 GroupControllers.controller('GroupCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'GroupService', 'items',
-    ($scope, $log, $uibModalInstance, GroupService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, GroupService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            GroupService.Create($scope.title, $scope.content, (result) => {
+            GroupService.Create($scope.title, $scope.content, function (result) {
                 progress(false);
                 $scope.title = result.name;
                 $scope.message = "";
@@ -197,33 +197,33 @@ GroupControllers.controller('GroupCreateDialogController', ['$scope', '$log', '$
         };
     }]);
 GroupControllers.controller('GroupOpenDialogController', ['$scope', '$log', '$uibModalInstance', 'GroupService', 'items',
-    ($scope, $log, $uibModalInstance, GroupService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, GroupService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             //      items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
         progress(true);
-        GroupService.Get(items._id, (result) => {
+        GroupService.Get(items._id, function (result) {
             $scope.message = "";
             progress(false);
             $scope.title = result.name;
         }, error_handler);
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            GroupService.Put(items._id, {}, (result) => {
+            GroupService.Put(items._id, {}, function (result) {
                 $scope.message = "";
                 progress(false);
                 $uibModalInstance.close(result);
@@ -231,28 +231,28 @@ GroupControllers.controller('GroupOpenDialogController', ['$scope', '$log', '$ui
         };
     }]);
 GroupControllers.controller('GroupDeleteConfirmController', ['$scope', '$log', '$uibModalInstance', 'GroupService', 'items',
-    ($scope, $log, $uibModalInstance, GroupService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, GroupService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             //      items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
         $scope.title = items.name;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            GroupService.Delete(items._id, (result) => {
+            GroupService.Delete(items._id, function (result) {
                 progress(false);
                 $uibModalInstance.close({});
             }, error_handler);

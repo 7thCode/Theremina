@@ -6,14 +6,14 @@
 "use strict";
 var ResourceModule;
 (function (ResourceModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const timestamp = require('../../systems/plugins/timestamp/timestamp');
-    const userdata = require('../../systems/plugins/userdata/userdata');
-    const Resource = new Schema({});
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var timestamp = require('../../systems/plugins/timestamp/timestamp');
+    var userdata = require('../../systems/plugins/userdata/userdata');
+    var Resource = new Schema({});
     Resource.plugin(timestamp);
     Resource.plugin(userdata, {});
-    Resource.index({ namespace: 1, name: 1, userid: 1, type: 1, status: 1, version: 1 }, { unique: true, index: true });
+    Resource.index({ namespace: 1, name: 1, userid: 1, type: 1, status: 1, version: 1 }, { unique: true });
     module.exports = mongoose.model('Resource', Resource);
 })(ResourceModule || (ResourceModule = {}));
 //# sourceMappingURL=resource.js.map

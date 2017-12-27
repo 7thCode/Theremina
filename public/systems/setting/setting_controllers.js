@@ -6,95 +6,95 @@
 "use strict";
 var Setting;
 (function (Setting) {
-    let SettingControllers = angular.module('SettingControllers', ["ngResource"]);
+    var SettingControllers = angular.module('SettingControllers', ["ngResource"]);
     SettingControllers.controller('SettingController', ['$scope', '$document', '$log', '$uibModal', 'ApplicationSettingService', 'PluginsSettingService', 'ServicesSettingService', 'SystemSettingService', 'BackupService', 'RestoreService',
-        ($scope, $document, $log, $uibModal, ApplicationSettingService, PluginsSettingService, ServicesSettingService, SystemSettingService, BackupService, RestoreService) => {
-            let progress = (value) => {
+        function ($scope, $document, $log, $uibModal, ApplicationSettingService, PluginsSettingService, ServicesSettingService, SystemSettingService, BackupService, RestoreService) {
+            var progress = function (value) {
                 $scope.$emit('progress', value);
             };
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', function (event, value) {
                 $scope.progress = value;
             });
-            let error_handler = (code, message) => {
+            var error_handler = function (code, message) {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
                 alert(message);
             };
-            let alert = (message) => {
-                let modalInstance = $uibModal.open({
+            var alert = function (message) {
+                var modalInstance = $uibModal.open({
                     controller: 'AlertDialogController',
                     templateUrl: '/common/dialogs/alert_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                             return message;
                         }
                     }
                 });
-                modalInstance.result.then((answer) => {
-                }, () => {
+                modalInstance.result.then(function (answer) {
+                }, function () {
                 });
             };
-            $document.on('drop dragover', (e) => {
+            $document.on('drop dragover', function (e) {
                 e.stopPropagation();
                 e.preventDefault();
             });
-            let Backup = () => {
-                let modalRegist = $uibModal.open({
+            var Backup = function () {
+                var modalRegist = $uibModal.open({
                     controller: 'BackupConfirmController',
                     templateUrl: '/setting/dialogs/backup_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                             return null;
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
-                }, () => {
+                modalRegist.result.then(function (content) {
+                }, function () {
                 });
             };
-            let Restore = () => {
-                let modalRegist = $uibModal.open({
+            var Restore = function () {
+                var modalRegist = $uibModal.open({
                     controller: 'RestoreConfirmController',
                     templateUrl: '/setting/dialogs/restore_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                             return null;
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
-                }, () => {
+                modalRegist.result.then(function (content) {
+                }, function () {
                 });
             };
-            let Draw = () => {
-                ApplicationSettingService.Get((application_data) => {
+            var Draw = function () {
+                ApplicationSettingService.Get(function (application_data) {
                     $scope.application_setting = application_data;
                 }, error_handler);
-                PluginsSettingService.Get((plugins_data) => {
+                PluginsSettingService.Get(function (plugins_data) {
                     $scope.plugins_setting = plugins_data;
                 }, error_handler);
-                ServicesSettingService.Get((services_data) => {
+                ServicesSettingService.Get(function (services_data) {
                     $scope.services_setting = services_data;
                 }, error_handler);
-                SystemSettingService.Get((system_data) => {
+                SystemSettingService.Get(function (system_data) {
                     $scope.system_setting = system_data;
                 }, error_handler);
             };
-            let Maintenance = () => {
+            var Maintenance = function () {
                 $scope.system_setting.mode = 2;
             };
-            let Write = () => {
-                ApplicationSettingService.Put($scope.application_setting, (application_data) => {
+            var Write = function () {
+                ApplicationSettingService.Put($scope.application_setting, function (application_data) {
                     $scope.application_setting = application_data;
                 });
-                PluginsSettingService.Put($scope.plugins_setting, (plugins_data) => {
+                PluginsSettingService.Put($scope.plugins_setting, function (plugins_data) {
                     $scope.plugins_setting = plugins_data;
                 });
-                ServicesSettingService.Put($scope.services_setting, (services_data) => {
+                ServicesSettingService.Put($scope.services_setting, function (services_data) {
                     $scope.services_setting = services_data;
                 });
-                SystemSettingService.Put($scope.system_setting, (system_data) => {
+                SystemSettingService.Put($scope.system_setting, function (system_data) {
                     $scope.system_setting = system_data;
                 });
             };
@@ -105,55 +105,55 @@ var Setting;
             Draw();
         }]);
     SettingControllers.controller('BackupConfirmController', ['$scope', '$log', '$uibModalInstance', 'items', 'BackupService',
-        ($scope, $log, $uibModalInstance, items, BackupService) => {
-            let progress = (value) => {
+        function ($scope, $log, $uibModalInstance, items, BackupService) {
+            var progress = function (value) {
                 $scope.$emit('progress', value);
             };
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', function (event, value) {
                 $scope.progress = value;
             });
-            let error_handler = (code, message) => {
+            var error_handler = function (code, message) {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
             };
-            $scope.hide = () => {
+            $scope.hide = function () {
                 $uibModalInstance.close();
             };
-            $scope.cancel = () => {
+            $scope.cancel = function () {
                 $uibModalInstance.dismiss();
             };
-            $scope.answer = () => {
+            $scope.answer = function () {
                 progress(true);
-                BackupService.Put((result) => {
+                BackupService.Put(function (result) {
                     progress(false);
                     $uibModalInstance.close({});
                 }, error_handler);
             };
         }]);
     SettingControllers.controller('RestoreConfirmController', ['$scope', '$log', '$uibModalInstance', 'items', 'RestoreService',
-        ($scope, $log, $uibModalInstance, items, RestoreService) => {
-            let progress = (value) => {
+        function ($scope, $log, $uibModalInstance, items, RestoreService) {
+            var progress = function (value) {
                 $scope.$emit('progress', value);
             };
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', function (event, value) {
                 $scope.progress = value;
             });
-            let error_handler = (code, message) => {
+            var error_handler = function (code, message) {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
                 window.alert(message);
             };
-            $scope.hide = () => {
+            $scope.hide = function () {
                 $uibModalInstance.close();
             };
-            $scope.cancel = () => {
+            $scope.cancel = function () {
                 $uibModalInstance.dismiss();
             };
-            $scope.answer = () => {
+            $scope.answer = function () {
                 progress(true);
-                RestoreService.Put($scope.password, (result) => {
+                RestoreService.Put($scope.password, function (result) {
                     progress(false);
                     $uibModalInstance.close({});
                 }, error_handler);

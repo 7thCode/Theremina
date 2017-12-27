@@ -4,21 +4,21 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let FormBuilderControllers = angular.module('FormBuilderControllers', ['ui.ace']);
-class RGBAColor {
-    constructor(r, g, b, a) {
+var FormBuilderControllers = angular.module('FormBuilderControllers', ['ui.ace']);
+var RGBAColor = (function () {
+    function RGBAColor(r, g, b, a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
     }
-    RGB() {
+    RGBAColor.prototype.RGB = function () {
         return "#" + ("0" + this.r.toString(16)).slice(-2) + ("0" + this.g.toString(16)).slice(-2) + ("0" + this.b.toString(16)).slice(-2);
-    }
-    RGBA() {
+    };
+    RGBAColor.prototype.RGBA = function () {
         return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
-    }
-    SetRGB(color) {
+    };
+    RGBAColor.prototype.SetRGB = function (color) {
         if (color) {
             if (color.length === 6) {
                 this.r = parseInt(color.slice(0, 2), 16);
@@ -33,9 +33,9 @@ class RGBAColor {
                 //this._a = parseInt(color.slice(7, 9), 16);
             }
         }
-    }
-    static Check(a) {
-        let result = 0;
+    };
+    RGBAColor.Check = function (a) {
+        var result = 0;
         if (a > 255) {
             result = 255;
         }
@@ -43,72 +43,73 @@ class RGBAColor {
             result = 0;
         }
         return result;
-    }
+    };
     ;
-    Lighten(n) {
-        let check = (a, b) => {
-            let result = a + b;
+    RGBAColor.prototype.Lighten = function (n) {
+        var check = function (a, b) {
+            var result = a + b;
             if (a > 255) {
                 result = 255;
             }
             return result;
         };
         return new RGBAColor(check(this.r, n), check(this.g, n), check(this.b, n), this.a);
-    }
-    Darken(n) {
-        let check = (a, b) => {
-            let result = a - b;
+    };
+    RGBAColor.prototype.Darken = function (n) {
+        var check = function (a, b) {
+            var result = a - b;
             if (a < 0) {
                 result = 0;
             }
             return result;
         };
         return new RGBAColor(check(this.r, n), check(this.g, n), check(this.b, n), this.a);
-    }
-    Invert() {
+    };
+    RGBAColor.prototype.Invert = function () {
         return new RGBAColor(255 - this.r, 255 - this.g, 255 - this.b, this.a);
-    }
-}
-const key_escape = /^(?!.*(\"|\\|\/|\.)).+$/;
-const tag_escape = /^(?!.*\u3040-\u30ff).+$/;
-const class_escape = /^(?!.*\u3040-\u30ff).+$/;
+    };
+    return RGBAColor;
+}());
+var key_escape = /^(?!.*(\"|\\|\/|\.)).+$/;
+var tag_escape = /^(?!.*\u3040-\u30ff).+$/;
+var class_escape = /^(?!.*\u3040-\u30ff).+$/;
 FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
     function ($scope, $document, $log, $compile, $uibModal, FormBuilderService, ElementsService) {
-        let progress = (value) => {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        window.addEventListener('beforeunload', (e) => {
+        window.addEventListener('beforeunload', function (e) {
             if ($scope.opened) {
                 e.returnValue = '';
                 return '';
             }
         }, false);
-        let pages = [
+        var pages = [
             {
                 contents: []
             }
         ];
-        let mark = document.getElementById("mark");
+        var mark = document.getElementById("mark");
         mark.style.setProperty('display', 'none');
         mark.style.backgroundColor = 'rgba(100,100,100,0.5)';
         mark.style.position = 'absolute';
-        window.addEventListener('resize', (event) => {
+        window.addEventListener('resize', function (event) {
             redraw_select();
         });
-        let editor = null;
-        $scope.aceLoaded = (_editor) => {
+        var editor = null;
+        $scope.aceLoaded = function (_editor) {
             editor = _editor;
             editor.setTheme("ace/theme/chrome");
             $scope.theme = 'chrome';
@@ -121,17 +122,17 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 enableLiveAutocompletion: true
             });
         };
-        $scope.aceChanged = (e) => {
+        $scope.aceChanged = function (e) {
             redraw_select();
         };
-        let changeElementContents = (contents) => {
+        var changeElementContents = function (contents) {
             $scope.contents = contents;
             redraw_select();
         };
-        let absolute_position = (target_element) => {
-            let left = 0;
-            let top = 0;
-            let element = target_element;
+        var absolute_position = function (target_element) {
+            var left = 0;
+            var top = 0;
+            var element = target_element;
             while (element) {
                 left += element.offsetLeft;
                 top += element.offsetTop;
@@ -139,18 +140,18 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             }
             return { left: left, top: top };
         };
-        let redraw_select = () => {
+        var redraw_select = function () {
             if (FormBuilderService.Selected()) {
-                let selected_element = FormBuilderService.Selected();
-                let root_element = document.getElementById("box");
-                let target_element = document.getElementById(selected_element.id);
+                var selected_element = FormBuilderService.Selected();
+                var root_element = document.getElementById("box");
+                var target_element = document.getElementById(selected_element.id);
                 if (target_element) {
-                    let root_position = absolute_position(root_element);
-                    let target_position = absolute_position(target_element);
-                    let select_reft = target_position.left - root_position.left;
-                    let select_top = target_position.top - root_position.top;
-                    let select_width = target_element.offsetWidth;
-                    let select_height = target_element.offsetHeight;
+                    var root_position = absolute_position(root_element);
+                    var target_position = absolute_position(target_element);
+                    var select_reft = target_position.left - root_position.left;
+                    var select_top = target_position.top - root_position.top;
+                    var select_width = target_element.offsetWidth;
+                    var select_height = target_element.offsetHeight;
                     mark.innerHTML = "<div style='float:right'>" + target_element.id + "</div>";
                     mark.style.top = "" + select_top + "px";
                     mark.style.left = "" + select_reft + "px";
@@ -164,10 +165,10 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             }
             $scope.current_page = FormBuilderService.current_page;
         };
-        let ElementOpen = (id) => {
-            let element = FormBuilderService.Find(id);
+        var ElementOpen = function (id) {
+            var element = FormBuilderService.Find(id);
             if (element.length == 1) {
-                let modalRegist = $uibModal.open({
+                var modalRegist = $uibModal.open({
                     controller: 'FormBuilderEditElementDialogController',
                     templateUrl: '/forms/dialogs/elements/edit_element_dialog',
                     resolve: {
@@ -176,13 +177,13 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 });
             }
         };
-        let ElementSelect = (id) => {
-            FormBuilderService.Select(id, (element) => {
+        var ElementSelect = function (id) {
+            FormBuilderService.Select(id, function (element) {
                 $scope.selected_element_type = element.type;
-                let selected_element = FormBuilderService.Selected();
-                let target_element = document.getElementById(selected_element.id); // $event.target;
+                var selected_element = FormBuilderService.Selected();
+                var target_element = document.getElementById(selected_element.id); // $event.target;
                 $scope.newid = element.id;
-                let style = element.attributes.style;
+                var style = element.attributes.style;
                 $scope.items = [];
                 if (style) {
                     $scope.items = style;
@@ -191,77 +192,77 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                     $scope.tab = { element_contents: element.contents };
                 }
                 $scope.attributes = element.attributes;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
-            }, (element) => {
+            }, function (element) {
                 redraw_select();
                 $scope.items = [];
             });
         };
-        let ElementSelected = (id) => {
-            let result = false;
-            let selected = FormBuilderService.Selected();
+        var ElementSelected = function (id) {
+            var result = false;
+            var selected = FormBuilderService.Selected();
             if (selected) {
                 result = (selected.id == id);
             }
             return result;
         };
-        let edit = ($event, id) => {
+        var edit = function ($event, id) {
             $event.stopPropagation();
             $event.preventDefault();
             ElementSelect(id);
         };
-        let deselect = () => {
-            FormBuilderService.Deselect((selected) => {
+        var deselect = function () {
+            FormBuilderService.Deselect(function (selected) {
             });
             redraw_select();
         };
-        let up = () => {
+        var up = function () {
             FormBuilderService.UpElement();
             redraw_select();
         };
-        let down = () => {
+        var down = function () {
             FormBuilderService.DownElement();
             redraw_select();
         };
-        let addTag = () => {
-            let modalRegist = $uibModal.open({
+        var addTag = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddTagDialogController',
                 templateUrl: '/forms/dialogs/elements/add_tag_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let new_tag = ElementsService.Tag(dialog_scope.tag, {
+            modalRegist.result.then(function (dialog_scope) {
+                var new_tag = ElementsService.Tag(dialog_scope.tag, {
                     class: "a",
                     style: { "border-style": "solid", "border-color": "black", "border-width": "1px;" }
                 });
                 FormBuilderService.AddElement(new_tag);
-            }, () => {
+            }, function () {
             });
         };
-        let addDiv = () => {
-            let modalRegist = $uibModal.open({
+        var addDiv = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddDivDialogController',
                 templateUrl: '/forms/dialogs/elements/add_div_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 FormBuilderService.AddElement(ElementsService.Div(dialog_scope.klass));
-            }, () => {
+            }, function () {
             });
         };
-        let addForm = () => {
-            let add_field = (label) => {
-                let parent_id = FormBuilderService.ParentId("root");
-                let id = FormBuilderService.CreateId("root");
-                let new_form = {
+        var addForm = function () {
+            var add_field = function (label) {
+                var parent_id = FormBuilderService.ParentId("root");
+                var id = FormBuilderService.CreateId("root");
+                var new_form = {
                     kind: "control",
                     type: "form",
                     id: id,
@@ -279,28 +280,28 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 };
                 FormBuilderService.AddElement(new_form);
             };
-            let modalRegist = $uibModal.open({
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddStyleDialogController',
                 templateUrl: '/forms/dialogs/add_style_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 add_field(dialog_scope.key);
-            }, () => {
+            }, function () {
             });
         };
-        let addField = () => {
-            let modalRegist = $uibModal.open({
+        var addField = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddFieldDialogController',
                 templateUrl: '/forms/dialogs/elements/add_field_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = {
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
                     min: {
                         value: dialog_scope.min.value,
                         message: dialog_scope.min.message
@@ -319,19 +320,19 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                     }
                 };
                 FormBuilderService.AddElement(ElementsService.Field(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addHtmlField = () => {
-            let modalRegist = $uibModal.open({
+        var addHtmlField = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddFieldDialogController',
                 templateUrl: '/forms/dialogs/elements/add_field_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = {
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
                     min: {
                         value: dialog_scope.min.value,
                         message: dialog_scope.min.message
@@ -350,112 +351,143 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                     }
                 };
                 FormBuilderService.AddElement(ElementsService.HtmlField(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addTextArea = () => {
-            let modalRegist = $uibModal.open({
+        var addTextArea = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddTextAreaDialogController',
                 templateUrl: '/forms/dialogs/elements/add_textarea_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = {
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
                     min: { value: dialog_scope.min.value, message: dialog_scope.min.message },
                     max: { value: dialog_scope.max.value, message: dialog_scope.max.message },
                     required: { value: dialog_scope.required.value, message: dialog_scope.required.message }
                 };
                 FormBuilderService.AddElement(ElementsService.TextArea(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addNumber = () => {
-            let modalRegist = $uibModal.open({
+        var addNumber = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddNumberDialogController',
                 templateUrl: '/forms/dialogs/elements/add_number_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = {
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
                     min: { value: dialog_scope.min.value, message: "" },
                     max: { value: dialog_scope.max.value, message: "" },
                     step: { value: dialog_scope.step.value, message: "" }
                 };
                 FormBuilderService.AddElement(ElementsService.Number(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addHtml = () => {
-            let modalRegist = $uibModal.open({
+        var addDate = function () {
+            var modalRegist = $uibModal.open({
+                controller: 'FormBuilderAddFieldDialogController',
+                templateUrl: '/forms/dialogs/elements/add_field_dialog',
+                resolve: {
+                    items: null
+                }
+            });
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
+                    min: {
+                        value: dialog_scope.min.value,
+                        message: dialog_scope.min.message
+                    },
+                    max: {
+                        value: dialog_scope.max.value,
+                        message: dialog_scope.max.message
+                    },
+                    pattern: {
+                        value: dialog_scope.pattern.value,
+                        message: dialog_scope.pattern.message
+                    },
+                    required: {
+                        value: dialog_scope.required.value,
+                        message: dialog_scope.required.message
+                    }
+                };
+                FormBuilderService.AddElement(ElementsService.Date(dialog_scope.key, validator));
+            }, function () {
+            });
+        };
+        var addHtml = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddTextAreaDialogController',
                 templateUrl: '/forms/dialogs/elements/add_textarea_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = {
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = {
                     min: { value: dialog_scope.min.value, message: dialog_scope.min.message },
                     max: { value: dialog_scope.max.value, message: dialog_scope.max.message },
                     required: { value: dialog_scope.required.value, message: dialog_scope.required.message }
                 };
                 FormBuilderService.AddElement(ElementsService.HtmlElement(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addImg = () => {
-            let modalRegist = $uibModal.open({
+        var addImg = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddImgDialogController',
                 templateUrl: '/forms/dialogs/elements/add_img_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let property = {};
+            modalRegist.result.then(function (dialog_scope) {
+                var property = {};
                 FormBuilderService.AddElement(ElementsService.Img(dialog_scope.key, property));
-            }, () => {
+            }, function () {
             });
         };
-        let addSelect = () => {
-            let modalRegist = $uibModal.open({
+        var addSelect = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddSelectDialogController',
                 templateUrl: '/forms/dialogs/elements/add_select_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let validator = { contents: dialog_scope.contents };
+            modalRegist.result.then(function (dialog_scope) {
+                var validator = { contents: dialog_scope.contents };
                 if (dialog_scope.required) {
                     validator = { contents: dialog_scope.contents, required: { value: true, message: dialog_scope.required.message } };
                 }
                 FormBuilderService.AddElement(ElementsService.Select(dialog_scope.key, validator));
-            }, () => {
+            }, function () {
             });
         };
-        let addChack = () => {
-            let modalRegist = $uibModal.open({
+        var addChack = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddImgDialogController',
                 templateUrl: '/forms/dialogs/elements/add_img_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let property = {};
+            modalRegist.result.then(function (dialog_scope) {
+                var property = {};
                 FormBuilderService.AddElement(ElementsService.Check(dialog_scope.key, property));
-            }, () => {
+            }, function () {
             });
         };
-        let addRadio = () => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_field = {
+        var addRadio = function () {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_field = {
                 kind: "control",
                 type: "radio",
                 id: id,
@@ -548,10 +580,10 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             };
             FormBuilderService.AddElement(new_field);
         };
-        let addButton = () => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_text = {
+        var addButton = function () {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_text = {
                 kind: "static",
                 type: "text",
                 id: id,
@@ -568,7 +600,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                     }
                 ]
             };
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "field",
                 id: id,
@@ -648,7 +680,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                     }
                 ]
             };
-            let new_div = {
+            var new_div = {
                 kind: "control",
                 type: "field",
                 id: id,
@@ -667,93 +699,93 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             };
             FormBuilderService.AddElement(new_field);
         };
-        let addChips = () => {
-            let modalRegist = $uibModal.open({
+        var addChips = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddChipsDialogController',
                 templateUrl: '/forms/dialogs/elements/add_chips_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let property = { contents: [] };
+            modalRegist.result.then(function (dialog_scope) {
+                var property = { contents: [] };
                 FormBuilderService.AddElement(ElementsService.Chips(dialog_scope.key, property));
-            }, () => {
+            }, function () {
             });
         };
-        let addAddress = () => {
-            let modalRegist = $uibModal.open({
+        var addAddress = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddChipsDialogController',
                 templateUrl: '/forms/dialogs/elements/add_chips_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let property = { contents: [] };
-                let new_address = ElementsService.Address(dialog_scope.key, property);
+            modalRegist.result.then(function (dialog_scope) {
+                var property = { contents: [] };
+                var new_address = ElementsService.Address(dialog_scope.key, property);
                 FormBuilderService.AddElement(new_address);
-            }, () => {
+            }, function () {
             });
         };
-        let DeleteElement = () => {
+        var DeleteElement = function () {
             FormBuilderService.DeleteElement();
             redraw_select();
         };
-        let setmode = (mode) => {
-            FormBuilderService.SetEditMode(mode, (element) => {
+        var setmode = function (mode) {
+            FormBuilderService.SetEditMode(mode, function (element) {
                 redraw_select();
             });
         };
-        let redraw = (page_no) => {
+        var redraw = function (page_no) {
             FormBuilderService.current_page = pages[page_no].contents;
-            FormBuilderService.Draw((event) => {
+            FormBuilderService.Draw(function (event) {
                 if (event.name == "exit") {
                     redraw_select();
                 }
             });
         };
-        let contents_update = (value) => {
-            let target = FormBuilderService.Selected();
+        var contents_update = function (value) {
+            var target = FormBuilderService.Selected();
             if (target) {
                 target.contents = value;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
             }
         };
-        let attribute_value_update = (key, value) => {
-            let target = FormBuilderService.Selected();
+        var attribute_value_update = function (key, value) {
+            var target = FormBuilderService.Selected();
             if (target) {
                 target.attributes[key] = value;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
             }
         };
-        let style_value_update = (key, value) => {
-            let target = FormBuilderService.Selected();
+        var style_value_update = function (key, value) {
+            var target = FormBuilderService.Selected();
             if (target) {
                 target.attributes.style[key] = value;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
             }
         };
-        let remove_attribute = (key) => {
-            let result = false;
+        var remove_attribute = function (key) {
+            var result = false;
             if (key != 'style') {
-                let target = FormBuilderService.Selected();
+                var target = FormBuilderService.Selected();
                 if (target) {
                     if (key in target.attributes) {
                         delete target.attributes[key];
-                        FormBuilderService.Draw((event) => {
+                        FormBuilderService.Draw(function (event) {
                             if (event.name == "exit") {
                                 redraw_select();
                             }
@@ -764,13 +796,13 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             }
             return result;
         };
-        let remove_style = (key) => {
-            let result = false;
-            let target = FormBuilderService.Selected();
+        var remove_style = function (key) {
+            var result = false;
+            var target = FormBuilderService.Selected();
             if (target) {
                 if (key in target.attributes.style) {
                     delete target.attributes.style[key];
-                    FormBuilderService.Draw((event) => {
+                    FormBuilderService.Draw(function (event) {
                         if (event.name == "exit") {
                             redraw_select();
                         }
@@ -780,15 +812,15 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
             }
             return result;
         };
-        let add_attribute = () => {
-            let add_attribute = (key, value) => {
-                let result = false;
+        var add_attribute = function () {
+            var add_attribute = function (key, value) {
+                var result = false;
                 if (key != 'style') {
-                    let target = FormBuilderService.Selected();
+                    var target = FormBuilderService.Selected();
                     if (target) {
                         if (!(key in target.attributes)) {
                             target.attributes[key] = value;
-                            FormBuilderService.Draw((event) => {
+                            FormBuilderService.Draw(function (event) {
                                 if (event.name == "exit") {
                                     redraw_select();
                                 }
@@ -799,29 +831,29 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 }
                 return result;
             };
-            let modalRegist = $uibModal.open({
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddAttributeDialogController as dialog',
                 templateUrl: '/forms/dialogs/add_attribute_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 add_attribute(dialog_scope.key, dialog_scope.value);
-            }, () => {
+            }, function () {
             });
         };
-        let add_style = () => {
-            let add_style = (key, value) => {
-                let result = false;
-                let target = FormBuilderService.Selected();
+        var add_style = function () {
+            var add_style = function (key, value) {
+                var result = false;
+                var target = FormBuilderService.Selected();
                 if (target) {
                     if (!target.attributes.style) {
                         target.attributes["style"] = {};
                     }
                     if (!(key in target.attributes.style)) {
                         target.attributes.style[key] = value;
-                        FormBuilderService.Draw((event) => {
+                        FormBuilderService.Draw(function (event) {
                             if (event.name == "exit") {
                                 redraw_select();
                             }
@@ -831,87 +863,87 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 }
                 return result;
             };
-            let modalRegist = $uibModal.open({
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderAddStyleDialogController as dialog',
                 templateUrl: '/forms/dialogs/add_style_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 add_style(dialog_scope.key, dialog_scope.value);
-            }, () => {
+            }, function () {
             });
         };
-        let Create = () => {
-            let modalRegist = $uibModal.open({
+        var Create = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderCreateDialogController',
                 templateUrl: '/forms/dialogs/create_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((layout) => {
+            modalRegist.result.then(function (layout) {
                 $scope.layout = layout;
                 $scope.name = layout.name;
                 $scope.userid = layout.userid;
                 $scope.opened = true;
                 FormBuilderService.current_page = layout.content;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
-            }, () => {
+            }, function () {
             });
         };
-        let Open = () => {
-            let modalRegist = $uibModal.open({
+        var Open = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormBuilderOpenDialogController',
                 templateUrl: '/forms/dialogs/open_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((layout) => {
+            modalRegist.result.then(function (layout) {
                 $scope.layout = layout;
                 $scope.name = layout.name;
                 $scope.userid = layout.userid;
                 $scope.opened = true;
                 FormBuilderService.current_page = layout.content;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
                 });
-            }, () => {
+            }, function () {
             });
         };
-        let Update = () => {
+        var Update = function () {
             if (FormBuilderService.current_page) {
                 progress(true);
-                FormBuilderService.Put(FormBuilderService.current_page, (result) => {
+                FormBuilderService.Put(FormBuilderService.current_page, function (result) {
                     progress(false);
                 }, error_handler);
             }
         };
-        let Delete = () => {
+        var Delete = function () {
             if (FormBuilderService.current_page) {
-                let modalRegist = $uibModal.open({
+                var modalRegist = $uibModal.open({
                     controller: 'FormBuilderDeleteConfirmController',
                     templateUrl: '/forms/dialogs/delete_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                             return FormBuilderService.current_page;
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
+                modalRegist.result.then(function (content) {
                     progress(true);
-                    FormBuilderService.Delete((result) => {
+                    FormBuilderService.Delete(function (result) {
                         $scope.name = "";
                         FormBuilderService.current_page = [];
-                        FormBuilderService.Draw((event) => {
+                        FormBuilderService.Draw(function (event) {
                             if (event.name == "exit") {
                                 redraw_select();
                             }
@@ -919,7 +951,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                         progress(false);
                         $scope.opened = false;
                     }, error_handler);
-                }, () => {
+                }, function () {
                 });
             }
         };
@@ -940,6 +972,7 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
         $scope.addHtmlField = addHtmlField;
         $scope.addTextArea = addTextArea;
         $scope.addNumber = addNumber;
+        $scope.addDate = addDate;
         $scope.addHtml = addHtml;
         $scope.addImg = addImg;
         $scope.addSelect = addSelect;
@@ -961,12 +994,12 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
         $scope.Open = Open;
         $scope.Update = Update;
         $scope.Delete = Delete;
-        $scope.$watch('class', () => {
-            let target = FormBuilderService.Selected();
+        $scope.$watch('class', function () {
+            var target = FormBuilderService.Selected();
             if (target) {
                 if ($scope.class) {
                     target.attributes.class = $scope.class;
-                    FormBuilderService.Draw((event) => {
+                    FormBuilderService.Draw(function (event) {
                         if (event.name == "exit") {
                             redraw_select();
                         }
@@ -974,11 +1007,11 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
                 }
             }
         });
-        $scope.$watch('contents', () => {
-            let target = FormBuilderService.Selected();
+        $scope.$watch('contents', function () {
+            var target = FormBuilderService.Selected();
             if (target) {
                 target.contents = $scope.contents;
-                FormBuilderService.Draw((event) => {
+                FormBuilderService.Draw(function (event) {
                     if (event.name == "exit") {
                         redraw_select();
                     }
@@ -989,181 +1022,197 @@ FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document
         FormBuilderService.$compile = $compile;
         $scope.components = true;
         $scope.attributes = true;
+        //tinymce
+        $scope.tinymceOptions = {
+            onChange: function (e) {
+                // put logic here for keypress and cut/paste changes
+            },
+            inline: false,
+            plugins: 'advlist autolink link image lists charmap print preview',
+            skin: 'lightgray',
+            theme: 'modern'
+        };
+        //froala
+        //     $scope.froalaOptions = {
+        //         toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+        //     };
     }]);
 FormBuilderControllers.controller('FormBuilderAddStyleDialogController', ['$uibModalInstance', 'items',
     function ($uibModalInstance, items) {
-        this.hide = () => {
+        var _this = this;
+        this.hide = function () {
             $uibModalInstance.close();
         };
-        this.cancel = () => {
+        this.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        this.answer = () => {
-            $uibModalInstance.close(this);
+        this.answer = function () {
+            $uibModalInstance.close(_this);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddAttributeDialogController', ['$uibModalInstance', 'items',
     function ($uibModalInstance, items) {
-        this.hide = () => {
+        var _this = this;
+        this.hide = function () {
             $uibModalInstance.close();
         };
-        this.cancel = () => {
+        this.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        this.answer = () => {
-            $uibModalInstance.close(this);
+        this.answer = function () {
+            $uibModalInstance.close(_this);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddTagDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.tag_escape = tag_escape;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddDivDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.class_escape = class_escape;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddFieldDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.key_escape = key_escape;
         $scope.min = { value: 5, message: 'もう少し長く' };
         $scope.max = { value: 100, message: 'もう少し短く' };
         $scope.pattern = { value: "", message: "" };
         $scope.required = { value: false, message: '必須です' };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddNumberDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.min = { value: 0, message: '' };
         $scope.max = { value: 100, message: '' };
         $scope.step = { value: 1, message: '' };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddTextAreaDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.key_escape = key_escape;
         $scope.min = { value: 5, message: 'もう少し長く' };
         $scope.max = { value: 100, message: 'もう少し短く' };
         $scope.required = { value: false, message: '必須です' };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddImgDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.key_escape = key_escape;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddSelectDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.key_escape = key_escape;
         $scope.contents = [];
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddChipsDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.key_escape = key_escape;
         $scope.contents = [];
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderAddElementDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormBuilderControllers.controller('FormBuilderCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'FormBuilderService', 'items',
-    ($scope, $log, $uibModalInstance, FormBuilderService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, FormBuilderService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
         $scope.type = 1;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            FormBuilderService.Create($scope.title, $scope.type, (result) => {
+            FormBuilderService.Create($scope.title, $scope.type, function (result) {
                 progress(false);
                 $scope.message = "";
                 $uibModalInstance.close(result);
@@ -1171,89 +1220,89 @@ FormBuilderControllers.controller('FormBuilderCreateDialogController', ['$scope'
         };
     }]);
 FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'FormBuilderService',
-    ($scope, $log, $uibModalInstance, $uibModal, items, FormBuilderService) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, $uibModal, items, FormBuilderService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        let Query = () => {
+        var Query = function () {
             progress(true);
             FormBuilderService.query = {};
-            FormBuilderService.Query((result) => {
+            FormBuilderService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             progress(true);
             FormBuilderService.query = {};
             if (name) {
                 FormBuilderService.query = { name: name };
             }
-            FormBuilderService.Query((result) => {
+            FormBuilderService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Count = () => {
-            FormBuilderService.Count((result) => {
+        var Count = function () {
+            FormBuilderService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            FormBuilderService.Next((result) => {
+            FormBuilderService.Next(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            FormBuilderService.Prev((result) => {
+            FormBuilderService.Prev(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Get = (layout) => {
+        var Get = function (layout) {
             progress(true);
-            FormBuilderService.Get(layout._id, (result) => {
+            FormBuilderService.Get(layout._id, function (result) {
                 progress(false);
                 $scope.message = "";
                 $uibModalInstance.close(result);
             }, error_handler);
         };
-        let hide = () => {
+        var hide = function () {
             $uibModalInstance.close();
         };
-        let cancel = () => {
+        var cancel = function () {
             $uibModalInstance.dismiss();
         };
-        let LayoutQuery = () => Query;
+        var LayoutQuery = function () { return Query; };
         $scope.Count = Count;
         $scope.Next = Next;
         $scope.Prev = Prev;
@@ -1261,38 +1310,38 @@ FormBuilderControllers.controller('FormBuilderOpenDialogController', ['$scope', 
         $scope.Get = Get;
         $scope.hide = hide;
         $scope.cancel = cancel;
-        $scope.LayoutQuery = () => Query;
+        $scope.LayoutQuery = function () { return Query; };
         Query();
     }]);
 FormBuilderControllers.controller('FormBuilderDeleteConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.title = items.name;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);
 FormBuilderControllers.controller('FormBuilderEditElementDialogController', ['$scope', '$uibModal', '$uibModalInstance', 'FormBuilderService', 'items',
-    ($scope, $uibModal, $uibModalInstance, FormBuilderService, items) => {
+    function ($scope, $uibModal, $uibModalInstance, FormBuilderService, items) {
         $scope.control = items;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
-        $scope.ElementOpen = (id) => {
-            let element = FormBuilderService.Find(id);
+        $scope.ElementOpen = function (id) {
+            var element = FormBuilderService.Find(id);
             if (element.length == 1) {
-                let modalRegist = $uibModal.open({
+                var modalRegist = $uibModal.open({
                     controller: 'FormBuilderEditElementDialogController',
                     templateUrl: '/forms/dialogs/elements/edit_element_dialog',
                     resolve: {

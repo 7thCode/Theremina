@@ -6,14 +6,14 @@
 "use strict";
 var FormModule;
 (function (FormModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const timestamp = require('../../systems/plugins/timestamp/timestamp');
-    const userdata = require('../../systems/plugins/userdata/userdata');
-    const Form = new Schema({});
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var timestamp = require('../../systems/plugins/timestamp/timestamp');
+    var userdata = require('../../systems/plugins/userdata/userdata');
+    var Form = new Schema({});
     Form.plugin(timestamp);
     Form.plugin(userdata, {});
-    Form.index({ namespace: 1, name: 1, userid: 1, type: 1, status: 1, version: 1 }, { unique: true, index: true });
+    Form.index({ namespace: 1, name: 1, userid: 1, type: 1, status: 1, version: 1 }, { unique: true });
     module.exports = mongoose.model('Page', Form);
 })(FormModule || (FormModule = {}));
 //# sourceMappingURL=form.js.map

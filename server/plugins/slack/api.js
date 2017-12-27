@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SlackApiRouter;
 (function (SlackApiRouter) {
-    const express = require("express");
+    var express = require("express");
     SlackApiRouter.router = express.Router();
-    const core = require(process.cwd() + "/gs");
-    const share = core.share;
-    const plugins_config = share.plugins_config;
+    var core = require(process.cwd() + "/gs");
+    var share = core.share;
+    var plugins_config = share.plugins_config;
     if (plugins_config.slack) {
-        const SlackModule = require(share.Server("plugins/slack/controllers/slack_controller"));
-        const slack = new SlackModule.Slack();
+        var SlackModule = require(share.Server("plugins/slack/controllers/slack_controller"));
+        var slack = new SlackModule.Slack();
     }
 })(SlackApiRouter = exports.SlackApiRouter || (exports.SlackApiRouter = {}));
 module.exports = SlackApiRouter.router;

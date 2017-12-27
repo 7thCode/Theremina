@@ -4,120 +4,120 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let FormPlayerControllers = angular.module('FormPlayerControllers', []);
+var FormPlayerControllers = angular.module('FormPlayerControllers', []);
 FormPlayerControllers.controller('FormPlayerController', ["$scope", "$document", "$log", "$compile", "$uibModal", "FormPlayerService", "ArticleService",
     function ($scope, $document, $log, $compile, $uibModal, FormPlayerService, ArticleService) {
-        let progress = (value) => {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let page_no = 0;
-        let pages = [
+        var page_no = 0;
+        var pages = [
             {
                 contents: []
             }
         ];
-        let current_id = null;
-        let Init = () => {
+        var current_id = null;
+        var Init = function () {
             $scope.opened = false;
             page_no = 0;
             pages = [{ contents: [] }];
         };
-        let Open = () => {
+        var Open = function () {
             Init();
-            let modalRegist = $uibModal.open({
+            var modalRegist = $uibModal.open({
                 controller: 'FormPlayerOpenDialogController',
                 templateUrl: '/forms/dialogs/open_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                     }
                 }
             });
-            modalRegist.result.then((layout) => {
+            modalRegist.result.then(function (layout) {
                 $scope.name = layout.name;
                 FormPlayerService.current_page = layout.content;
                 FormPlayerService.Draw();
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
-        let Draw = () => {
+        var Draw = function () {
             FormPlayerService.current_page = pages[page_no].contents;
             FormPlayerService.Draw();
         };
-        let Clear = () => {
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Clear = function () {
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        $scope[name] = "";
+                        var name_1 = attributes["ng-model"];
+                        $scope[name_1] = "";
                     }
                 });
             });
             Draw();
         };
-        let Map = (result) => {
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Map = function (result) {
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        $scope[name] = result[element.label];
+                        var name_2 = attributes["ng-model"];
+                        $scope[name_2] = result[element.label];
                     }
                 });
             });
             Draw();
         };
-        let Reduce = (result) => {
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Reduce = function (result) {
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        if ($scope[name]) {
-                            result[element.label] = $scope[name];
+                        var name_3 = attributes["ng-model"];
+                        if ($scope[name_3]) {
+                            result[element.label] = $scope[name_3];
                         }
                     }
                 });
             });
             return result;
         };
-        let CreateArticle = () => {
-            let modalRegist = $uibModal.open({
+        var CreateArticle = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'FormPlayerCreateDialogController',
                 templateUrl: '/forms/dialogs/create_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 progress(true);
-                let name = dialog_scope.title;
-                ArticleService.Create(name, {}, (result) => {
+                var name = dialog_scope.title;
+                ArticleService.Create(name, {}, function (result) {
                     current_id = result._id;
                     progress(false);
                 }, error_handler);
-            }, () => {
+            }, function () {
             });
         };
-        let LoadArticle = (id) => {
+        var LoadArticle = function (id) {
             progress(true);
-            ArticleService.Get(id, (result) => {
+            ArticleService.Get(id, function (result) {
                 $scope.current_article = result;
                 current_id = id;
                 if (result.content) {
@@ -127,10 +127,10 @@ FormPlayerControllers.controller('FormPlayerController', ["$scope", "$document",
                 progress(false);
             }, error_handler);
         };
-        let SaveArticle = () => {
+        var SaveArticle = function () {
             progress(true);
-            let new_record = Reduce({});
-            ArticleService.Put(current_id, new_record, (result) => {
+            var new_record = Reduce({});
+            ArticleService.Put(current_id, new_record, function (result) {
                 progress(false);
             }, error_handler);
         };
@@ -144,88 +144,88 @@ FormPlayerControllers.controller('FormPlayerController', ["$scope", "$document",
         //     Draw();
     }]);
 FormPlayerControllers.controller('FormPlayerCreateDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 FormPlayerControllers.controller('FormPlayerOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'FormPlayerService',
-    ($scope, $log, $uibModalInstance, $uibModal, items, FormPlayerService) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, $uibModal, items, FormPlayerService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        let Query = () => {
+        var Query = function () {
             progress(true);
             FormPlayerService.SetQuery(null);
-            FormPlayerService.Query((value) => {
+            FormPlayerService.Query(function (value) {
                 $scope.pages = value;
-                FormPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             progress(true);
             FormPlayerService.SetQuery(null);
             if (name) {
                 FormPlayerService.SetQuery({ name: name });
             }
-            FormPlayerService.Query((result) => {
+            FormPlayerService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            FormPlayerService.Next((result) => {
+            FormPlayerService.Next(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            FormPlayerService.Prev((result) => {
+            FormPlayerService.Prev(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                FormPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                FormPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                FormPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FormPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Get = (layout) => {
+        var Get = function (layout) {
             progress(true);
-            FormPlayerService.Get(layout._id, (result) => {
+            FormPlayerService.Get(layout._id, function (result) {
                 progress(false);
                 $uibModalInstance.close(layout);
             }, error_handler);
         };
-        let hide = () => {
+        var hide = function () {
             $uibModalInstance.close();
         };
-        let cancel = () => {
+        var cancel = function () {
             $uibModalInstance.dismiss();
         };
         $scope.Next = Next;

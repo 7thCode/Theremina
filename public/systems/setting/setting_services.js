@@ -6,58 +6,58 @@
 "use strict";
 var Setting;
 (function (Setting) {
-    let SettingServices = angular.module('SettingServices', []);
+    var SettingServices = angular.module('SettingServices', []);
     SettingServices.factory('Backup', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/command/backup', {}, {
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('Restore', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/command/restore', {}, {
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('ApplicationSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/setting/application', {}, {
                 get: { method: 'GET' },
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('PluginsSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/setting/plugins', {}, {
                 get: { method: 'GET' },
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('ServicesSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/setting/services', {}, {
                 get: { method: 'GET' },
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('SystemSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/setting/system', {}, {
                 get: { method: 'GET' },
                 put: { method: 'PUT' }
             });
         }]);
     SettingServices.factory('ModulesSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/setting/setting/modules', {}, {
                 get: { method: 'GET' }
             });
         }]);
     SettingServices.service('BackupService', ['Backup',
         function (Backup) {
-            this.Put = (callback, error) => {
-                let data = new Backup();
-                data.$put({}, (result) => {
+            this.Put = function (callback, error) {
+                var data = new Backup();
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -74,10 +74,10 @@ var Setting;
         }]);
     SettingServices.service('RestoreService', ['Restore',
         function (Restore) {
-            this.Put = (password, callback, error) => {
-                let data = new Restore();
+            this.Put = function (password, callback, error) {
+                var data = new Restore();
                 data.password = password;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -94,8 +94,8 @@ var Setting;
         }]);
     SettingServices.service('ApplicationSettingService', ['ApplicationSetting',
         function (ApplicationSetting) {
-            this.Get = (callback, error) => {
-                ApplicationSetting.get({}, (result) => {
+            this.Get = function (callback, error) {
+                ApplicationSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -109,10 +109,10 @@ var Setting;
                     }
                 });
             };
-            this.Put = (setting, callback, error) => {
-                let data = new ApplicationSetting();
+            this.Put = function (setting, callback, error) {
+                var data = new ApplicationSetting();
                 data.setting = setting;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -129,8 +129,8 @@ var Setting;
         }]);
     SettingServices.service('PluginsSettingService', ['PluginsSetting',
         function (PluginsSetting) {
-            this.Get = (callback, error) => {
-                PluginsSetting.get({}, (result) => {
+            this.Get = function (callback, error) {
+                PluginsSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -144,10 +144,10 @@ var Setting;
                     }
                 });
             };
-            this.Put = (setting, callback, error) => {
-                let data = new PluginsSetting();
+            this.Put = function (setting, callback, error) {
+                var data = new PluginsSetting();
                 data.setting = setting;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -164,8 +164,8 @@ var Setting;
         }]);
     SettingServices.service('ServicesSettingService', ['ServicesSetting',
         function (ServicesSetting) {
-            this.Get = (callback, error) => {
-                ServicesSetting.get({}, (result) => {
+            this.Get = function (callback, error) {
+                ServicesSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -179,10 +179,10 @@ var Setting;
                     }
                 });
             };
-            this.Put = (setting, callback, error) => {
-                let data = new ServicesSetting();
+            this.Put = function (setting, callback, error) {
+                var data = new ServicesSetting();
                 data.setting = setting;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -199,8 +199,8 @@ var Setting;
         }]);
     SettingServices.service('SystemSettingService', ['SystemSetting', 'ModulesSetting',
         function (SystemSetting, ModulesSetting) {
-            this.Get = (callback, error) => {
-                SystemSetting.get({}, (result) => {
+            this.Get = function (callback, error) {
+                SystemSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -214,10 +214,10 @@ var Setting;
                     }
                 });
             };
-            this.Put = (setting, callback, error) => {
-                let data = new SystemSetting();
+            this.Put = function (setting, callback, error) {
+                var data = new SystemSetting();
                 data.setting = setting;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -231,8 +231,8 @@ var Setting;
                     }
                 });
             };
-            this.Modules = (callback, error) => {
-                ModulesSetting.get({}, (result) => {
+            this.Modules = function (callback, error) {
+                ModulesSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);

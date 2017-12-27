@@ -7,32 +7,33 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MailerModule;
 (function (MailerModule) {
-    const _ = require('lodash');
-    class Mailer {
-        constructor(mailsetting, mailaccount) {
+    var _ = require('lodash');
+    var Mailer = (function () {
+        function Mailer(mailsetting, mailaccount) {
             this.mailer = require('nodemailer');
             this.account = mailaccount;
             this.mailsetting = mailsetting;
         }
-        send(mail_address, title, message, callback) {
+        Mailer.prototype.send = function (mail_address, bcc_address, title, message, callback) {
+            var _this = this;
             this.smtpUser = this.mailer.createTransport('SMTP', this.mailsetting); //SMTPの接続
             if (this.smtpUser) {
-                let resultMail = {
+                var resultMail = {
                     from: this.account,
                     to: mail_address,
-                    bcc: this.account,
+                    bcc: bcc_address,
                     subject: title,
                     html: message
                 };
                 try {
-                    this.smtpUser.sendMail(resultMail, (error) => {
+                    this.smtpUser.sendMail(resultMail, function (error) {
                         if (!error) {
                             callback(error);
                         }
                         else {
                             callback(error);
                         }
-                        this.smtpUser.close();
+                        _this.smtpUser.close();
                     });
                 }
                 catch (e) {
@@ -42,33 +43,35 @@ var MailerModule;
             else {
                 callback({});
             }
-        }
-    }
+        };
+        return Mailer;
+    }());
     MailerModule.Mailer = Mailer;
-    class Mailer2 {
-        constructor(mailsetting, mailaccount) {
-            let mailer = require('nodemailer');
+    var Mailer2 = (function () {
+        function Mailer2(mailsetting, mailaccount) {
+            var mailer = require('nodemailer');
             this.account = mailaccount;
             this.smtpUser = mailer.createTransport(mailsetting);
         }
-        send(mail_address, title, message, callback) {
+        Mailer2.prototype.send = function (mail_address, bcc_address, title, message, callback) {
+            var _this = this;
             if (this.smtpUser) {
-                let resultMail = {
+                var resultMail = {
                     from: this.account,
                     to: mail_address,
-                    bcc: this.account,
+                    bcc: bcc_address,
                     subject: title,
                     html: message
                 };
                 try {
-                    this.smtpUser.sendMail(resultMail, (error) => {
+                    this.smtpUser.sendMail(resultMail, function (error) {
                         if (!error) {
                             callback(error);
                         }
                         else {
                             callback(error);
                         }
-                        this.smtpUser.close();
+                        _this.smtpUser.close();
                     });
                 }
                 catch (e) {
@@ -78,25 +81,26 @@ var MailerModule;
             else {
                 callback({});
             }
-        }
-    }
+        };
+        return Mailer2;
+    }());
     MailerModule.Mailer2 = Mailer2;
-    class MailGun {
-        constructor(mailsetting, mailaccount) {
+    var MailGun = (function () {
+        function MailGun(mailsetting, mailaccount) {
             this.account = mailaccount;
             this.api_key = mailsetting.api_key;
             this.domain = mailsetting.domain;
             this.mailgun = require('mailgun-js')({ apiKey: this.api_key, domain: this.domain });
         }
-        send(mail_address, title, message, callback) {
-            let data = {
+        MailGun.prototype.send = function (mail_address, bcc_address, title, message, callback) {
+            var data = {
                 from: this.account,
                 to: mail_address,
-                bcc: this.account,
+                bcc: bcc_address,
                 subject: title,
                 html: message
             };
-            this.mailgun.messages().send(data, (error, body) => {
+            this.mailgun.messages().send(data, function (error, body) {
                 if (!error) {
                     callback(null);
                 }
@@ -104,40 +108,42 @@ var MailerModule;
                     callback(error);
                 }
             });
-        }
-    }
+        };
+        return MailGun;
+    }());
     MailerModule.MailGun = MailGun;
-    class MailReceiver {
-        constructor() {
-            let iconv = require('iconv');
+    var MailReceiver = (function () {
+        function MailReceiver() {
+            var iconv = require('iconv');
             this.conv = new iconv.Iconv("UTF-8", "UTF-8");
             this.inbox = require('inbox');
         }
-        connect(receiver_setting, connect, receive) {
-            let imap;
+        MailReceiver.prototype.connect = function (receiver_setting, connect, receive) {
+            var imap;
             if (receiver_setting.type == "imap") {
                 imap = this.inbox.createConnection(false, receiver_setting.address, {
                     secureConnection: true,
                     auth: receiver_setting.auth
                 });
-                imap.on('connect', () => {
-                    imap.openMailbox('INBOX', (error) => {
+                imap.on('connect', function () {
+                    imap.openMailbox('INBOX', function (error) {
                         connect(error);
                     });
                 });
-                imap.on('new', (message) => {
-                    let stream = imap.createMessageStream(message.UID);
-                    let simpleParser = require("mailparser").simpleParser;
-                    simpleParser(stream).then((mail) => {
+                imap.on('new', function (message) {
+                    var stream = imap.createMessageStream(message.UID);
+                    var simpleParser = require("mailparser").simpleParser;
+                    simpleParser(stream).then(function (mail) {
                         receive(message, mail);
-                    }).catch((error) => {
-                        let a = error;
+                    }).catch(function (error) {
+                        var a = error;
                     });
                 });
                 imap.connect();
             }
-        }
-    }
+        };
+        return MailReceiver;
+    }());
     MailerModule.MailReceiver = MailReceiver;
 })(MailerModule = exports.MailerModule || (exports.MailerModule = {}));
 module.exports = MailerModule;

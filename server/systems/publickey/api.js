@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var PublicKeyApiRouter;
 (function (PublicKeyApiRouter) {
-    const express = require('express');
+    var express = require('express');
     PublicKeyApiRouter.router = express.Router();
-    const share = require('../common/share');
-    const ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception = new ExceptionController.Exception();
+    var share = require('../common/share');
+    var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
+    var exception = new ExceptionController.Exception();
     /*! public key */
-    const PublicKeyController = require(share.Server("systems/publickey/controllers/publickey_controller"));
-    const publickey = new PublicKeyController.PublicKey();
+    var PublicKeyController = require(share.Server("systems/publickey/controllers/publickey_controller"));
+    var publickey = new PublicKeyController.PublicKey();
     PublicKeyApiRouter.router.get("/fixed", [publickey.get_fixed_public_key]);
     PublicKeyApiRouter.router.get("/dynamic", [exception.exception, exception.guard, exception.authenticate, publickey.get_public_key]);
     PublicKeyApiRouter.router.get("/token", [exception.exception, exception.guard, exception.authenticate, publickey.get_access_token]);

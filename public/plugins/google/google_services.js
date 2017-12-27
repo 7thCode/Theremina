@@ -4,14 +4,14 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let GoogleServices = angular.module('GoogleServices', []);
+var GoogleServices = angular.module('GoogleServices', []);
 GoogleServices.factory('Analytics', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/google/api/ga/:dimensions', { dimensions: "@dimensions" }, {});
     }]);
 GoogleServices.service("LocationService", [function () {
-        let id, target, options;
-        this.Get = (callback, error) => {
+        var id, target, options;
+        this.Get = function (callback, error) {
             target = {
                 latitude: 0,
                 longitude: 0,
@@ -30,10 +30,10 @@ GoogleServices.service("LocationService", [function () {
         };
     }]);
 GoogleServices.service("AnalyticsService", ["Analytics", "AnalyticsCreate", "AnalyticsCreate2", "Upload", function (Analytics, AnalyticsCreate, AnalyticsCreate2, Upload) {
-        this.Get = (dimensions, callback, error) => {
+        this.Get = function (dimensions, callback, error) {
             Analytics.get({
                 dimensions: encodeURIComponent(JSON.stringify(dimensions)),
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);

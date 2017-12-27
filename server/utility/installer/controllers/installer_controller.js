@@ -7,11 +7,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var InstallerModule;
 (function (InstallerModule) {
-    const fs = require('graceful-fs');
-    class Installer {
-        read(request, response) {
-            let result = "";
-            let config_seed_file = fs.openSync(process.cwd() + "/config/systems/config.json", 'r');
+    var fs = require('graceful-fs');
+    var Installer = (function () {
+        function Installer() {
+        }
+        Installer.prototype.read = function (request, response) {
+            var result = "";
+            var config_seed_file = fs.openSync(process.cwd() + "/config/systems/config.json", 'r');
             if (config_seed_file) {
                 try {
                     result = JSON.parse(fs.readFileSync(config_seed_file, 'utf8'));
@@ -23,11 +25,11 @@ var InstallerModule;
                     response.json({ code: 0, message: "", value: result });
                 }
             }
-        }
-        write(request, response) {
-            let config_seed = request.body.setting;
+        };
+        Installer.prototype.write = function (request, response) {
+            var config_seed = request.body.setting;
             config_seed.mode = 1;
-            let config_seed_file = fs.openSync(process.cwd() + "/config/systems/config.json", 'w');
+            var config_seed_file = fs.openSync(process.cwd() + "/config/systems/config.json", 'w');
             if (config_seed_file) {
                 try {
                     fs.writeFileSync(config_seed_file, JSON.stringify(config_seed, null, 1));
@@ -39,8 +41,9 @@ var InstallerModule;
                     response.json({ code: 0, message: "", value: config_seed });
                 }
             }
-        }
-    }
+        };
+        return Installer;
+    }());
     InstallerModule.Installer = Installer;
 })(InstallerModule = exports.InstallerModule || (exports.InstallerModule = {}));
 module.exports = InstallerModule;

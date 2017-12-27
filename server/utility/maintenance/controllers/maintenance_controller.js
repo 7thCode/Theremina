@@ -7,8 +7,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MaintenanceModule;
 (function (MaintenanceModule) {
-    class Installer {
-    }
+    var Installer = (function () {
+        function Installer() {
+        }
+        return Installer;
+    }());
     MaintenanceModule.Installer = Installer;
 })(MaintenanceModule = exports.MaintenanceModule || (exports.MaintenanceModule = {}));
 module.exports = MaintenanceModule;

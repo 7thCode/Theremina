@@ -9,35 +9,37 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Promised;
 (function (Promised) {
-    const fs = require('graceful-fs');
-    const _ = require("lodash");
-    const result = require("./result");
+    var fs = require('graceful-fs');
+    var _ = require("lodash");
+    var result = require("./result");
     //    const core = require(process.cwd() + '/gs');
     //    const share: any = core.share;
     //    const config: any = share.config;
     //    const logger = share.logger;
-    const config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
-    const log4js = require('log4js');
+    var config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
+    var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
-    const logger = log4js.getLogger('request');
+    var logger = log4js.getLogger('request');
     logger.setLevel(config.loglevel);
-    class Wrapper {
-        BasicHeader(response, session) {
+    var Wrapper = (function () {
+        function Wrapper() {
+        }
+        Wrapper.prototype.BasicHeader = function (response, session) {
             response.header("Access-Control-Allow-Origin", "*");
             response.header("Pragma", "no-cache");
             response.header("Cache-Control", "no-cache");
             response.contentType("application/json");
             return response;
-        }
-        Exception(req, res, callback) {
+        };
+        Wrapper.prototype.Exception = function (req, res, callback) {
             try {
                 callback(req, res);
             }
             catch (e) {
                 this.SendFatal(res, e.code, e.message, e);
             }
-        }
-        Guard(req, res, callback) {
+        };
+        Wrapper.prototype.Guard = function (req, res, callback) {
             if (req.headers["x-requested-with"] === "XMLHttpRequest") {
                 res = this.BasicHeader(res, "");
                 callback(req, res);
@@ -45,8 +47,8 @@ var Promised;
             else {
                 this.SendError(res, 1, "", { code: 1, message: "" });
             }
-        }
-        Authenticate(req, res, callback) {
+        };
+        Wrapper.prototype.Authenticate = function (req, res, callback) {
             if (req.user) {
                 if (req.isAuthenticated()) {
                     callback(req, res);
@@ -58,124 +60,134 @@ var Promised;
             else {
                 this.SendError(res, 1, "", { code: 1, message: "" });
             }
-        }
-        FindById(res, code, model, id, callback) {
-            model.findById(id).then((object) => {
+        };
+        Wrapper.prototype.FindById = function (res, code, model, id, callback) {
+            var _this = this;
+            model.findById(id).then(function (object) {
                 callback(res, object);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        FindOne(res, code, model, query, callback) {
-            model.findOne(query).then((doc) => {
+        };
+        Wrapper.prototype.FindOne = function (res, code, model, query, callback) {
+            var _this = this;
+            model.findOne(query).then(function (doc) {
                 callback(res, doc);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Find(res, code, model, query, fields, option, callback) {
-            model.find(query, fields, option).then((docs) => {
+        };
+        Wrapper.prototype.Find = function (res, code, model, query, fields, option, callback) {
+            var _this = this;
+            model.find(query, fields, option).then(function (docs) {
                 callback(res, docs);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Count(response, code, model, query, callback) {
-            model.count(query).then((count) => {
+        };
+        Wrapper.prototype.Count = function (response, code, model, query, callback) {
+            var _this = this;
+            model.count(query).then(function (count) {
                 callback(response, count);
-            }).catch((error) => {
-                this.SendError(response, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(response, error.code, error.message, error);
             });
-        }
-        FindAndModify(res, code, model, query, sort, update, options, callback) {
-            model.findAndModify(query, sort, update, options).then((docs) => {
+        };
+        Wrapper.prototype.FindAndModify = function (res, code, model, query, sort, update, options, callback) {
+            var _this = this;
+            model.findAndModify(query, sort, update, options).then(function (docs) {
                 callback(res, docs);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Save(res, code, instance, callback) {
-            instance.save().then(() => {
+        };
+        Wrapper.prototype.Save = function (res, code, instance, callback) {
+            var _this = this;
+            instance.save().then(function () {
                 callback(res, instance);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Update(res, code, model, query, update, callback) {
-            model.findOneAndUpdate(query, update, { upsert: false }).then(() => {
+        };
+        Wrapper.prototype.Update = function (res, code, model, query, update, callback) {
+            var _this = this;
+            model.findOneAndUpdate(query, update, { upsert: false }).then(function () {
                 callback(res);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Upsert(res, code, model, query, update, callback) {
-            model.update(query, update, { upsert: true, multi: false }).then(() => {
+        };
+        Wrapper.prototype.Upsert = function (res, code, model, query, update, callback) {
+            var _this = this;
+            model.update(query, update, { upsert: true, multi: false }).then(function () {
                 callback(res);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Remove(res, code, instance, callback) {
-            instance.remove().then(() => {
+        };
+        Wrapper.prototype.Remove = function (res, code, instance, callback) {
+            var _this = this;
+            instance.remove().then(function () {
                 callback(res);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        Delete(res, code, model, query, callback) {
-            model.remove(query).then(() => {
+        };
+        Wrapper.prototype.Delete = function (res, code, model, query, callback) {
+            var _this = this;
+            model.remove(query).then(function () {
                 callback(res);
-            }).catch((error) => {
-                this.SendError(res, error.code, error.message, error);
+            }).catch(function (error) {
+                _this.SendError(res, error.code, error.message, error);
             });
-        }
-        If(res, code, condition, callback) {
+        };
+        Wrapper.prototype.If = function (res, code, condition, callback) {
             if (condition) {
                 callback(res);
             }
             else {
                 this.SendWarn(res, code + 100, "", { code: code + 100, message: "" });
             }
-        }
-        SendWarn(response, code, message, object) {
+        };
+        Wrapper.prototype.SendWarn = function (response, code, message, object) {
             logger.warn(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
-        }
-        SendError(response, code, message, object) {
+        };
+        Wrapper.prototype.SendError = function (response, code, message, object) {
             logger.error(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
-        }
-        SendForbidden(response) {
+        };
+        Wrapper.prototype.SendForbidden = function (response) {
             logger.error("Forbidden");
             if (response) {
                 response.status(403).render("error", { message: "Forbidden...", status: 403 });
             }
-        }
-        SendNotFound(response) {
+        };
+        Wrapper.prototype.SendNotFound = function (response) {
             logger.error("notfound");
             if (response) {
                 response.status(404).render("error", { message: "not found", status: 404 });
             }
-        }
-        SendFatal(response, code, message, object) {
+        };
+        Wrapper.prototype.SendFatal = function (response, code, message, object) {
             logger.fatal(message + " " + code);
             if (response) {
                 response.status(500).render("error", { message: message, status: 500 });
             }
-        }
-        SendSuccess(response, object) {
+        };
+        Wrapper.prototype.SendSuccess = function (response, object) {
             if (response) {
                 response.jsonp(new result(0, "", object));
             }
-        }
-        Decode(data) {
-            let result = {};
+        };
+        Wrapper.prototype.Decode = function (data) {
+            var result = {};
             if (data) {
-                let decode_data = decodeURIComponent(data);
+                var decode_data = decodeURIComponent(data);
                 try {
                     result = JSON.parse(decode_data);
                 }
@@ -183,10 +195,10 @@ var Promised;
                 }
             }
             return result;
-        }
+        };
         ;
-        Parse(data) {
-            let result = {};
+        Wrapper.prototype.Parse = function (data) {
+            var result = {};
             if (data) {
                 try {
                     result = JSON.parse(data);
@@ -195,9 +207,10 @@ var Promised;
                 }
             }
             return result;
-        }
+        };
         ;
-    }
+        return Wrapper;
+    }());
     Promised.Wrapper = Wrapper;
 })(Promised = exports.Promised || (exports.Promised = {}));
 module.exports = Promised;

@@ -4,26 +4,26 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let RobotControllers = angular.module('RobotControllers', ["ngResource"]);
+var RobotControllers = angular.module('RobotControllers', ["ngResource"]);
 RobotControllers.controller('RobotController', ['$scope', '$log', 'RobotService',
-    ($scope, $log, RobotService) => {
-        let progress = (value) => {
+    function ($scope, $log, RobotService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
         //   let url = "https://www.npmjs.com/package/wgxpath";
         //    let path = '/html/body//a/@href';
-        $scope.Get = () => {
-            let url = $scope.url;
-            let path = $scope.path;
-            RobotService.Get(url, path, (links) => {
+        $scope.Get = function () {
+            var url = $scope.url;
+            var path = $scope.path;
+            RobotService.Get(url, path, function (links) {
                 if (links) {
                     $scope.links = links;
                 }

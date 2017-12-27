@@ -7,24 +7,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SlackModule;
 (function (SlackModule) {
-    const _ = require('lodash');
-    const Botkit = require('botkit');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const plugins_config = share.plugins_config;
-    let controller = null;
-    class Slack {
-        constructor() {
+    var _ = require('lodash');
+    var Botkit = require('botkit');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var plugins_config = share.plugins_config;
+    var controller = null;
+    var Slack = (function () {
+        function Slack() {
             controller = Botkit.slackbot({
                 debug: false
             });
             controller.spawn({
                 token: plugins_config.slack.token
-            }).startRTM((err) => {
+            }).startRTM(function (err) {
                 if (err) {
                 }
             });
-            controller.hears('', ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+            controller.hears('', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
                 bot.startConversation(message, function (err, convo) {
                     convo.say('やあ!');
                     convo.say('おしゃべりしよ!');
@@ -35,7 +35,8 @@ var SlackModule;
                 });
             });
         }
-    }
+        return Slack;
+    }());
     SlackModule.Slack = Slack;
 })(SlackModule = exports.SlackModule || (exports.SlackModule = {}));
 module.exports = SlackModule;

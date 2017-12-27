@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SettingApiRouter;
 (function (SettingApiRouter) {
-    const express = require('express');
+    var express = require('express');
     SettingApiRouter.router = express.Router();
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const ExceptionController = require("../common/controllers/exception_controller");
-    const exception = new ExceptionController.Exception();
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth = new AuthController.Auth;
-    const SettingModule = require("./controllers/setting_controller");
-    const setting = new SettingModule.Setting();
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var ExceptionController = require("../common/controllers/exception_controller");
+    var exception = new ExceptionController.Exception();
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var auth = new AuthController.Auth;
+    var SettingModule = require("./controllers/setting_controller");
+    var setting = new SettingModule.Setting();
     SettingApiRouter.router.put('/command/backup', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.backup]);
     SettingApiRouter.router.put('/command/restore', [exception.exception, setting.restore]);
     SettingApiRouter.router.get('/setting/application', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_application]);

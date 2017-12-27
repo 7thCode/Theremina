@@ -4,46 +4,46 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ArticleControllers = angular.module('ArticleControllers', ["ngResource"]);
+var ArticleControllers = angular.module('ArticleControllers', ["ngResource"]);
 ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'Socket',
-    ($scope, $document, $log, $compile, $uibModal, FormPlayerService, ArticleService, Socket) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $compile, $uibModal, FormPlayerService, ArticleService, Socket) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        window.addEventListener('beforeunload', (e) => {
+        window.addEventListener('beforeunload', function (e) {
             if ($scope.opened) {
                 //          e.returnValue = '';
             }
         }, false);
-        Socket.on("client", (data) => {
-            let notifier = new NotifierModule.Notifier();
+        Socket.on("client", function (data) {
+            var notifier = new NotifierModule.Notifier();
             notifier.Pass(data);
         });
-        let Notify = (message) => {
-            Socket.emit("server", { value: message }, () => {
+        var Notify = function (message) {
+            Socket.emit("server", { value: message }, function () {
                 //          let hoge = 1;
             });
         };
@@ -51,34 +51,34 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
         //      ArticleService.option.limit = 40;//{sort: {create: -1}, limit: this.pagesize, skip: 0};
         FormPlayerService.$scope = $scope;
         FormPlayerService.$compile = $compile;
-        let current_id = null;
-        let page_name = ""; //a1
-        let direction = -1;
-        let Clear = () => {
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var current_id = null;
+        var page_name = ""; //a1
+        var direction = -1;
+        var Clear = function () {
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes) {
-                        let name = attributes["ng-model"];
-                        if (name) {
-                            $scope[name] = "";
+                        var name_1 = attributes["ng-model"];
+                        if (name_1) {
+                            $scope[name_1] = "";
                         }
                     }
                 });
             });
-            Draw(() => {
+            Draw(function () {
             });
         };
         /*
          resultで与えられたObjectのelementのlabelで示される値を取り出す。
          ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を設定する。
          */
-        let Map = (present) => {
+        var Map = function (present) {
             function unescapeHTML(value) {
-                let result = value;
+                var result = value;
                 if (typeof value == "string") {
-                    let div = document.createElement("div");
+                    var div = document.createElement("div");
                     div.innerHTML = value.replace(/</g, "&lt;")
                         .replace(/>/g, "&gt;")
                         .replace(/ /g, "&nbsp;")
@@ -88,20 +88,20 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                 }
                 return result;
             }
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes) {
-                        let name = attributes["ng-model"];
-                        if (name) {
-                            let value = "";
+                        var name_2 = attributes["ng-model"];
+                        if (name_2) {
+                            var value = "";
                             if (present) {
                                 if (present[element.label]) {
                                     value = present[element.label].value;
                                 }
                             }
-                            $scope[name] = unescapeHTML(value); //todo
+                            $scope[name_2] = unescapeHTML(value); //todo
                         }
                     }
                 });
@@ -111,26 +111,29 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
          ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を取り出す。
          elementのlabelを名前として、その値をresultに。
          */
-        let Reduce = () => {
-            let result = {}; // ArticleService.current_article.content;
+        var Reduce = function () {
+            var result = {}; // ArticleService.current_article.content;
             if (!result) {
                 result = {};
             }
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+            var page = FormPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes) {
-                        let name = attributes["ng-model"];
-                        if (name) {
-                            if ($scope[name]) {
-                                let type = "";
-                                let value = $scope[name];
+                        var name_3 = attributes["ng-model"];
+                        if (name_3) {
+                            if ($scope[name_3]) {
+                                var type = "";
+                                var value = $scope[name_3];
                                 switch (element.type) {
                                     case "field":
                                         switch (control.type) {
                                             case "html":
                                                 type = "html";
+                                                break;
+                                            case "date":
+                                                type = "date";
                                                 break;
                                             default:
                                                 type = "quoted";
@@ -143,6 +146,9 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                                         switch (control.type) {
                                             case "html":
                                                 type = "html";
+                                                break;
+                                            case "date":
+                                                type = "date";
                                                 break;
                                             default:
                                                 type = "quoted";
@@ -168,152 +174,167 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
             });
             return result;
         };
-        let Selected = () => {
+        var Selected = function () {
             return current_id;
         };
-        let CreateArticle = () => {
-            let modalRegist = $uibModal.open({
+        var CreateArticle = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'ArticleCreateDialogController',
                 templateUrl: '/articles/dialogs/create_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 progress(true);
-                let name = dialog_scope.name;
-                ArticleService.Create(name, {}, (result) => {
+                var name = dialog_scope.name;
+                ArticleService.Create(name, {}, function (result) {
                     current_id = result._id;
                     //     ArticleService.option = {sort: {create: -1}, limit: this.pagesize, skip: 0};
-                    DrawArticles(() => {
+                    DrawArticles(function () {
                         progress(false);
                         $scope.opened = true;
                     });
                     Clear();
                 }, error_handler);
-            }, () => {
+            }, function () {
             });
         };
-        let DeleteArticle = () => {
+        var DeleteArticle = function () {
             if (current_id) {
-                let modalRegist = $uibModal.open({
+                var modalRegist = $uibModal.open({
                     controller: 'ArticleDeleteConfirmController',
                     templateUrl: '/articles/dialogs/delete_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
+                modalRegist.result.then(function (content) {
                     progress(true);
-                    ArticleService.Delete(current_id, (result) => {
+                    ArticleService.Delete(current_id, function (result) {
                         current_id = null;
-                        DrawArticles(() => {
+                        DrawArticles(function () {
                             $scope.opened = false;
                             progress(false);
                         });
                     }, error_handler);
-                }, () => {
+                }, function () {
                 });
             }
         };
-        let SelectPage = (name) => {
+        var SelectPage = function (name) {
             progress(true);
             page_name = name;
             if (current_id) {
-                ArticleService.Get(current_id, (result) => {
+                ArticleService.Get(current_id, function (result) {
                     $scope.current_article = result;
                     $scope.opened = true;
-                    DrawPage(page_name, () => {
+                    DrawPage(page_name, function () {
                         Map(result.content);
                         progress(false);
                     });
                 }, error_handler);
             }
             else {
-                DrawPage(page_name, () => {
+                DrawPage(page_name, function () {
                     progress(false);
                 });
             }
         };
-        let PageSelected = (name) => {
+        var PageSelected = function (name) {
             return (page_name == name);
         };
-        let SelectArticle = (id) => {
+        var SelectArticle = function (id) {
             progress(true);
             current_id = id;
-            ArticleService.Get(current_id, (result) => {
+            ArticleService.Get(current_id, function (result) {
                 $scope.current_article = result;
                 $scope.opened = true;
-                DrawPage(page_name, () => {
+                DrawPage(page_name, function () {
                     Map(result.content);
                     progress(false);
                 });
             }, error_handler);
         };
-        let ArticleSelected = (id) => {
+        var SelectArticle = function (id) {
+            progress(true);
+            current_id = id;
+            page_name = "";
+            ArticleService.Get(current_id, function (result) {
+                $scope.current_article = result;
+                $scope.opened = true;
+                if (result.content.type) {
+                    DrawPage(result.content.type.value, function () {
+                        Map(result.content);
+                        progress(false);
+                    });
+                }
+            }, error_handler);
+        };
+        var ArticleSelected = function (id) {
             return (current_id == id);
         };
-        let SaveArticle = () => {
+        var SaveArticle = function () {
             progress(true);
-            let new_record = Reduce();
-            ArticleService.Put(current_id, new_record, (result) => {
+            var new_record = Reduce();
+            ArticleService.Put(current_id, new_record, function (result) {
                 progress(false);
             }, error_handler);
         };
-        let Find = (newValue) => {
+        var Find = function (newValue) {
             ArticleService.SetQuery(null);
             if (newValue) {
                 ArticleService.SetQuery({ name: { $regex: newValue } });
             }
-            Draw(() => {
+            Draw(function () {
             });
         };
-        let Count = () => {
-            ArticleService.Count((result) => {
+        var Count = function () {
+            ArticleService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Sort = (name) => {
+        var Sort = function (name) {
             if (name) {
                 direction = -direction;
                 ArticleService.option.sort[name] = direction;
             }
-            Draw(() => {
+            Draw(function () {
             });
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            ArticleService.Next((result) => {
+            ArticleService.Next(function (result) {
                 if (result) {
                     $scope.articles = result;
                 }
-                ArticleService.Over((hasnext) => { $scope.over = !hasnext; });
-                ArticleService.Under((hasprev) => { $scope.under = !hasprev; });
+                ArticleService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ArticleService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            ArticleService.Prev((result) => {
+            ArticleService.Prev(function (result) {
                 if (result) {
                     $scope.articles = result;
                 }
-                ArticleService.Over((hasnext) => { $scope.over = !hasnext; });
-                ArticleService.Under((hasprev) => { $scope.under = !hasprev; });
+                ArticleService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ArticleService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let onDrop = (data, evt, id) => {
+        var onDrop = function (data, evt, id) {
             $scope[id] = evt.element[0].src;
         };
-        let DrawPage = (name, callback) => {
+        var DrawPage = function (name, callback) {
             FormPlayerService.query = { name: name };
-            FormPlayerService.Query((value) => {
+            FormPlayerService.Query(function (value) {
                 if (value.length > 0) {
-                    FormPlayerService.Get(value[0]._id, (result) => {
+                    FormPlayerService.Get(value[0]._id, function (result) {
                         FormPlayerService.current_page = result.content;
                         $scope.current_page = result;
                         FormPlayerService.Draw();
@@ -325,28 +346,42 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
                 }
             }, error_handler);
         };
-        let DrawPages = (callback) => {
+        var DrawPages = function (callback) {
             FormPlayerService.query = {};
-            FormPlayerService.Query((value) => {
+            FormPlayerService.Query(function (value) {
                 $scope.pages = value;
                 callback();
             }, error_handler);
         };
-        let DrawArticles = (callback) => {
-            ArticleService.Query((value) => {
+        var DrawArticles = function (callback) {
+            ArticleService.Query(function (value) {
                 $scope.articles = value;
                 callback();
-                ArticleService.Over((hasnext) => { $scope.over = !hasnext; });
-                ArticleService.Under((hasprev) => { $scope.under = !hasprev; });
+                ArticleService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ArticleService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        let Draw = (callback) => {
-            DrawPage(page_name, () => {
-                DrawPages(() => {
+        var Draw = function (callback) {
+            DrawPage(page_name, function () {
+                DrawPages(function () {
                     DrawArticles(callback);
                 });
             });
         };
+        //tinymce
+        $scope.tinymceOptions = {
+            onChange: function (e) {
+                // put logic here for keypress and cut/paste changes
+            },
+            inline: false,
+            plugins: 'advlist autolink link image lists charmap print preview',
+            skin: 'lightgray',
+            theme: 'modern'
+        };
+        //froala
+        //      $scope.froalaOptions = {
+        //         toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+        //     };
         $scope.opened = false;
         //    $scope.Notify = Notify;
         $scope.Selected = Selected;
@@ -363,30 +398,30 @@ ArticleControllers.controller('ArticleController', ['$scope', '$document', '$log
         $scope.Next = Next;
         $scope.Prev = Prev;
         $scope.onDrop = onDrop;
-        Draw(() => {
+        Draw(function () {
         });
     }]);
 ArticleControllers.controller('ArticleCreateDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 ArticleControllers.controller('ArticleDeleteConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);

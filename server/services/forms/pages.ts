@@ -104,8 +104,6 @@ export namespace FormPageRouter {
         result.render('services/forms/builder/dialogs/delete_confirm_dialog', {message: message});
     }]);
 
-    // localhost:8000/forms/render/000000000000000000000000/test1
-
 }
 
 module.exports = FormPageRouter.router;

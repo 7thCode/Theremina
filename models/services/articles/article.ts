@@ -22,8 +22,8 @@ export namespace ArticleModule {
     Article.plugin(timestamp);
     Article.plugin(userdata, {});
 
-    Article.index({userid: 1, name: 1}, {unique: true, index: true});
-   // Article.index({name: 1}, {unique: true, index: true});
+    Article.index({_id: 1, userid: 1}, {unique: true});
+    Article.index({name: 1}, {unique: false});
 
     Article.method("GetContent", function (name: string): void {
         return this.content[name];

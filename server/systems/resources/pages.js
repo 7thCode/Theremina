@@ -7,23 +7,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResourcePageRouter;
 (function (ResourcePageRouter) {
-    const express = require('express');
+    var express = require('express');
     ResourcePageRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const config = share.config;
-    const services_config = share.services_config;
-    const webfonts = services_config.webfonts;
-    const message = config.message;
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth = new AuthController.Auth();
-    const AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    const analysis = new AnalysisModule.Analysis;
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resources = new ResourcesModule.Resource;
-    const pages = new ResourcesModule.Pages;
-    ResourcePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request, response) => {
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var config = share.config;
+    var services_config = share.services_config;
+    var webfonts = services_config.webfonts;
+    var message = config.message;
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var auth = new AuthController.Auth();
+    var AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
+    var analysis = new AnalysisModule.Analysis;
+    var ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+    var resources = new ResourcesModule.Resource;
+    var pages = new ResourcesModule.Pages;
+    ResourcePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
             response.render("systems/resources/player/index", {
                 config: config,
                 user: request.user,
@@ -32,7 +32,7 @@ var ResourcePageRouter;
                 fonts: webfonts
             });
         }]);
-    ResourcePageRouter.router.get("/builder", [exception.page_guard, auth.page_valid, auth.page_is_system, (request, response) => {
+    ResourcePageRouter.router.get("/builder", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
             response.render("systems/resources/builder/index", {
                 config: config,
                 domain: share.config.domain,
@@ -42,27 +42,27 @@ var ResourcePageRouter;
                 fonts: webfonts
             });
         }]);
-    ResourcePageRouter.router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req, result, next) => {
+    ResourcePageRouter.router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('systems/resources/builder/dialogs/create_dialog', { message: message });
         }]);
-    ResourcePageRouter.router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req, result, next) => {
+    ResourcePageRouter.router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('systems/resources/builder/dialogs/open_dialog', { message: message });
         }]);
-    ResourcePageRouter.router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req, result, next) => {
+    ResourcePageRouter.router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('systems/resources/builder/dialogs/delete_confirm_dialog', { message: message });
         }]);
     //http://localhost:8000/resources/render/000000000000000000000000/words_index
     // New Render
-    let Error = (error, request, response) => {
+    var Error = function (error, request, response) {
         switch (error.code) {
             case 10000:
             case 20000:
-                let userid = request.params.userid;
+                var userid = request.params.userid;
                 pages.render_object(userid, "error.html", {
                     status: 404,
                     message: error.message,
                     url: request.url
-                }, (error, result) => {
+                }, function (error, result) {
                     if (!error) {
                         response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
                         response.write(result.content);
@@ -85,8 +85,8 @@ var ResourcePageRouter;
                 });
         }
     };
-    let render_static = (request, response) => {
-        pages.render_direct(request, (error, result) => {
+    var render_static = function (request, response) {
+        pages.render_direct(request, function (error, result) {
             if (!error) {
                 response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
                 response.write(result.content);
@@ -97,17 +97,17 @@ var ResourcePageRouter;
             }
         });
     };
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+    ResourcePageRouter.router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, function (request, response) {
             render_static(request, response);
         }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+    ResourcePageRouter.router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, function (request, response) {
             render_static(request, response);
         }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+    ResourcePageRouter.router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, function (request, response) {
             render_static(request, response);
         }]);
-    let render_html = (request, response) => {
-        pages.render_html(request, (error, result) => {
+    var render_html = function (request, response) {
+        pages.render_html(request, function (error, result) {
             if (!error) {
                 response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
                 response.write(result.content);
@@ -118,14 +118,14 @@ var ResourcePageRouter;
             }
         });
     };
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request, response) => {
+    ResourcePageRouter.router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, function (request, response) {
             render_html(request, response);
         }]);
     // router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
     //     render_html(request, response);
     // }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request, response) => {
-            pages.render_fragment(request, (error, result) => {
+    ResourcePageRouter.router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, function (request, response) {
+            pages.render_fragment(request, function (error, result) {
                 if (!error) {
                     response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
                     response.write(result.content);

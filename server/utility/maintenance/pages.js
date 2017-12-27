@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MaintenancePageRouter;
 (function (MaintenancePageRouter) {
-    const express = require('express');
+    var express = require('express');
     MaintenancePageRouter.router = express.Router();
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const config = share.config;
-    const services_config = share.services_config;
-    const webfonts = services_config.webfonts;
-    let message = config.message;
-    MaintenancePageRouter.router.get("/", [(request, response) => {
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var config = share.config;
+    var services_config = share.services_config;
+    var webfonts = services_config.webfonts;
+    var message = config.message;
+    MaintenancePageRouter.router.get("/", [function (request, response) {
             response.render("utility/maintenance/index", { user: null, message: message, status: 503, fonts: webfonts });
         }]);
 })(MaintenancePageRouter = exports.MaintenancePageRouter || (exports.MaintenancePageRouter = {}));

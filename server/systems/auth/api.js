@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var AuthApiRouter;
 (function (AuthApiRouter) {
-    const express = require('express');
+    var express = require('express');
     AuthApiRouter.router = express.Router();
-    const passport = require("passport");
-    const share = require('../common/share');
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth = new AuthController.Auth;
-    const ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception = new ExceptionController.Exception();
+    var passport = require("passport");
+    var share = require('../common/share');
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var auth = new AuthController.Auth;
+    var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
+    var exception = new ExceptionController.Exception();
     AuthApiRouter.router.post("/local/register", [exception.exception, exception.guard, auth.is_enabled_regist_user, auth.post_local_register]);
     AuthApiRouter.router.get("/register/:token", auth.get_register_token);
     AuthApiRouter.router.post("/local/member", [exception.exception, exception.guard, exception.authenticate, auth.is_enabled_regist_member, auth.post_member_register]);

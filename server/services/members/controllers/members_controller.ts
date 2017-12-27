@@ -15,13 +15,13 @@ export namespace MembersModule {
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const archiver: any = require('archiver');
+   // const archiver: any = require('archiver');
 
     const sharp = require("sharp");
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const applications_config: any = share.applications_config;
+  //  const applications_config: any = share.applications_config;
     const Wrapper: any = share.Wrapper;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));

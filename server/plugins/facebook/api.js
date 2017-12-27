@@ -7,17 +7,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FacebookApiRouter;
 (function (FacebookApiRouter) {
-    const express = require('express');
+    var express = require('express');
     FacebookApiRouter.router = express.Router();
-    const bodyParser = require('body-parser');
-    const jsonParser = bodyParser.json();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const plugins_config = share.plugins_config;
+    var bodyParser = require('body-parser');
+    var jsonParser = bodyParser.json();
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var plugins_config = share.plugins_config;
     if (plugins_config.facebook) {
-        const exception = core.exception;
-        const FacebookModule = require(share.Server("plugins/facebook/controllers/facebook_controller"));
-        const facebook = new FacebookModule.Facebook;
+        var exception = core.exception;
+        var FacebookModule = require(share.Server("plugins/facebook/controllers/facebook_controller"));
+        var facebook = new FacebookModule.Facebook;
         FacebookApiRouter.router.get("/webhook/", [exception.exception, facebook.bot_hook]);
         FacebookApiRouter.router.post("/webhook/", [exception.exception, jsonParser, facebook.bot_push]);
     }

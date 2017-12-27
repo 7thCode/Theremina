@@ -20,7 +20,7 @@ export namespace AssetsModule {
     const Wrapper: any = share.Wrapper;
 
     const AssetModel: any = require(share.Models("plugins/asset/asset"));
-    const validator: any = require('validator');
+  //  const validator: any = require('validator');
 
     export class Asset {
 

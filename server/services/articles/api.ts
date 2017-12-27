@@ -21,8 +21,6 @@ export namespace ArticleApiRouter {
     const ArticleModule: any = require(share.Server("services/articles/controllers/article_controller"));
     const article: any = new ArticleModule.Article;
 
-  //  router.get("/json/get/:id", [article.get_article_json]);
-
     router.get("/json/:id", [ [article.get_article_json]]);
 
     router.get("/json/query/:query/:option", [article.get_article_query_query_json]);

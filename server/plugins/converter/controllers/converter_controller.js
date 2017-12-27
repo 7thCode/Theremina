@@ -7,21 +7,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConverterModule;
 (function (ConverterModule) {
-    const fs = require('graceful-fs');
-    const _ = require('lodash');
-    const mongoose = require('mongoose');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const Wrapper = share.Wrapper;
-    const Exceljs = require("exceljs");
-    const LocalAccount = require(share.Models("systems/accounts/account"));
-    class Excel {
-        constructor() {
+    var fs = require('graceful-fs');
+    var _ = require('lodash');
+    var mongoose = require('mongoose');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var Wrapper = share.Wrapper;
+    var Exceljs = require("exceljs");
+    var LocalAccount = require(share.Models("systems/accounts/account"));
+    var Excel = (function () {
+        function Excel() {
         }
-        account(request, response) {
-            let workbook = new Exceljs.Workbook();
-            let worksheet = workbook.addWorksheet("Accounts");
-            let transformer = {
+        Excel.prototype.account = function (request, response) {
+            var workbook = new Exceljs.Workbook();
+            var worksheet = workbook.addWorksheet("Accounts");
+            var transformer = {
                 columns: [
                     { header: 'Username', key: 'username', width: 32 },
                     { header: 'Zip', key: 'zip', width: 10 },
@@ -32,8 +32,8 @@ var ConverterModule;
                     { header: 'Nickname', key: 'nickname', width: 20 },
                     { header: 'Magazine', key: 'send', width: 10 }
                 ],
-                transform: (from) => {
-                    let result = {};
+                transform: function (from) {
+                    var result = {};
                     result.username = from.username;
                     if (from.local) {
                         result.zip = from.local.zip;
@@ -50,38 +50,39 @@ var ConverterModule;
                 }
             };
             worksheet.columns = transformer.columns;
-            Wrapper.Find(response, 5000, LocalAccount, {}, {}, {}, (response, accounts) => {
-                let aligns = [];
-                accounts.forEach((account) => {
+            Wrapper.Find(response, 5000, LocalAccount, {}, {}, {}, function (response, accounts) {
+                var aligns = [];
+                accounts.forEach(function (account) {
                     aligns.push(transformer.transform(account));
                 });
                 worksheet.addRows(aligns);
-                let filename = request.params.filename;
-                let tmp_path = '/tmp/' + request.sessionID;
-                let tmp_file = '/' + filename;
-                let original_mask = process.umask(0);
-                fs.mkdir(tmp_path, '0777', () => {
+                var filename = request.params.filename;
+                var tmp_path = '/tmp/' + request.sessionID;
+                var tmp_file = '/' + filename;
+                var original_mask = process.umask(0);
+                fs.mkdir(tmp_path, '0777', function () {
                     workbook.xlsx.writeFile(tmp_path + tmp_file).then(function () {
                         process.umask(original_mask);
                         Wrapper.SendSuccess(response, {});
                     });
                 });
             });
-        }
-    }
+        };
+        return Excel;
+    }());
     ConverterModule.Excel = Excel;
-    class Downloader {
-        constructor() {
+    var Downloader = (function () {
+        function Downloader() {
         }
         /**
          * @param request
          * @param response
          * @returns none
          */
-        download(request, response) {
-            let delete_folder_recursive = function (path) {
+        Downloader.prototype.download = function (request, response) {
+            var delete_folder_recursive = function (path) {
                 fs.readdirSync(path).forEach(function (file) {
-                    let curPath = path + "/" + file;
+                    var curPath = path + "/" + file;
                     if (fs.lstatSync(curPath).isDirectory()) {
                         delete_folder_recursive(curPath);
                     }
@@ -91,19 +92,20 @@ var ConverterModule;
                 });
                 fs.rmdirSync(path);
             };
-            let tmp_path = '/tmp/' + request.sessionID;
-            let tmp_file = '/' + request.params.filename; //  '/noname.xlsx';
-            response.download(tmp_path + tmp_file, (error) => {
+            var tmp_path = '/tmp/' + request.sessionID;
+            var tmp_file = '/' + request.params.filename; //  '/noname.xlsx';
+            response.download(tmp_path + tmp_file, function (error) {
                 if (!error) {
-                    fs.unlink(tmp_path + tmp_file, (error) => {
+                    fs.unlink(tmp_path + tmp_file, function (error) {
                         if (!error) {
                             delete_folder_recursive(tmp_path);
                         }
                     });
                 }
             });
-        }
-    }
+        };
+        return Downloader;
+    }());
     ConverterModule.Downloader = Downloader;
 })(ConverterModule = exports.ConverterModule || (exports.ConverterModule = {}));
 module.exports = ConverterModule;

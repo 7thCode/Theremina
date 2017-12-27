@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var CommonApiRouter;
 (function (CommonApiRouter) {
-    const express = require('express');
+    var express = require('express');
     CommonApiRouter.router = express.Router();
 })(CommonApiRouter = exports.CommonApiRouter || (exports.CommonApiRouter = {}));
 module.exports = CommonApiRouter.router;

@@ -6,10 +6,10 @@
 "use strict";
 var DataSource;
 (function (DataSource_1) {
-    const mongoose = require("mongoose");
+    var mongoose = require("mongoose");
     mongoose.Promise = global.Promise;
-    const Article = require("../articles/article");
-    const DataSource = new mongoose.Schema({});
+    var Article = require("../articles/article");
+    var DataSource = new mongoose.Schema({});
     DataSource.static("find", function (query) {
         this.query = query;
         return this;
@@ -27,7 +27,7 @@ var DataSource;
         return this;
     });
     DataSource.static("exec", function () {
-        let result_promise = Article.find(this.query).limit(this.limit).skip(this.skip).sort(this.sort).exec();
+        var result_promise = Article.find(this.query).limit(this.limit).skip(this.skip).sort(this.sort).exec();
         return result_promise;
     });
     module.exports = mongoose.model("DataSource", DataSource);

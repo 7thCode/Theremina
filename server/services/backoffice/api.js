@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var BackofficeApiRouter;
 (function (BackofficeApiRouter) {
-    const express = require('express');
+    var express = require('express');
     BackofficeApiRouter.router = express.Router();
 })(BackofficeApiRouter = exports.BackofficeApiRouter || (exports.BackofficeApiRouter = {}));
 module.exports = BackofficeApiRouter.router;

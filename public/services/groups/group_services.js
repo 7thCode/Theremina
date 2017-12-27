@@ -4,17 +4,17 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let GroupServices = angular.module('GroupServices', []);
+var GroupServices = angular.module('GroupServices', []);
 GroupServices.factory('GroupOwn', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/groups/api/own', {}, {});
     }]);
 GroupServices.factory('GroupCreate', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/groups/api/create', {}, {});
     }]);
 GroupServices.factory('Group', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/groups/api/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -22,38 +22,39 @@ GroupServices.factory('Group', ['$resource',
         });
     }]);
 GroupServices.factory('GroupQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource("/groups/api/query/:query/:option", { query: '@query', option: '@optopn' }, {
             query: { method: 'GET' }
         });
     }]);
 GroupServices.factory('GroupCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/groups/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "GroupQuery", "GroupCount",
     function (GroupOwn, GroupCreate, Group, GroupQuery, GroupCount) {
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        var _this = this;
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.option = { limit: 40, skip: 0 };
-            this.SetQuery(null);
+        var init = function () {
+            _this.option = { limit: 40, skip: 0 };
+            _this.SetQuery(null);
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (callback, error) => {
+        this.Query = function (callback, error) {
             GroupQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query)),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -67,10 +68,10 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Count = (callback, error) => {
+        this.Count = function (callback, error) {
             GroupCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -84,42 +85,42 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Own = (name, content, callback, error) => {
+        this.Own = function (name, content, callback, error) {
             init();
-            let group = new GroupOwn();
+            var group = new GroupOwn();
             group.name = name;
             group.content = content;
-            group.$save({}, (result) => {
+            group.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -133,12 +134,12 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Create = (name, content, callback, error) => {
+        this.Create = function (name, content, callback, error) {
             init();
-            let group = new GroupCreate();
+            var group = new GroupCreate();
             group.name = name;
             group.content = content;
-            group.$save({}, (result) => {
+            group.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -152,11 +153,11 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Get = (id, callback, error) => {
+        this.Get = function (id, callback, error) {
             init();
             Group.get({
                 id: id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -170,12 +171,12 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Put = (id, content, callback, error) => {
-            let group = new Group();
+        this.Put = function (id, content, callback, error) {
+            var group = new Group();
             group.content = content;
             group.$put({
                 id: id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -189,10 +190,10 @@ GroupServices.service('GroupService', ["GroupOwn", "GroupCreate", "Group", "Grou
                 }
             });
         };
-        this.Delete = (id, callback, error) => {
+        this.Delete = function (id, callback, error) {
             Group.delete({
                 id: id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         init();

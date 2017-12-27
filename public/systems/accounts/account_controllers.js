@@ -5,97 +5,97 @@
  */
 /// <reference path="../../../node_modules/@types/angular/index.d.ts" />
 "use strict";
-let AccountControllers = angular.module('AccountControllers', ["ngResource"]);
+var AccountControllers = angular.module('AccountControllers', ["ngResource"]);
 AccountControllers.controller('AccountController', ['$scope', '$document', '$log', '$uibModal', 'AccountService',
-    ($scope, $document, $log, $uibModal, AccountService) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $uibModal, AccountService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let Draw = () => {
-            AccountService.Query((result) => {
+        var Draw = function () {
+            AccountService.Query(function (result) {
                 if (result) {
                     $scope.accounts = result;
-                    AccountService.Over((hasnext) => { $scope.over = !hasnext; });
-                    AccountService.Under((hasprev) => { $scope.under = !hasprev; });
+                    AccountService.Over(function (hasnext) { $scope.over = !hasnext; });
+                    AccountService.Under(function (hasprev) { $scope.under = !hasprev; });
                 }
             }, error_handler);
         };
-        let Count = () => {
-            AccountService.Count((result) => {
+        var Count = function () {
+            AccountService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            AccountService.Next((result) => {
+            AccountService.Next(function (result) {
                 if (result) {
                     $scope.accounts = result;
                 }
-                AccountService.Over((hasnext) => { $scope.over = !hasnext; });
-                AccountService.Under((hasprev) => { $scope.under = !hasprev; });
+                AccountService.Over(function (hasnext) { $scope.over = !hasnext; });
+                AccountService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            AccountService.Prev((result) => {
+            AccountService.Prev(function (result) {
                 if (result) {
                     $scope.accounts = result;
                 }
-                AccountService.Over((hasnext) => { $scope.over = !hasnext; });
-                AccountService.Under((hasprev) => { $scope.under = !hasprev; });
+                AccountService.Over(function (hasnext) { $scope.over = !hasnext; });
+                AccountService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             if (name) {
                 AccountService.query = { username: { $regex: name } };
             }
             Draw();
             Count();
         };
-        let Open = (acount) => {
-            let modalRegist = $uibModal.open({
+        var Open = function (acount) {
+            var modalRegist = $uibModal.open({
                 controller: 'AccountOpenDialogController',
                 templateUrl: '/accounts/dialogs/open_dialog',
                 resolve: {
                     items: acount
                 }
             });
-            modalRegist.result.then((group) => {
+            modalRegist.result.then(function (group) {
                 $scope.layout = group;
                 $scope.name = group.name;
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
         $scope.Next = Next;
@@ -106,12 +106,12 @@ AccountControllers.controller('AccountController', ['$scope', '$document', '$log
         Find(null);
     }]);
 AccountControllers.controller('AccountOpenDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.items = items;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
     }]);

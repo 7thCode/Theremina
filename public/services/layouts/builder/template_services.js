@@ -4,19 +4,19 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let TemplateServices = angular.module('TemplateServices', []);
+var TemplateServices = angular.module('TemplateServices', []);
 TemplateServices.factory('TemplateCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 TemplateServices.factory('TemplateCreate', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/create', {}, {});
     }]);
 TemplateServices.factory('Template', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -24,40 +24,41 @@ TemplateServices.factory('Template', ['$resource',
         });
     }]);
 TemplateServices.factory('TemplatePDF', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/pdf', {}, {});
     }]);
 TemplateServices.factory('TemplateSVG', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/svg', {}, {});
     }]);
 TemplateServices.factory('TemplateQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource("/layouts/template/query/:query/:option", { query: '@query', option: '@optopn' }, {
             query: { method: 'GET' }
         });
     }]);
 TemplateServices.factory('TemplateCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/layouts/template/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template", 'TemplateQuery', "TemplateCount", 'TemplatePDF', 'TemplateSVG',
     function ($log, TemplateCreate, Template, TemplateQuery, TemplateCount, TemplatePDF, TemplateSVG) {
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        var _this = this;
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.current_layout = null;
-            this.option = { sort: { modify: -1 }, limit: 40, skip: 0 };
-            this.SetQuery(null);
-            this.count = 0;
-            this.format = {
+        var init = function () {
+            _this.current_layout = null;
+            _this.option = { sort: { modify: -1 }, limit: 40, skip: 0 };
+            _this.SetQuery(null);
+            _this.count = 0;
+            _this.format = {
                 size: [600, 848],
                 margins: {
                     top: 72,
@@ -76,14 +77,14 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             };
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (callback, error) => {
+        this.Query = function (callback, error) {
             TemplateQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query)),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -97,10 +98,10 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Count = (callback, error) => {
+        this.Count = function (callback, error) {
             TemplateCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -114,43 +115,43 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Create = (namespace, name, content, callback, error) => {
+        this.Create = function (namespace, name, content, callback, error) {
             init();
-            let layout = new TemplateCreate();
+            var layout = new TemplateCreate();
             layout.name = name;
             layout.namespace = namespace;
             layout.content = content;
-            layout.$save({}, (result) => {
+            layout.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -164,11 +165,11 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Get = (id, callback, error) => {
+        this.Get = function (id, callback, error) {
             init();
             Template.get({
                 id: id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -182,13 +183,13 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Put = (_layout, callback, error) => {
-            let layout = new Template();
+        this.Put = function (_layout, callback, error) {
+            var layout = new Template();
             layout.content = _layout.content;
             layout.name = _layout.name;
             layout.$put({
-                id: this.current_layout._id
-            }, (result) => {
+                id: _this.current_layout._id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -202,13 +203,13 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.PutAs = (name, _layout, callback, error) => {
-            let layout = new Template();
+        this.PutAs = function (name, _layout, callback, error) {
+            var layout = new Template();
             layout.content = _layout.content;
             layout.name = name;
             layout.$put({
-                id: this.current_layout._id
-            }, (result) => {
+                id: _this.current_layout._id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -222,10 +223,10 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.Delete = (callback, error) => {
+        this.Delete = function (callback, error) {
             Template.delete({
-                id: this.current_layout._id
-            }, (result) => {
+                id: _this.current_layout._id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         init();
@@ -240,10 +241,10 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.PrintPDF = (content, callback, error) => {
-            let layout = new TemplatePDF();
+        this.PrintPDF = function (content, callback, error) {
+            var layout = new TemplatePDF();
             layout.content = content;
-            layout.$save({}, (result) => {
+            layout.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -257,10 +258,10 @@ TemplateServices.service('TemplateService', ['$log', "TemplateCreate", "Template
                 }
             });
         };
-        this.PrintSVG = (content, callback, error) => {
-            let layout = new TemplateSVG();
+        this.PrintSVG = function (content, callback, error) {
+            var layout = new TemplateSVG();
             layout.content = content;
-            layout.$save({}, (result) => {
+            layout.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);

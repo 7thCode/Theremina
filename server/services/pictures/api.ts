@@ -13,10 +13,10 @@ export namespace PicturesApiRouter {
 
     const core = require(process.cwd() + "/gs");
     const share: any = core.share;
-    const event: any = share.Event;
+  //  const event: any = share.Event;
 
-    const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception: any = new ExceptionController.Exception();
+   // const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
+  //  const exception: any = new ExceptionController.Exception();
 
     const PicturesModule: any = require(share.Server("services/pictures/controllers/pictures_controller"));
     const pictures: any = new PicturesModule.Pictures;

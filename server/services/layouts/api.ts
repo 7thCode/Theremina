@@ -34,7 +34,6 @@ export namespace LayoutsApiRouter {
     router.put("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.put_template]);
     router.delete("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.delete_template]);
 
-
     // for layout
     router.get("/layout/svg/:name", [layout.get_layout_svg]);
 
@@ -47,8 +46,6 @@ export namespace LayoutsApiRouter {
     router.get("/layout/:id", [layout.get_layout]);
     router.put("/layout/:id", [exception.exception, exception.guard, exception.authenticate, layout.put_layout]);
     router.delete("/layout/:id", [exception.exception, exception.guard, exception.authenticate, layout.delete_layout]);
-
-
 
     router.get("/download/pdf", [layout.download_pdf]);
     router.get("/download/svg", [layout.download_svg]);

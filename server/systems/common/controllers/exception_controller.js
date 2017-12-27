@@ -7,25 +7,27 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ExceptionModule;
 (function (ExceptionModule) {
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const Wrapper = share.Wrapper;
-    class Exception {
-        exception(request, response, next) {
-            Wrapper.Exception(request, response, (request, response) => {
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var Wrapper = share.Wrapper;
+    var Exception = (function () {
+        function Exception() {
+        }
+        Exception.prototype.exception = function (request, response, next) {
+            Wrapper.Exception(request, response, function (request, response) {
                 next();
             });
-        }
-        guard(request, response, next) {
-            Wrapper.Guard(request, response, (request, response) => {
+        };
+        Exception.prototype.guard = function (request, response, next) {
+            Wrapper.Guard(request, response, function (request, response) {
                 next();
             });
-        }
-        authenticate(request, response, next) {
-            Wrapper.Authenticate(request, response, (request, response) => {
+        };
+        Exception.prototype.authenticate = function (request, response, next) {
+            Wrapper.Authenticate(request, response, function (request, response) {
                 next();
             });
-        }
-        page_catch(request, response, next) {
+        };
+        Exception.prototype.page_catch = function (request, response, next) {
             try {
                 next();
             }
@@ -36,8 +38,8 @@ var ExceptionModule;
                     url: request.url
                 });
             }
-        }
-        page_guard(request, response, next) {
+        };
+        Exception.prototype.page_guard = function (request, response, next) {
             try {
                 if (request.user) {
                     if (request.isAuthenticated()) {
@@ -58,8 +60,9 @@ var ExceptionModule;
                     url: request.url
                 });
             }
-        }
-    }
+        };
+        return Exception;
+    }());
     ExceptionModule.Exception = Exception;
 })(ExceptionModule = exports.ExceptionModule || (exports.ExceptionModule = {}));
 module.exports = ExceptionModule;

@@ -6,29 +6,29 @@
 "use strict";
 var PublicKeyServicesModule;
 (function (PublicKeyServicesModule) {
-    let PublicKeyServices = angular.module('PublicKeyServices', []);
+    var PublicKeyServices = angular.module('PublicKeyServices', []);
     PublicKeyServices.factory('FixedPublicKey', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/publickey/fixed', {}, {
                 get: { method: 'GET' }
             });
         }]);
     PublicKeyServices.factory('DynamicPublicKey', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/publickey/dynamic', {}, {
                 get: { method: 'GET' }
             });
         }]);
     PublicKeyServices.factory('Token', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/publickey/token', {}, {
                 get: { method: 'GET' }
             });
         }]);
     PublicKeyServices.service('PublicKeyService', ["FixedPublicKey", "DynamicPublicKey", "Token",
         function (FixedPublicKey, DynamicPublicKey, Token) {
-            this.Fixed = (callback, error) => {
-                FixedPublicKey.get({}, (result) => {
+            this.Fixed = function (callback, error) {
+                FixedPublicKey.get({}, function (result) {
                     if (result) {
                         switch (result.code) {
                             case 0:
@@ -46,8 +46,8 @@ var PublicKeyServicesModule;
                     }
                 });
             };
-            this.Dynamic = (callback, error) => {
-                DynamicPublicKey.get({}, (result) => {
+            this.Dynamic = function (callback, error) {
+                DynamicPublicKey.get({}, function (result) {
                     if (result) {
                         switch (result.code) {
                             case 0:
@@ -65,8 +65,8 @@ var PublicKeyServicesModule;
                     }
                 });
             };
-            this.Token = (callback, error) => {
-                Token.get({}, (result) => {
+            this.Token = function (callback, error) {
+                Token.get({}, function (result) {
                     if (result) {
                         switch (result.code) {
                             case 0:

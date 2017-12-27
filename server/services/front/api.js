@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ApiRouter;
 (function (ApiRouter) {
-    const express = require("express");
+    var express = require("express");
     ApiRouter.router = express.Router();
 })(ApiRouter = exports.ApiRouter || (exports.ApiRouter = {}));
 module.exports = ApiRouter.router;

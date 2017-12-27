@@ -19,21 +19,22 @@ export namespace PagesModule {
 
     const archiver: any = require('archiver');
 
-    const sharp = require("sharp");
+    //const sharp = require("sharp");
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
+    const Wrapper: any = share.Wrapper;
 
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
 
     const ArticleModel: any = require(share.Models("services/articles/article"));
 
-    const validator: any = require('validator');
-    const url: any = require('url');
+    //const validator: any = require('validator');
+    //const url: any = require('url');
 
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resource = new ResourcesModule.Resource;
+ //   const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+ //   const resource = new ResourcesModule.Resource;
 
     // type 20   page
     // type 21   stamp
@@ -65,7 +66,6 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        /*
         static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
 
             let number: number = 27000;
@@ -126,7 +126,7 @@ export namespace PagesModule {
                 callback({code: number + 40, message: "db error"});
             }
         }
-*/
+
         /**
          *  let userid = Pages.userid(request);
          * @param userid
@@ -134,10 +134,8 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        /*
         static get_article_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            let namespace = "";
-            ArticleModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
+            ArticleModel.find({userid: userid}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -145,7 +143,7 @@ export namespace PagesModule {
                 callback(error);
             });
         }
-*/
+
         /**
          *  let userid = Pages.userid(request);
          * @param userid
@@ -153,18 +151,37 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        /*
         static get_resource_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            let namespace = "";
-            ResourceModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {}, {}).then((docs: any): void => {
-                fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
+
+            ResourceModel.find({userid: userid}, {}, {}).then((docs: any): void => {
+
+                let save = (doc: any): any => {
+                    return new Promise((resolve: any, reject: any): void => {
+                        if (doc) {
+                            fs.writeFile(path.join(tmp_path, doc.name), doc.content.resource, (error) => {
+                                if (!error) {
+                                    resolve({});
+                                } else {
+                                    reject(error);
+                                }
+                            });
+                        }
+                    });
+                };
+
+                Promise.all(docs.map((doc: any): void => {
+                    return save(doc);
+                })).then((results: any[]): void => {
+                    callback(null);
+                }).catch((error: any): void => {
                     callback(error);
                 });
             }).catch((error: any): void => {
                 callback(error);
             });
+
         }
-*/
+
         /**
          *  let userid = Pages.userid(request);
          * @param work
@@ -172,10 +189,8 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        /*
         static zip(work: string, target: string, callback: (error) => void) {
-
-            let zip_file_name = work + "/" + target + ".zip";
+            let zip_file_name = path.join(work, target + ".zip");
             let archive = archiver.create('zip', {});
             let output = fs.createWriteStream(zip_file_name);
 
@@ -195,70 +210,94 @@ export namespace PagesModule {
             archive.pipe(output);
             archive.glob("data/*");
             archive.finalize();
-
         }
-*/
+
         /**
          *  let userid = Pages.userid(request);
          * @param request
          * @param response
          * @returns none
          */
-        /*
         public get_all(request: any, response: any): void {
             let userid = Pages.userid(request);
             let tmp_path = path.join("/tmp", request.sessionID);
-            fs.mkdir(tmp_path, (error): void => {
-                if (!error) {
-                    fs.mkdir(path.join(tmp_path, "data"), (error): void => {
-                        if (!error) {
-                            Pages.get_file_all(userid, path.join(tmp_path, "data"), (error: any): void => {
-                                if (!error) {
-                                    Pages.get_article_all(userid, path.join(tmp_path, "data/articles.txt"), (error: any): void => {
-                                        if (!error) {
-                                            Pages.get_resource_all(userid, path.join(tmp_path, "data/resources.txt"), (error: any): void => {
-                                                if (!error) {
-                                                    Pages.zip(tmp_path, "data", (error: any): void => {
-                                                        if (!error) {
-                                                            response.download(path.join(tmp_path, "data.zip"), (error: any): void => {
-                                                                if (!error) {
-                                                                    let exec = require('child_process').exec;
-                                                                    exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
-                                                                        //        Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                                                    });
-                                                                } else {
-                                                                    Wrapper.SendError(response, error.code, error.message, error);
-                                                                }
-                                                            });
-                                                        } else {
-                                                            Wrapper.SendError(response, error.code, error.message, error);
-                                                        }
-                                                    });
-                                                } else {
-                                                    Wrapper.SendError(response, error.code, error.message, error);
-                                                }
-                                            });
-                                        } else {
-                                            Wrapper.SendError(response, error.code, error.message, error);
-                                        }
-                                    });
-                                } else {
-                                    Wrapper.SendError(response, error.code, error.message, error);
-                                }
+
+            let rm = (tmp_path, callback) => {
+                let exec = require('child_process').exec;
+                exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
+                    callback(error);
+                    //        Wrapper.SendSuccess(response, {code: 0, message: ""});
+                });
+            };
+
+            let make_file = (tmp_path,userid) => {
+                Pages.get_file_all(userid, path.join(tmp_path, "data"), (error: any): void => {
+                            if (!error) {
+                                Pages.get_article_all(userid, path.join(tmp_path, "data/articles.txt"), (error: any): void => {
+                                    if (!error) {
+                                        Pages.get_resource_all(userid, path.join(tmp_path, "data"), (error: any): void => {
+                                            if (!error) {
+                                                Pages.zip(tmp_path, "data", (error: any): void => {
+                                                    if (!error) {
+                                                        response.download(path.join(tmp_path, "data.zip"), (error: any): void => {
+                                                            if (!error) {
+                                                                rm(tmp_path, (error) => {
+
+                                                                });
+                                                            } else {
+                                                                Wrapper.SendError(response, error.code, error.message, error);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        Wrapper.SendError(response, error.code, error.message, error);
+                                                    }
+                                                });
+                                            } else {
+                                                Wrapper.SendError(response, error.code, error.message, error);
+                                            }
+                                        });
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
+                            } else {
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
+            };
+
+            let make_data = (tmp_path,userid) => {
+                fs.mkdir(path.join(tmp_path, "data"), (error): void => {
+                    if (!error) {
+                        make_file(tmp_path,userid);
+                    } else {
+                        if (error.code == "EEXIST") {
+                            rm(tmp_path, (error) => {
+                                make_file(tmp_path,userid);
                             });
                         } else {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
-                    });
+                    }
+                });
+            };
+
+            fs.mkdir(tmp_path, (error): void => {
+                if (!error) {
+                    make_data(tmp_path,userid);
                 } else {
-                    Wrapper.SendError(response, error.code, error.message, error);
+                    if (error.code == "EEXIST") {
+                        make_data(tmp_path,userid);
+                    } else {
+                        Wrapper.SendError(response, error.code, error.message, error);
+                    }
                 }
             });
         }
 
         public put_all(request: any, response: any): void {
         }
-*/
+
         public create_init_user_file(user: any): void {
             let userid = user.userid;
             let conn = Pages.connect(config.db.user);
@@ -266,7 +305,6 @@ export namespace PagesModule {
                 conn.once('open', (error: any): void => {
                     if (!error) {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
-
                             let query = {"metadata.userid": config.systems.userid};
                             collection.find(query, (error: any, items: any): void => {
                                 if (!error) {
@@ -310,21 +348,16 @@ export namespace PagesModule {
                                                 conn.db.close();
                                             });
                                         } else {
-
                                         }
                                     });
                                 } else {
-
                                 }
                             });
-
                         });
                     } else {
-
                     }
                 });
             } else {
-
             }
         }
 

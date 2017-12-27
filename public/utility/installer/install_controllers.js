@@ -6,30 +6,30 @@
 "use strict";
 var Install;
 (function (Install) {
-    let InstallControllers = angular.module('InstallControllers', ["ngResource"]);
+    var InstallControllers = angular.module('InstallControllers', ["ngResource"]);
     InstallControllers.controller('InstallController', ['$scope', '$log', 'InstallService',
-        ($scope, $log, InstallService) => {
-            let progress = (value) => {
+        function ($scope, $log, InstallService) {
+            var progress = function (value) {
                 $scope.$emit('progress', value);
             };
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', function (event, value) {
                 $scope.progress = value;
             });
-            let error_handler = (code, message) => {
+            var error_handler = function (code, message) {
                 progress(false);
                 $scope.message = message;
                 $log.error(message);
             };
-            let Draw = () => {
+            var Draw = function () {
                 progress(true);
-                InstallService.Get((system_data) => {
+                InstallService.Get(function (system_data) {
                     $scope.setting = system_data;
                     progress(false);
                 }, error_handler);
             };
-            let Write = () => {
+            var Write = function () {
                 progress(true);
-                InstallService.Put($scope.setting, (system_data) => {
+                InstallService.Put($scope.setting, function (system_data) {
                     $scope.setting = system_data;
                     progress(false);
                 });

@@ -7,29 +7,29 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GooglePageRouter;
 (function (GooglePageRouter) {
-    const express = require('express');
+    var express = require('express');
     GooglePageRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const auth = core.auth;
-    const share = core.share;
-    const exception = core.exception;
-    const config = share.config;
-    let message = config.message;
-    const services_config = share.services_config;
-    const webfonts = services_config.webfonts;
-    const plugins_config = share.plugins_config;
+    var core = require(process.cwd() + '/gs');
+    var auth = core.auth;
+    var share = core.share;
+    var exception = core.exception;
+    var config = share.config;
+    var message = config.message;
+    var services_config = share.services_config;
+    var webfonts = services_config.webfonts;
+    var plugins_config = share.plugins_config;
     if (plugins_config.google_api) {
-        const GoogleModule = require(share.Server("plugins/google/controllers/google_controller"));
-        const calendar = new GoogleModule.Calendar(plugins_config.google_api.calendar);
+        var GoogleModule = require(share.Server("plugins/google/controllers/google_controller"));
+        var calendar_1 = new GoogleModule.Calendar(plugins_config.google_api.calendar);
         //step1
-        GooglePageRouter.router.get('/auth', (request, response) => {
-            let user = request.session.req.user;
+        GooglePageRouter.router.get('/auth', function (request, response) {
+            var user = request.session.req.user;
             if (user) {
                 if (user.tokens) {
-                    let tokens = user.tokens.google_calendar_token;
-                    calendar.authorize(tokens, (client, tokens) => {
+                    var tokens = user.tokens.google_calendar_token;
+                    calendar_1.authorize(tokens, function (client, tokens) {
                         if (client) {
-                            calendar.analytics(client, (error, result) => {
+                            calendar_1.analytics(client, function (error, result) {
                                 if (!error) {
                                     response.send(result);
                                 }
@@ -52,7 +52,7 @@ var GooglePageRouter;
                     });
                 }
                 else {
-                    let url = calendar.authorize_url(['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar', "https://www.googleapis.com/auth/analytics.readonly"]);
+                    var url = calendar_1.authorize_url(['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar', "https://www.googleapis.com/auth/analytics.readonly"]);
                     response.redirect(url);
                 }
             }
@@ -61,15 +61,15 @@ var GooglePageRouter;
             }
         });
         //step2
-        GooglePageRouter.router.get('/callback', (request, response) => {
-            let code = request.query.code;
-            calendar.authorize_callback(code, (client, tokens) => {
+        GooglePageRouter.router.get('/callback', function (request, response) {
+            var code = request.query.code;
+            calendar_1.authorize_callback(code, function (client, tokens) {
                 if (client) {
-                    let user = request.session.req.user;
+                    var user = request.session.req.user;
                     if (user) {
                         user.tokens = { google_calendar_token: tokens };
                         request.session.save();
-                        calendar.analytics(client, (error, result) => {
+                        calendar_1.analytics(client, function (error, result) {
                             if (!error) {
                                 response.send(JSON.stringify(result));
                             }
@@ -91,7 +91,7 @@ var GooglePageRouter;
                 }
             });
         });
-        GooglePageRouter.router.get('/', [exception.page_guard, auth.page_valid, (request, response, next) => {
+        GooglePageRouter.router.get('/', [exception.page_guard, auth.page_valid, function (request, response, next) {
                 response.render("plugins/google/index", {
                     config: config,
                     user: request.user,

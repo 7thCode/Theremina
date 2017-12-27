@@ -7,12 +7,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var AssetModule;
 (function (AssetModule) {
-    const mongoose = require('mongoose');
-    const request = require('request-promise');
-    const Schema = mongoose.Schema;
-    const timestamp = require('../../systems/plugins/timestamp/timestamp');
-    const userdata = require('../../systems/plugins/userdata/userdata');
-    const Asset = new Schema({
+    var mongoose = require('mongoose');
+    var request = require('request-promise');
+    var Schema = mongoose.Schema;
+    var timestamp = require('../../systems/plugins/timestamp/timestamp');
+    var userdata = require('../../systems/plugins/userdata/userdata');
+    var Asset = new Schema({
         from: { type: Date },
         to: { type: Date }
     });

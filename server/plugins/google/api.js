@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GoogleApiRouter;
 (function (GoogleApiRouter) {
-    const express = require('express');
+    var express = require('express');
     GoogleApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const plugins_config = share.plugins_config;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var plugins_config = share.plugins_config;
     if (plugins_config.google_api) {
-        const GoogleModule = require(share.Server("plugins/google/controllers/google_controller"));
-        const analytics = new GoogleModule.Analytics(plugins_config.google_api.analytics);
+        var GoogleModule = require(share.Server("plugins/google/controllers/google_controller"));
+        var analytics = new GoogleModule.Analytics(plugins_config.google_api.analytics);
         GoogleApiRouter.router.get('/api/ga/:dimensions', [exception.exception, analytics.get]);
     }
 })(GoogleApiRouter = exports.GoogleApiRouter || (exports.GoogleApiRouter = {}));

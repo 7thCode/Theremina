@@ -81,9 +81,6 @@ export namespace LayoutsPageRouter {
         LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
     }]);
 
-    // router.get('/dialogs/send_confirm_dialog', (req: any, result: any, next: any) => {
-    //     result.render('systems/layouts/dialogs/send_confirm_dialog', {});
-    // });
 }
 
 module.exports = LayoutsPageRouter.router;

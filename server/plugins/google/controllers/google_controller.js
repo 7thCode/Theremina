@@ -7,28 +7,28 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GoogleModule;
 (function (GoogleModule) {
-    const fs = require('graceful-fs');
-    const _ = require('lodash');
-    const mongoose = require('mongoose');
+    var fs = require('graceful-fs');
+    var _ = require('lodash');
+    var mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    const google = require('googleapis');
-    const googleAuth = require('google-auth-library');
-    const ga_analytics = require("ga-analytics");
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const Wrapper = share.Wrapper;
-    const plugins_config = share.plugins_config;
-    class Calendar {
+    var google = require('googleapis');
+    var googleAuth = require('google-auth-library');
+    var ga_analytics = require("ga-analytics");
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var Wrapper = share.Wrapper;
+    var plugins_config = share.plugins_config;
+    var Calendar = (function () {
         // plugins_config.google_api.
-        constructor(calendar) {
-            let clientSecret = calendar.client_secret;
-            let clientId = calendar.client_id;
-            let redirectUrl = calendar.redirect_uris[1];
+        function Calendar(calendar) {
+            var clientSecret = calendar.client_secret;
+            var clientId = calendar.client_id;
+            var redirectUrl = calendar.redirect_uris[1];
             this.auth = new googleAuth();
             this.oauth2Client = new this.auth.OAuth2(clientId, clientSecret, redirectUrl);
         }
         // already auth
-        authorize(tokens, callback) {
+        Calendar.prototype.authorize = function (tokens, callback) {
             if (tokens) {
                 this.oauth2Client.credentials = tokens;
                 callback(this.oauth2Client, tokens);
@@ -36,44 +36,45 @@ var GoogleModule;
             else {
                 callback(null, null); // not auth etc...
             }
-        }
+        };
         // new auth step1
-        authorize_url(scopes) {
-            let authUrl = this.oauth2Client.generateAuthUrl({
+        Calendar.prototype.authorize_url = function (scopes) {
+            var authUrl = this.oauth2Client.generateAuthUrl({
                 access_type: 'offline',
                 scope: scopes
             });
             return authUrl;
-        }
+        };
         // new auth step2
-        authorize_callback(code, callback) {
-            this.oauth2Client.getToken(code, (error, tokens) => {
+        Calendar.prototype.authorize_callback = function (code, callback) {
+            var _this = this;
+            this.oauth2Client.getToken(code, function (error, tokens) {
                 if (!error) {
-                    this.oauth2Client.credentials = tokens;
-                    callback(this.oauth2Client, tokens);
+                    _this.oauth2Client.credentials = tokens;
+                    callback(_this.oauth2Client, tokens);
                 }
                 else {
                     callback(null, null); // not auth etc...
                 }
             });
-        }
+        };
         // etc etc...
-        calendar(auth, callback) {
-            let result = "";
-            let calendar = google.calendar({ auth: auth, version: "v3" });
+        Calendar.prototype.calendar = function (auth, callback) {
+            var result = "";
+            var calendar = google.calendar({ auth: auth, version: "v3" });
             calendar.events.list({
                 calendarId: 'primary',
                 timeMin: (new Date()).toISOString(),
                 maxResults: 10,
                 singleEvents: true,
                 orderBy: 'startTime'
-            }, (error, response) => {
+            }, function (error, response) {
                 if (!error) {
-                    let events = response.items;
+                    var events = response.items;
                     for (var i = 0; i < events.length; i++) {
-                        let event = events[i];
-                        let start = event.start.dateTime || event.start.date;
-                        result += start + "-" + event.summary;
+                        var event_1 = events[i];
+                        var start = event_1.start.dateTime || event_1.start.date;
+                        result += start + "-" + event_1.summary;
                     }
                     callback(null, result);
                 }
@@ -81,10 +82,10 @@ var GoogleModule;
                     callback(error, null);
                 }
             });
-        }
+        };
         // etc etc...
-        insert_calendar(auth, callback) {
-            let event = {
+        Calendar.prototype.insert_calendar = function (auth, callback) {
+            var event = {
                 'summary': 'Google I/O 2015',
                 'location': '800 Howard St., San Francisco, CA 94103',
                 'description': 'A chance to hear more about Google\'s developer products.',
@@ -111,11 +112,11 @@ var GoogleModule;
                     ]
                 },
             };
-            let calendar = google.calendar({ auth: auth, version: "v3" });
+            var calendar = google.calendar({ auth: auth, version: "v3" });
             calendar.events.insert({
                 calendarId: 'primary',
                 resource: event,
-            }, (error, response) => {
+            }, function (error, response) {
                 if (!error) {
                     callback(null, response.htmlLink);
                 }
@@ -123,18 +124,18 @@ var GoogleModule;
                     callback(error, null);
                 }
             });
-        }
+        };
         // etc etc...
-        analytics(auth, callback) {
-            let result = "";
-            let analytics = google.analytics({ auth: auth, version: "v3" });
+        Calendar.prototype.analytics = function (auth, callback) {
+            var result = "";
+            var analytics = google.analytics({ auth: auth, version: "v3" });
             analytics.data.ga.get({
                 ids: "ga:" + "76780519",
                 "start-date": "30daysAgo",
                 "end-date": "yesterday",
                 metrics: "ga:users,ga:percentNewSessions,ga:bounceRate",
                 dimensions: "ga:userType"
-            }, (error, rows) => {
+            }, function (error, rows) {
                 if (!error) {
                     callback(null, rows);
                 }
@@ -142,18 +143,21 @@ var GoogleModule;
                     callback(error, null);
                 }
             });
-        }
-    }
+        };
+        return Calendar;
+    }());
     GoogleModule.Calendar = Calendar;
-    class Analytics {
-        get(request, response) {
-            let ga = plugins_config.google_api.analytics;
-            let dimensions = Wrapper.Parse(decodeURIComponent(request.params.dimensions));
+    var Analytics = (function () {
+        function Analytics() {
+        }
+        Analytics.prototype.get = function (request, response) {
+            var ga = plugins_config.google_api.analytics;
+            var dimensions = Wrapper.Parse(decodeURIComponent(request.params.dimensions));
             dimensions["clientId"] = ga.client_id;
             dimensions["serviceEmail"] = ga.service_account_email;
             dimensions["key"] = ga.service_account_key_file;
             dimensions["ids"] = ga.ids;
-            ga_analytics(dimensions, (error, result) => {
+            ga_analytics(dimensions, function (error, result) {
                 if (!error) {
                     Wrapper.SendSuccess(response, result);
                 }
@@ -161,9 +165,10 @@ var GoogleModule;
                     Wrapper.SendError(response, error.code, error.message, error);
                 }
             });
-        }
+        };
         ;
-    }
+        return Analytics;
+    }());
     GoogleModule.Analytics = Analytics;
     /*
         export class FileTransfer {

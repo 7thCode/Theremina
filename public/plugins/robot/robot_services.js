@@ -4,14 +4,14 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let RobotServices = angular.module('RobotServices', []);
+var RobotServices = angular.module('RobotServices', []);
 RobotServices.factory('Robot', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/robot/api/xpath/:url/:path', { url: "@url", path: "@path" }, {});
     }]);
 RobotServices.service("RobotService", ["Robot", function (Robot) {
-        this.Get = (url, path, callback, error) => {
-            Robot.get({ url: encodeURIComponent(url), path: encodeURIComponent(path) }, (result) => {
+        this.Get = function (url, path, callback, error) {
+            Robot.get({ url: encodeURIComponent(url), path: encodeURIComponent(path) }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);

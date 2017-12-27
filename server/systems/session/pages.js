@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SessionPageRouter;
 (function (SessionPageRouter) {
-    const express = require('express');
+    var express = require('express');
     SessionPageRouter.router = express.Router();
 })(SessionPageRouter = exports.SessionPageRouter || (exports.SessionPageRouter = {}));
 module.exports = SessionPageRouter.router;

@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileApiRouter;
 (function (FileApiRouter) {
-    const express = require('express');
+    var express = require('express');
     FileApiRouter.router = express.Router();
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception = new ExceptionController.Exception();
-    const FileModule = require(share.Server("systems/files/controllers/file_controller"));
-    const file = new FileModule.Files();
-    const temporaryfiles = new FileModule.TemporaryFiles();
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
+    var exception = new ExceptionController.Exception();
+    var FileModule = require(share.Server("systems/files/controllers/file_controller"));
+    var file = new FileModule.Files();
+    var temporaryfiles = new FileModule.TemporaryFiles();
     FileApiRouter.router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, file.get_file_query_query]);
     FileApiRouter.router.get('/api/count/:query', [exception.exception, exception.guard, exception.authenticate, file.get_file_query_count]);
     FileApiRouter.router.get('/api/data/:name', [exception.exception, file.get_file_data_name]);

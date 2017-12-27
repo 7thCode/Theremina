@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var AccountApiRouter;
 (function (AccountApiRouter) {
-    const express = require('express');
+    var express = require('express');
     AccountApiRouter.router = express.Router();
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     AccountApiRouter.auth = new AuthController.Auth();
-    const AccountModule = require(share.Server("systems/accounts/controllers/account_controller"));
-    const accounts = new AccountModule.Accounts;
-    const ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception = new ExceptionController.Exception;
+    var AccountModule = require(share.Server("systems/accounts/controllers/account_controller"));
+    var accounts = new AccountModule.Accounts;
+    var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
+    var exception = new ExceptionController.Exception;
     AccountApiRouter.router.get("/api/:username", [exception.exception, exception.guard, exception.authenticate, AccountApiRouter.auth.is_system, accounts.get_account]);
     AccountApiRouter.router.put("/api/:username", [exception.exception, exception.guard, exception.authenticate, AccountApiRouter.auth.is_system, accounts.put_account]);
     AccountApiRouter.router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, accounts.get_account_query_query]);

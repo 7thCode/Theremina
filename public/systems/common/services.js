@@ -8,24 +8,24 @@
 /// <reference path="./shape_edit/adaptor.ts" />
 /// <reference path="./html_edit/html_edit.ts" />
 "use strict";
-let Services = angular.module('Services', []);
-Services.factory('Socket', ["$rootScope", ($rootScope) => {
-        let socket = io.connect();
+var Services = angular.module('Services', []);
+Services.factory('Socket', ["$rootScope", function ($rootScope) {
+        var socket = io.connect();
         return {
-            on: (eventName, callback) => {
-                socket.on(eventName, (data) => {
-                    let args = [data];
-                    $rootScope.$apply(() => {
+            on: function (eventName, callback) {
+                socket.on(eventName, function (data) {
+                    var args = [data];
+                    $rootScope.$apply(function () {
                         if (callback) {
                             callback.apply(socket, args);
                         }
                     });
                 });
             },
-            emit: (eventName, data, callback) => {
-                socket.emit(eventName, data, (ee) => {
-                    let args = [data];
-                    $rootScope.$apply(() => {
+            emit: function (eventName, data, callback) {
+                socket.emit(eventName, data, function (ee) {
+                    var args = [data];
+                    $rootScope.$apply(function () {
                         if (callback) {
                             callback.apply(socket, args);
                         }
@@ -35,73 +35,74 @@ Services.factory('Socket', ["$rootScope", ($rootScope) => {
         };
     }]);
 Services.factory('Session', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/session/api', {}, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
         });
     }]);
 Services.service("BrowserService", [function () {
+        var _this = this;
         this.UserAgent = "";
-        this.IsIE = () => {
-            return (this.UserAgent.indexOf('msie') >= 0 || this.UserAgent.indexOf('trident') >= 0 || this.UserAgent.indexOf('edge/') >= 0);
+        this.IsIE = function () {
+            return (_this.UserAgent.indexOf('msie') >= 0 || _this.UserAgent.indexOf('trident') >= 0 || _this.UserAgent.indexOf('edge/') >= 0);
         };
-        this.IsEdge = () => {
-            return this.UserAgent.indexOf('edge/') >= 0;
+        this.IsEdge = function () {
+            return _this.UserAgent.indexOf('edge/') >= 0;
         };
-        this.IsChrome = () => {
-            let result = false;
-            if (!this.IsIE()) {
-                result = this.UserAgent.indexOf('chrome/') >= 0;
+        this.IsChrome = function () {
+            var result = false;
+            if (!_this.IsIE()) {
+                result = _this.UserAgent.indexOf('chrome/') >= 0;
             }
             return result;
         };
-        this.IsSafari = () => {
-            let result = false;
-            if (!this.IsIE()) {
-                if (!this.IsChrome()) {
-                    result = this.UserAgent.indexOf('safari/') >= 0;
+        this.IsSafari = function () {
+            var result = false;
+            if (!_this.IsIE()) {
+                if (!_this.IsChrome()) {
+                    result = _this.UserAgent.indexOf('safari/') >= 0;
                 }
             }
             return result;
         };
-        this.IsiPhone = () => {
-            return this.UserAgent.indexOf('iphone') >= 0;
+        this.IsiPhone = function () {
+            return _this.UserAgent.indexOf('iphone') >= 0;
         };
-        this.IsiPod = () => {
-            return this.UserAgent.indexOf('ipod') >= 0;
+        this.IsiPod = function () {
+            return _this.UserAgent.indexOf('ipod') >= 0;
         };
-        this.IsiPad = () => {
-            return this.UserAgent.indexOf('ipad') >= 0;
+        this.IsiPad = function () {
+            return _this.UserAgent.indexOf('ipad') >= 0;
         };
-        this.IsiOS = () => {
-            return (this.IsiPhone() || this.IsiPod() || this.IsiPad());
+        this.IsiOS = function () {
+            return (_this.IsiPhone() || _this.IsiPod() || _this.IsiPad());
         };
-        this.IsAndroid = () => {
-            return this.UserAgent.indexOf('android') >= 0;
+        this.IsAndroid = function () {
+            return _this.UserAgent.indexOf('android') >= 0;
         };
-        this.IsPhone = () => {
-            return (this.IsiOS() || this.IsAndroid());
+        this.IsPhone = function () {
+            return (_this.IsiOS() || _this.IsAndroid());
         };
-        this.IsTablet = () => {
-            return (this.IsiPad() || (this.IsAndroid() && this.UserAgent.indexOf('mobile') < 0));
+        this.IsTablet = function () {
+            return (_this.IsiPad() || (_this.IsAndroid() && _this.UserAgent.indexOf('mobile') < 0));
         };
-        this.Version = () => {
-            let result = 0;
-            if (this.IsIE()) {
-                let verArray = /(msie|rv:?)\s?([0-9]{1,})([\.0-9]{1,})/.exec(this.UserAgent);
+        this.Version = function () {
+            var result = 0;
+            if (_this.IsIE()) {
+                var verArray = /(msie|rv:?)\s?([0-9]{1,})([\.0-9]{1,})/.exec(_this.UserAgent);
                 if (verArray) {
                     result = parseInt(verArray[2], 10);
                 }
             }
-            else if (this.IsiOS()) {
-                let verArray = /(os)\s([0-9]{1,})([\_0-9]{1,})/.exec(this.UserAgent);
+            else if (_this.IsiOS()) {
+                var verArray = /(os)\s([0-9]{1,})([\_0-9]{1,})/.exec(_this.UserAgent);
                 if (verArray) {
                     result = parseInt(verArray[2], 10);
                 }
             }
-            else if (this.IsAndroid()) {
-                let verArray = /(android)\s([0-9]{1,})([\.0-9]{1,})/.exec(this.UserAgent);
+            else if (_this.IsAndroid()) {
+                var verArray = /(android)\s([0-9]{1,})([\.0-9]{1,})/.exec(_this.UserAgent);
                 if (verArray) {
                     result = parseInt(verArray[2], 10);
                 }
@@ -111,9 +112,9 @@ Services.service("BrowserService", [function () {
         this.UserAgent = window.navigator.userAgent.toLowerCase();
     }]);
 Services.service("CollectionService", [function () {
-        this.Get = (model, param, callback, error) => {
-            let instance = new model();
-            instance.$get(param, (result) => {
+        this.Get = function (model, param, callback, error) {
+            var instance = new model();
+            instance.$get(param, function (result) {
                 if (result) {
                     if (result.code == 0) {
                         callback(result.value);
@@ -127,11 +128,11 @@ Services.service("CollectionService", [function () {
                 }
             });
         };
-        this.List = (resource, query, option, success, error) => {
+        this.List = function (resource, query, option, success, error) {
             resource.query({
                 query: encodeURIComponent(JSON.stringify(query)),
                 option: encodeURIComponent(JSON.stringify(option))
-            }, (data) => {
+            }, function (data) {
                 if (data) {
                     if (data.code === 0) {
                         success(data.value);
@@ -145,10 +146,10 @@ Services.service("CollectionService", [function () {
                 }
             });
         };
-        this.Count = (resource, query, success, error) => {
+        this.Count = function (resource, query, success, error) {
             resource.get({
                 query: encodeURIComponent(JSON.stringify(query))
-            }, (data) => {
+            }, function (data) {
                 if (data) {
                     if (data.code === 0) {
                         success(data.value);
@@ -164,8 +165,8 @@ Services.service("CollectionService", [function () {
         };
     }]);
 Services.service("SessionService", ['Session', function (Session) {
-        this.Get = (callback, error) => {
-            Session.get({}, (result) => {
+        this.Get = function (callback, error) {
+            Session.get({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -179,10 +180,10 @@ Services.service("SessionService", ['Session', function (Session) {
                 }
             });
         };
-        this.Put = (content, callback, error) => {
-            let self = new Session();
+        this.Put = function (content, callback, error) {
+            var self = new Session();
             self.data = content;
-            self.$put({}, (result) => {
+            self.$put({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -223,41 +224,41 @@ Services.directive('eventFocus', function(focus) {
     };
 });
 */
-Services.directive("compareTo", () => {
+Services.directive("compareTo", function () {
     return {
         require: "ngModel",
         scope: {
             otherModelValue: "=compareTo"
         },
-        link: (scope, element, attributes, ngModel) => {
-            ngModel.$validators.compareTo = (modelValue) => {
+        link: function (scope, element, attributes, ngModel) {
+            ngModel.$validators.compareTo = function (modelValue) {
                 return modelValue === scope.otherModelValue;
             };
-            scope.$watch("otherModelValue", () => {
+            scope.$watch("otherModelValue", function () {
                 ngModel.$validate();
             });
         }
     };
 });
 Services.directive("guidance", ['$compile', '$parse',
-    ($compile, $parse) => {
-        return (scope, element, attrs) => {
-            let scenario = $parse(attrs.scenario)(scope);
-            let result = '<section>';
-            _.forEach(scenario, (act, index) => {
-                let target = act.outer.target;
-                let target_element = document.getElementById(target);
+    function ($compile, $parse) {
+        return function (scope, element, attrs) {
+            var scenario = $parse(attrs.scenario)(scope);
+            var result = '<section>';
+            _.forEach(scenario, function (act, index) {
+                var target = act.outer.target;
+                var target_element = document.getElementById(target);
                 if (target_element) {
-                    let rect = target_element.getBoundingClientRect();
-                    let position_x = rect.left + window.pageXOffset;
-                    let position_y = rect.top + window.pageYOffset;
-                    let padding_x = Math.round(act.outer.width / 8);
-                    let padding_y = Math.round(act.outer.height / 8);
-                    let top = act.outer.top + position_y;
-                    let left = act.outer.left + position_x;
+                    var rect = target_element.getBoundingClientRect();
+                    var position_x = rect.left + window.pageXOffset;
+                    var position_y = rect.top + window.pageYOffset;
+                    var padding_x = Math.round(act.outer.width / 8);
+                    var padding_y = Math.round(act.outer.height / 8);
+                    var top_1 = act.outer.top + position_y;
+                    var left = act.outer.left + position_x;
                     result +=
                         '<div ng-show="step == ' + index + '">' +
-                            '<div style="position:absolute;z-index:10000;top:' + top + 'px' + ';left:' + left + 'px' + ';' + act.style + '" class="' + act._class + '">' +
+                            '<div style="position:absolute;z-index:10000;top:' + top_1 + 'px' + ';left:' + left + 'px' + ';' + act.style + '" class="' + act._class + '">' +
                             '<div style="position:absolute;top:' + act.inner.top + 'px' + ';left:' + act.inner.left + 'px' + ';width:' + act.inner.width + 'px' + ';height:' + act.inner.height + 'px' + ';word-wrap: break-word;padding:' + padding_x + 'px' + ' ' + padding_y + 'px' + ';">' + act.inner.content + '</div>' +
                             '<img src="' + act.outer.background + '" style="object-fit:fill;width:' + act.outer.width + 'px' + ';height:' + act.outer.height + 'px' + ';"/>' +
                             '</div>' +
@@ -270,70 +271,70 @@ Services.directive("guidance", ['$compile', '$parse',
         };
     }
 ]);
-Services.directive('draggablepane', ['$document', ($document) => {
+Services.directive('draggablepane', ['$document', function ($document) {
         return {
             restrict: 'A',
-            link: (scope, element, attribute) => {
-                let style = element[0].style;
+            link: function (scope, element, attribute) {
+                var style = element[0].style;
                 if (style) {
-                    let name;
+                    var name_1;
                     element.css({ position: 'fixed' });
-                    name = attribute.draggablepane;
-                    let start_x;
-                    let start_y;
-                    let clicked_x;
-                    let clicked_y;
-                    let location_x;
-                    let location_y;
-                    let left = localStorage.getItem(name + '_left');
+                    name_1 = attribute.draggablepane;
+                    var start_x_1;
+                    var start_y_1;
+                    var clicked_x_1;
+                    var clicked_y_1;
+                    var location_x_1;
+                    var location_y_1;
+                    var left = localStorage.getItem(name_1 + '_left');
                     if (left) {
-                        location_x = left;
+                        location_x_1 = left;
                     }
                     else {
-                        location_x = element[0].style.left;
+                        location_x_1 = element[0].style.left;
                     }
-                    let top = localStorage.getItem(name + '_top');
-                    if (top) {
-                        location_y = top;
+                    var top_2 = localStorage.getItem(name_1 + '_top');
+                    if (top_2) {
+                        location_y_1 = top_2;
                     }
                     else {
-                        location_y = element[0].style.top;
+                        location_y_1 = element[0].style.top;
                     }
                     element.css({
                         width: element[0].style.width,
                         height: element[0].style.height,
-                        top: location_y,
-                        left: location_x
+                        top: location_y_1,
+                        left: location_x_1
                     });
-                    element.bind('mousedown', ($event) => {
-                        let result = false;
-                        start_x = element.prop('offsetLeft');
-                        start_y = element.prop('offsetTop');
-                        clicked_x = $event.clientX;
-                        clicked_y = $event.clientY;
-                        let handle_y = clicked_y - start_y;
+                    element.bind('mousedown', function ($event) {
+                        var result = false;
+                        start_x_1 = element.prop('offsetLeft');
+                        start_y_1 = element.prop('offsetTop');
+                        clicked_x_1 = $event.clientX;
+                        clicked_y_1 = $event.clientY;
+                        var handle_y = clicked_y_1 - start_y_1;
                         if (handle_y < 30) {
-                            $document.bind('mousemove', mousemove);
-                            $document.bind('mouseup', mouseup);
+                            $document.bind('mousemove', mousemove_1);
+                            $document.bind('mouseup', mouseup_1);
                         }
                         else {
                             result = true;
                         }
                         return result;
                     });
-                    let mousemove = ($event) => {
-                        let target = angular.element("#draggable_area");
+                    var mousemove_1 = function ($event) {
+                        var target = angular.element("#draggable_area");
                         if (target) {
-                            let target_x_min = target[0].offsetLeft;
-                            let target_y_min = target[0].offsetTop;
-                            let target_width = target[0].offsetWidth;
-                            let target_height = target[0].offsetHeight;
-                            let target_x_max = target_x_min + target_width;
-                            let target_y_max = target_y_min + target_height;
-                            let delta_x = $event.clientX - clicked_x;
-                            let delta_y = $event.clientY - clicked_y;
-                            let position_x = start_x + delta_x;
-                            let position_y = start_y + delta_y;
+                            var target_x_min = target[0].offsetLeft;
+                            var target_y_min = target[0].offsetTop;
+                            var target_width = target[0].offsetWidth;
+                            var target_height = target[0].offsetHeight;
+                            var target_x_max = target_x_min + target_width;
+                            var target_y_max = target_y_min + target_height;
+                            var delta_x = $event.clientX - clicked_x_1;
+                            var delta_y = $event.clientY - clicked_y_1;
+                            var position_x = start_x_1 + delta_x;
+                            var position_y = start_y_1 + delta_y;
                             if (position_x < target_x_min) {
                                 position_x = target_x_min;
                             }
@@ -346,32 +347,32 @@ Services.directive('draggablepane', ['$document', ($document) => {
                             if (position_y > target_y_max) {
                                 position_y = target_y_max;
                             }
-                            location_x = position_x + "px";
-                            location_y = position_y + "px";
+                            location_x_1 = position_x + "px";
+                            location_y_1 = position_y + "px";
                         }
                         element.css({
-                            top: location_y,
-                            left: location_x
+                            top: location_y_1,
+                            left: location_x_1
                         });
                         return false;
                     };
-                    let mouseup = () => {
+                    var mouseup_1 = function () {
                         if (('localStorage' in window) && (window.localStorage !== null)) {
-                            if (name) {
-                                localStorage.setItem(name + '_left', location_x);
-                                localStorage.setItem(name + '_top', location_y);
+                            if (name_1) {
+                                localStorage.setItem(name_1 + '_left', location_x_1);
+                                localStorage.setItem(name_1 + '_top', location_y_1);
                             }
                         }
-                        $document.unbind('mousemove', mousemove);
-                        $document.unbind('mouseup', mouseup);
+                        $document.unbind('mousemove', mousemove_1);
+                        $document.unbind('mouseup', mouseup_1);
                     };
                 }
             }
         };
     }]);
-Services.filter('length', [() => {
-        return (s, limit) => {
-            let result = s;
+Services.filter('length', [function () {
+        return function (s, limit) {
+            var result = s;
             if (s) {
                 if (s.length > limit) {
                     result = s.slice(0, limit) + "...";
@@ -381,12 +382,12 @@ Services.filter('length', [() => {
         };
     }]);
 Services.provider('HtmlEdit', [function () {
-        this.$get = () => {
+        this.$get = function () {
             return {
-                toHtml: (object, init) => {
+                toHtml: function (object, init) {
                     return HtmlEdit.Render.toHtml(object, init);
                 },
-                fromHtml: (html, callback) => {
+                fromHtml: function (html, callback) {
                     HtmlEdit.Render.fromHtml(html, callback);
                 },
             };
@@ -395,7 +396,7 @@ Services.provider('HtmlEdit', [function () {
 ]);
 // ShapeEditProvider
 Services.provider('ShapeEdit', [function () {
-        let _self = this;
+        var _self = this;
         _self.Handlers = new ShapeEdit.EventHandlers();
         _self.Plugins = new ShapeEdit.Plugins();
         _self.pagesize = 40;
@@ -407,7 +408,7 @@ Services.provider('ShapeEdit', [function () {
         _self.ratio = 1;
         _self.scale = 1;
         _self.object = null;
-        this.configure = (options) => {
+        this.configure = function (options) {
             _self.Wrapper = document.getElementById(options.wrapper);
             _self.CanvasElement = document.getElementById(options.canvas);
             if (_self.CanvasElement) {
@@ -417,19 +418,19 @@ Services.provider('ShapeEdit', [function () {
                 //this.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.CanvasElement.width, _self.CanvasElement.height);
             }
         };
-        this.adjust = (element, outerwidth, outerheight, innerwidth, innerheight, scale) => {
+        this.adjust = function (element, outerwidth, outerheight, innerwidth, innerheight, scale) {
             element.width = innerwidth;
             element.height = innerheight;
             element.style.marginLeft = ((outerwidth - innerwidth) / 2) + "px";
             element.style.marginRight = ((outerwidth - innerwidth) / 2) + "px";
             element.style.marginTop = ((outerheight - innerheight) / 2) + "px";
             element.style.marginBottom = ((outerheight - innerheight) / 2) + "px";
-            let width = (outerwidth / innerwidth);
-            let height = (outerheight / innerheight);
+            var width = (outerwidth / innerwidth);
+            var height = (outerheight / innerheight);
             _self.ratio = Math.min(width, height) * scale * 0.9;
             element.style.transform = "scale(" + _self.ratio + ")";
         };
-        this.$get = () => {
+        this.$get = function () {
             return {
                 Canvas: _self.Canvas,
                 Wrapper: _self.Wrapper,
@@ -449,10 +450,10 @@ Services.provider('ShapeEdit', [function () {
                 Input: _self.input,
                 Ratio: _self.ratio,
                 Scale: _self.scale,
-                Serialize: () => {
+                Serialize: function () {
                     return ShapeEdit.Canvas.Serialize(_self.Canvas);
                 },
-                Load: (value) => {
+                Load: function (value) {
                     _self.object = {};
                     try {
                         _self.object = JSON.parse(value);
@@ -466,216 +467,216 @@ Services.provider('ShapeEdit', [function () {
                     _self.Canvas.Draw();
                     //    _self.Canvas.Animate();
                 },
-                IsDirty: () => {
+                IsDirty: function () {
                     return _self.Canvas.isdirty;
                 },
-                Save: () => {
+                Save: function () {
                     return ShapeEdit.Canvas.Save(_self.Canvas);
                 },
-                Clear: () => {
+                Clear: function () {
                     _self.IsOpen = true;
                 },
-                Draw: () => {
+                Draw: function () {
                     _self.Canvas.Draw();
                 },
-                GetScale: () => {
+                GetScale: function () {
                     return _self.scale;
                 },
-                SetScale: (scale) => {
+                SetScale: function (scale) {
                     _self.scale = scale;
                     _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
                     _self.Canvas.Draw();
                     //     _self.Canvas.Animate();
                 },
-                ToTop: () => {
+                ToTop: function () {
                     _self.Canvas.ToTop();
                 },
-                ToBottom: () => {
+                ToBottom: function () {
                     _self.Canvas.ToBottom();
                 },
-                Selected: () => {
+                Selected: function () {
                     _self.Canvas.Selected();
                 },
-                Add: (shape) => {
+                Add: function (shape) {
                     _self.Canvas.Add(shape);
                 },
-                DeleteSelected: () => {
+                DeleteSelected: function () {
                     _self.Canvas.DeleteSelected();
                 },
-                Lock: () => {
+                Lock: function () {
                     _self.Canvas.Lock();
                 },
-                UnLockAll: () => {
+                UnLockAll: function () {
                     _self.Canvas.UnLockAll();
                 },
-                Group: () => {
+                Group: function () {
                     _self.Canvas.Group();
                 },
-                Ungroup: () => {
+                Ungroup: function () {
                     _self.Canvas.Ungroup();
                 },
-                Copy: () => {
+                Copy: function () {
                     _self.Canvas.Copy();
                 },
-                Paste: () => {
+                Paste: function () {
                     _self.Canvas.Paste();
                 },
-                Snap: () => {
+                Snap: function () {
                     _self.Canvas.Snap();
                 },
-                SetMode: (mode) => {
+                SetMode: function (mode) {
                     _self.Canvas.SetMode(mode);
                 },
-                SetCurrentLocation: (loc) => {
+                SetCurrentLocation: function (loc) {
                     _self.Canvas.SetCurrentLocation(loc);
                 },
-                CurrentLocation: () => {
+                CurrentLocation: function () {
                     return _self.Canvas.CurrentLocation();
                 },
-                SetCurrentSize: (size) => {
+                SetCurrentSize: function (size) {
                     _self.Canvas.SetCurrentSize(size);
                 },
-                CurrentSize: () => {
+                CurrentSize: function () {
                     return _self.Canvas.CurrentSize();
                 },
-                SetCurrentFillColor: (color) => {
+                SetCurrentFillColor: function (color) {
                     _self.Canvas.SetCurrentFillColor(color);
                 },
-                CurrentFillColor: () => {
+                CurrentFillColor: function () {
                     return _self.Canvas.CurrentFillColor();
                 },
-                SetCurrentStrokeColor: (color) => {
+                SetCurrentStrokeColor: function (color) {
                     _self.Canvas.SetCurrentStrokeColor(color);
                 },
-                CurrentStrokeColor: () => {
+                CurrentStrokeColor: function () {
                     return _self.Canvas.CurrentStrokeColor();
                 },
-                SetCurrentStrokeWidth: (width) => {
+                SetCurrentStrokeWidth: function (width) {
                     _self.Canvas.SetCurrentStrokeWidth(width);
                 },
-                CurrentStrokeWidth: () => {
+                CurrentStrokeWidth: function () {
                     return _self.Canvas.CurrentStrokeWidth();
                 },
-                SetCurrentFontStyle: (style) => {
+                SetCurrentFontStyle: function (style) {
                     if (_self.Canvas) {
                         _self.Canvas.SetCurrentFontStyle(style);
                     }
                 },
-                CurrentFontStyle: () => {
+                CurrentFontStyle: function () {
                     return _self.Canvas.CurrentFontStyle();
                 },
-                SetCurrentFontVariant(variant) {
+                SetCurrentFontVariant: function (variant) {
                     _self.Canvas.SetCurrentFontVariant(variant);
                 },
-                CurrentFontVariant: () => {
+                CurrentFontVariant: function () {
                     return _self.Canvas.CurrentFontVariant();
                 },
-                SetCurrentFontWeight: (weight) => {
+                SetCurrentFontWeight: function (weight) {
                     if (_self.Canvas) {
                         _self.Canvas.SetCurrentFontWeight(weight);
                     }
                 },
-                CurrentFontWeight: () => {
+                CurrentFontWeight: function () {
                     return _self.Canvas.CurrentFontWeight();
                 },
-                SetCurrentFontSize: (size) => {
+                SetCurrentFontSize: function (size) {
                     if (_self.Canvas) {
                         _self.Canvas.SetCurrentFontSize(size);
                     }
                 },
-                CurrentFontSize: () => {
+                CurrentFontSize: function () {
                     return _self.Canvas.CurrentFontSize();
                 },
-                SetCurrentFontKeyword: (keyword) => {
+                SetCurrentFontKeyword: function (keyword) {
                     _self.Canvas.SetCurrentFontKeyword(keyword);
                 },
-                CurrentFontKeyword: () => {
+                CurrentFontKeyword: function () {
                     return _self.Canvas.CurrentFontKeyword();
                 },
-                SetCurrentFontFamily: (family) => {
+                SetCurrentFontFamily: function (family) {
                     _self.Canvas.SetCurrentFontFamily(family);
                 },
-                CurrentFontFamily: () => {
+                CurrentFontFamily: function () {
                     return _self.Canvas.CurrentFontFamily();
                 },
-                SetCurrentPath: (path) => {
+                SetCurrentPath: function (path) {
                     _self.Canvas.SetCurrentPath(path);
                 },
-                CurrentPath: () => {
+                CurrentPath: function () {
                     return _self.Canvas.CurrentPath();
                 },
-                SetCurrentAlign: (align) => {
+                SetCurrentAlign: function (align) {
                     if (_self.Canvas) {
                         _self.Canvas.SetCurrentAlign(align);
                     }
                 },
-                CurrentAlign: () => {
+                CurrentAlign: function () {
                     return _self.Canvas.CurrentAlign();
                 },
-                SetCurrentText: (text) => {
+                SetCurrentText: function (text) {
                     if (_self.Canvas) {
                         _self.Canvas.SetCurrentText(text);
                     }
                 },
-                CurrentText: () => {
+                CurrentText: function () {
                     return _self.Canvas.CurrentText();
                 },
-                CurrentType: () => {
+                CurrentType: function () {
                     return _self.Canvas.CurrentType();
                 },
-                SetCurrentShapesAlign: (align) => {
+                SetCurrentShapesAlign: function (align) {
                     _self.Canvas.SetCurrentShapesAlign(align);
                 },
-                DeselectAll: () => {
+                DeselectAll: function () {
                     _self.Canvas.DeselectAll();
                 },
-                SelectedCount: () => {
+                SelectedCount: function () {
                     return _self.Canvas.SelectedCount();
                 },
-                onTick: (callback) => {
+                onTick: function (callback) {
                     _self.Plugins.on("tick", callback);
                 },
-                onDraw: (callback) => {
+                onDraw: function (callback) {
                     _self.Plugins.on("draw", callback);
                 },
-                onNew: (callback) => {
+                onNew: function (callback) {
                     _self.Handlers.on("new", callback);
                 },
-                onDelete: (callback) => {
+                onDelete: function (callback) {
                     _self.Handlers.on("delete", callback);
                 },
-                onSelect: (callback) => {
+                onSelect: function (callback) {
                     _self.Handlers.on("select", callback);
                 },
-                onDeselect: (callback) => {
+                onDeselect: function (callback) {
                     _self.Handlers.on("deselect", callback);
                 },
-                onMove: (callback) => {
+                onMove: function (callback) {
                     _self.Handlers.on("move", callback);
                 },
-                onResize: (callback) => {
+                onResize: function (callback) {
                     _self.Handlers.on("resize", callback);
                 },
-                onDeformation: (callback) => {
+                onDeformation: function (callback) {
                     _self.Handlers.on("deformation", callback);
                 },
-                onChange: (callback) => {
+                onChange: function (callback) {
                     _self.Handlers.on("change", callback);
                 },
-                onKeydown: (callback) => {
+                onKeydown: function (callback) {
                     _self.Handlers.on("keydown", callback);
                 },
-                onDrop: (callback) => {
+                onDrop: function (callback) {
                     _self.Handlers.on("drop", callback);
                 },
-                onResizeWindow: (callback) => {
-                    let resizeTimer;
-                    let interval = Math.floor(1000 / 60 * 10);
-                    window.addEventListener('resize', (event) => {
+                onResizeWindow: function (callback) {
+                    var resizeTimer;
+                    var interval = Math.floor(1000 / 60 * 10);
+                    window.addEventListener('resize', function (event) {
                         if (resizeTimer !== false) {
                             clearTimeout(resizeTimer);
                         }
-                        resizeTimer = setTimeout(() => {
+                        resizeTimer = setTimeout(function () {
                             if (_self.object) {
                                 callback(_self.Wrapper, _self.object);
                                 _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);

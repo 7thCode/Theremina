@@ -7,14 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ImageApiRouter;
 (function (ImageApiRouter) {
-    const express = require('express');
+    var express = require('express');
     ImageApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     ImageApiRouter.auth = new AuthController.Auth();
-    const FileModule = require(share.Server("systems/files/controllers/file_controller"));
-    const file = new FileModule.Files();
+    var FileModule = require(share.Server("systems/files/controllers/file_controller"));
+    var file = new FileModule.Files();
     ImageApiRouter.router.get('/api/:userid/:name', file.get_file);
 })(ImageApiRouter = exports.ImageApiRouter || (exports.ImageApiRouter = {}));
 module.exports = ImageApiRouter.router;

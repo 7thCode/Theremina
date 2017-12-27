@@ -83,7 +83,7 @@
                     a.btn.btn-success.btn-xs(download ng-href="/articles/json/{{article._id}}", target="_blank")
                         i.fa.fa-cloud-download
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{article.name}}", ng-click="SelectArticle(article._id)")
-                        img.center-block.thumbnail(ng-src="{{article.content.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
+                        img.center-block.thumbnail(ng-src="{{article.content.type.value | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
                     div(style="height:8rem;text-align:center;")
                         .row
                             .col-xs-12

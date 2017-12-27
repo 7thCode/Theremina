@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var LayoutsApiRouter;
 (function (LayoutsApiRouter) {
-    const express = require('express');
+    var express = require('express');
     LayoutsApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     LayoutsApiRouter.auth = new AuthController.Auth();
-    const LayoutsModule = require(share.Server("services/layouts/controllers/layouts_controller"));
-    const layout = new LayoutsModule.Layout();
+    var LayoutsModule = require(share.Server("services/layouts/controllers/layouts_controller"));
+    var layout = new LayoutsModule.Layout();
     // for template
     LayoutsApiRouter.router.get("/template/svg/:name", [layout.get_template_svg]);
     LayoutsApiRouter.router.post("/template/create", [exception.exception, exception.guard, exception.authenticate, LayoutsApiRouter.auth.is_system, layout.create_template]);

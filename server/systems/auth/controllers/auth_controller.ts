@@ -17,8 +17,8 @@ export namespace AuthModule {
 
     const passport: any = require('passport');
 
-    const pug = require('pug');
-    const path = require('path');
+//    const pug = require('pug');
+//    const path = require('path');
 
     const crypto = require('crypto');
 

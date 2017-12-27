@@ -6,9 +6,9 @@
 "use strict";
 var Install;
 (function (Install) {
-    let InstallServices = angular.module('InstallServices', []);
+    var InstallServices = angular.module('InstallServices', []);
     InstallServices.factory('InstallSetting', ['$resource',
-        ($resource) => {
+        function ($resource) {
             return $resource('/install', {}, {
                 get: { method: 'GET' },
                 put: { method: 'PUT' }
@@ -16,8 +16,8 @@ var Install;
         }]);
     InstallServices.service('InstallService', ['$location', 'InstallSetting',
         function ($location, InstallSetting) {
-            this.Get = (callback, error) => {
-                InstallSetting.get({}, (result) => {
+            this.Get = function (callback, error) {
+                InstallSetting.get({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);
@@ -31,10 +31,10 @@ var Install;
                     }
                 });
             };
-            this.Put = (setting, callback, error) => {
-                let data = new InstallSetting();
+            this.Put = function (setting, callback, error) {
+                var data = new InstallSetting();
                 data.setting = setting;
-                data.$put({}, (result) => {
+                data.$put({}, function (result) {
                     if (result) {
                         if (result.code === 0) {
                             callback(result.value);

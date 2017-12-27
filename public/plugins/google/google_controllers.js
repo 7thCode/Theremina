@@ -4,52 +4,52 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let GoogleControllers = angular.module('GoogleControllers', ["ngResource"]);
+var GoogleControllers = angular.module('GoogleControllers', ["ngResource"]);
 GoogleControllers.controller('AnalyticsController', ['$scope', '$window', '$document', '$log', '$uibModal', "AnalyticsService",
-    ($scope, $window, $document, $log, $uibModal, AnalyticsService) => {
-        let progress = (value) => {
+    function ($scope, $window, $document, $log, $uibModal, AnalyticsService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        window.addEventListener('beforeunload', (e) => {
+        window.addEventListener('beforeunload', function (e) {
             if ($scope.opened) {
             }
         }, false);
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let Draw = () => {
-            let dimensions = {
+        var Draw = function () {
+            var dimensions = {
                 dimensions: 'ga:sourceMedium,ga:date',
                 metrics: 'ga:bounceRate,ga:sessions,ga:users,ga:pageviews,ga:pageviewsPerSession,ga:avgSessionDuration,ga:goal7Completions,ga:goal8Completions',
                 startDate: '2017-06-30',
                 endDate: '2017-07-18',
                 sort: 'ga:sourceMedium'
             };
-            let dictionary = {
+            var dictionary = {
                 "ga:sourceMedium": "メディア",
                 "ga:date": "日付",
                 "ga:bounceRate": "直帰率",
@@ -61,10 +61,10 @@ GoogleControllers.controller('AnalyticsController', ['$scope', '$window', '$docu
                 "ga:goal7Completions": "B-Cコンタクトフォーム",
                 "ga:goal8Completions": "B-CコンタクトフォームSP"
             };
-            let reference = (data, dictionary) => {
-                let result = [];
-                data.forEach((item, index) => {
-                    let name = dictionary[item.name];
+            var reference = function (data, dictionary) {
+                var result = [];
+                data.forEach(function (item, index) {
+                    var name = dictionary[item.name];
                     if (!name) {
                         name = index;
                     }
@@ -72,7 +72,7 @@ GoogleControllers.controller('AnalyticsController', ['$scope', '$window', '$docu
                 });
                 return result;
             };
-            AnalyticsService.Get(dimensions, (result) => {
+            AnalyticsService.Get(dimensions, function (result) {
                 if (result) {
                     $scope.rows = result.rows;
                     $scope.columnHeaders = reference(result.columnHeaders, dictionary);

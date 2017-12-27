@@ -7,13 +7,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SessionApiRouter;
 (function (SessionApiRouter) {
-    const express = require('express');
+    var express = require('express');
     SessionApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const SessionModule = require(share.Server("systems/session/controllers/session_controller"));
-    const session = new SessionModule.Session;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var SessionModule = require(share.Server("systems/session/controllers/session_controller"));
+    var session = new SessionModule.Session;
     SessionApiRouter.router.get("/api", [exception.exception, exception.guard, exception.authenticate, session.get]);
     SessionApiRouter.router.put("/api", [exception.exception, exception.guard, exception.authenticate, session.put]);
 })(SessionApiRouter = exports.SessionApiRouter || (exports.SessionApiRouter = {}));

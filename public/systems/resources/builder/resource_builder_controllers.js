@@ -4,31 +4,31 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ResourceBuilderControllers = angular.module('ResourceBuilderControllers', ['ui.ace']);
+var ResourceBuilderControllers = angular.module('ResourceBuilderControllers', ['ui.ace']);
 ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$document", "$log", "$compile", "$uibModal", "ResourceBuilderService", "ElementsService",
     function ($scope, $document, $log, $compile, $uibModal, ResourceBuilderService, ElementsService) {
-        let progress = (value) => {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        window.addEventListener('beforeunload', (e) => {
+        window.addEventListener('beforeunload', function (e) {
             if (!editor.session.getUndoManager().isClean()) {
                 e.returnValue = '';
                 return '';
             }
         }, false);
-        let editor = null;
-        let document = null;
-        let inner_peview = false;
-        let preview_window = null;
-        let Draw = (text) => {
+        var editor = null;
+        var document = null;
+        var inner_peview = false;
+        var preview_window = null;
+        var Draw = function (text) {
             switch (ResourceBuilderService.current.content.type) {
                 case "text/html":
                     if (document) {
@@ -42,9 +42,9 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         };
         $scope.aceOption = {
             theme: "chrome",
-            onLoad: (_ace) => {
+            onLoad: function (_ace) {
                 editor = _ace;
-                let session = _ace.getSession();
+                var session = _ace.getSession();
                 //      let beautify = _ace.require("ace/ext/beautify"); // get reference to extension
                 //      beautify.beautify(session);
                 editor.$blockScrolling = Infinity;
@@ -57,26 +57,26 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
                 editor.container.addEventListener("drop", function (event) {
                 });
             },
-            onChange: (e) => {
+            onChange: function (e) {
                 Draw($scope.resource);
             }
         };
-        $scope.Undo = () => {
-            let session = editor.getSession();
-            let undo = session.getUndoManager();
+        $scope.Undo = function () {
+            var session = editor.getSession();
+            var undo = session.getUndoManager();
             undo.undo(true);
         };
-        $scope.Paste = (id) => {
+        $scope.Paste = function (id) {
             progress(true);
-            let current = ResourceBuilderService.current;
-            ResourceBuilderService.Get(id, (result) => {
+            var current = ResourceBuilderService.current;
+            ResourceBuilderService.Get(id, function (result) {
                 progress(false);
                 ResourceBuilderService.current = current;
                 editor.insert(result.resource);
                 Draw(result.resource);
             }, error_handler);
         };
-        let OpenPreview = () => {
+        var OpenPreview = function () {
             //      $scope.inner_preview = inner_peview;
             //      if (inner_peview) {
             //          let preview = window.document.getElementById("view");
@@ -87,20 +87,20 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
             //      }
             //      Draw(ResourceBuilderService.current.content.resource);
         };
-        let ClosePreview = () => {
+        var ClosePreview = function () {
             //      if (preview_window) {
             //          document = preview_window.close();
             //      }
         };
-        let Create = () => {
-            let modalRegist = $uibModal.open({
+        var Create = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'ResourceBuilderCreateDialogController',
                 templateUrl: '/resources/dialogs/create_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((resource) => {
+            modalRegist.result.then(function (resource) {
                 switch (ResourceBuilderService.current.content.type) {
                     case "text/html":
                         editor.getSession().setMode("ace/mode/html");
@@ -118,18 +118,18 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
                 $scope.userid = ResourceBuilderService.current.userid;
                 editor.session.getUndoManager().markClean();
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
-        let Open = () => {
-            let modalRegist = $uibModal.open({
+        var Open = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'ResourceBuilderOpenDialogController',
                 templateUrl: '/resources/dialogs/open_dialog',
                 resolve: {
                     items: $scope
                 }
             });
-            modalRegist.result.then((content) => {
+            modalRegist.result.then(function (content) {
                 switch (ResourceBuilderService.current.content.type) {
                     case "text/html":
                         editor.getSession().setMode("ace/mode/html");
@@ -147,33 +147,33 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
                 $scope.userid = ResourceBuilderService.current.userid;
                 editor.session.getUndoManager().markClean();
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
-        let Update = () => {
+        var Update = function () {
             if (ResourceBuilderService.current) {
                 progress(true);
                 ResourceBuilderService.current.content.resource = $scope.resource;
-                ResourceBuilderService.Put((result) => {
+                ResourceBuilderService.Put(function (result) {
                     editor.session.getUndoManager().markClean();
                     progress(false);
                 }, error_handler);
             }
         };
-        let Delete = () => {
+        var Delete = function () {
             if (ResourceBuilderService.current) {
-                let modalRegist = $uibModal.open({
+                var modalRegist = $uibModal.open({
                     controller: 'ResourceBuilderDeleteConfirmController',
                     templateUrl: '/resources/dialogs/delete_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                             return ResourceBuilderService.current;
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
+                modalRegist.result.then(function (content) {
                     progress(true);
-                    ResourceBuilderService.Delete((result) => {
+                    ResourceBuilderService.Delete(function (result) {
                         ClosePreview();
                         $scope.resource = {};
                         $scope.name = "";
@@ -181,13 +181,13 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
                         ResourceBuilderService.Draw("");
                         progress(false);
                     }, error_handler);
-                }, () => {
+                }, function () {
                 });
             }
         };
-        let Query = () => {
+        var Query = function () {
             ResourceBuilderService.query = { type: { $lt: 10 } };
-            ResourceBuilderService.Query((result) => {
+            ResourceBuilderService.Query(function (result) {
                 if (result) {
                     $scope.templates = result;
                 }
@@ -202,31 +202,31 @@ ResourceBuilderControllers.controller('ResourceBuilderController', ["$scope", "$
         Query();
     }]);
 ResourceBuilderControllers.controller('ResourceBuilderCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'ResourceBuilderService', 'items',
-    ($scope, $log, $uibModalInstance, ResourceBuilderService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, ResourceBuilderService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
         $scope.type = 20;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
             ResourceBuilderService.Init();
             //ResourceBuilderService.current.content.resource = $scope.resource;
             ResourceBuilderService.current.content.type = $scope.mimetype;
-            ResourceBuilderService.Create($scope.title, $scope.type, (result) => {
+            ResourceBuilderService.Create($scope.title, $scope.type, function (result) {
                 progress(false);
                 $scope.message = "";
                 $uibModalInstance.close(result);
@@ -234,89 +234,89 @@ ResourceBuilderControllers.controller('ResourceBuilderCreateDialogController', [
         };
     }]);
 ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ResourceBuilderService',
-    ($scope, $log, $uibModalInstance, $uibModal, items, ResourceBuilderService) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, $uibModal, items, ResourceBuilderService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             items.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
-        let Query = () => {
+        var Query = function () {
             progress(true);
             ResourceBuilderService.InitQuery(null);
-            ResourceBuilderService.Query((result) => {
+            ResourceBuilderService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                ResourceBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                ResourceBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                ResourceBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ResourceBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             progress(true);
             ResourceBuilderService.InitQuery(null);
             if (name) {
                 ResourceBuilderService.AddQuery({ name: { $regex: name } });
             }
-            ResourceBuilderService.Query((result) => {
+            ResourceBuilderService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                ResourceBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                ResourceBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                ResourceBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ResourceBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Count = () => {
-            ResourceBuilderService.Count((result) => {
+        var Count = function () {
+            ResourceBuilderService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            ResourceBuilderService.Next((result) => {
+            ResourceBuilderService.Next(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                ResourceBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                ResourceBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                ResourceBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ResourceBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            ResourceBuilderService.Prev((result) => {
+            ResourceBuilderService.Prev(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                ResourceBuilderService.Over((hasnext) => { $scope.over = !hasnext; });
-                ResourceBuilderService.Under((hasprev) => { $scope.under = !hasprev; });
+                ResourceBuilderService.Over(function (hasnext) { $scope.over = !hasnext; });
+                ResourceBuilderService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Get = (resource) => {
+        var Get = function (resource) {
             progress(true);
-            ResourceBuilderService.Get(resource._id, (result) => {
+            ResourceBuilderService.Get(resource._id, function (result) {
                 progress(false);
                 $scope.message = "";
                 $uibModalInstance.close(result);
             }, error_handler);
         };
-        let hide = () => {
+        var hide = function () {
             $uibModalInstance.close();
         };
-        let cancel = () => {
+        var cancel = function () {
             $uibModalInstance.dismiss();
         };
-        let LayoutQuery = () => Query;
+        var LayoutQuery = function () { return Query; };
         $scope.Count = Count;
         $scope.Next = Next;
         $scope.Prev = Prev;
@@ -324,19 +324,19 @@ ResourceBuilderControllers.controller('ResourceBuilderOpenDialogController', ['$
         $scope.Get = Get;
         $scope.hide = hide;
         $scope.cancel = cancel;
-        $scope.LayoutQuery = () => Query;
+        $scope.LayoutQuery = function () { return Query; };
         Query();
     }]);
 ResourceBuilderControllers.controller('ResourceBuilderDeleteConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.title = items.name;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);

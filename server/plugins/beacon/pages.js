@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var BeaconPageRouter;
 (function (BeaconPageRouter) {
-    const express = require('express');
+    var express = require('express');
     BeaconPageRouter.router = express.Router();
 })(BeaconPageRouter = exports.BeaconPageRouter || (exports.BeaconPageRouter = {}));
 module.exports = BeaconPageRouter.router;

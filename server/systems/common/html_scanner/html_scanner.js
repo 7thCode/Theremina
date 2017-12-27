@@ -1,40 +1,54 @@
-/**
- * Created by oda on 2017/07/05.
+/**!
+ Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ This software is released under the MIT License.
+ //opensource.org/licenses/mit-license.php
  */
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var HTMLScanner;
 (function (HTMLScanner) {
-    const url = require('url');
-    const _ = require('lodash');
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const PREFIX = "ds";
-    class NodeScanner {
-        constructor(callback) {
+    var url = require('url');
+    var _ = require('lodash');
+    var jsdom = require("jsdom");
+    var JSDOM = jsdom.JSDOM;
+    var PREFIX = "ds";
+    var NodeScanner = (function () {
+        function NodeScanner(callback) {
             this.document_depth = 0;
             this.depth = 0;
             this.position = 0;
             this.callback = callback;
         }
-        static prefix(name) {
-            let result = "";
-            let splited_name = name.toLowerCase().split(":");
+        NodeScanner.prefix = function (name) {
+            var result = "";
+            var splited_name = name.toLowerCase().split(":");
             if (splited_name.length == 2) {
                 result = splited_name[0];
             }
             return result;
-        }
-        static localName(name) {
-            let splited_name = name.toLowerCase().split(":");
+        };
+        NodeScanner.localName = function (name) {
+            var splited_name = name.toLowerCase().split(":");
             return splited_name[splited_name.length - 1];
-        }
-        ScanChild(node, data, position) {
+        };
+        NodeScanner.prototype.ScanChild = function (node, data, position) {
+            var _this = this;
             if (node) {
-                let childnodes = node.childNodes;
+                var childnodes = node.childNodes;
                 this.depth++;
                 if (childnodes) {
-                    _.forEach(childnodes, (node, index) => {
-                        this.position = index;
-                        this.ScanNode(node, data, position);
+                    _.forEach(childnodes, function (node, index) {
+                        _this.position = index;
+                        _this.ScanNode(node, data, position);
                     });
                 }
                 this.depth--;
@@ -42,19 +56,20 @@ var HTMLScanner;
             else {
                 this.callback({ code: 1, message: "ScanChild node is null." }, null);
             }
-        }
-        ScanNode(node, data, position) {
+        };
+        NodeScanner.prototype.ScanNode = function (node, data, position) {
             this.ScanChild(node, data, position);
-        }
-        ScanHtml(source) {
+        };
+        NodeScanner.prototype.ScanHtml = function (source) {
+            var _this = this;
             this.document_depth++;
-            let dom = new JSDOM(source);
+            var dom = new JSDOM(source);
             if (dom) {
-                let childnodes = dom.window.document.childNodes;
+                var childnodes = dom.window.document.childNodes;
                 if (childnodes) {
-                    _.forEach(childnodes, (element, index) => {
-                        this.position = index;
-                        this.ScanNode(element, null, 0);
+                    _.forEach(childnodes, function (element, index) {
+                        _this.position = index;
+                        _this.ScanNode(element, null, 0);
                     });
                 }
             }
@@ -65,35 +80,38 @@ var HTMLScanner;
             if (this.document_depth == 0) {
                 this.callback(null, "");
             }
-        }
-    }
+        };
+        return NodeScanner;
+    }());
     HTMLScanner.NodeScanner = NodeScanner;
-    class LinkScanner extends NodeScanner {
-        constructor() {
-            super(...arguments);
-            this.links = [];
-            this.base_url = "";
+    var LinkScanner = (function (_super) {
+        __extends(LinkScanner, _super);
+        function LinkScanner() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.links = [];
+            _this.base_url = "";
+            return _this;
         }
-        UrlNormalize(partial_url) {
+        LinkScanner.prototype.UrlNormalize = function (partial_url) {
             return url.resolve(this.base_url, partial_url);
-        }
-        ScanLinks(node, data) {
+        };
+        LinkScanner.prototype.ScanLinks = function (node, data) {
             if (node.attributes) {
                 if (node.attributes.href) {
-                    let url_value = node.attributes.href.nodeValue;
-                    let target_url_string = this.UrlNormalize(url_value);
+                    var url_value = node.attributes.href.nodeValue;
+                    var target_url_string = this.UrlNormalize(url_value);
                     if (_.indexOf(this.links, target_url_string) == -1) {
                         this.links.push(target_url_string);
-                        let parsed_base_url = url.parse(this.base_url);
-                        let parsed_target_url = url.parse(target_url_string);
+                        var parsed_base_url = url.parse(this.base_url);
+                        var parsed_target_url = url.parse(target_url_string);
                         if (parsed_target_url.hostname == parsed_base_url.hostname) {
                             this.ScanHtml(target_url_string);
                         }
                     }
                 }
             }
-        }
-        ScanNode(node, data, position) {
+        };
+        LinkScanner.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
@@ -113,8 +131,9 @@ var HTMLScanner;
             else {
                 this.callback({ code: 1, message: "ScanNode node is null," }, null);
             }
-        }
-    }
+        };
+        return LinkScanner;
+    }(NodeScanner));
     HTMLScanner.LinkScanner = LinkScanner;
     /* DataSourceResolver
     *
@@ -124,47 +143,60 @@ var HTMLScanner;
     *  クエリー文字列を名前、クエリーの結果を値としてオブジェクトを構成。
     *
     * */
-    class DataSourceResolver extends NodeScanner {
-        constructor(datasource, callback) {
-            super(callback);
-            this.datasource_promises = [];
-            this.datasource = datasource;
+    var DataSourceResolver = (function (_super) {
+        __extends(DataSourceResolver, _super);
+        function DataSourceResolver(datasource, callback) {
+            var _this = _super.call(this, callback) || this;
+            _this.datasource_promises = [];
+            _this.datasource = datasource;
+            return _this;
         }
-        PromisedDataSource(node) {
-            let result = null;
+        DataSourceResolver.prototype.PromisedDataSource = function (node) {
+            var result = null;
             try {
-                let query = node.attributes.query.nodeValue;
+                var query = node.attributes.query.nodeValue;
                 result = this.datasource.GetDatasource(query, this);
             }
             catch (e) {
                 this.callback(e, null);
             }
             return result;
-        }
-        PromisedDataCount(node) {
-            let result = null;
+        };
+        DataSourceResolver.prototype.PromisedDataCount = function (node) {
+            var result = null;
             try {
-                let query = node.attributes.query.nodeValue;
+                var query = node.attributes.query.nodeValue;
                 result = this.datasource.GetCount(query, this);
             }
             catch (e) {
                 this.callback(e, null);
             }
             return result;
-        }
-        ScanNode(node, data, position) {
+        };
+        DataSourceResolver.prototype.Aggregate = function (node) {
+            var result = null;
+            try {
+                var aggrigate = node.attributes.aggrigate.nodeValue;
+                result = this.datasource.Aggregate(aggrigate, this);
+            }
+            catch (e) {
+                this.callback(e, null);
+            }
+            return result;
+        };
+        DataSourceResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname = node.localName;
+                        var tagname = node.localName;
                         if (tagname) {
-                            let prefix = DataSourceResolver.prefix(tagname);
-                            let localname = DataSourceResolver.localName(tagname);
+                            var prefix = DataSourceResolver.prefix(tagname);
+                            var localname = DataSourceResolver.localName(tagname);
                             switch (localname) {
                                 case "meta":
                                     if (node.attributes) {
                                         if (node.attributes["query"]) {
-                                            let query = node.attributes["query"];
+                                            var query = node.attributes["query"];
                                             this.datasource_promises.push({
                                                 name: query.nodeValue,
                                                 promise: this.PromisedDataSource(node),
@@ -178,12 +210,21 @@ var HTMLScanner;
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) {
-                                                let query = node.attributes["query"];
+                                            if (node.attributes.query) {
+                                                var query = node.attributes.query;
                                                 this.datasource_promises.push({
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
                                                     count: this.PromisedDataCount(node),
+                                                    resolved: ""
+                                                });
+                                            }
+                                            else if (node.attributes.aggrigate) {
+                                                var aggrigate = node.attributes.aggrigate;
+                                                this.datasource_promises.push({
+                                                    name: aggrigate.nodeValue,
+                                                    promise: this.Aggregate(node),
+                                                    count: null,
                                                     resolved: ""
                                                 });
                                             }
@@ -205,16 +246,17 @@ var HTMLScanner;
             else {
                 this.callback({ code: 2, message: "ScanNode node is null" }, null);
             }
-        }
-        ResolveDataSource(source, result) {
+        };
+        DataSourceResolver.prototype.ResolveDataSource = function (source, result) {
+            var _this = this;
             this.document_depth++;
-            let dom = new JSDOM(source);
+            var dom = new JSDOM(source);
             if (dom) {
-                let childnodes = dom.window.document.childNodes;
+                var childnodes = dom.window.document.childNodes;
                 if (childnodes) {
-                    _.forEach(childnodes, (element, index) => {
-                        this.position = index;
-                        this.ScanNode(element, null, 0);
+                    _.forEach(childnodes, function (element, index) {
+                        _this.position = index;
+                        _this.ScanNode(element, null, 0);
                     });
                 }
             }
@@ -224,73 +266,75 @@ var HTMLScanner;
             this.document_depth--;
             if (this.document_depth == 0) {
                 // resolve all [record reference] in document.
-                Promise.all(this.datasource_promises.map((doc) => {
-                    let result1 = null;
+                Promise.all(this.datasource_promises.map(function (doc) {
+                    var result1 = null;
                     if (doc.promise) {
                         result1 = doc.promise;
                     }
                     return result1;
-                })).then((resolved) => {
-                    _.forEach(resolved, (entry, index) => {
-                        result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+                })).then(function (resolved) {
+                    _.forEach(resolved, function (entry, index) {
+                        result[_this.datasource_promises[index].name] = { content: entry, count: 0 };
                     });
-                    Promise.all(this.datasource_promises.map((doc) => {
-                        let result2 = null;
+                    Promise.all(_this.datasource_promises.map(function (doc) {
+                        var result2 = null;
                         if (doc.count) {
                             result2 = doc.count;
                         }
                         return result2;
-                    })).then((resolved) => {
-                        _.forEach(resolved, (count, index) => {
-                            result[this.datasource_promises[index].name].count = count;
+                    })).then(function (resolved) {
+                        _.forEach(resolved, function (count, index) {
+                            result[_this.datasource_promises[index].name].count = count;
                         });
-                        this.callback(null, result);
-                    }).catch((error) => {
-                        this.callback(error, null);
+                        _this.callback(null, result);
+                    }).catch(function (error) {
+                        _this.callback(error, null);
                     });
-                }).catch((error) => {
-                    this.callback(error, null);
+                }).catch(function (error) {
+                    _this.callback(error, null);
                 });
             }
-        }
+        };
         // todo:1path
-        ResolveDataSource2(childnodes, result) {
+        DataSourceResolver.prototype.ResolveDataSource2 = function (childnodes, result) {
+            var _this = this;
             if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null, 0);
+                _.forEach(childnodes, function (element, index) {
+                    _this.position = index;
+                    _this.ScanNode(element, null, 0);
                 });
             }
             // resolve all [record reference] in document.
-            Promise.all(this.datasource_promises.map((doc) => {
-                let result1 = null;
+            Promise.all(this.datasource_promises.map(function (doc) {
+                var result1 = null;
                 if (doc.promise) {
                     result1 = doc.promise;
                 }
                 return result1;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.datasource_promises[index].name] = { content: entry, count: 0 };
+            })).then(function (resolved) {
+                _.forEach(resolved, function (entry, index) {
+                    result[_this.datasource_promises[index].name] = { content: entry, count: 0 };
                 });
-                Promise.all(this.datasource_promises.map((doc) => {
-                    let result2 = null;
+                Promise.all(_this.datasource_promises.map(function (doc) {
+                    var result2 = null;
                     if (doc.count) {
                         result2 = doc.count;
                     }
                     return result2;
-                })).then((resolved) => {
-                    _.forEach(resolved, (count, index) => {
-                        result[this.datasource_promises[index].name].count = count;
+                })).then(function (resolved) {
+                    _.forEach(resolved, function (count, index) {
+                        result[_this.datasource_promises[index].name].count = count;
                     });
-                    this.callback(null, result);
-                }).catch((error) => {
-                    this.callback(error, null);
+                    _this.callback(null, result);
+                }).catch(function (error) {
+                    _this.callback(error, null);
                 });
-            }).catch((error) => {
-                this.callback(error, null);
+            }).catch(function (error) {
+                _this.callback(error, null);
             });
-        }
-    }
+        };
+        return DataSourceResolver;
+    }(NodeScanner));
     HTMLScanner.DataSourceResolver = DataSourceResolver;
     /* UrlResolver
     *
@@ -300,15 +344,17 @@ var HTMLScanner;
     *  URLを名前、HTTP Getの結果を値としてオブジェクトを構成。
     *
     * */
-    class UrlResolver extends NodeScanner {
-        constructor(datasource, config, callback) {
-            super(callback);
-            this.url_promises = [];
-            this.datasource = datasource;
-            this.config = config;
+    var UrlResolver = (function (_super) {
+        __extends(UrlResolver, _super);
+        function UrlResolver(datasource, config, callback) {
+            var _this = _super.call(this, callback) || this;
+            _this.url_promises = [];
+            _this.datasource = datasource;
+            _this.config = config;
+            return _this;
         }
-        PromisedUrl(target_url_string) {
-            let result = null;
+        UrlResolver.prototype.PromisedUrl = function (target_url_string) {
+            var result = null;
             try {
                 result = this.datasource.GetUrl(target_url_string, this);
             }
@@ -316,16 +362,16 @@ var HTMLScanner;
                 this.callback(e, null);
             }
             return result;
-        }
+        };
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        Include(node) {
+        UrlResolver.prototype.Include = function (node) {
             if (node.attributes) {
-                let number = node.attributes.length;
+                var number = node.attributes.length;
                 for (var index = 0; index < number; index++) {
-                    let attribute = node.attributes[index];
-                    let prefix = Expander.prefix(attribute.name);
-                    let localname = Expander.localName(attribute.name);
+                    var attribute = node.attributes[index];
+                    var prefix = Expander.prefix(attribute.name);
+                    var localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         if (localname == "include") {
                             this.url_promises.push({
@@ -338,15 +384,15 @@ var HTMLScanner;
                     }
                 }
             }
-        }
-        ScanNode(node, data, position) {
+        };
+        UrlResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname = node.localName;
+                        var tagname = node.localName;
                         if (tagname) {
-                            let prefix = UrlResolver.prefix(tagname);
-                            let localname = UrlResolver.localName(tagname);
+                            var prefix = UrlResolver.prefix(tagname);
+                            var localname = UrlResolver.localName(tagname);
                             switch (localname) {
                                 case "meta":
                                     this.Include(node);
@@ -358,7 +404,7 @@ var HTMLScanner;
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.src) {
-                                                let src = node.attributes.src;
+                                                var src = node.attributes.src;
                                                 this.url_promises.push({
                                                     name: src.nodeValue,
                                                     promise: this.PromisedUrl(src.nodeValue),
@@ -381,16 +427,17 @@ var HTMLScanner;
             else {
                 this.callback({ code: 1, message: "ScanNode node is null." }, null);
             }
-        }
-        ResolveUrl(source, result) {
+        };
+        UrlResolver.prototype.ResolveUrl = function (source, result) {
+            var _this = this;
             this.document_depth++;
-            let dom = new JSDOM(source);
+            var dom = new JSDOM(source);
             if (dom) {
-                let childnodes = dom.window.document.childNodes;
+                var childnodes = dom.window.document.childNodes;
                 if (childnodes) {
-                    _.forEach(childnodes, (element, index) => {
-                        this.position = index;
-                        this.ScanNode(element, null, 0);
+                    _.forEach(childnodes, function (element, index) {
+                        _this.position = index;
+                        _this.ScanNode(element, null, 0);
                     });
                 }
             }
@@ -399,52 +446,54 @@ var HTMLScanner;
             }
             this.document_depth--;
             if (this.document_depth == 0) {
-                Promise.all(this.url_promises.map((doc) => {
-                    let promise = null;
+                Promise.all(this.url_promises.map(function (doc) {
+                    var promise = null;
                     if (doc.promise) {
                         promise = doc.promise;
                     }
                     return promise;
-                })).then((resolved) => {
-                    _.forEach(resolved, (entry, index) => {
-                        result[this.url_promises[index].name] = { content: entry, count: 1 };
+                })).then(function (resolved) {
+                    _.forEach(resolved, function (entry, index) {
+                        result[_this.url_promises[index].name] = { content: entry, count: 1 };
                     });
-                    this.callback(null, result);
-                }).catch((error) => {
+                    _this.callback(null, result);
+                }).catch(function (error) {
                     switch (error.statusCode) {
                         case 404:
-                            this.callback({ code: 404, message: error.options.uri }, null);
+                            _this.callback({ code: 404, message: error.options.uri }, null);
                             break;
                         default:
-                            this.callback(error, null);
+                            _this.callback(error, null);
                     }
                 });
             }
-        }
+        };
         // todo:1path
-        ResolveUrl2(childnodes, result) {
+        UrlResolver.prototype.ResolveUrl2 = function (childnodes, result) {
+            var _this = this;
             if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, null, 0);
+                _.forEach(childnodes, function (element, index) {
+                    _this.position = index;
+                    _this.ScanNode(element, null, 0);
                 });
             }
-            Promise.all(this.url_promises.map((doc) => {
-                let promise = null;
+            Promise.all(this.url_promises.map(function (doc) {
+                var promise = null;
                 if (doc.promise) {
                     promise = doc.promise;
                 }
                 return promise;
-            })).then((resolved) => {
-                _.forEach(resolved, (entry, index) => {
-                    result[this.url_promises[index].name] = { content: entry, count: 1 };
+            })).then(function (resolved) {
+                _.forEach(resolved, function (entry, index) {
+                    result[_this.url_promises[index].name] = { content: entry, count: 1 };
                 });
-                this.callback(null, result);
-            }).catch((error) => {
-                this.callback(error, null);
+                _this.callback(null, result);
+            }).catch(function (error) {
+                _this.callback(error, null);
             });
-        }
-    }
+        };
+        return UrlResolver;
+    }(NodeScanner));
     HTMLScanner.UrlResolver = UrlResolver;
     /* Expander
     *
@@ -458,23 +507,25 @@ var HTMLScanner;
     *  例　　　<div ds:class="fieldname">   ->   <div class="hoge">
     *
     * */
-    class Expander extends NodeScanner {
-        constructor(datasource, callback) {
-            super(callback);
-            this.fragments = {};
-            this.html = "";
-            this.datasource = datasource;
+    var Expander = (function (_super) {
+        __extends(Expander, _super);
+        function Expander(datasource, callback) {
+            var _this = _super.call(this, callback) || this;
+            _this.fragments = {};
+            _this.html = "";
+            _this.datasource = datasource;
+            return _this;
         }
         //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
         //よって、"meta"タグをInclude命令に使用する。
-        Meta(node, data, position) {
-            let resolved = false;
+        Expander.prototype.Meta = function (node, data, position) {
+            var resolved = false;
             if (node.attributes) {
-                let number = node.attributes.length;
+                var number = node.attributes.length;
                 for (var index = 0; index < number; index++) {
-                    let attribute = node.attributes[index];
-                    let prefix = Expander.prefix(attribute.name);
-                    let localname = Expander.localName(attribute.name);
+                    var attribute = node.attributes[index];
+                    var prefix = Expander.prefix(attribute.name);
+                    var localname = Expander.localName(attribute.name);
                     if (prefix == PREFIX) {
                         switch (localname) {
                             case "include":
@@ -483,11 +534,11 @@ var HTMLScanner;
                                 break;
                             case "title":
                                 {
-                                    let query_attribute = node.attributes["query"];
+                                    var query_attribute = node.attributes["query"];
                                     if (query_attribute) {
-                                        let datas = data[query_attribute.nodeValue];
+                                        var datas = data[query_attribute.nodeValue];
                                         if (datas.content.length > 0) {
-                                            let first_data = datas.content[0];
+                                            var first_data = datas.content[0];
                                             this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
                                                 content: attribute.value,
                                                 count: 1
@@ -499,11 +550,11 @@ var HTMLScanner;
                                 break;
                             case "content":
                                 {
-                                    let query_attribute = node.attributes["query"];
+                                    var query_attribute = node.attributes["query"];
                                     if (query_attribute) {
-                                        let datas = data[query_attribute.nodeValue];
+                                        var datas = data[query_attribute.nodeValue];
                                         if (datas.content.length > 0) {
-                                            let first_data = datas.content[0];
+                                            var first_data = datas.content[0];
                                             /*
                                                                                   let name_attribute: any = node.attributes["name"];
                                                                                   let name = "";
@@ -511,19 +562,19 @@ var HTMLScanner;
                                                                                       name = 'name="' + name_attribute.nodeValue + '"';
                                                                                   }
                                           */
-                                            let name = "";
-                                            let number = node.attributes.length;
-                                            for (var index = 0; index < number; index++) {
-                                                let attribute = node.attributes[index];
-                                                let prefix = Expander.prefix(attribute.name);
-                                                let localname = Expander.localName(attribute.name);
-                                                if (prefix != PREFIX) {
-                                                    if (localname != "query") {
-                                                        name = attribute.name + '="' + attribute.nodeValue + '" ';
+                                            var name_1 = "";
+                                            var number_1 = node.attributes.length;
+                                            for (var index = 0; index < number_1; index++) {
+                                                var attribute_1 = node.attributes[index];
+                                                var prefix_1 = Expander.prefix(attribute_1.name);
+                                                var localname_1 = Expander.localName(attribute_1.name);
+                                                if (prefix_1 != PREFIX) {
+                                                    if (localname_1 != "query") {
+                                                        name_1 = attribute_1.name + '="' + attribute_1.nodeValue + '" ';
                                                     }
                                                 }
                                             }
-                                            this.html += '<meta ' + name + ' content="' + this.datasource.ResolveFormat(first_data, {
+                                            this.html += '<meta ' + name_1 + ' content="' + this.datasource.ResolveFormat(first_data, {
                                                 content: attribute.value,
                                                 count: 1
                                             }, position, this) + '"/>';
@@ -543,18 +594,18 @@ var HTMLScanner;
             if (!resolved) {
                 this.NodeToElement(node, data, position);
             }
-        }
-        NodeToElement(node, data, position) {
-            let tagname = node.localName;
-            let attribute_string = "";
+        };
+        Expander.prototype.NodeToElement = function (node, data, position) {
+            var tagname = node.localName;
+            var attribute_string = "";
             if (node.attributes) {
-                let number = node.attributes.length;
+                var number = node.attributes.length;
                 for (var index = 0; index < number; index++) {
-                    let attribute = node.attributes[index];
-                    let prefix = Expander.prefix(attribute.name);
-                    let localname = Expander.localName(attribute.name);
-                    if (prefix == PREFIX) {
-                        attribute_string += ' ' + localname + '="' + this.datasource.ResolveFormat(data, {
+                    var attribute = node.attributes[index];
+                    var prefix_2 = Expander.prefix(attribute.name);
+                    var localname_2 = Expander.localName(attribute.name);
+                    if (prefix_2 == PREFIX) {
+                        attribute_string += ' ' + localname_2 + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
                             count: 1
                         }, position, this) + '"';
@@ -564,8 +615,8 @@ var HTMLScanner;
                     }
                 }
             }
-            let localname = DataSourceResolver.localName(tagname);
-            let prefix = DataSourceResolver.prefix(tagname);
+            var localname = DataSourceResolver.localName(tagname);
+            var prefix = DataSourceResolver.prefix(tagname);
             if (prefix != PREFIX) {
                 localname = tagname;
             }
@@ -586,21 +637,23 @@ var HTMLScanner;
                         break;
                 }
             }
-        }
-        ResolveChildren(node, result, position) {
-            _.forEach(node.childNodes, (childnode, index) => {
-                this.position = index;
-                this.ScanNode(childnode, result, position);
+        };
+        Expander.prototype.ResolveChildren = function (node, result, position) {
+            var _this = this;
+            _.forEach(node.childNodes, function (childnode, index) {
+                _this.position = index;
+                _this.ScanNode(childnode, result, position);
             });
-        }
-        ScanNode(node, data, position) {
+        };
+        Expander.prototype.ScanNode = function (node, data, position) {
+            var _this = this;
             if (node) {
                 switch (node.nodeType) {
                     case 1://element
-                        let tagname = node.localName;
+                        var tagname = node.localName;
                         if (tagname) {
-                            let prefix = Expander.prefix(tagname);
-                            let localname = Expander.localName(tagname);
+                            var prefix = Expander.prefix(tagname);
+                            var localname = Expander.localName(tagname);
                             switch (localname) {
                                 case "html":
                                 case "head":
@@ -618,23 +671,39 @@ var HTMLScanner;
                                 case "foreach":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) {
-                                                let query = node.attributes["query"];
-                                                let result = this.fragments[query.nodeValue].content;
+                                            if (node.attributes.query) {
+                                                var query = node.attributes.query;
+                                                var result = this.fragments[query.nodeValue].content;
                                                 if (result) {
-                                                    _.forEach(result, (resolved_data, position) => {
-                                                        this.ResolveChildren(node, resolved_data, position);
+                                                    _.forEach(result, function (resolved_data, position) {
+                                                        _this.ResolveChildren(node, resolved_data, position);
                                                     });
                                                 }
                                             }
+                                            else if (node.attributes.aggrigate) {
+                                                var aggrigate = node.attributes.aggrigate;
+                                                var result = this.fragments[aggrigate.nodeValue].content;
+                                                if (result) {
+                                                    _.forEach(result, function (resolved_data, position) {
+                                                        _this.ResolveChildren(node, resolved_data, position);
+                                                    });
+                                                }
+                                            }
+                                            else if (node.attributes.field) {
+                                                var field = node.attributes.field;
+                                                this.html += this.datasource.ResolveFormat(data, {
+                                                    content: field.nodeValue,
+                                                    count: 1
+                                                }, position, this);
+                                            }
                                             else if (node.attributes.scope) {
                                                 if (data) {
-                                                    let scope = node.attributes.scope;
-                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, position, this); //fragment
+                                                    var scope = node.attributes.scope;
+                                                    var result = this.datasource.FieldValue(data, scope.nodeValue, position, this); //fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
-                                                            _.forEach(result, (resolved_data, position) => {
-                                                                this.ResolveChildren(node, resolved_data, position);
+                                                            _.forEach(result, function (resolved_data, position) {
+                                                                _this.ResolveChildren(node, resolved_data, position);
                                                             });
                                                         }
                                                     }
@@ -643,29 +712,28 @@ var HTMLScanner;
                                         }
                                     }
                                     break;
-                                case "include":
-                                    if (prefix == PREFIX) {
-                                        if (node.attributes) {
-                                            if (node.attributes.src) {
-                                                let src = node.attributes.src;
-                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], position, this);
-                                            }
-                                        }
-                                    }
-                                    break;
                                 case "resolve":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes["query"]) {
-                                                let query = node.attributes["query"];
-                                                let current_datasource = this.fragments[query.nodeValue].content;
-                                                _.forEach(node.childNodes, (childnode, index) => {
-                                                    this.position = index;
-                                                    this.ScanNode(childnode, current_datasource[0], 0);
+                                            if (node.attributes.query) {
+                                                var query = node.attributes.query;
+                                                var current_datasource_1 = this.fragments[query.nodeValue].content;
+                                                _.forEach(node.childNodes, function (childnode, index) {
+                                                    _this.position = index;
+                                                    _this.ScanNode(childnode, current_datasource_1[0], 0);
                                                 });
                                             }
+                                            else if (node.attributes.aggrigate) {
+                                                var aggrigate = node.attributes.aggrigate;
+                                                var result = this.fragments[aggrigate.nodeValue].content;
+                                                if (result) {
+                                                    _.forEach(result, function (resolved_data, position) {
+                                                        _this.ResolveChildren(node, resolved_data, position);
+                                                    });
+                                                }
+                                            }
                                             else if (node.attributes.field) {
-                                                let field = node.attributes.field;
+                                                var field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1
@@ -673,8 +741,8 @@ var HTMLScanner;
                                             }
                                             else if (node.attributes.scope) {
                                                 if (data) {
-                                                    let scope = node.attributes.scope;
-                                                    let result = this.datasource.FieldValue(data, scope.nodeValue, position, this);
+                                                    var scope = node.attributes.scope;
+                                                    var result = this.datasource.FieldValue(data, scope.nodeValue, position, this);
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             if (result.length > 0) {
@@ -690,14 +758,39 @@ var HTMLScanner;
                                         }
                                     }
                                     break;
+                                case "include":
+                                    if (prefix == PREFIX) {
+                                        if (node.attributes) {
+                                            if (node.attributes.src) {
+                                                var src = node.attributes.src;
+                                                this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], position, this);
+                                            }
+                                        }
+                                    }
+                                    break;
                                 case "if":
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist = node.attributes.exist;
-                                                let result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
-                                                if (result) {
-                                                    this.ResolveChildren(node, data, position);
+                                                var exist = node.attributes.exist;
+                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
+                                                if (node.attributes.equal) {
+                                                    var equal = node.attributes.equal;
+                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
+                                                    if (result == result2) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
+                                                else if (node.attributes.match) {
+                                                    var match = node.attributes.match;
+                                                    if (result == match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
+                                                else {
+                                                    if (result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
                                                 }
                                             }
                                         }
@@ -707,10 +800,25 @@ var HTMLScanner;
                                     if (prefix == PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
-                                                let exist = node.attributes.exist;
-                                                let result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
-                                                if (!result) {
-                                                    this.ResolveChildren(node, data, position);
+                                                var exist = node.attributes.exist;
+                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
+                                                if (node.attributes.equal) {
+                                                    var equal = node.attributes.equal;
+                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
+                                                    if (result != result2) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
+                                                else if (node.attributes.match) {
+                                                    var match = node.attributes.match;
+                                                    if (result != match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
+                                                else {
+                                                    if (!result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
                                                 }
                                             }
                                         }
@@ -724,10 +832,13 @@ var HTMLScanner;
                         break;
                     case 3://text
                         if (node.parentNode) {
-                            let parent_name = node.parentNode.localName;
-                            let prefix = Expander.prefix(parent_name);
+                            var parent_name = node.parentNode.localName;
+                            var prefix = Expander.prefix(parent_name);
                             if (prefix == PREFIX) {
-                                this.html += this.datasource.ResolveFormat(data, { content: node.data, count: 1 }, position, this);
+                                this.html += this.datasource.ResolveFormat(data, {
+                                    content: node.data,
+                                    count: 1
+                                }, position, this);
                             }
                             else {
                                 this.html += node.data;
@@ -748,17 +859,18 @@ var HTMLScanner;
             else {
                 this.callback({ code: 1, message: "ScanNode node is null." }, null);
             }
-        }
-        ExpandHtml(source, fragments) {
+        };
+        Expander.prototype.ExpandHtml = function (source, fragments) {
+            var _this = this;
             this.fragments = fragments;
             this.document_depth++;
-            let dom = new JSDOM(source);
+            var dom = new JSDOM(source);
             if (dom) {
-                let childnodes = dom.window.document.childNodes;
+                var childnodes = dom.window.document.childNodes;
                 if (childnodes) {
-                    _.forEach(childnodes, (element, index) => {
-                        this.position = index;
-                        this.ScanNode(element, fragments, 0);
+                    _.forEach(childnodes, function (element, index) {
+                        _this.position = index;
+                        _this.ScanNode(element, fragments, 0);
                     });
                 }
             }
@@ -769,32 +881,36 @@ var HTMLScanner;
             if (this.document_depth == 0) {
                 this.callback(null, this.html);
             }
-        }
+        };
         // todo:1path
-        ExpandHtml2(childnodes, fragments, position) {
+        Expander.prototype.ExpandHtml2 = function (childnodes, fragments, position) {
+            var _this = this;
             if (childnodes) {
-                _.forEach(childnodes, (element, index) => {
-                    this.position = index;
-                    this.ScanNode(element, fragments, position);
+                _.forEach(childnodes, function (element, index) {
+                    _this.position = index;
+                    _this.ScanNode(element, fragments, position);
                 });
                 this.callback(null, this.html);
             }
-        }
-    }
+        };
+        return Expander;
+    }(NodeScanner));
     HTMLScanner.Expander = Expander;
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
     *　todo: ３回パースするのはダサダサ。
     *
     * */
-    class Builder {
-        static Build(source, datasource, page_init, config, callback) {
-            let build = (source, datasource, page_init, callback) => {
-                let datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, (error, datasource_result) => {
+    var Builder = (function () {
+        function Builder() {
+        }
+        Builder.Build = function (source, datasource, page_init, config, callback) {
+            var build = function (source, datasource, page_init, callback) {
+                var datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, function (error, datasource_result) {
                     if (!error) {
-                        let url_resolver = new HTMLScanner.UrlResolver(datasource, config, (error, url_result) => {
+                        var url_resolver = new HTMLScanner.UrlResolver(datasource, config, function (error, url_result) {
                             if (!error) {
-                                let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
+                                var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                                     if (!error) {
                                         callback(null, expand_result);
                                     }
@@ -823,10 +939,10 @@ var HTMLScanner;
             else {
                 build(source, datasource, {}, callback);
             }
-        }
+        };
         ;
-        static Resolve(source, datasource, url_result, callback) {
-            let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
+        Builder.Resolve = function (source, datasource, url_result, callback) {
+            var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                 if (!error) {
                     callback(null, expand_result);
                 }
@@ -835,15 +951,15 @@ var HTMLScanner;
                 }
             });
             expander.ExpandHtml(source, url_result);
-        }
+        };
         // todo:1path
-        static Build2(source, datasource, page_init, config, callback) {
-            let build = (source, datasource, page_init, callback) => {
-                let datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, (error, datasource_result) => {
+        Builder.Build2 = function (source, datasource, page_init, config, callback) {
+            var build = function (source, datasource, page_init, callback) {
+                var datasource_resolver = new HTMLScanner.DataSourceResolver(datasource, function (error, datasource_result) {
                     if (!error) {
-                        let url_resolver = new HTMLScanner.UrlResolver(datasource, config, (error, url_result) => {
+                        var url_resolver = new HTMLScanner.UrlResolver(datasource, config, function (error, url_result) {
                             if (!error) {
-                                let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
+                                var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                                     if (!error) {
                                         callback(null, expand_result);
                                     }
@@ -866,9 +982,9 @@ var HTMLScanner;
                 datasource_resolver.datasource_promises.push(page_init);
                 datasource_resolver.ResolveDataSource2(source, {});
             };
-            let dom = new JSDOM(source);
+            var dom = new JSDOM(source);
             if (dom) {
-                let childnodes = dom.window.document.childNodes;
+                var childnodes = dom.window.document.childNodes;
                 if (datasource.page_params) {
                     build(childnodes, datasource, page_init, callback);
                 }
@@ -879,10 +995,10 @@ var HTMLScanner;
             else {
                 callback({ code: 1, message: "" }, null);
             }
-        }
+        };
         ;
-        static Resolve2(source, datasource, url_result, callback) {
-            let expander = new HTMLScanner.Expander(datasource, (error, expand_result) => {
+        Builder.Resolve2 = function (source, datasource, url_result, callback) {
+            var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                 if (!error) {
                     callback(null, expand_result);
                 }
@@ -891,8 +1007,9 @@ var HTMLScanner;
                 }
             });
             expander.ExpandHtml(source, url_result);
-        }
-    }
+        };
+        return Builder;
+    }());
     HTMLScanner.Builder = Builder;
 })(HTMLScanner || (HTMLScanner = {}));
 module.exports = HTMLScanner;

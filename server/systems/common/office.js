@@ -7,14 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var OfficeModule;
 (function (OfficeModule) {
-    class Excel {
-        constructor() {
+    var Excel = (function () {
+        function Excel() {
         }
-        ObjectToRow(object) {
-        }
-        test() {
-        }
-    }
+        Excel.prototype.ObjectToRow = function (object) {
+        };
+        Excel.prototype.test = function () {
+        };
+        return Excel;
+    }());
     OfficeModule.Excel = Excel;
 })(OfficeModule = exports.OfficeModule || (exports.OfficeModule = {}));
 module.exports = OfficeModule;

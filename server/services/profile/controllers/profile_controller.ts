@@ -22,7 +22,7 @@ export namespace ProfileModule {
     const share: any = core.share;
     const Wrapper = share.Wrapper;
 
-    const applications_config = share.applications_config;
+   // const applications_config = share.applications_config;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 

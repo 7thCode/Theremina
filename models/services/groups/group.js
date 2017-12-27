@@ -6,11 +6,11 @@
 "use strict";
 var GroupModule;
 (function (GroupModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const timestamp = require('../../systems/plugins/timestamp/timestamp');
-    const userdata = require('../../systems/plugins/userdata/userdata');
-    const Group = new Schema({});
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var timestamp = require('../../systems/plugins/timestamp/timestamp');
+    var userdata = require('../../systems/plugins/userdata/userdata');
+    var Group = new Schema({});
     Group.plugin(timestamp);
     Group.plugin(userdata, {});
     module.exports = mongoose.model('Group', Group);

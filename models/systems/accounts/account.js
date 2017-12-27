@@ -6,12 +6,12 @@
 "use strict";
 var AccountModule;
 (function (AccountModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const passport = require('passport-local-mongoose');
-    const timestamp = require('../plugins/timestamp/timestamp');
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var passport = require('passport-local-mongoose');
+    var timestamp = require('../plugins/timestamp/timestamp');
     // Legacy of v1
-    const Account = new Schema({
+    var Account = new Schema({
         provider: { type: String, default: "local" },
         type: { type: String, default: "User" },
         auth: { type: Number, default: 100 },

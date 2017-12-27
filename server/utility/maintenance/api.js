@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MaintenanceApiRouter;
 (function (MaintenanceApiRouter) {
-    const express = require('express');
+    var express = require('express');
     MaintenanceApiRouter.router = express.Router();
 })(MaintenanceApiRouter = exports.MaintenanceApiRouter || (exports.MaintenanceApiRouter = {}));
 module.exports = MaintenanceApiRouter.router;

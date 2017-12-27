@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConverterApiRouter;
 (function (ConverterApiRouter) {
-    const express = require('express');
+    var express = require('express');
     ConverterApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth = new AuthController.Auth();
-    const ConverterModule = require(share.Server("plugins/converter/controllers/converter_controller"));
-    const excel = new ConverterModule.Excel();
-    const downloader = new ConverterModule.Downloader();
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var auth = new AuthController.Auth();
+    var ConverterModule = require(share.Server("plugins/converter/controllers/converter_controller"));
+    var excel = new ConverterModule.Excel();
+    var downloader = new ConverterModule.Downloader();
     ConverterApiRouter.router.get("/api/account/excel/:filename", [excel.account]);
     ConverterApiRouter.router.get("/api/download/:filename", [downloader.download]);
 })(ConverterApiRouter = exports.ConverterApiRouter || (exports.ConverterApiRouter = {}));

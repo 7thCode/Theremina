@@ -17,7 +17,7 @@ namespace LayoutModule {
     Layout.plugin(timestamp);
     Layout.plugin(userdata, {});
 
-    Layout.index({namespace:1, name: 1, type: 1, userid:1}, {unique: true, index: true});
+    Layout.index({name: 1, type: 1, userid:1}, {unique: true});
 
     module.exports = mongoose.model('Layout', Layout);
 }

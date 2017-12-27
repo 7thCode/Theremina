@@ -18,34 +18,34 @@
 
  */
 "use strict";
-let ImageControllers = angular.module('ImageControllers', ["ngResource", 'ngMessages', 'flow']);
+var ImageControllers = angular.module('ImageControllers', ["ngResource", 'ngMessages', 'flow']);
 /*! Controllers  */
 ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$uibModal', '$log', 'FileService',
-    ($scope, $q, $document, $uibModal, $log, FileService) => {
-        let progress = (value) => {
+    function ($scope, $q, $document, $uibModal, $log, FileService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
         /*
@@ -95,62 +95,62 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
                     return mime;
                 };
         */
-        let Type = (mimetype) => {
-            let result = "";
-            let nameparts = mimetype.split("/");
+        var Type = function (mimetype) {
+            var result = "";
+            var nameparts = mimetype.split("/");
             if (nameparts.length == 2) {
                 result = nameparts[0].toLowerCase();
             }
             return result;
         };
-        let Draw = () => {
-            FileService.Query((result) => {
+        var Draw = function () {
+            FileService.Query(function (result) {
                 if (result) {
                     $scope.files = result;
                 }
-                FileService.Over((hasnext) => { $scope.over = !hasnext; });
-                FileService.Under((hasprev) => { $scope.under = !hasprev; });
+                FileService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FileService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        let Count = () => {
-            FileService.Count((result) => {
+        var Count = function () {
+            FileService.Count(function (result) {
                 if (result) {
                     $scope.count = result;
                 }
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            FileService.Next((result) => {
+            FileService.Next(function (result) {
                 if (result) {
                     $scope.files = result;
                 }
-                FileService.Over((hasnext) => { $scope.over = !hasnext; });
-                FileService.Under((hasprev) => { $scope.under = !hasprev; });
+                FileService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FileService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            FileService.Prev((result) => {
+            FileService.Prev(function (result) {
                 if (result) {
                     $scope.files = result;
                 }
-                FileService.Over((hasnext) => { $scope.over = !hasnext; });
-                FileService.Under((hasprev) => { $scope.under = !hasprev; });
+                FileService.Over(function (hasnext) { $scope.over = !hasnext; });
+                FileService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let createImage = (files) => {
+        var createImage = function (files) {
             progress(true);
-            let promises = [];
-            _.forEach(files, (local_file) => {
-                let deferred = $q.defer();
-                let fileReader = new FileReader();
-                fileReader.onload = (event) => {
-                    FileService.Create(event.target.result, local_file.name, 1000, (result) => {
+            var promises = [];
+            _.forEach(files, function (local_file) {
+                var deferred = $q.defer();
+                var fileReader = new FileReader();
+                fileReader.onload = function (event) {
+                    FileService.Create(event.target.result, local_file.name, 1000, function (result) {
                         deferred.resolve(true);
-                    }, (code, message) => {
+                    }, function (code, message) {
                         deferred.reject(false);
                     });
                 };
@@ -159,41 +159,41 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
             });
             $q.all(promises).then(function (result) {
                 progress(false);
-                files.forEach((file) => {
+                files.forEach(function (file) {
                     file.cancel();
                 });
                 Draw();
-            }).finally(() => {
+            }).finally(function () {
             });
         };
-        let showImage = (url) => {
-            let modalInstance = $uibModal.open({
+        var showImage = function (url) {
+            var modalInstance = $uibModal.open({
                 controller: 'ImageShowDialogController',
                 templateUrl: '/images/dialogs/image_show_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return url;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        let deleteImage = (filename) => {
-            let modalInstance = $uibModal.open({
+        var deleteImage = function (filename) {
+            var modalInstance = $uibModal.open({
                 controller: 'FileDeleteDialogController',
                 templateUrl: '/files/dialogs/file_delete_dialog',
             });
-            modalInstance.result.then((answer) => {
-                FileService.Delete(filename, 1000, (result) => {
+            modalInstance.result.then(function (answer) {
+                FileService.Delete(filename, 1000, function (result) {
                     Draw();
                 }, error_handler);
-            }, () => {
+            }, function () {
             });
         };
         FileService.query = { "metadata.key": { $gte: 1000 } };
-        let Find = (name) => {
+        var Find = function (name) {
             if (!name) {
                 name = "";
             }
@@ -210,27 +210,27 @@ ImageControllers.controller('ImageController', ['$scope', '$q', '$document', '$u
         Draw();
     }]);
 ImageControllers.controller('ImageShowDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.image = items;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
+        $scope.answer = function (answer) {
             $uibModalInstance.close($scope);
         };
     }]);
 ImageControllers.controller('ImageDeleteDialogController', ['$scope', '$uibModalInstance',
-    ($scope, $uibModalInstance) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
+        $scope.answer = function (answer) {
             $uibModalInstance.close($scope);
         };
     }]);
