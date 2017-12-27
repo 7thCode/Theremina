@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SlackPageRouter;
 (function (SlackPageRouter) {
-    const express = require('express');
+    var express = require('express');
     SlackPageRouter.router = express.Router();
 })(SlackPageRouter = exports.SlackPageRouter || (exports.SlackPageRouter = {}));
 module.exports = SlackPageRouter.router;

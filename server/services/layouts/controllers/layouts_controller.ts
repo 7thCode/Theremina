@@ -17,7 +17,7 @@ export namespace LayoutsModule {
     const share: any = core.share;
     const config = share.config;
     const Wrapper = share.Wrapper;
-    const logger = share.logger;
+   // const logger = share.logger;
 
     const ShapeEditModule: any = core.ShapeEditModule;
     const ServerModule: any = core.ServerModule;

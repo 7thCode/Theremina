@@ -27,6 +27,9 @@ export namespace PagesPageRouter {
   //  const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
    // const resources = new ResourcesModule.Pages;
 
+    const PagesModule: any = require(share.Server("services/pages/controllers/pages_controller"));
+    const pages: any = new PagesModule.Pages;
+
     let message = config.message;
 
     //pages
@@ -40,6 +43,8 @@ export namespace PagesPageRouter {
         });
     }]);
 
+    router.get("/getall", [exception.page_guard, auth.page_valid, pages.get_all]);
+
     router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/create_dialog', {message: message});
     }]);
@@ -51,6 +56,7 @@ export namespace PagesPageRouter {
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/delete_confirm_dialog', {message: message});
     }]);
+
 
 }
 

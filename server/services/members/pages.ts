@@ -40,7 +40,6 @@ export namespace MembersPageRouter {
         response.render("services/members/dialogs/open_dialog", {message: message});
     }]);
 
-
 }
 
 module.exports = MembersPageRouter.router;

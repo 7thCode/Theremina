@@ -7,13 +7,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var EventModule;
 (function (EventModule) {
-    const Emitter = require('events');
-    class Event {
-        constructor() {
+    var Emitter = require('events');
+    var Event = (function () {
+        function Event() {
             this.emitter = null;
             this.emitter = new Emitter();
         }
-    }
+        return Event;
+    }());
     EventModule.Event = Event;
 })(EventModule = exports.EventModule || (exports.EventModule = {}));
 module.exports = EventModule;

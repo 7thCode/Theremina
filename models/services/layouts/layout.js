@@ -6,14 +6,14 @@
 "use strict";
 var LayoutModule;
 (function (LayoutModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const timestamp = require('../../systems/plugins/timestamp/timestamp');
-    const userdata = require('../../systems/plugins/userdata/userdata');
-    const Layout = new Schema({});
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var timestamp = require('../../systems/plugins/timestamp/timestamp');
+    var userdata = require('../../systems/plugins/userdata/userdata');
+    var Layout = new Schema({});
     Layout.plugin(timestamp);
     Layout.plugin(userdata, {});
-    Layout.index({ name: 1, type: 1, userid: 1 }, { unique: true, index: true });
+    Layout.index({ name: 1, type: 1, userid: 1 }, { unique: true });
     module.exports = mongoose.model('Layout', Layout);
 })(LayoutModule || (LayoutModule = {}));
 //# sourceMappingURL=layout.js.map

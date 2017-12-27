@@ -6,17 +6,17 @@
 "use strict";
 var NotifierModule;
 (function (NotifierModule) {
-    class Notifier {
-        constructor() {
+    var Notifier = (function () {
+        function Notifier() {
             this.notification = window.Notification || window.mozNotification || window.webkitNotification;
         }
-        Pass(data) {
+        Notifier.prototype.Pass = function (data) {
             if (this.notification) {
                 this.notification.requestPermission(function (permission) {
                     switch (permission) {
                         case "granted":
                             {
-                                let instance = new Notification(data.value, // 通知タイトル
+                                var instance = new Notification(data.value, // 通知タイトル
                                 {
                                     body: data.value,
                                     icon: "http://scrap.php.xdomain.jp/wp-content/uploads/favicon.ico",
@@ -44,9 +44,10 @@ var NotifierModule;
                     }
                 });
             }
-        }
+        };
         ;
-    }
+        return Notifier;
+    }());
     NotifierModule.Notifier = Notifier;
 })(NotifierModule || (NotifierModule = {}));
 //# sourceMappingURL=notify.js.map

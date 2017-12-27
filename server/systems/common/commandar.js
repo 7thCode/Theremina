@@ -7,22 +7,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Commandar;
 (function (Commandar) {
-    let execSync = require('child_process').execSync;
-    class Linux {
-        constructor() {
+    var execSync = require('child_process').execSync;
+    var Linux = (function () {
+        function Linux() {
             this.backupdir = process.cwd() + "/backup";
         }
-        Backup(config) {
-            let backup = "mongodump --authenticationDatabase " + config.name + " -u " + config.user + " -p " + config.password + " -d " + config.name + " -o " + '"' + this.backupdir + '"';
+        Linux.prototype.Backup = function (config) {
+            var backup = "mongodump --authenticationDatabase " + config.name + " -u " + config.user + " -p " + config.password + " -d " + config.name + " -o " + '"' + this.backupdir + '"';
             console.log(backup);
             return "" + execSync(backup);
-        }
-        Restore(config) {
-            let restore = "mongorestore --authenticationDatabase " + config.name + " -u " + config.user + " -p " + config.password + " -d " + config.name + " " + '"' + this.backupdir + "/" + config.name + '"';
+        };
+        Linux.prototype.Restore = function (config) {
+            var restore = "mongorestore --authenticationDatabase " + config.name + " -u " + config.user + " -p " + config.password + " -d " + config.name + " " + '"' + this.backupdir + "/" + config.name + '"';
             console.log(restore);
             return "" + execSync(restore);
-        }
-    }
+        };
+        return Linux;
+    }());
     Commandar.Linux = Linux;
 })(Commandar = exports.Commandar || (exports.Commandar = {}));
 module.exports = Commandar;

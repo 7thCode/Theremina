@@ -7,47 +7,50 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var PublicKeyModule;
 (function (PublicKeyModule) {
-    const share = require('../../common/share');
-    const Config = share.config;
-    const Wrapper = share.Wrapper;
-    const Cipher = share.Cipher;
-    class PublicKey {
-        get_fixed_public_key(request, response) {
+    var share = require('../../common/share');
+    var Config = share.config;
+    var Wrapper = share.Wrapper;
+    var Cipher = share.Cipher;
+    var PublicKey = (function () {
+        function PublicKey() {
+        }
+        PublicKey.prototype.get_fixed_public_key = function (request, response) {
             if (Config.use_publickey) {
-                let systempassphrase = request.session.id;
+                var systempassphrase = request.session.id;
                 Wrapper.SendSuccess(response, Cipher.PublicKey(systempassphrase));
             }
             else {
                 Wrapper.SendError(response, 1, "", null);
             }
-        }
-        get_public_key(request, response) {
+        };
+        PublicKey.prototype.get_public_key = function (request, response) {
             if (Config.use_publickey) {
                 Wrapper.SendSuccess(response, Cipher.PublicKey(request.user.passphrase));
             }
             else {
                 Wrapper.SendError(response, 1, "", null);
             }
-        }
-        get_access_token(request, response) {
+        };
+        PublicKey.prototype.get_access_token = function (request, response) {
             if (Config.use_publickey) {
                 Wrapper.SendSuccess(response, Cipher.FixedCrypt(request.session.id, request.user.passphrase));
             }
             else {
                 Wrapper.SendError(response, 1, "", null);
             }
-        }
-        decrypt_test(request, response) {
-            Wrapper.Authenticate(request, response, (req, res) => {
-                let passphrase = req.user.passphrase;
-                let CipherText = req.params.text;
-                let SecretKey = cryptico.generateRSAKey(passphrase, 1024); //秘密鍵
-                let Decryption = cryptico.decrypt(CipherText, SecretKey); // 復号
-                let textForm = Decryption.plaintext;
+        };
+        PublicKey.prototype.decrypt_test = function (request, response) {
+            Wrapper.Authenticate(request, response, function (req, res) {
+                var passphrase = req.user.passphrase;
+                var CipherText = req.params.text;
+                var SecretKey = cryptico.generateRSAKey(passphrase, 1024); //秘密鍵
+                var Decryption = cryptico.decrypt(CipherText, SecretKey); // 復号
+                var textForm = Decryption.plaintext;
                 res.send(textForm);
             });
-        }
-    }
+        };
+        return PublicKey;
+    }());
     PublicKeyModule.PublicKey = PublicKey;
 })(PublicKeyModule = exports.PublicKeyModule || (exports.PublicKeyModule = {}));
 module.exports = PublicKeyModule;

@@ -7,16 +7,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SchedulerModule;
 (function (SchedulerModule) {
-    let schedule = require("node-schedule");
-    class Scheduler {
-        constructor() {
+    var schedule = require("node-schedule");
+    var Scheduler = (function () {
+        function Scheduler() {
             this.Scheduled_jobs = [];
         }
-        Add(item) {
-            let job = schedule.scheduleJob(item.timing, item.job);
+        Scheduler.prototype.Add = function (item) {
+            var job = schedule.scheduleJob(item.timing, item.job);
             this.Scheduled_jobs.push(job);
-        }
-    }
+        };
+        return Scheduler;
+    }());
     SchedulerModule.Scheduler = Scheduler;
 })(SchedulerModule = exports.SchedulerModule || (exports.SchedulerModule = {}));
 module.exports = SchedulerModule;

@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var PublicKeyPageRouter;
 (function (PublicKeyPageRouter) {
-    const express = require('express');
+    var express = require('express');
     PublicKeyPageRouter.router = express.Router();
     //const core = require(process.cwd() + '/gs');
     //const share: any = core.share;

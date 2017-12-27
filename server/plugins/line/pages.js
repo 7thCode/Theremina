@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var LinePageRouter;
 (function (LinePageRouter) {
-    const express = require('express');
+    var express = require('express');
     LinePageRouter.router = express.Router();
 })(LinePageRouter = exports.LinePageRouter || (exports.LinePageRouter = {}));
 module.exports = LinePageRouter.router;

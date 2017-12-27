@@ -5,7 +5,7 @@
  */
 "use strict";
 //import forEach = require("lodash/forEach");
-let BackOfficeApplication = angular.module('InstallApplication', [
+var BackOfficeApplication = angular.module('InstallApplication', [
     'ngMessages', "ngResource", 'ui.bootstrap',
     "Services",
     'InstallControllers',
@@ -13,12 +13,12 @@ let BackOfficeApplication = angular.module('InstallApplication', [
 ]);
 BackOfficeApplication.run(['$rootScope',
     function ($rootScope) {
-        $rootScope.$on("$routeChangeSuccess", (event, current, previous, rejection) => {
+        $rootScope.$on("$routeChangeSuccess", function (event, current, previous, rejection) {
         });
     }
 ]);
 BackOfficeApplication.config(['$compileProvider', '$httpProvider',
-    ($compileProvider, $httpProvider) => {
+    function ($compileProvider, $httpProvider) {
         $compileProvider.debugInfoEnabled(false);
         $httpProvider.defaults.headers.common = { 'x-requested-with': 'XMLHttpRequest' };
         $httpProvider.defaults.headers.common['If-Modified-Since'] = 'Thu, 01 Jun 1970 00:00:00 GMT'; //マイクロソフトのバグ対応！！！

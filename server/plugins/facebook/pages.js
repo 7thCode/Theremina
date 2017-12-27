@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FacebookPageRouter;
 (function (FacebookPageRouter) {
-    const express = require('express');
+    var express = require('express');
     FacebookPageRouter.router = express.Router();
 })(FacebookPageRouter = exports.FacebookPageRouter || (exports.FacebookPageRouter = {}));
 module.exports = FacebookPageRouter.router;

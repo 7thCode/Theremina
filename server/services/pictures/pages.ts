@@ -24,8 +24,8 @@ export namespace PicturesPageRouter {
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resources = new ResourcesModule.Pages;
+  //  const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+   // const resources = new ResourcesModule.Pages;
 
     let message = config.message;
 

@@ -4,75 +4,75 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ProfileControllers = angular.module('ProfileControllers', ['ui.bootstrap', 'flow']);
+var ProfileControllers = angular.module('ProfileControllers', ['ui.bootstrap', 'flow']);
 //Self
 ProfileControllers.controller('ProfileController', ['$scope', '$document', '$log', "$uibModal", "ProfileService", 'SessionService', 'FileService',
-    ($scope, $document, $log, $uibModal, ProfileService, SessionService, FileService) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $uibModal, ProfileService, SessionService, FileService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
         $scope.opened = false;
-        $scope.Save = () => {
-            ProfileService.Put({}, (result) => {
+        $scope.Save = function () {
+            ProfileService.Put({}, function (result) {
             }, error_handler);
         };
-        $scope.CreateProfilePicture = (files) => {
+        $scope.CreateProfilePicture = function (files) {
             progress(true);
-            let local_file = files[0];
-            let fileReader = new FileReader();
-            let image = new Image();
+            var local_file = files[0];
+            var fileReader = new FileReader();
+            var image = new Image();
             image.crossOrigin = 'Anonymous';
             $scope.userid = ""; // $scope trick for redraw
-            fileReader.onload = (event) => {
-                let uri = event.target.result;
+            fileReader.onload = function (event) {
+                var uri = event.target.result;
                 image.src = uri;
-                image.onload = () => {
-                    ProfileService.Get((self) => {
+                image.onload = function () {
+                    ProfileService.Get(function (self) {
                         if (self) {
-                            FileService.Delete(self.username, 1999, (result) => {
-                                FileService.Create(event.target.result, self.username, 1999, (result) => {
-                                    ProfileService.Get((self) => {
+                            FileService.Delete(self.username, 1999, function (result) {
+                                FileService.Create(event.target.result, self.username, 1999, function (result) {
+                                    ProfileService.Get(function (self) {
                                         if (self) {
                                             $scope.$evalAsync(// $apply
-                                            ($scope) => {
+                                            function ($scope) {
                                                 $scope.userid = self.userid; // $scope trick for redraw
                                                 progress(false);
                                             });
                                         }
                                     }, error_handler);
                                 }, error_handler);
-                            }, FileService.Create(event.target.result, self.username, 1999, (result) => {
-                                ProfileService.Get((self) => {
+                            }, FileService.Create(event.target.result, self.username, 1999, function (result) {
+                                ProfileService.Get(function (self) {
                                     if (self) {
                                         $scope.$evalAsync(// $apply
-                                        ($scope) => {
+                                        function ($scope) {
                                             $scope.userid = self.userid; // $scope trick for redraw
                                             progress(false);
                                         });
@@ -85,7 +85,7 @@ ProfileControllers.controller('ProfileController', ['$scope', '$document', '$log
             };
             fileReader.readAsDataURL(local_file.file);
         };
-        ProfileService.Get((self) => {
+        ProfileService.Get(function (self) {
             if (self) {
                 $scope.userid = self.userid;
                 $scope.provider = self.provider;
@@ -257,24 +257,24 @@ ProfileControllers.controller('ProfileController', ['$scope', '$document', '$log
          */
     }]);
 ProfileControllers.controller('ProfileUpdateDialogController', ['$scope', '$uibModalInstance', 'items', 'ZipService',
-    ($scope, $uibModalInstance, items, ZipService) => {
-        let progress = (value) => {
+    function ($scope, $uibModalInstance, items, ZipService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
         $scope.magazine = true;
-        $scope.Zip = (zip) => {
+        $scope.Zip = function (zip) {
             if (zip) {
                 if (zip.length > 6) {
                     progress(true);
-                    ZipService.Zip(zip, (error, result) => {
+                    ZipService.Zip(zip, function (error, result) {
                         if (!error) {
                             if (result) {
                                 if (result.results) {
                                     if (result.results.length > 0) {
-                                        let address = result.results[0];
+                                        var address = result.results[0];
                                         $scope.address = address.address1;
                                         $scope.city = address.address2;
                                         $scope.street = address.address3;
@@ -292,13 +292,13 @@ ProfileControllers.controller('ProfileUpdateDialogController', ['$scope', '$uibM
                 }
             }
         };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);

@@ -7,10 +7,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var InstallerApiRouter;
 (function (InstallerApiRouter) {
-    const express = require('express');
+    var express = require('express');
     InstallerApiRouter.router = express.Router();
-    const InstallerModule = require("./controllers/installer_controller");
-    const installer = new InstallerModule.Installer();
+    var InstallerModule = require("./controllers/installer_controller");
+    var installer = new InstallerModule.Installer();
     InstallerApiRouter.router.get('/install', [installer.read]);
     InstallerApiRouter.router.put('/install', [installer.write]);
 })(InstallerApiRouter = exports.InstallerApiRouter || (exports.InstallerApiRouter = {}));

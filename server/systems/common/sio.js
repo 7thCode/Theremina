@@ -8,34 +8,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Socket;
 (function (Socket) {
     // Socket.IO
-    const socketio = require('socket.io');
-    const _ = require("lodash");
-    class IO {
-        constructor(server) {
+    var socketio = require('socket.io');
+    var _ = require("lodash");
+    var IO = (function () {
+        function IO(server) {
             this.sio = null;
             this.socket = null;
             this.clients = [];
             this.sio = socketio.listen(server);
         }
-        wait(event) {
-            this.sio.sockets.on('connection', (socket) => {
-                this.socket = socket;
-                _.forEach(this.sio.sockets.connected, (client, id) => {
-                    this.clients.push(client);
+        IO.prototype.wait = function (event) {
+            var _this = this;
+            this.sio.sockets.on('connection', function (socket) {
+                _this.socket = socket;
+                _.forEach(_this.sio.sockets.connected, function (client, id) {
+                    _this.clients.push(client);
                 });
-                socket.on('server', (data) => {
+                socket.on('server', function (data) {
                     event.emitter.emit('socket', data);
                     // all client except self
                     // socket.broadcast.emit('client', {value: data.value});
                     // callback
-                    this.sio.sockets.connected[socket.id].emit('client', { value: socket.id });
+                    _this.sio.sockets.connected[socket.id].emit('client', { value: socket.id });
                 });
-                socket.on("disconnect", () => {
-                    this.socket = null;
+                socket.on("disconnect", function () {
+                    _this.socket = null;
                 });
             });
-        }
-    }
+        };
+        return IO;
+    }());
     Socket.IO = IO;
     //function sio_emitter() {
     //    var emitter = require('socket.io-emitter')("localhost:6379");

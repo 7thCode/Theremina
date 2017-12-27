@@ -7,41 +7,41 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FacebookModule;
 (function (FacebookModule) {
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const plugins_config = share.plugins_config;
-    const request = require('request');
-    class Facebook {
-        constructor() {
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var plugins_config = share.plugins_config;
+    var request = require('request');
+    var Facebook = (function () {
+        function Facebook() {
         }
         /**
          * @param request
          * @param response
          * @returns none
          */
-        bot_hook(req, response) {
-            let verify_token = plugins_config.facebook.token;
-            let token = req.query["hub.verify_token"];
+        Facebook.prototype.bot_hook = function (req, response) {
+            var verify_token = plugins_config.facebook.token;
+            var token = req.query["hub.verify_token"];
             if (token == verify_token) {
                 response.send(req.query["hub.challenge"]);
             }
             else {
                 response.send("");
             }
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        bot_push(req, response) {
-            let token = plugins_config.facebook.token;
-            let receivedMessage = (event) => {
-                let sendGenericMessage = (recipientId, messageText) => {
+        Facebook.prototype.bot_push = function (req, response) {
+            var token = plugins_config.facebook.token;
+            var receivedMessage = function (event) {
+                var sendGenericMessage = function (recipientId, messageText) {
                     // To be expanded in later sections
                 };
-                let sendTextMessage = (recipientId, messageText) => {
-                    let callSendAPI = (messageData) => {
+                var sendTextMessage = function (recipientId, messageText) {
+                    var callSendAPI = function (messageData) {
                         request({
                             uri: 'https://graph.facebook.com/v2.7/me/messages',
                             qs: { access_token: token },
@@ -50,7 +50,7 @@ var FacebookModule;
                                 recipient: { id: recipientId },
                                 message: messageData,
                             }
-                        }, (error, response, body) => {
+                        }, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 var recipientId = body.recipient_id;
                                 var messageId = body.message_id;
@@ -63,7 +63,7 @@ var FacebookModule;
                             }
                         });
                     };
-                    let messageData = {
+                    var messageData = {
                         recipient: {
                             id: recipientId
                         },
@@ -73,15 +73,15 @@ var FacebookModule;
                     };
                     callSendAPI(messageData);
                 };
-                let senderID = event.sender.id;
-                let recipientID = event.recipient.id;
-                let timeOfMessage = event.timestamp;
-                let message = event.message;
+                var senderID = event.sender.id;
+                var recipientID = event.recipient.id;
+                var timeOfMessage = event.timestamp;
+                var message = event.message;
                 console.log("Received message for user %d and page %d at %d with message:", senderID, recipientID, timeOfMessage);
                 console.log(JSON.stringify(message));
-                let messageId = message.mid;
-                let messageText = message.text;
-                let messageAttachments = message.attachments;
+                var messageId = message.mid;
+                var messageText = message.text;
+                var messageAttachments = message.attachments;
                 if (messageText) {
                     switch (messageText) {
                         case 'generic':
@@ -95,11 +95,11 @@ var FacebookModule;
                     sendTextMessage(senderID, "Message with attachment received");
                 }
             };
-            let data = req.body;
+            var data = req.body;
             if (data.object === 'page') {
                 data.entry.forEach(function (entry) {
-                    let pageID = entry.id;
-                    let timeOfEvent = entry.time;
+                    var pageID = entry.id;
+                    var timeOfEvent = entry.time;
                     entry.messaging.forEach(function (event) {
                         if (event.message) {
                             receivedMessage(event);
@@ -111,8 +111,9 @@ var FacebookModule;
                 });
                 response.sendStatus(200);
             }
-        }
-    }
+        };
+        return Facebook;
+    }());
     FacebookModule.Facebook = Facebook;
 })(FacebookModule = exports.FacebookModule || (exports.FacebookModule = {}));
 module.exports = FacebookModule;

@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var RobotModule;
 (function (RobotModule) {
-    const _ = require('lodash');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const Wrapper = share.Wrapper;
-    const CrawlerModule = require('../../../systems/common/crawler');
-    const crawler = new CrawlerModule.Crawler();
-    const validator = require('validator');
-    class Robot {
-        constructor() {
+    var _ = require('lodash');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var Wrapper = share.Wrapper;
+    var CrawlerModule = require('../../../systems/common/crawler');
+    var crawler = new CrawlerModule.Crawler();
+    var validator = require('validator');
+    var Robot = (function () {
+        function Robot() {
             this.type = {
                 "ANY_TYPE": 0,
                 "NUMBER_TYPE": 1,
@@ -29,14 +29,14 @@ var RobotModule;
                 "FIRST_ORDERED_NODE_TYPE": 9
             };
         }
-        get(request, response) {
-            const number = 1300;
-            let url = decodeURIComponent(request.params.url);
-            let path = decodeURIComponent(request.params.path);
-            crawler.Crawl(url, "", [], []).then((result) => {
-                let nodes = result._value.nodes;
-                let urls = [];
-                nodes.forEach((node) => {
+        Robot.prototype.get = function (request, response) {
+            var number = 1300;
+            var url = decodeURIComponent(request.params.url);
+            var path = decodeURIComponent(request.params.path);
+            crawler.Crawl(url, "", [], []).then(function (result) {
+                var nodes = result._value.nodes;
+                var urls = [];
+                nodes.forEach(function (node) {
                     if (node._nodeValue) {
                         urls.push(node._nodeValue);
                     }
@@ -44,9 +44,9 @@ var RobotModule;
                         urls.push(node._data);
                     }
                 });
-                let unique_urls = _.uniq(urls);
+                var unique_urls = _.uniq(urls);
                 Wrapper.SendSuccess(response, unique_urls);
-            }).catch((error) => {
+            }).catch(function (error) {
                 Wrapper.SendError(response, error.code, error.message, error);
             });
             /*
@@ -68,22 +68,23 @@ var RobotModule;
                 }
             });
             */
-        }
+        };
         // public Crawl(url: string, path: string, type: any, callback: () => void) {
         //     crawler.Crawl(url, path, type, callback);
         // }
-        LinkUrls(url, callback) {
-            let path = '/html/body//a/@href';
-            crawler.Crawl(url, "", [], []).then((result) => {
-                let nodes = result._value.nodes;
-                let urls = [];
-                nodes.forEach((node) => {
+        Robot.prototype.LinkUrls = function (url, callback) {
+            var path = '/html/body//a/@href';
+            crawler.Crawl(url, "", [], []).then(function (result) {
+                var nodes = result._value.nodes;
+                var urls = [];
+                nodes.forEach(function (node) {
                     urls.push(node._nodeValue);
                 });
                 callback(null, urls);
             });
-        }
-    }
+        };
+        return Robot;
+    }());
     RobotModule.Robot = Robot;
 })(RobotModule = exports.RobotModule || (exports.RobotModule = {}));
 module.exports = RobotModule;

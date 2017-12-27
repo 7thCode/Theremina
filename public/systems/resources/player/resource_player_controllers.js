@@ -4,135 +4,135 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ResourcePlayerControllers = angular.module('ResourcePlayerControllers', []);
+var ResourcePlayerControllers = angular.module('ResourcePlayerControllers', []);
 ResourcePlayerControllers.controller('ResourcePlayerController', ["$scope", "$document", "$log", "$compile", "$uibModal", "ResourcePlayerService", "ArticleService",
     function ($scope, $document, $log, $compile, $uibModal, HtmlPlayerService, ArticleService) {
-        let progress = (value) => {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let page_no = 0;
-        let pages = [
+        var page_no = 0;
+        var pages = [
             {
                 contents: []
             }
         ];
-        let current_id = null;
-        let Init = () => {
+        var current_id = null;
+        var Init = function () {
             $scope.opened = false;
             page_no = 0;
             pages = [{ contents: [] }];
         };
-        let Open = () => {
+        var Open = function () {
             Init();
-            let modalRegist = $uibModal.open({
+            var modalRegist = $uibModal.open({
                 controller: 'ResourcePlayerOpenDialogController',
                 templateUrl: '/resources/dialogs/open_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                     }
                 }
             });
-            modalRegist.result.then((layout) => {
+            modalRegist.result.then(function (layout) {
                 $scope.name = layout.name;
                 HtmlPlayerService.current_page = layout.content;
                 HtmlPlayerService.Draw();
                 $scope.opened = true;
-            }, () => {
+            }, function () {
             });
         };
-        let Draw = () => {
+        var Draw = function () {
             HtmlPlayerService.current_page = pages[page_no].contents;
             HtmlPlayerService.Draw();
         };
-        let Clear = () => {
-            let page = HtmlPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Clear = function () {
+            var page = HtmlPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        $scope[name] = "";
+                        var name_1 = attributes["ng-model"];
+                        $scope[name_1] = "";
                     }
                 });
             });
             Draw();
         };
-        let Map = (result) => {
-            let page = HtmlPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Map = function (result) {
+            var page = HtmlPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        $scope[name] = result[element.label];
+                        var name_2 = attributes["ng-model"];
+                        $scope[name_2] = result[element.label];
                     }
                 });
             });
             Draw();
         };
-        let Reduce = (result) => {
-            let page = HtmlPlayerService.current_page;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
-                    let attributes = element.attributes;
+        var Reduce = function (result) {
+            var page = HtmlPlayerService.current_page;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
+                    var attributes = element.attributes;
                     if (attributes["ng-model"]) {
-                        let name = attributes["ng-model"];
-                        if ($scope[name]) {
-                            result[element.label] = $scope[name];
+                        var name_3 = attributes["ng-model"];
+                        if ($scope[name_3]) {
+                            result[element.label] = $scope[name_3];
                         }
                     }
                 });
             });
             return result;
         };
-        let CreateArticle = () => {
-            let modalRegist = $uibModal.open({
+        var CreateArticle = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'ResourcePlayerCreateDialogController',
                 templateUrl: '/resources/dialogs/create_dialog',
                 resolve: {
                     items: null
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
+            modalRegist.result.then(function (dialog_scope) {
                 progress(true);
-                let name = dialog_scope.title;
-                ArticleService.Create(name, {}, (result) => {
+                var name = dialog_scope.title;
+                ArticleService.Create(name, {}, function (result) {
                     current_id = result._id;
                     progress(false);
                 }, error_handler);
-            }, () => {
+            }, function () {
             });
         };
-        let LoadArticle = (id) => {
+        var LoadArticle = function (id) {
             progress(true);
-            ArticleService.Get(id, (result) => {
+            ArticleService.Get(id, function (result) {
                 $scope.current_article = result;
                 current_id = id;
                 if (result.content) {
@@ -142,10 +142,10 @@ ResourcePlayerControllers.controller('ResourcePlayerController', ["$scope", "$do
                 progress(false);
             }, error_handler);
         };
-        let SaveArticle = () => {
+        var SaveArticle = function () {
             progress(true);
-            let new_record = Reduce({});
-            ArticleService.Put(current_id, new_record, (result) => {
+            var new_record = Reduce({});
+            ArticleService.Put(current_id, new_record, function (result) {
                 progress(false);
             }, error_handler);
         };
@@ -159,103 +159,103 @@ ResourcePlayerControllers.controller('ResourcePlayerController', ["$scope", "$do
         //     Draw();
     }]);
 ResourcePlayerControllers.controller('ResourcePlayerCreateDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close($scope);
         };
     }]);
 ResourcePlayerControllers.controller('ResourcePlayerOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ResourcePlayerService',
-    ($scope, $log, $uibModalInstance, $uibModal, items, HtmlPlayerService) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, $uibModal, items, HtmlPlayerService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        let Query = () => {
+        var Query = function () {
             progress(true);
             HtmlPlayerService.query = {};
-            HtmlPlayerService.Query((value) => {
+            HtmlPlayerService.Query(function (value) {
                 $scope.pages = value;
-                HtmlPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                HtmlPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                HtmlPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                HtmlPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Find = (name) => {
+        var Find = function (name) {
             progress(true);
             HtmlPlayerService.query = {};
             if (name) {
                 HtmlPlayerService.query = { name: name };
             }
-            HtmlPlayerService.Query((result) => {
+            HtmlPlayerService.Query(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                HtmlPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                HtmlPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                HtmlPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                HtmlPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Next = () => {
+        var Next = function () {
             progress(true);
-            HtmlPlayerService.Next((result) => {
+            HtmlPlayerService.Next(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                HtmlPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                HtmlPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                HtmlPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                HtmlPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Prev = () => {
+        var Prev = function () {
             progress(true);
-            HtmlPlayerService.Prev((result) => {
+            HtmlPlayerService.Prev(function (result) {
                 if (result) {
                     $scope.pages = result;
                 }
-                HtmlPlayerService.Over((hasnext) => { $scope.over = !hasnext; });
-                HtmlPlayerService.Under((hasprev) => { $scope.under = !hasprev; });
+                HtmlPlayerService.Over(function (hasnext) { $scope.over = !hasnext; });
+                HtmlPlayerService.Under(function (hasprev) { $scope.under = !hasprev; });
                 progress(false);
             }, error_handler);
         };
-        let Get = (layout) => {
+        var Get = function (layout) {
             progress(true);
-            HtmlPlayerService.Get(layout._id, (result) => {
+            HtmlPlayerService.Get(layout._id, function (result) {
                 progress(false);
                 $uibModalInstance.close(layout);
             }, error_handler);
         };
-        let hide = () => {
+        var hide = function () {
             $uibModalInstance.close();
         };
-        let cancel = () => {
+        var cancel = function () {
             $uibModalInstance.dismiss();
         };
         $scope.Next = Next;

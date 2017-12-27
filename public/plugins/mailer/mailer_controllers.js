@@ -4,195 +4,195 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let MailerControllers = angular.module('MailerControllers', ["ngResource"]);
+var MailerControllers = angular.module('MailerControllers', ["ngResource"]);
 MailerControllers.controller('MailerController', ['$scope', '$document', '$log', '$compile', '$uibModal', "MailerService", "MailQueryService", 'Socket',
-    ($scope, $document, $log, $compile, $uibModal, MailerService, MailQueryService, Socket) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $compile, $uibModal, MailerService, MailQueryService, Socket) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        window.addEventListener('beforeunload', (e) => {
+        window.addEventListener('beforeunload', function (e) {
             if ($scope.opened) {
             }
         }, false);
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        Socket.on("client", (data) => {
-            let notifier = new NotifierModule.Notifier();
+        Socket.on("client", function (data) {
+            var notifier = new NotifierModule.Notifier();
             notifier.Pass(data);
         });
-        let Notify = (message) => {
-            Socket.emit("server", { value: message }, () => {
+        var Notify = function (message) {
+            Socket.emit("server", { value: message }, function () {
             });
         };
         //let hoge = MailerService.sender;
-        let SendMail = () => {
-            let modalRegist = $uibModal.open({
+        var SendMail = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'SendMailDialogController',
                 templateUrl: '/mailer/dialogs/send_mail_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return { sender: [], userid: "", formname: "", article: {} };
                     }
                 }
             });
-            modalRegist.result.then((dialog_scope) => {
-                let modalRegist = $uibModal.open({
+            modalRegist.result.then(function (dialog_scope) {
+                var modalRegist = $uibModal.open({
                     controller: 'MailSendConfirmController',
                     templateUrl: '/mailer/dialogs/send_mail_confirm_dialog',
                     resolve: {
-                        items: () => {
+                        items: function () {
                         }
                     }
                 });
-                modalRegist.result.then((content) => {
+                modalRegist.result.then(function (content) {
                     SendDraw();
                     progress(false);
-                }, () => {
+                }, function () {
                 });
-            }, () => {
+            }, function () {
             });
         };
-        let OpenMail = (mail) => {
-            let modalRegist = $uibModal.open({
+        var OpenMail = function (mail) {
+            var modalRegist = $uibModal.open({
                 controller: 'OpenMailDialogController',
                 templateUrl: '/mailer/dialogs/open_mail_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return mail;
                     }
                 }
             });
-            modalRegist.result.then((content) => {
+            modalRegist.result.then(function (content) {
                 progress(true);
-            }, () => {
+            }, function () {
             });
         };
-        let DeleteMail = (mail) => {
-            let modalRegist = $uibModal.open({
+        var DeleteMail = function (mail) {
+            var modalRegist = $uibModal.open({
                 controller: 'MailDeleteConfirmController',
                 templateUrl: '/mailer/dialogs/delete_mail_confirm_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                     }
                 }
             });
-            modalRegist.result.then((content) => {
+            modalRegist.result.then(function (content) {
                 progress(true);
-                MailerService.Delete(mail, (result) => {
+                MailerService.Delete(mail, function (result) {
                     SendDraw();
                     ReceiveDraw();
                 }, error_handler);
-            }, () => {
+            }, function () {
             });
         };
-        let SendFind = (newValue) => {
+        var SendFind = function (newValue) {
             MailQueryService.SetQuery(null);
             if (newValue) {
                 MailQueryService.SetQuery({ "content.subject": { $regex: newValue } });
             }
             SendDraw();
         };
-        let SendCount = () => {
-            MailQueryService.Count(true, (result) => {
+        var SendCount = function () {
+            MailQueryService.Count(true, function (result) {
                 if (result) {
                     $scope.sendcount = result;
                 }
             }, error_handler);
         };
-        let SendNext = () => {
+        var SendNext = function () {
             progress(true);
-            MailQueryService.Next(true, (result) => {
+            MailQueryService.Next(true, function (result) {
                 if (result) {
                     $scope.sendmails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let SendPrev = () => {
+        var SendPrev = function () {
             progress(true);
-            MailQueryService.Prev(true, (result) => {
+            MailQueryService.Prev(true, function (result) {
                 if (result) {
                     $scope.sendmails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let SendDraw = () => {
+        var SendDraw = function () {
             progress(true);
-            MailQueryService.Query(true, (result) => {
+            MailQueryService.Query(true, function (result) {
                 if (result) {
                     $scope.sendmails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let ReceiveFind = (newValue) => {
+        var ReceiveFind = function (newValue) {
             MailQueryService.SetQuery(null);
             if (newValue) {
                 MailQueryService.SetQuery({ "content.subject": { $regex: newValue } });
             }
             ReceiveDraw();
         };
-        let ReceiveCount = () => {
-            MailQueryService.Count(false, (result) => {
+        var ReceiveCount = function () {
+            MailQueryService.Count(false, function (result) {
                 if (result) {
                     $scope.receivecount = result;
                 }
             }, error_handler);
         };
-        let ReceiveNext = () => {
+        var ReceiveNext = function () {
             progress(true);
-            MailQueryService.Next(false, (result) => {
+            MailQueryService.Next(false, function (result) {
                 if (result) {
                     $scope.receivemails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let ReceivePrev = () => {
+        var ReceivePrev = function () {
             progress(true);
-            MailQueryService.Prev(false, (result) => {
+            MailQueryService.Prev(false, function (result) {
                 if (result) {
                     $scope.receivemails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let ReceiveDraw = () => {
+        var ReceiveDraw = function () {
             progress(true);
-            MailQueryService.Query(false, (result) => {
+            MailQueryService.Query(false, function (result) {
                 if (result) {
                     $scope.receivemails = result;
                 }
                 progress(false);
             }, error_handler);
         };
-        let onDrop = (data, evt, id) => {
+        var onDrop = function (data, evt, id) {
             $scope[id] = evt.element[0].src;
         };
         $scope.opened = false;
@@ -211,14 +211,14 @@ MailerControllers.controller('MailerController', ['$scope', '$document', '$log',
         $scope.ReceivePrev = ReceivePrev;
         ReceiveDraw();
     }]);
-MailerControllers.filter('mailer', [() => {
-        return (mail, field) => {
-            let result = "";
-            let delimiter = "";
+MailerControllers.filter('mailer', [function () {
+        return function (mail, field) {
+            var result = "";
+            var delimiter = "";
             switch (field) {
                 case "sender":
                     if (mail.content.from.length > 0) {
-                        _.forEach(mail.content.from, (mail) => {
+                        _.forEach(mail.content.from, function (mail) {
                             result += mail.address + delimiter;
                             delimiter = ",";
                         });
@@ -226,7 +226,7 @@ MailerControllers.filter('mailer', [() => {
                     break;
                 case "receiver":
                     if (mail.content.to.length > 0) {
-                        _.forEach(mail.content.to, (mail) => {
+                        _.forEach(mail.content.to, function (mail) {
                             result += mail.address + delimiter;
                             delimiter = ",";
                         });
@@ -243,23 +243,23 @@ MailerControllers.filter('mailer', [() => {
         };
     }]);
 MailerControllers.controller('SendMailDialogController', ['$scope', '$log', '$uibModalInstance', 'MailerService', 'ArticleService', 'items',
-    ($scope, $log, $uibModalInstance, MailerService, ArticleService, items) => {
-        let progress = (value) => {
+    function ($scope, $log, $uibModalInstance, MailerService, ArticleService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
         };
         $scope.sender = items.sender;
         $scope.subject = items.subject;
-        let userid = items.userid;
-        let formname = items.formname;
-        let article = items.article;
+        var userid = items.userid;
+        var formname = items.formname;
+        var article = items.article;
         /*
         if ((userid + formname) != "") {
             ArticleService.RenderFragment(userid, formname, article, (result: any): void => {
@@ -271,42 +271,42 @@ MailerControllers.controller('SendMailDialogController', ['$scope', '$log', '$ui
             }, error_handler);
         }
         */
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             progress(true);
-            let to = "";
-            let delimmiter = "";
-            _.forEach($scope.sender, (address) => {
+            var to = "";
+            var delimmiter = "";
+            _.forEach($scope.sender, function (address) {
                 to += delimmiter + address;
                 delimmiter = ",";
             });
-            let subject = $scope.subject;
-            let doc = $scope.doc;
+            var subject = $scope.subject;
+            var doc = $scope.doc;
             MailerService.Send({
                 to: to,
                 subject: subject,
                 html: doc
-            }, (result) => {
+            }, function (result) {
                 $uibModalInstance.close($scope);
             }, error_handler);
         };
     }]);
 MailerControllers.controller('OpenMailDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        let to = "";
-        let delimmiter = "";
-        _.forEach(items.content.to, (entry) => {
+    function ($scope, $uibModalInstance, items) {
+        var to = "";
+        var delimmiter = "";
+        _.forEach(items.content.to, function (entry) {
             to += delimmiter + entry.address;
             delimmiter = ",";
         });
-        let from = "";
+        var from = "";
         delimmiter = "";
-        _.forEach(items.content.from, (entry) => {
+        _.forEach(items.content.from, function (entry) {
             from += delimmiter + entry.address;
             delimmiter = ",";
         });
@@ -314,37 +314,37 @@ MailerControllers.controller('OpenMailDialogController', ['$scope', '$uibModalIn
         $scope.to = to;
         $scope.subject = items.content.subject;
         $scope.html = items.content.html;
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);
 MailerControllers.controller('MailSendConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);
 MailerControllers.controller('MailDeleteConfirmController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance, items) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = () => {
+        $scope.answer = function () {
             $uibModalInstance.close({});
         };
     }]);

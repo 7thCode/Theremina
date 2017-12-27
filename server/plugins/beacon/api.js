@@ -7,13 +7,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var BeaconApiRouter;
 (function (BeaconApiRouter) {
-    const express = require('express');
+    var express = require('express');
     BeaconApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const BeaconModule = require(share.Server("plugins/beacon/controllers/beacon_controller"));
-    const beacon = new BeaconModule.Beacon;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var BeaconModule = require(share.Server("plugins/beacon/controllers/beacon_controller"));
+    var beacon = new BeaconModule.Beacon;
     BeaconApiRouter.router.get("/api/:token", [exception.exception, beacon.get_beacon]);
 })(BeaconApiRouter = exports.BeaconApiRouter || (exports.BeaconApiRouter = {}));
 module.exports = BeaconApiRouter.router;

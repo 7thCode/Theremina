@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Persistent;
 (function (Persistent) {
-    const fs = require('graceful-fs');
-    class Map {
-        constructor(filename) {
+    var fs = require('graceful-fs');
+    var Map = (function () {
+        function Map(filename) {
             this.filename = filename;
             this.map = {};
         }
-        Load() {
+        Map.prototype.Load = function () {
             try {
-                let file = fs.openSync(this.filename, 'r');
+                var file = fs.openSync(this.filename, 'r');
                 if (file) {
                     try {
                         this.map = JSON.parse(fs.readFileSync(this.filename, 'utf8'));
@@ -30,10 +30,10 @@ var Persistent;
             }
             catch (e) {
             }
-        }
-        Store() {
+        };
+        Map.prototype.Store = function () {
             try {
-                let file = fs.openSync(this.filename, 'w');
+                var file = fs.openSync(this.filename, 'w');
                 if (file) {
                     try {
                         fs.writeFile(this.filename, JSON.stringify(this.map));
@@ -45,21 +45,22 @@ var Persistent;
             }
             catch (e) {
             }
-        }
-        Init() {
+        };
+        Map.prototype.Init = function () {
             this.map = {};
             this.Store();
-        }
-        Set(key, value) {
+        };
+        Map.prototype.Set = function (key, value) {
             this.map[key] = value;
-        }
-        SetArrray(array) {
+        };
+        Map.prototype.SetArrray = function (array) {
             this.map = array;
-        }
-        Get(key) {
+        };
+        Map.prototype.Get = function (key) {
             return this.map[key];
-        }
-    }
+        };
+        return Map;
+    }());
     Persistent.Map = Map;
 })(Persistent = exports.Persistent || (exports.Persistent = {}));
 module.exports = Persistent;

@@ -7,16 +7,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var LineApiRouter;
 (function (LineApiRouter) {
-    const express = require('express');
+    var express = require('express');
     LineApiRouter.router = express.Router();
-    const line = require('@line/bot-sdk');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const plugins_config = share.plugins_config;
+    var line = require('@line/bot-sdk');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var plugins_config = share.plugins_config;
     if (plugins_config.line) {
-        const exception = core.exception;
-        const LineModule = require(share.Server("plugins/line/controllers/line_controller"));
-        const _line = new LineModule.Line;
+        var exception = core.exception;
+        var LineModule = require(share.Server("plugins/line/controllers/line_controller"));
+        var _line = new LineModule.Line;
         /*
                 const bodyParser = require('body-parser');
         

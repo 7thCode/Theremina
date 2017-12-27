@@ -7,19 +7,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ApiAiModule;
 (function (ApiAiModule) {
-    const _ = require('lodash');
-    const apiai = require('apiai-promise');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const plugins_config = share.plugins_config;
-    const ai = apiai(plugins_config.apiai.token);
-    class ApiAi {
-        constructor() {
+    var _ = require('lodash');
+    var apiai = require('apiai-promise');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var plugins_config = share.plugins_config;
+    var ai = apiai(plugins_config.apiai.token);
+    var ApiAi = (function () {
+        function ApiAi() {
         }
-        inquiry(sessionId, ask, callback) {
+        ApiAi.prototype.inquiry = function (sessionId, ask, callback) {
             return ai.textRequest(ask, {
                 sessionId: sessionId
-            }).then((result) => {
+            }).then(function (result) {
                 callback(null, result);
                 /*     switch (response.result.source) {
                  case "agent":
@@ -31,11 +31,12 @@ var ApiAiModule;
                  default:
                  }
                  */
-            }).catch((error) => {
+            }).catch(function (error) {
                 callback(error, null);
             });
-        }
-    }
+        };
+        return ApiAi;
+    }());
     ApiAiModule.ApiAi = ApiAi;
 })(ApiAiModule = exports.ApiAiModule || (exports.ApiAiModule = {}));
 module.exports = ApiAiModule;

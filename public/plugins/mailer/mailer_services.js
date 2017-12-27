@@ -4,13 +4,13 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let MailerServices = angular.module('MailerServices', []);
+var MailerServices = angular.module('MailerServices', []);
 MailerServices.factory('MailSend', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/mailer/api/send', {}, {});
     }]);
 MailerServices.factory('Mail', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/mailer/api/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -18,73 +18,74 @@ MailerServices.factory('Mail', ['$resource',
         });
     }]);
 MailerServices.factory('MailQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource("/mailer/api/query/:query/:option", { query: '@query', option: '@optopn' }, {
             query: { method: 'GET' }
         });
     }]);
 MailerServices.factory('MailCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/mailer/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
     function (MailSend, Mail, $http) {
+        var _this = this;
         this.sender = [];
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.option = { sort: { create: -1 }, limit: 40, skip: 0 };
-            this.SetQuery(null);
-            this.current_article = null;
+        var init = function () {
+            _this.option = { sort: { create: -1 }, limit: 40, skip: 0 };
+            _this.SetQuery(null);
+            _this.current_article = null;
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Send = (content, callback, error) => {
+        this.Send = function (content, callback, error) {
             init();
-            let article = new MailSend();
+            var article = new MailSend();
             article.content = content;
-            article.$save({}, (result) => {
+            article.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
-                        this.current_article = result.value;
+                        _this.current_article = result.value;
                         callback(result.value);
                     }
                     else {
@@ -96,14 +97,14 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
                 }
             });
         };
-        this.Get = (mail, callback, error) => {
+        this.Get = function (mail, callback, error) {
             init();
             Mail.get({
                 id: mail._id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
-                        this.current_article = result.value;
+                        _this.current_article = result.value;
                         callback(result.value);
                     }
                     else {
@@ -115,10 +116,10 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
                 }
             });
         };
-        this.Delete = (mail, callback, error) => {
+        this.Delete = function (mail, callback, error) {
             Mail.delete({
                 id: mail._id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         init();
@@ -137,31 +138,32 @@ MailerServices.service('MailerService', ["MailSend", "Mail", "$http",
     }]);
 MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
     function (MailQuery, MailCount) {
+        var _this = this;
         this.sender = [];
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.option = { sort: { create: -1 }, limit: 40, skip: 0 };
-            this.SetQuery(null);
-            this.current_article = null;
+        var init = function () {
+            _this.option = { sort: { create: -1 }, limit: 40, skip: 0 };
+            _this.SetQuery(null);
+            _this.current_article = null;
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (send, callback, error) => {
-            let type = 10001;
+        this.Query = function (send, callback, error) {
+            var type = 10001;
             if (send) {
                 type = 10000;
             }
             MailQuery.query({
-                query: encodeURIComponent(JSON.stringify({ $and: [{ type: type }, this.query] })),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify({ $and: [{ type: type }, _this.query] })),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -175,14 +177,14 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
                 }
             });
         };
-        this.Count = (send, callback, error) => {
-            let type = 10001;
+        this.Count = function (send, callback, error) {
+            var type = 10001;
             if (send) {
                 type = 10000;
             }
             MailCount.get({
-                query: encodeURIComponent(JSON.stringify({ $and: [{ type: type }, this.query] }))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify({ $and: [{ type: type }, _this.query] }))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -196,30 +198,30 @@ MailerServices.service('MailQueryService', ["MailQuery", "MailCount",
                 }
             });
         };
-        this.Over = (send, callback, error) => {
-            this.Count(send, (count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (send, callback, error) {
+            _this.Count(send, function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (send, callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (send, callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (send, callback, error) => {
-            this.Over(send, (hasnext) => {
+        this.Next = function (send, callback, error) {
+            _this.Over(send, function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(send, callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(send, callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (send, callback, error) => {
-            this.Under(send, (hasprev) => {
+        this.Prev = function (send, callback, error) {
+            _this.Under(send, function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(send, callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(send, callback, error);
                 }
                 else {
                     callback(null);

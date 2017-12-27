@@ -4,14 +4,14 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ResourcesProviders = angular.module('ResourcesProviders', []);
+var ResourcesProviders = angular.module('ResourcesProviders', []);
 ResourcesProviders.provider('HtmlEdit', [function () {
-        this.$get = () => {
+        this.$get = function () {
             return {
-                toHtml: (object, init) => {
+                toHtml: function (object, init) {
                     return HtmlEdit.Render.toHtml(object, init);
                 },
-                fromHtml: (html, callback) => {
+                fromHtml: function (html, callback) {
                     HtmlEdit.Render.fromHtml(html, callback);
                 },
             };

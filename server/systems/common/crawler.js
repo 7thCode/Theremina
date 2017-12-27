@@ -8,16 +8,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var CrawlerModule;
 (function (CrawlerModule) {
-    const wgxpath = require('wgxpath');
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const request = require('request');
-    class Crawler {
-        constructor() {
+    var wgxpath = require('wgxpath');
+    var jsdom = require("jsdom");
+    var JSDOM = jsdom.JSDOM;
+    var request = require('request');
+    var Crawler = (function () {
+        function Crawler() {
             this.count = 0;
         }
-        constractor() {
-        }
+        Crawler.prototype.constractor = function () {
+        };
         //   public setCookie(cookies) {
         /*
         let cookie  = request.cookie('B=5635uttc79b6h&b=4&d=nqPtuxtpYF20p87x.lJPGbNFRFHKUZkQUunHTJFp&s=4p&i=nkm9FaKwUuQVDdlLrIRm');
@@ -75,33 +75,33 @@ var CrawlerModule;
 
     */
         //   }
-        Crawl(url, param, cookies, expressions) {
+        Crawler.prototype.Crawl = function (url, param, cookies, expressions) {
             //this.count++;
-            let jar = request.jar();
-            cookies.forEach((entry) => {
-                let cookie = request.cookie(entry.cookie);
+            var jar = request.jar();
+            cookies.forEach(function (entry) {
+                var cookie = request.cookie(entry.cookie);
                 jar.setCookie(cookie, entry.domain);
             });
-            return new Promise((resolve, reject) => {
+            return new Promise(function (resolve, reject) {
                 //    setTimeout(() => {
                 request({
                     uri: url,
                     method: 'GET',
                     jar: jar
-                }, (error, response, body) => {
+                }, function (error, response, body) {
                     if (!error) {
-                        let dom = new JSDOM(body);
+                        var dom = new JSDOM(body);
                         if (dom) {
-                            let window = dom.window;
-                            if (window) {
-                                wgxpath.install(window);
-                                let result = {};
-                                let keys = Object.keys(expressions);
-                                keys.forEach((key) => {
-                                    let expression_for_key = window.document.createExpression(expressions[key]);
-                                    result[key] = expression_for_key.evaluate(window.document, wgxpath.XPathResultType.STRING_TYPE).stringValue;
+                            var window_1 = dom.window;
+                            if (window_1) {
+                                wgxpath.install(window_1);
+                                var result_1 = {};
+                                var keys = Object.keys(expressions);
+                                keys.forEach(function (key) {
+                                    var expression_for_key = window_1.document.createExpression(expressions[key]);
+                                    result_1[key] = expression_for_key.evaluate(window_1.document, wgxpath.XPathResultType.STRING_TYPE).stringValue;
                                 });
-                                resolve({ param: param, result: result });
+                                resolve({ param: param, result: result_1 });
                             }
                             else {
                                 reject({ code: 1, message: "html error" });
@@ -111,8 +111,9 @@ var CrawlerModule;
                 });
                 //      }, 10000 * this.count);
             });
-        }
-    }
+        };
+        return Crawler;
+    }());
     CrawlerModule.Crawler = Crawler;
 })(CrawlerModule = exports.CrawlerModule || (exports.CrawlerModule = {}));
 module.exports = CrawlerModule;

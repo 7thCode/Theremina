@@ -7,21 +7,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var InterceptorModule;
 (function (InterceptorModule) {
-    const _ = require("lodash");
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    const analysis = new AnalysisModule.Analysis;
-    InterceptorModule.Handler = (request, response, next) => {
+    var _ = require("lodash");
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
+    var analysis = new AnalysisModule.Analysis;
+    InterceptorModule.Handler = function (request, response, next) {
         return {
-            isInterceptable: () => {
-                let result = false;
-                let type = response.get('Content-Type');
+            isInterceptable: function () {
+                var result = false;
+                var type = response.get('Content-Type');
                 if (type) {
                     result = /text\/html/.test(type);
                 }
                 return result;
             },
-            intercept: (html, send) => {
+            intercept: function (html, send) {
                 analysis.page_view(request, response, next);
             }
         };

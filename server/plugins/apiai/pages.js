@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ApiaiPageRouter;
 (function (ApiaiPageRouter) {
-    const express = require('express');
+    var express = require('express');
     ApiaiPageRouter.router = express.Router();
 })(ApiaiPageRouter = exports.ApiaiPageRouter || (exports.ApiaiPageRouter = {}));
 module.exports = ApiaiPageRouter.router;

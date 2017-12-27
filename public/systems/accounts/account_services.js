@@ -4,9 +4,9 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let AccountServices = angular.module('AccountServices', []);
+var AccountServices = angular.module('AccountServices', []);
 AccountServices.factory('Account', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/accounts/api/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -14,79 +14,80 @@ AccountServices.factory('Account', ['$resource',
         });
     }]);
 AccountServices.factory('AccountQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/accounts/api/query/:query/:option', { query: '@query', option: '@option' }, {
             query: { method: 'GET' }
         });
     }]);
 AccountServices.factory('AccountCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/accounts/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 AccountServices.service('AccountService', ['Account', 'AccountQuery', 'AccountCount', 'CollectionService',
     function (Account, AccountQuery, AccountCount, CollectionService) {
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        var _this = this;
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.option = { limit: 40, skip: 0 };
-            this.SetQuery(null);
+        var init = function () {
+            _this.option = { limit: 40, skip: 0 };
+            _this.SetQuery(null);
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (callback, error) => {
-            CollectionService.List(AccountQuery, this.query, this.option, callback, error);
+        this.Query = function (callback, error) {
+            CollectionService.List(AccountQuery, _this.query, _this.option, callback, error);
         };
-        this.Count = (callback, error) => {
-            CollectionService.Count(AccountCount, this.query, callback, error);
+        this.Count = function (callback, error) {
+            CollectionService.Count(AccountCount, _this.query, callback, error);
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Put = (username, content, callback, error) => {
-            let group = new Account();
+        this.Put = function (username, content, callback, error) {
+            var group = new Account();
             group.content = content;
             group.$put({
                 username: username
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
-                        this.dirty = false;
+                        _this.dirty = false;
                     }
                     else {
                         error(result.code, result.message);

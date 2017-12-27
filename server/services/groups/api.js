@@ -7,13 +7,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GroupApiRouter;
 (function (GroupApiRouter) {
-    const express = require('express');
+    var express = require('express');
     GroupApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const GroupModule = require(share.Server("services/groups/controllers/group_controller"));
-    const group = new GroupModule.Group;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var GroupModule = require(share.Server("services/groups/controllers/group_controller"));
+    var group = new GroupModule.Group;
     GroupApiRouter.router.post("/api/own", [exception.exception, exception.guard, exception.authenticate, group.own_group]);
     GroupApiRouter.router.post("/api/create", [exception.exception, exception.guard, exception.authenticate, group.create_group]);
     GroupApiRouter.router.get("/api/:id", [group.get_group]);

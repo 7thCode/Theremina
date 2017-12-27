@@ -7,15 +7,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileUtility;
 (function (FileUtility) {
-    const fs = require('graceful-fs');
-    const share = require('./share');
-    const config = share.config;
-    class Utility {
-        constructor(current) {
+    var fs = require('graceful-fs');
+    var share = require('./share');
+    var config = share.config;
+    var Utility = (function () {
+        function Utility(current) {
             this.current = '';
             this.current = current;
         }
-        readdir(path, callback) {
+        Utility.prototype.readdir = function (path, callback) {
             fs.readdir(this.current + "/" + path, function (error, files) {
                 if (!error) {
                     callback(null, files);
@@ -24,10 +24,10 @@ var FileUtility;
                     callback(error, null);
                 }
             });
-        }
-        readfileSync(filename) {
-            let result = "";
-            let file = fs.openSync(filename, 'r');
+        };
+        Utility.prototype.readfileSync = function (filename) {
+            var result = "";
+            var file = fs.openSync(filename, 'r');
             if (file) {
                 try {
                     result = fs.readFileSync(filename, 'utf8');
@@ -37,10 +37,10 @@ var FileUtility;
                 }
             }
             return result;
-        }
-        readfile(filename, callback) {
-            fs.open(filename, 'r', (error, fd) => {
-                let data = null;
+        };
+        Utility.prototype.readfile = function (filename, callback) {
+            fs.open(filename, 'r', function (error, fd) {
+                var data = null;
                 if (fd) {
                     try {
                         data = fs.readFileSync(filename, 'utf8');
@@ -51,8 +51,8 @@ var FileUtility;
                 }
                 callback(error, data);
             });
-        }
-        delete_folder_recursive(path) {
+        };
+        Utility.prototype.delete_folder_recursive = function (path) {
             fs.readdirSync(path).forEach(function (file, index) {
                 var curPath = path + "/" + file;
                 if (fs.lstatSync(curPath).isDirectory()) {
@@ -63,10 +63,10 @@ var FileUtility;
                 }
             });
             fs.rmdirSync(path);
-        }
-        writefileSync(filename, data) {
-            let result = false;
-            let fd = fs.openSync(filename, 'w');
+        };
+        Utility.prototype.writefileSync = function (filename, data) {
+            var result = false;
+            var fd = fs.openSync(filename, 'w');
             if (fd) {
                 try {
                     fs.writeFileSync(fd, data);
@@ -79,12 +79,12 @@ var FileUtility;
                 }
             }
             return result;
-        }
-        writefile(filename, data, callback) {
-            fs.open(filename, 'w', (error, fd) => {
+        };
+        Utility.prototype.writefile = function (filename, data, callback) {
+            fs.open(filename, 'w', function (error, fd) {
                 if (!error) {
                     try {
-                        fs.writefile(fd, data, (error) => {
+                        fs.writefile(fd, data, function (error) {
                             if (!error) {
                                 callback(null);
                             }
@@ -94,7 +94,7 @@ var FileUtility;
                         });
                     }
                     finally {
-                        fs.close(fd, () => {
+                        fs.close(fd, function () {
                         });
                     }
                 }
@@ -102,8 +102,9 @@ var FileUtility;
                     callback(error);
                 }
             });
-        }
-    }
+        };
+        return Utility;
+    }());
     FileUtility.Utility = Utility;
 })(FileUtility = exports.FileUtility || (exports.FileUtility = {}));
 module.exports = FileUtility;

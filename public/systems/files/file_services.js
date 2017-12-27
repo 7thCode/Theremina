@@ -4,26 +4,26 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let FileServices = angular.module('FileServices', []);
-FileServices.filter('filename', [() => {
-        return (filename, limit) => {
-            let result = filename;
-            let nameparts = filename.split(".");
+var FileServices = angular.module('FileServices', []);
+FileServices.filter('filename', [function () {
+        return function (filename, limit) {
+            var result = filename;
+            var nameparts = filename.split(".");
             if (nameparts.length == 2) {
-                let name = nameparts[0];
-                let type = nameparts[1];
-                if (name) {
-                    if (name.length > limit) {
-                        result = name.slice(0, limit) + "..." + type;
+                var name_1 = nameparts[0];
+                var type = nameparts[1];
+                if (name_1) {
+                    if (name_1.length > limit) {
+                        result = name_1.slice(0, limit) + "..." + type;
                     }
                 }
             }
             return result;
         };
     }]);
-FileServices.filter('icon', [() => {
-        return (mimetype) => {
-            let result = "";
+FileServices.filter('icon', [function () {
+        return function (mimetype) {
+            var result = "";
             switch (mimetype) {
                 case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
                     result = "/systems/resources/files/icon/xls.svg";
@@ -53,32 +53,32 @@ FileServices.filter('icon', [() => {
         };
     }]);
 FileServices.factory('File', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/files/api/:name/:key', { name: '@name', key: '@key' }, {
             send: { method: 'POST' },
             update: { method: 'PUT' }
         });
     }]);
 FileServices.factory('FileData', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/files/api/data/:name', { name: '@name' }, {
             get: { method: 'GET' },
         });
     }]);
 FileServices.factory('FileQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/files/api/query/:query/:option', { query: '@query', option: '@option' }, {
             query: { method: 'GET' }
         });
     }]);
 FileServices.factory('FileCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/files/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 FileServices.factory('Upload', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/files/api/temporary/upload/:filename', { filename: '@filename' }, {
             send: { method: 'POST' }
         });
@@ -86,26 +86,28 @@ FileServices.factory('Upload', ['$resource',
 //FileServices.value("CurrentFileQuery", {query: {filename: {$regex: ""}}, option: {limit: 10, skip: 0}});
 FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount", "Upload",
     function (File, FileData, FileQuery, FileCount, Upload) {
-        this.SetQuery = (query, type = 0) => {
-            this.option.skip = 0;
+        var _this = this;
+        this.SetQuery = function (query, type) {
+            if (type === void 0) { type = 0; }
+            _this.option.skip = 0;
             //    this.query = {"metadata.key": {$gte: type, $lt: type + 2000}};
             //    if (query) {
             //       this.query = {$and:[{"metadata.key": {$gte: type, $lt: type + 2000}},query]};
             //   }
-            this.query = query;
+            _this.query = query;
         };
-        let init = () => {
-            this.option = { limit: 40, skip: 0 };
-            this.SetQuery(null);
+        var init = function () {
+            _this.option = { limit: 40, skip: 0 };
+            _this.SetQuery(null);
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (callback, error) => {
+        this.Query = function (callback, error) {
             FileQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query)),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -119,10 +121,10 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
                 }
             });
         };
-        this.Exist = (query, callback, error) => {
+        this.Exist = function (query, callback, error) {
             FileCount.get({
                 query: encodeURIComponent(JSON.stringify(query))
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value > 0);
@@ -136,10 +138,10 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
                 }
             });
         };
-        this.Count = (callback, error) => {
+        this.Count = function (callback, error) {
             FileCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -153,57 +155,57 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
                 }
             });
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Create = (url, filename, key, callback, error) => {
-            let remote_file = new File();
+        this.Create = function (url, filename, key, callback, error) {
+            var remote_file = new File();
             remote_file.url = url;
-            let promise = remote_file.$send({ name: filename, key: key }, (value, responseHeaders) => {
+            var promise = remote_file.$send({ name: filename, key: key }, function (value, responseHeaders) {
                 callback(value);
-            }, (httpResponse) => {
+            }, function (httpResponse) {
                 error(1, "");
             });
         };
-        this.Update = (url, filename, key, callback, error) => {
-            let remote_file = new File();
+        this.Update = function (url, filename, key, callback, error) {
+            var remote_file = new File();
             remote_file.url = url;
-            let promise = remote_file.$update({ name: filename, key: key }, (value, responseHeaders) => {
+            var promise = remote_file.$update({ name: filename, key: key }, function (value, responseHeaders) {
                 callback(value);
-            }, (httpResponse) => {
+            }, function (httpResponse) {
                 error(1, "");
             });
         };
-        this.Delete = (filename, key, callback, error) => {
-            let file = new File();
-            file.$delete({ name: filename, key: key }, (result, responseHeaders) => {
+        this.Delete = function (filename, key, callback, error) {
+            var file = new File();
+            file.$delete({ name: filename, key: key }, function (result, responseHeaders) {
                 if (result) {
                     switch (result.code) {
                         case 0:
@@ -212,14 +214,14 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
                         default:
                     }
                 }
-            }, (httpResponse) => {
+            }, function (httpResponse) {
                 error(1, "");
             });
         };
-        this.Get = (name, callback, error) => {
+        this.Get = function (name, callback, error) {
             FileData.get({
                 name: name
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -233,12 +235,12 @@ FileServices.service('FileService', ["File", "FileData", "FileQuery", "FileCount
                 }
             });
         };
-        this.Upload = (url, filename, callback, error) => {
-            let remote_file = new Upload();
+        this.Upload = function (url, filename, callback, error) {
+            var remote_file = new Upload();
             remote_file.url = url;
-            let promise = remote_file.$send({ filename: filename }, (value, responseHeaders) => {
+            var promise = remote_file.$send({ filename: filename }, function (value, responseHeaders) {
                 callback(value);
-            }, (httpResponse) => {
+            }, function (httpResponse) {
                 error(1, "");
             });
         };

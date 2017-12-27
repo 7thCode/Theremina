@@ -7,103 +7,105 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FormsModule;
 (function (FormsModule) {
-    const fs = require('graceful-fs');
-    const _ = require('lodash');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const builder_userid = config.systems.userid; // template maker user id
-    const FormModel = require(share.Models("services/forms/form"));
-    class Form {
-        static userid(request) {
-            return request.user.userid;
+    var fs = require('graceful-fs');
+    var _ = require('lodash');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var config = share.config;
+    var Wrapper = share.Wrapper;
+    var builder_userid = config.systems.userid; // template maker user id
+    var FormModel = require(share.Models("services/forms/form"));
+    var Form = (function () {
+        function Form() {
         }
-        static namespace(name) {
-            let result = "";
+        Form.userid = function (request) {
+            return request.user.userid;
+        };
+        Form.namespace = function (name) {
+            var result = "";
             if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
+                var names_1 = name.split("#");
+                var delimmiter_1 = "";
+                names_1.forEach(function (name, index) {
+                    if (index < (names_1.length - 1)) {
+                        result += delimmiter_1 + name;
+                        delimmiter_1 = ":";
                     }
                 });
             }
             return result;
-        }
-        static localname(name) {
-            let result = "";
+        };
+        Form.localname = function (name) {
+            var result = "";
             if (name) {
-                let names = name.split("#");
-                names.forEach((name, index) => {
-                    if (index == (names.length - 1)) {
+                var names_2 = name.split("#");
+                names_2.forEach(function (name, index) {
+                    if (index == (names_2.length - 1)) {
                         result = name;
                     }
                 });
             }
             return result;
-        }
-        create_init_forms(initforms) {
-            let docs = initforms;
+        };
+        Form.prototype.create_init_forms = function (initforms) {
+            var docs = initforms;
             if (docs) {
-                let save = (doc) => {
-                    return new Promise((resolve, reject) => {
+                var save_1 = function (doc) {
+                    return new Promise(function (resolve, reject) {
                         //   let namespace: string = Form.namespace(doc.name);
-                        let localname = Form.localname(doc.name);
-                        let userid = doc.userid;
-                        let namespace = "";
-                        let type = doc.type;
-                        let content = doc.content;
-                        let query = { $and: [{ namespace: namespace }, { userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
-                        Wrapper.FindOne(null, 1000, FormModel, query, (response, page) => {
+                        var localname = Form.localname(doc.name);
+                        var userid = doc.userid;
+                        var namespace = "";
+                        var type = doc.type;
+                        var content = doc.content;
+                        var query = { $and: [{ namespace: namespace }, { userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
+                        Wrapper.FindOne(null, 1000, FormModel, query, function (response, page) {
                             if (!page) {
-                                let page = new FormModel();
-                                page.userid = userid;
-                                page.namespace = namespace;
-                                page.name = localname;
-                                page.type = type;
-                                page.content = content;
-                                page.open = true;
-                                page.save().then(() => {
+                                var page_1 = new FormModel();
+                                page_1.userid = userid;
+                                page_1.namespace = namespace;
+                                page_1.name = localname;
+                                page_1.type = type;
+                                page_1.content = content;
+                                page_1.open = true;
+                                page_1.save().then(function () {
                                     resolve({});
-                                }).catch((error) => {
+                                }).catch(function (error) {
                                     reject(error);
                                 });
                             }
                         });
                     });
                 };
-                Promise.all(docs.map((doc) => {
-                    return save(doc);
-                })).then((results) => {
-                }).catch((error) => {
+                Promise.all(docs.map(function (doc) {
+                    return save_1(doc);
+                })).then(function (results) {
+                }).catch(function (error) {
                 });
             }
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        create_form(request, response) {
-            const number = 1000;
-            let userid = builder_userid;
-            let namespace = "";
-            let name = request.body.name;
-            let type = request.body.type;
+        Form.prototype.create_form = function (request, response) {
+            var number = 1000;
+            var userid = builder_userid;
+            var namespace = "";
+            var name = request.body.name;
+            var type = request.body.type;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, FormModel, { $and: [{ name: name }, { type: type }, { namespace: namespace }, { userid: userid }] }, (response, exists) => {
+                    Wrapper.FindOne(response, number, FormModel, { $and: [{ name: name }, { type: type }, { namespace: namespace }, { userid: userid }] }, function (response, exists) {
                         if (!exists) {
-                            let page = new FormModel();
+                            var page = new FormModel();
                             page.userid = userid;
                             page.name = name;
                             page.type = type;
                             page.content = [];
                             page.open = true;
-                            Wrapper.Save(response, number, page, (response, object) => {
+                            Wrapper.Save(response, number, page, function (response, object) {
                                 Wrapper.SendSuccess(response, object);
                             });
                         }
@@ -122,22 +124,22 @@ var FormsModule;
             else {
                 Wrapper.SendError(response, 2, "no form name", { code: 2, message: "no form name" });
             }
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        put_form(request, response) {
-            const number = 1100;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
+        Form.prototype.put_form = function (request, response) {
+            var number = 1100;
+            var userid = builder_userid;
+            var namespace = "";
+            var id = request.params.id;
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, function (response, page) {
                 if (page) {
                     page.content = request.body.content;
                     page.open = true;
-                    Wrapper.Save(response, number, page, (response, object) => {
+                    Wrapper.Save(response, number, page, function (response, object) {
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -145,20 +147,20 @@ var FormsModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        delete_form(request, response) {
-            const number = 1200;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
+        Form.prototype.delete_form = function (request, response) {
+            var number = 1200;
+            var userid = builder_userid;
+            var namespace = "";
+            var id = request.params.id;
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, function (response, page) {
                 if (page) {
-                    Wrapper.Remove(response, number, page, (response) => {
+                    Wrapper.Remove(response, number, page, function (response) {
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -166,18 +168,18 @@ var FormsModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_form(request, response) {
-            const number = 1300;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
-            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, (response, page) => {
+        Form.prototype.get_form = function (request, response) {
+            var number = 1300;
+            var userid = builder_userid;
+            var namespace = "";
+            var id = request.params.id;
+            Wrapper.FindOne(response, number, FormModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, function (response, page) {
                 if (page) {
                     Wrapper.SendSuccess(response, page);
                 }
@@ -185,53 +187,54 @@ var FormsModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        delete_own(request, response) {
-            const number = 1200;
-            let userid = builder_userid;
-            let namespace = "";
-            Wrapper.Delete(response, number, FormModel, { $and: [{ namespace: namespace }, { userid: userid }] }, (response) => {
+        Form.prototype.delete_own = function (request, response) {
+            var number = 1200;
+            var userid = builder_userid;
+            var namespace = "";
+            Wrapper.Delete(response, number, FormModel, { $and: [{ namespace: namespace }, { userid: userid }] }, function (response) {
                 Wrapper.SendSuccess(response, {});
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_form_query(request, response) {
-            const number = 1400;
-            let userid = builder_userid;
-            let namespace = "";
-            let query = Wrapper.Decode(request.params.query);
-            let option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, {}, option, (response, pages) => {
-                _.forEach(pages, (page) => {
+        Form.prototype.get_form_query = function (request, response) {
+            var number = 1400;
+            var userid = builder_userid;
+            var namespace = "";
+            var query = Wrapper.Decode(request.params.query);
+            var option = Wrapper.Decode(request.params.option);
+            Wrapper.Find(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, {}, option, function (response, pages) {
+                _.forEach(pages, function (page) {
                     page.content = null;
                 });
                 Wrapper.SendSuccess(response, pages);
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_form_count(request, response) {
-            const number = 2800;
-            let userid = builder_userid;
-            let namespace = "";
-            let query = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, (response, count) => {
+        Form.prototype.get_form_count = function (request, response) {
+            var number = 2800;
+            var userid = builder_userid;
+            var namespace = "";
+            var query = Wrapper.Decode(request.params.query);
+            Wrapper.Count(response, number, FormModel, { $and: [{ userid: userid }, { namespace: namespace }, query] }, function (response, count) {
                 Wrapper.SendSuccess(response, count);
             });
-        }
-    }
+        };
+        return Form;
+    }());
     FormsModule.Form = Form;
 })(FormsModule = exports.FormsModule || (exports.FormsModule = {}));
 module.exports = FormsModule;

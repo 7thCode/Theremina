@@ -6,9 +6,9 @@
 "use strict";
 var QueueModule;
 (function (QueueModule) {
-    const mongoose = require('mongoose');
-    const Schema = mongoose.Schema;
-    const Queue = new Schema({ content: { type: Object } }, { capped: { size: 102400, max: 100000, autoIndexId: true } });
+    var mongoose = require('mongoose');
+    var Schema = mongoose.Schema;
+    var Queue = new Schema({ content: { type: Object } }, { capped: { size: 102400, max: 100000, autoIndexId: true } });
     module.exports = mongoose.model('Queue', Queue);
 })(QueueModule || (QueueModule = {}));
 //# sourceMappingURL=queue.js.map

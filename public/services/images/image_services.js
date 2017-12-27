@@ -4,85 +4,85 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let ImageServices = angular.module('ImageServices', []);
+var ImageServices = angular.module('ImageServices', []);
 ImageServices.service('ImageService', [
     function () {
-        this.DecodeImage = (original, callback) => {
-            let type = original.substring(5, original.indexOf(";"));
-            let image = new Image();
-            image.onload = () => {
+        this.DecodeImage = function (original, callback) {
+            var type = original.substring(5, original.indexOf(";"));
+            var image = new Image();
+            image.onload = function () {
                 callback(image, type);
             };
             image.src = original;
         };
-        let dataURLtoBlob = (original) => {
-            let result = {};
+        var dataURLtoBlob = function (original) {
+            var result = {};
             if (original.length > 5) {
-                let arr = original.split(',');
+                var arr = original.split(',');
                 // let mime:string = arr[0].match(/:(.*?);/)[1];
-                let mime = original.substring(5, original.indexOf(";"));
-                let bstr = atob(arr[1]);
-                let n = bstr.length;
-                let u8arr = new Uint8Array(n);
+                var mime_1 = original.substring(5, original.indexOf(";"));
+                var bstr = atob(arr[1]);
+                var n = bstr.length;
+                var u8arr = new Uint8Array(n);
                 while (n--) {
                     u8arr[n] = bstr.charCodeAt(n);
                 }
-                result = new Blob([u8arr], { type: mime });
+                result = new Blob([u8arr], { type: mime_1 });
             }
             return result;
         };
-        this.ResizeImage = (original, width, height, callback) => {
+        this.ResizeImage = function (original, width, height, callback) {
             if (original.length > 5) {
-                let type = original.substring(5, original.indexOf(";"));
-                let image = new Image();
-                image.onload = () => {
-                    let canvas = document.createElement('canvas');
+                var type_1 = original.substring(5, original.indexOf(";"));
+                var image_1 = new Image();
+                image_1.onload = function () {
+                    var canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
-                    let ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, 0, 0, width, height);
-                    callback(canvas.toDataURL(type));
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(image_1, 0, 0, width, height);
+                    callback(canvas.toDataURL(type_1));
                 };
-                image.src = original;
+                image_1.src = original;
             }
             else {
                 callback(original);
             }
         };
-        this.RotateImage = (original, resize, orientation, callback) => {
+        this.RotateImage = function (original, resize, orientation, callback) {
             if (original.length > 5) {
-                let type = original.substring(5, original.indexOf(";"));
-                let image = new Image();
-                image.onload = () => {
-                    let canvas = document.createElement('canvas');
-                    let width = image.width;
-                    let height = image.height;
+                var type_2 = original.substring(5, original.indexOf(";"));
+                var image_2 = new Image();
+                image_2.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var width = image_2.width;
+                    var height = image_2.height;
                     if (resize) {
-                        width = image.height;
-                        height = image.width;
+                        width = image_2.height;
+                        height = image_2.width;
                     }
                     canvas.width = width;
                     canvas.height = height;
-                    let ctx = canvas.getContext('2d');
-                    let rad = orientation * Math.PI;
+                    var ctx = canvas.getContext('2d');
+                    var rad = orientation * Math.PI;
                     ctx.clearRect(0, 0, width, height);
                     ctx.rotate(rad);
                     switch (orientation) {
                         case 0.5:
-                            ctx.translate(0, -1 * image.height);
+                            ctx.translate(0, -1 * image_2.height);
                             break;
                         case 1.0:
-                            ctx.translate(-1 * image.width, -1 * image.height);
+                            ctx.translate(-1 * image_2.width, -1 * image_2.height);
                             break;
                         case 1.5:
-                            ctx.translate(-1 * image.width, 0);
+                            ctx.translate(-1 * image_2.width, 0);
                             break;
                         default:
                     }
-                    ctx.drawImage(image, 0, 0);
-                    callback(canvas.toDataURL(type));
+                    ctx.drawImage(image_2, 0, 0);
+                    callback(canvas.toDataURL(type_2));
                 };
-                image.src = original;
+                image_2.src = original;
             }
             else {
                 callback(original);
@@ -106,35 +106,35 @@ ImageServices.service('ImageService', [
              callback(original);
              }*/
         };
-        this.Brightness = (original, adjustment, callback) => {
+        this.Brightness = function (original, adjustment, callback) {
             if (original.length > 5) {
-                let type = original.substring(5, original.indexOf(";"));
-                let image = new Image();
-                image.onload = () => {
-                    let canvas = document.createElement('canvas');
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    let ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, 0, 0, image.width, image.height);
-                    let bitmap = ctx.getImageData(0, 0, image.width, image.height);
+                var type_3 = original.substring(5, original.indexOf(";"));
+                var image_3 = new Image();
+                image_3.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = image_3.width;
+                    canvas.height = image_3.height;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(image_3, 0, 0, image_3.width, image_3.height);
+                    var bitmap = ctx.getImageData(0, 0, image_3.width, image_3.height);
                     for (var i = 0; i < bitmap.data.length; i += 4) {
                         bitmap.data[i] += adjustment;
                         bitmap.data[i + 1] += adjustment;
                         bitmap.data[i + 2] += adjustment;
                     }
                     ctx.putImageData(bitmap, 0, 0);
-                    callback(canvas.toDataURL(type));
+                    callback(canvas.toDataURL(type_3));
                 };
-                image.src = original;
+                image_3.src = original;
             }
             else {
                 callback(original);
             }
         };
-        this.ImageExif = (original, callback) => {
+        this.ImageExif = function (original, callback) {
             if (original.length > 5) {
-                let blob = dataURLtoBlob(original);
-                loadImage.parseMetaData(blob, (data) => {
+                var blob = dataURLtoBlob(original);
+                loadImage.parseMetaData(blob, function (data) {
                     //         console.log(data.exif.getAll());
                     callback(data.exif);
                 });

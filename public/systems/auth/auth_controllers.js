@@ -5,154 +5,154 @@
  */
 /// <reference path="../common/notify/notify.ts" />
 "use strict";
-let AuthControllers = angular.module('AuthControllers', ["ngResource", 'ngMessages', 'ngAnimate']);
+var AuthControllers = angular.module('AuthControllers', ["ngResource", 'ngMessages', 'ngAnimate']);
 AuthControllers.controller('LoginController', ["$scope", "$rootScope", "$document", "$window", "$uibModal", '$log', 'AuthService', 'ProfileService', 'PublicKeyService',
-    ($scope, $rootScope, $document, $window, $uibModal, $log, AuthService, ProfileService, PublicKeyService) => {
-        let progress = (value) => {
+    function ($scope, $rootScope, $document, $window, $uibModal, $log, AuthService, ProfileService, PublicKeyService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
         //  $document.on('drop dragover', (e: any): void => {
         //      e.stopPropagation();
         //      e.preventDefault();
         //  });
-        let confirmAccount = () => {
-            let modalRegistConfirm = $uibModal.open({
+        var confirmAccount = function () {
+            var modalRegistConfirm = $uibModal.open({
                 controller: 'RegisterConfirmDialogController',
                 templateUrl: '/auth/dialogs/registerconfirmdialog',
                 backdrop: "static",
                 targetEvent: null
             });
-            modalRegistConfirm.result.then(() => {
-            }, () => {
+            modalRegistConfirm.result.then(function () {
+            }, function () {
             });
         };
-        let confirmMember = () => {
-            let modalRegistConfirm = $uibModal.open({
+        var confirmMember = function () {
+            var modalRegistConfirm = $uibModal.open({
                 controller: 'MemberConfirmDialogController',
                 templateUrl: '/auth/dialogs/memberconfirmdialog',
                 backdrop: "static",
                 targetEvent: null
             });
-            modalRegistConfirm.result.then(() => {
-            }, () => {
+            modalRegistConfirm.result.then(function () {
+            }, function () {
             });
         };
         $scope.about = true;
-        ProfileService.Get((self) => {
+        ProfileService.Get(function (self) {
             if (self) {
                 $scope.userid = self.userid;
             }
         }, error_handler);
-        $scope.showRegisterDialog = (items) => {
-            let modalRegist = $uibModal.open({
+        $scope.showRegisterDialog = function (items) {
+            var modalRegist = $uibModal.open({
                 controller: 'RegisterDialogController',
                 templateUrl: '/auth/dialogs/registerdialog',
                 backdrop: "static",
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return items;
                     }
                 }
             });
-            modalRegist.result.then(() => {
+            modalRegist.result.then(function () {
                 confirmAccount();
-            }, () => {
+            }, function () {
             });
         };
-        $scope.Regist = (items) => {
+        $scope.Regist = function (items) {
             $scope.message = "";
             progress(true);
-            AuthService.Regist($scope.items.username, $scope.items.password, $scope.items.displayName, items, (account) => {
+            AuthService.Regist($scope.items.username, $scope.items.password, $scope.items.displayName, items, function (account) {
                 confirmAccount();
                 progress(false);
-            }, (error, message) => {
+            }, function (error, message) {
                 $scope.message = message;
                 progress(false);
             });
         };
-        $scope.showMemberDialog = () => {
-            let modalRegist = $uibModal.open({
+        $scope.showMemberDialog = function () {
+            var modalRegist = $uibModal.open({
                 controller: 'MemberDialogController',
                 templateUrl: '/auth/dialogs/memberdialog',
                 backdrop: "static",
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return $scope.items;
                     }
                 }
             });
-            modalRegist.result.then(() => {
+            modalRegist.result.then(function () {
                 confirmMember();
-            }, () => {
+            }, function () {
             });
         };
-        $scope.showLoginDialog = () => {
-            let modalInstance = $uibModal.open({
+        $scope.showLoginDialog = function () {
+            var modalInstance = $uibModal.open({
                 controller: 'LoginDialogController',
                 templateUrl: '/auth/dialogs/logindialog',
                 backdrop: "static",
                 targetEvent: null
             });
-            modalInstance.result.then((member) => {
+            modalInstance.result.then(function (member) {
                 $rootScope.$broadcast('Login');
-            }, () => {
+            }, function () {
             });
         };
-        $scope.showPasswordDialog = () => {
-            let modalInstance = $uibModal.open({
+        $scope.showPasswordDialog = function () {
+            var modalInstance = $uibModal.open({
                 controller: 'PasswordDialogController',
                 templateUrl: '/auth/dialogs/passworddialog',
                 backdrop: false,
                 targetEvent: null
             });
-            modalInstance.result.then(() => {
-                let modalRegistConfirm = $uibModal.open({
+            modalInstance.result.then(function () {
+                var modalRegistConfirm = $uibModal.open({
                     controller: 'PasswordConfirmDialogController',
                     templateUrl: '/auth/dialogs/passwordconfirmdialog',
                     backdrop: "static",
                     targetEvent: null
                 });
-                modalRegistConfirm.result.then(() => {
-                }, () => {
+                modalRegistConfirm.result.then(function () {
+                }, function () {
                 });
-            }, () => {
+            }, function () {
             });
         };
-        $scope.Logout = () => {
-            AuthService.Logout((account) => {
+        $scope.Logout = function () {
+            AuthService.Logout(function (account) {
                 $rootScope.$broadcast('Logout');
             });
         };
-        $scope.go = (ref) => {
+        $scope.go = function (ref) {
             $window.location.href = ref;
         };
-        $scope.$on('Login', () => {
-            $window.location.href = "//" + $window.location.host + "/pages";
+        $scope.$on('Login', function () {
+            $window.location.href = "//" + $window.location.host + "/front";
         });
-        $scope.$on('Logout', () => {
+        $scope.$on('Logout', function () {
             $window.location.href = "//" + $window.location.host + "/";
         });
     }]);
@@ -163,29 +163,29 @@ AuthControllers.controller('LoginController', ["$scope", "$rootScope", "$documen
  * @returns       Comment for return value.
  */
 AuthControllers.controller('LoginDialogController', ['$scope', '$window', '$uibModalInstance', 'AuthService',
-    ($scope, $window, $uibModalInstance, AuthService) => {
-        let progress = (value) => {
+    function ($scope, $window, $uibModalInstance, AuthService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.go = (ref) => {
+        $scope.go = function (ref) {
             $window.location.href = ref;
         };
-        $scope.answer = (items) => {
+        $scope.answer = function (items) {
             $scope.message = "";
             progress(true);
-            AuthService.Login($scope.items.username, $scope.items.password, (account) => {
+            AuthService.Login($scope.items.username, $scope.items.password, function (account) {
                 $uibModalInstance.close(account);
                 progress(false);
-            }, (error, message) => {
+            }, function (error, message) {
                 $scope.message = message;
                 progress(false);
             });
@@ -197,78 +197,78 @@ AuthControllers.controller('LoginDialogController', ['$scope', '$window', '$uibM
  * @returns       Comment for return value.
  */
 AuthControllers.controller('RegisterDialogController', ['$scope', '$uibModalInstance', 'AuthService', 'items',
-    ($scope, $uibModalInstance, AuthService, items) => {
-        let progress = (value) => {
+    function ($scope, $uibModalInstance, AuthService, items) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (scope) => {
+        $scope.answer = function (scope) {
             $scope.message = "";
             progress(true);
-            AuthService.Regist($scope.items.username, $scope.items.password, $scope.items.displayName, items, (account) => {
+            AuthService.Regist($scope.items.username, $scope.items.password, $scope.items.displayName, items, function (account) {
                 $uibModalInstance.close(account);
                 progress(false);
-            }, (error, message) => {
+            }, function (error, message) {
                 $scope.message = message;
                 progress(false);
             });
         };
     }]);
 AuthControllers.controller('RegisterConfirmDialogController', ['$scope', '$uibModalInstance',
-    ($scope, $uibModalInstance) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
+        $scope.answer = function (answer) {
             $uibModalInstance.close($scope);
         };
     }]);
 AuthControllers.controller('MemberDialogController', ['$scope', '$uibModalInstance', 'AuthService',
-    ($scope, $uibModalInstance, AuthService) => {
-        let progress = (value) => {
+    function ($scope, $uibModalInstance, AuthService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (items) => {
+        $scope.answer = function (items) {
             $scope.message = "";
             progress(true);
-            AuthService.Member($scope.items.username, $scope.items.password, $scope.items.displayName, items, (account) => {
+            AuthService.Member($scope.items.username, $scope.items.password, $scope.items.displayName, items, function (account) {
                 $uibModalInstance.close(account);
                 progress(false);
-            }, (error, message) => {
+            }, function (error, message) {
                 $scope.message = message;
                 progress(false);
             });
         };
     }]);
 AuthControllers.controller('MemberConfirmDialogController', ['$scope', '$uibModalInstance',
-    ($scope, $uibModalInstance) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
+        $scope.answer = function (answer) {
             $uibModalInstance.close($scope);
         };
     }]);
@@ -278,35 +278,35 @@ AuthControllers.controller('MemberConfirmDialogController', ['$scope', '$uibModa
  * @returns       Comment for return value.
  */
 AuthControllers.controller('PasswordDialogController', ['$scope', '$uibModalInstance', 'AuthService',
-    ($scope, $uibModalInstance, AuthService) => {
-        let progress = (value) => {
+    function ($scope, $uibModalInstance, AuthService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.hide = () => {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
-            AuthService.Password($scope.items.username, $scope.items.password, (account) => {
+        $scope.answer = function (answer) {
+            AuthService.Password($scope.items.username, $scope.items.password, function (account) {
                 $uibModalInstance.close(account);
                 progress(false);
-            }, (error, message) => {
+            }, function (error, message) {
                 $scope.message = message;
                 progress(false);
             });
         };
     }]);
 AuthControllers.controller('PasswordConfirmDialogController', ['$scope', '$uibModalInstance',
-    ($scope, $uibModalInstance) => {
-        $scope.hide = () => {
+    function ($scope, $uibModalInstance) {
+        $scope.hide = function () {
             $uibModalInstance.close();
         };
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-        $scope.answer = (answer) => {
+        $scope.answer = function (answer) {
             $uibModalInstance.close($scope);
         };
     }]);

@@ -4,66 +4,66 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let AnalysisControllers = angular.module('AnalysisControllers', ["ngResource"]);
+var AnalysisControllers = angular.module('AnalysisControllers', ["ngResource"]);
 AnalysisControllers.controller('AnalysisController', ['$scope', '$document', '$log', "$uibModal", 'AnalysisService',
-    ($scope, $document, $log, $uibModal, AnalysisService) => {
-        let progress = (value) => {
+    function ($scope, $document, $log, $uibModal, AnalysisService) {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
-        let error_handler = (code, message) => {
+        var error_handler = function (code, message) {
             progress(false);
             $scope.message = message;
             $log.error(message);
             alert(message);
         };
-        let alert = (message) => {
-            let modalInstance = $uibModal.open({
+        var alert = function (message) {
+            var modalInstance = $uibModal.open({
                 controller: 'AlertDialogController',
                 templateUrl: '/common/dialogs/alert_dialog',
                 resolve: {
-                    items: () => {
+                    items: function () {
                         return message;
                     }
                 }
             });
-            modalInstance.result.then((answer) => {
-            }, () => {
+            modalInstance.result.then(function (answer) {
+            }, function () {
             });
         };
-        $document.on('drop dragover', (e) => {
+        $document.on('drop dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        let Draw = () => {
-            AnalysisService.Query((data) => {
+        var Draw = function () {
+            AnalysisService.Query(function (data) {
                 $scope.logs = data;
-                AnalysisService.Over((hasnext) => { $scope.over = !hasnext; });
-                AnalysisService.Under((hasprev) => { $scope.under = !hasprev; });
+                AnalysisService.Over(function (hasnext) { $scope.over = !hasnext; });
+                AnalysisService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        let AccessLogs = () => {
-            AnalysisService.Query((data) => {
+        var AccessLogs = function () {
+            AnalysisService.Query(function (data) {
                 $scope.logs = data;
             }, error_handler);
         };
-        $scope.Next = () => {
-            AnalysisService.Next((data) => {
+        $scope.Next = function () {
+            AnalysisService.Next(function (data) {
                 $scope.logs = data;
-                AnalysisService.Over((hasnext) => { $scope.over = !hasnext; });
-                AnalysisService.Under((hasprev) => { $scope.under = !hasprev; });
+                AnalysisService.Over(function (hasnext) { $scope.over = !hasnext; });
+                AnalysisService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        $scope.Prev = () => {
-            AnalysisService.Prev((data) => {
+        $scope.Prev = function () {
+            AnalysisService.Prev(function (data) {
                 $scope.logs = data;
-                AnalysisService.Over((hasnext) => { $scope.over = !hasnext; });
-                AnalysisService.Under((hasprev) => { $scope.under = !hasprev; });
+                AnalysisService.Over(function (hasnext) { $scope.over = !hasnext; });
+                AnalysisService.Under(function (hasprev) { $scope.under = !hasprev; });
             }, error_handler);
         };
-        $scope.Find = (name) => {
+        $scope.Find = function (name) {
             if (!name) {
                 AnalysisService.query.key = name;
             }

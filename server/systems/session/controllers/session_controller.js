@@ -7,19 +7,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SessionModule;
 (function (SessionModule) {
-    const _ = require('lodash');
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const Wrapper = share.Wrapper;
-    class Session {
+    var _ = require('lodash');
+    var share = require(process.cwd() + '/server/systems/common/share');
+    var Wrapper = share.Wrapper;
+    var Session = (function () {
+        function Session() {
+        }
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get(request, response) {
-            let user = request.session.req.user;
+        Session.prototype.get = function (request, response) {
+            var user = request.session.req.user;
             if (user) {
-                let result = {
+                var result = {
                     create: user.create,
                     modify: user.modify,
                     provider: user.provider,
@@ -36,14 +38,14 @@ var SessionModule;
             else {
                 Wrapper.SendError(response, 2, "not found", { code: 2, message: "not found" });
             }
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        put(request, response) {
-            let user = request.session.req.user;
+        Session.prototype.put = function (request, response) {
+            var user = request.session.req.user;
             if (user) {
                 if (!user.data) {
                     user.data = {};
@@ -55,8 +57,9 @@ var SessionModule;
             else {
                 Wrapper.SendError(response, 2, "not found", { code: 2, message: "not found" });
             }
-        }
-    }
+        };
+        return Session;
+    }());
     SessionModule.Session = Session;
 })(SessionModule = exports.SessionModule || (exports.SessionModule = {}));
 module.exports = SessionModule;

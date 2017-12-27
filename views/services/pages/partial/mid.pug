@@ -33,22 +33,6 @@
 
             include ../../../services/common/find
 
-            //select.form-control#namespace(name="namespace", ng-model="namespace", ng-options="name for name in namespaces", ng-change="SetNamespace(namespace)")
-            //.panel.panel-default
-                .panel-body
-                    .row(ng-controller="NamespaceController")
-                        .col-xs-3
-                            label.control-label(for="namespace") #{message.namespace}
-                                span(ng-messages="validate.namespace.$error")
-                                    span.error-message(ng-message="required") #{message.required}
-                                    span.error-message(ng-message="maxlength") #{message.long}
-                                input.form-control.no-zoom#namespace(ng-change="SetNamespace(namespace)", ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
-                        .col-xs-9
-                            ul.nav.nav-tabs
-                                li(ng-repeat="name in namespaces" ng-class="{active: name == namespace}")
-                                    a(ng-click="SetNamespace(name)") {{name}}
-
-
     .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset", flow-drop, data-toggle="tooltip", data-placement="top", title=message.filedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="page in pages")

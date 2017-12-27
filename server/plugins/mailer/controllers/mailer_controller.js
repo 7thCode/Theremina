@@ -7,25 +7,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MailerModule;
 (function (MailerModule_1) {
-    const _ = require('lodash');
-    const mongoose = require('mongoose');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const AssetModel = require(share.Models("plugins/asset/asset"));
-    const MailerModule = require('../../../systems/common/mailer');
-    const validator = require('validator');
-    class Mailer {
-        constructor() {
+    var _ = require('lodash');
+    var mongoose = require('mongoose');
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var config = share.config;
+    var Wrapper = share.Wrapper;
+    var AssetModel = require(share.Models("plugins/asset/asset"));
+    var MailerModule = require('../../../systems/common/mailer');
+    var validator = require('validator');
+    var Mailer = (function () {
+        function Mailer() {
         }
         /**
          * @param request
          * @returns userid
          */
-        static userid(request) {
+        Mailer.userid = function (request) {
             return request.user.userid;
-        }
+        };
         /**
          *
          * @param request
@@ -33,8 +33,8 @@ var MailerModule;
          * @param next
          * @returns none
          */
-        send(request, response, next) {
-            let mailer = null;
+        Mailer.prototype.send = function (request, response, next) {
+            var mailer = null;
             switch (config.mailer.type) {
                 case "gmail":
                     mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
@@ -44,25 +44,25 @@ var MailerModule;
                     break;
                 default:
             }
-            let to = request.body.content.to;
-            let subject = request.body.content.subject;
-            let html = request.body.content.html;
-            mailer.send(to, subject, html, (error) => {
+            var to = request.body.content.to;
+            var subject = request.body.content.subject;
+            var html = request.body.content.html;
+            mailer.send(to, subject, html, function (error) {
                 if (!error) {
-                    let content = {};
+                    var content = {};
                     content["from"] = [{ name: "", address: "" }];
                     content["to"] = [{ name: "", address: to }];
                     content["headers"] = {};
                     content["html"] = "<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>" + html + "</body></html>";
                     content["subject"] = subject;
-                    let article = new AssetModel();
+                    var article = new AssetModel();
                     article.userid = config.systems.userid;
-                    let objectid = new mongoose.Types.ObjectId;
+                    var objectid = new mongoose.Types.ObjectId;
                     article.name = objectid.toString();
                     article.content = content;
                     article.type = 10000;
                     article.open = false;
-                    Wrapper.Save(response, 1000, article, (response, object) => {
+                    Wrapper.Save(response, 1000, article, function (response, object) {
                         Wrapper.SendSuccess(response, { code: 0, message: "" });
                     });
                 }
@@ -70,62 +70,62 @@ var MailerModule;
                     Wrapper.SendError(response, error.code, error.message, error);
                 }
             });
-        }
-        receive(mail) {
-            let content = {};
+        };
+        Mailer.prototype.receive = function (mail) {
+            var content = {};
             content["from"] = mail.body.from.value;
             content["to"] = mail.body.to.value;
             content["headers"] = mail.body.headers;
             content["html"] = mail.body.html;
             content["subject"] = mail.body.subject;
-            let article = new AssetModel();
+            var article = new AssetModel();
             article.userid = config.systems.userid;
-            let objectid = new mongoose.Types.ObjectId;
+            var objectid = new mongoose.Types.ObjectId;
             article.name = objectid.toString();
             article.content = content;
             article.type = 10001;
             article.open = false;
-            Wrapper.Save(null, 1000, article, (response, object) => {
+            Wrapper.Save(null, 1000, article, function (response, object) {
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_mail_query_query(request, response) {
-            let userid = Mailer.userid(request);
+        Mailer.prototype.get_mail_query_query = function (request, response) {
+            var userid = Mailer.userid(request);
             //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
             //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let query = Wrapper.Decode(request.params.query);
-            let option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1400, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, {}, option, (response, mails) => {
+            var query = Wrapper.Decode(request.params.query);
+            var option = Wrapper.Decode(request.params.option);
+            Wrapper.Find(response, 1400, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, {}, option, function (response, mails) {
                 //      _.forEach(mails, (article) => {
                 //          article.content = null;
                 //       });
                 Wrapper.SendSuccess(response, mails);
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_mail_count(request, response) {
+        Mailer.prototype.get_mail_count = function (request, response) {
             //           let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            let query = Wrapper.Decode(request.params.query);
-            Wrapper.Count(response, 2800, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, (response, count) => {
+            var query = Wrapper.Decode(request.params.query);
+            Wrapper.Count(response, 2800, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, function (response, count) {
                 Wrapper.SendSuccess(response, count);
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        get_mail(request, response) {
-            let id = request.params.id;
-            Wrapper.FindOne(response, 1400, AssetModel, { $and: [{ _id: id }, { userid: config.systems.userid }] }, (response, mail) => {
+        Mailer.prototype.get_mail = function (request, response) {
+            var id = request.params.id;
+            Wrapper.FindOne(response, 1400, AssetModel, { $and: [{ _id: id }, { userid: config.systems.userid }] }, function (response, mail) {
                 if (mail) {
                     Wrapper.SendSuccess(response, mail);
                 }
@@ -133,17 +133,17 @@ var MailerModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
+        };
         /**
          * @param request
          * @param response
          * @returns none
          */
-        delete_mail(request, response) {
-            let id = request.params.id;
-            Wrapper.FindOne(response, 1300, AssetModel, { $and: [{ _id: id }, { userid: config.systems.userid }] }, (response, mail) => {
+        Mailer.prototype.delete_mail = function (request, response) {
+            var id = request.params.id;
+            Wrapper.FindOne(response, 1300, AssetModel, { $and: [{ _id: id }, { userid: config.systems.userid }] }, function (response, mail) {
                 if (mail) {
-                    Wrapper.Remove(response, 1200, mail, (response) => {
+                    Wrapper.Remove(response, 1200, mail, function (response) {
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -151,8 +151,9 @@ var MailerModule;
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
                 }
             });
-        }
-    }
+        };
+        return Mailer;
+    }());
     MailerModule_1.Mailer = Mailer;
 })(MailerModule = exports.MailerModule || (exports.MailerModule = {}));
 module.exports = MailerModule;

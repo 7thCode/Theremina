@@ -4,9 +4,9 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let AnalysisServices = angular.module('AnalysisServices', []);
+var AnalysisServices = angular.module('AnalysisServices', []);
 AnalysisServices.factory('Analysis', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/analysis/api/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -14,39 +14,40 @@ AnalysisServices.factory('Analysis', ['$resource',
         });
     }]);
 AnalysisServices.factory('AnalysisQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource("/analysis/api/query/:query/:option", { query: '@query', option: '@optopn' }, {
             query: { method: 'GET' }
         });
     }]);
 AnalysisServices.factory('AnalysisCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/analysis/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 AnalysisServices.service('AnalysisService', ["Analysis", "AnalysisQuery", "AnalysisCount",
     function (Analysis, AnalysisQuery, AnalysisCount) {
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        var _this = this;
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        this.Init = () => {
-            this.option = { limit: 40, skip: 0 };
-            this.SetQuery(null);
-            this.current = { content: {} };
+        this.Init = function () {
+            _this.option = { limit: 40, skip: 0 };
+            _this.SetQuery(null);
+            _this.current = { content: {} };
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        this.Query = (callback, error) => {
+        this.Query = function (callback, error) {
             AnalysisQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query)),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -60,10 +61,10 @@ AnalysisServices.service('AnalysisService', ["Analysis", "AnalysisQuery", "Analy
                 }
             });
         };
-        this.Count = (callback, error) => {
+        this.Count = function (callback, error) {
             AnalysisCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -77,45 +78,45 @@ AnalysisServices.service('AnalysisService', ["Analysis", "AnalysisQuery", "Analy
                 }
             });
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Get = (id, callback, error) => {
-            this.Init();
+        this.Get = function (id, callback, error) {
+            _this.Init();
             Analysis.get({
                 id: id
-            }, (result) => {
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
-                        this.current = result.value;
-                        callback(this.current.content);
+                        _this.current = result.value;
+                        callback(_this.current.content);
                     }
                     else {
                         error(result.code, result.message);

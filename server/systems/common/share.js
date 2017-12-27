@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ShareModule;
 (function (ShareModule) {
-    const fs = require('graceful-fs');
+    var fs = require('graceful-fs');
     ShareModule.config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
     ShareModule.services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
     ShareModule.plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
@@ -17,51 +17,54 @@ var ShareModule;
     //   export const services_config = _config.get('services');
     //   export const plugins_config = _config.get('plugins');
     //   export const applications_config = _config.get('applications');
-    const _ = require("lodash");
-    const log4js = require('log4js');
+    var _ = require("lodash");
+    var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
     ShareModule.logger = log4js.getLogger('request');
     ShareModule.logger.setLevel(ShareModule.config.loglevel);
-    const Promised = require("./wrapper");
+    var Promised = require("./wrapper");
     ShareModule.Wrapper = new Promised.Wrapper();
-    const CipherModule = require('./cipher');
+    var CipherModule = require('./cipher');
     ShareModule.Cipher = CipherModule.Cipher;
-    const EventModule = require('./event');
+    var EventModule = require('./event');
     ShareModule.Event = new EventModule.Event();
-    const SchedulerModule = require("./scheduler");
+    var SchedulerModule = require("./scheduler");
     ShareModule.Scheduler = new SchedulerModule.Scheduler();
-    const Commandar = require("./commandar");
+    var Commandar = require("./commandar");
     ShareModule.Command = new Commandar.Linux();
-    const path = require('path');
-    const root_path = process.cwd();
-    ShareModule.Root = (relpath) => {
+    var path = require('path');
+    var root_path = process.cwd();
+    ShareModule.Root = function (relpath) {
         return path.join(root_path, relpath);
     };
-    ShareModule.Config = (relpath) => {
+    ShareModule.Config = function (relpath) {
         return path.join(root_path, "config/" + relpath);
     };
-    ShareModule.Models = (relpath) => {
+    ShareModule.Models = function (relpath) {
         return path.join(root_path, "models/" + relpath);
     };
-    ShareModule.Persistent = (relpath) => {
+    ShareModule.Persistent = function (relpath) {
         return path.join(root_path, "persistent/" + relpath);
     };
-    ShareModule.Public = (relpath) => {
+    ShareModule.Public = function (relpath) {
         return path.join(root_path, "public/" + relpath);
     };
-    ShareModule.Server = (relpath) => {
+    ShareModule.Server = function (relpath) {
         return path.join(root_path, "server/" + relpath);
     };
-    ShareModule.Views = (relpath) => {
+    ShareModule.Views = function (relpath) {
         return path.join(root_path, "views/" + relpath);
     };
-    const PersistentModel = require("./persistent");
+    var PersistentModel = require("./persistent");
     ShareModule.Map = new PersistentModel.Map(ShareModule.Persistent("systems/storege.json"));
-    const FileUtility = require("./file_utility");
+    var FileUtility = require("./file_utility");
     ShareModule.Utility = new FileUtility.Utility(ShareModule.Public(""));
     ShareModule.Memory = [];
-    class Share {
-    }
+    var Share = (function () {
+        function Share() {
+        }
+        return Share;
+    }());
     ShareModule.Share = Share;
 })(ShareModule = exports.ShareModule || (exports.ShareModule = {}));
 module.exports = ShareModule;

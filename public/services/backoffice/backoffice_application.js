@@ -4,10 +4,11 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let BackOfficeApplication = angular.module('BackOfficeApplication', [
+var BackOfficeApplication = angular.module('BackOfficeApplication', [
     'ngMessages', "ngResource", 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar',
     'ngSanitize',
-    'textAngular',
+    'ui.tinymce',
+    //'froala',//froala
     "Services",
     'FrontControllers',
     "TemplateServices",
@@ -65,12 +66,12 @@ let BackOfficeApplication = angular.module('BackOfficeApplication', [
 ]);
 BackOfficeApplication.run(['$rootScope',
     function ($rootScope) {
-        $rootScope.$on("$routeChangeSuccess", (event, current, previous, rejection) => {
+        $rootScope.$on("$routeChangeSuccess", function (event, current, previous, rejection) {
         });
     }
 ]);
 BackOfficeApplication.config(['$compileProvider', '$httpProvider',
-    ($compileProvider, $httpProvider) => {
+    function ($compileProvider, $httpProvider) {
         $compileProvider.debugInfoEnabled(false);
         $httpProvider.defaults.headers.common = { 'x-requested-with': 'XMLHttpRequest' };
         $httpProvider.defaults.headers.common['If-Modified-Since'] = 'Thu, 01 Jun 1970 00:00:00 GMT'; //マイクロソフトのバグ対応！！！
@@ -91,9 +92,9 @@ BackOfficeApplication.config(['ShapeEditProvider', function (ShapeEditProvider) 
 BackOfficeApplication.config(['$sceDelegateProvider', function ($sceDelegateProvider) {
         $sceDelegateProvider.resourceUrlWhitelist(['**']);
     }]);
-BackOfficeApplication.filter('limit', [() => {
-        return (text, limit) => {
-            let result = "";
+BackOfficeApplication.filter('limit', [function () {
+        return function (text, limit) {
+            var result = "";
             if (text) {
                 result = text;
                 if (text.length > limit) {
@@ -104,9 +105,9 @@ BackOfficeApplication.filter('limit', [() => {
         };
     }]);
 BackOfficeApplication.controller('AlertDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope, $uibModalInstance, items) => {
+    function ($scope, $uibModalInstance, items) {
         $scope.message = items;
-        $scope.cancel = () => {
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
     }]);

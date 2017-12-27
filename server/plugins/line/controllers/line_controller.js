@@ -7,46 +7,116 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var LineModule;
 (function (LineModule) {
-    const _ = require('lodash');
-    const line = require('@line/bot-sdk');
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const Wrapper = share.Wrapper;
-    const plugins_config = share.plugins_config;
-    //  const ApiAiModule = require(share.Server("plugins/apiai/modules/apiai_module"));
-    //  const ai = new ApiAiModule.ApiAi();
-    class Line {
-        constructor() {
+    var _ = require('lodash');
+    var line = require('@line/bot-sdk');
+    var mongoose = require('mongoose');
+    mongoose.Promise = global.Promise;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var Watson = require(share.Server("plugins/watson/modules/watson_module")).Watson;
+    var ContextModel = require(share.Models("plugins/context/context"));
+    var plugins_config = share.plugins_config;
+    //   const watson = require('watson-developer-cloud');
+    /*
+        const conversation = watson.conversation({
+            username: "e10b9084-d755-4b1b-bcd7-58f14aad1eb5",
+            password: "PZJDFO5nq8pd",
+            version: 'v1',
+            version_date: '2017-05-26'
+        });
+    */
+    var Line = (function () {
+        function Line() {
         }
+        /**
+         * @param error
+         * @param line_client
+         * @param line_event
+         * @returns none
+         */
+        Line.error_message = function (error, line_client, line_event) {
+            line_client.replyMessage(line_event.replyToken, {
+                type: "text",
+                text: error.message
+            }).then();
+        };
+        /**
+         * @param message
+         * @param context
+         * @param callback
+         * @returns none
+         */
+        /*       static tell_watson(message: string, context: any, callback: (error: any, watson_response: any) => void): void {
+                   conversation.message({
+                       workspace_id: "07cd3b4e-438f-443e-beea-97ec7bba71e4",
+                       input: {'text': message},
+                       context: context
+                   }, callback);
+               }
+       */
         /**
          * @param request
          * @param response
          * @returns none
          */
-        bot_hook(request, response) {
+        Line.prototype.bot_hook = function (request, response) {
             if (request.body.events) {
-                let client = new line.Client(plugins_config.line.token);
-                let promises = [];
-                request.body.events.map((event) => {
-                    if (event.type == "message" || event.message.type == "text") {
-                        if (event.message.text == "こんにちは") {
-                            promises.push(client.replyMessage(event.replyToken, {
-                                type: "text",
-                                text: "これはこれは"
-                            }));
-                        }
+                var line_client_1 = new line.Client(plugins_config.line.token);
+                var promises_1 = [];
+                request.body.events.map(function (line_event) {
+                    if (line_event.type == "message" || line_event.message.type == "text") {
+                        var reply_1 = {
+                            type: "text",
+                            text: line_event.message.text + "?"
+                        };
+                        //   line_event.source.userId --- watson_response.context
+                        ContextModel.findOne({ $and: [{ userid: line_event.source.userId }, { type: "line" }] })
+                            .then(function (result) {
+                            Watson.tell(line_event.message.text, result.context, function (error, watson_response) {
+                                //    Line.tell_watson(line_event.message.text, result.context, (error: any, watson_response: any) => {
+                                if (!error) {
+                                    if (result) {
+                                        result.context = watson_response.context;
+                                    }
+                                    else {
+                                        result = new ContextModel();
+                                        result.type = "line";
+                                        result.userid = line_event.source.userId;
+                                        result.context = watson_response.context;
+                                    }
+                                    result.save().then(function () {
+                                        reply_1 = {
+                                            type: "text",
+                                            text: watson_response.output.text[0]
+                                        };
+                                        promises_1.push(line_client_1.replyMessage(line_event.replyToken, reply_1).then(function () {
+                                        }).catch(function (error) {
+                                            Line.error_message(error, line_client_1, line_event);
+                                        }));
+                                        Promise.all(promises_1).then(function (results) {
+                                        }).catch(function (error) {
+                                            Line.error_message(error, line_client_1, line_event);
+                                        });
+                                    }).catch(function (error) {
+                                        Line.error_message(error, line_client_1, line_event);
+                                    });
+                                }
+                                else {
+                                    Line.error_message(error, line_client_1, line_event);
+                                }
+                            });
+                        }).catch(function (error) {
+                            Line.error_message(error, line_client_1, line_event);
+                        });
                     }
-                });
-                Promise.all(promises).then((results) => {
-                    console.log(`${response.length} events processed.`);
-                }).catch((error) => {
                 });
             }
             else {
                 response.sendStatus(200);
             }
-        }
-    }
+        };
+        return Line;
+    }());
     LineModule.Line = Line;
     /**
      * @param request

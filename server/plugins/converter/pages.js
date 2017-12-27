@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConverterPageRouter;
 (function (ConverterPageRouter) {
-    const express = require('express');
+    var express = require('express');
     ConverterPageRouter.router = express.Router();
 })(ConverterPageRouter = exports.ConverterPageRouter || (exports.ConverterPageRouter = {}));
 module.exports = ConverterPageRouter.router;

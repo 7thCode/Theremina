@@ -17,12 +17,12 @@ export namespace MailerModule {
     const share: any = core.share;
     const config: any = share.config;
     const Wrapper: any = share.Wrapper;
+    const applications_config:any = share.applications_config;
 
     const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
     const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
 
-    const validator: any = require('validator');
     const url: any = require('url');
 
     const MailerModule: any = require('../../../systems/common/mailer');
@@ -40,12 +40,12 @@ export namespace MailerModule {
          * @returns none
          */
         public send(request: any, response: any): void {
-            const inquiry_mail: string = "inquiry_mail.html";
-            const thanks_mail: string = "thanks_mail.html";
-            const mail_type: number = 20;
-            const report_title: string = "お問い合わせいただきました";
-            const thanks_title: string = "ありがとうございます";
-            const done_message: string = "お問い合わせありがとうございます";
+            const inquiry_mail: string = applications_config.mail.inquiry_mail;
+            const thanks_mail: string = applications_config.mail.thanks_mail;
+            const mail_type: number = applications_config.mail.mail_type;
+            const report_title: string = applications_config.mail.report_title;
+            const thanks_title: string = applications_config.mail.thanks_title;
+            const done_message: string = applications_config.mail.done_message;
 
             let referer = request.headers.referer;
             if (referer) {

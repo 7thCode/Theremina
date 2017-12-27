@@ -7,16 +7,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResourceApiRouter;
 (function (ResourceApiRouter) {
-    const express = require('express');
+    var express = require('express');
     ResourceApiRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const exception = core.exception;
-    const AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth = new AuthController.Auth;
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resource = new ResourcesModule.Resource;
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var exception = core.exception;
+    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
+    var auth = new AuthController.Auth;
+    var ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
+    var resource = new ResourcesModule.Resource;
     ResourceApiRouter.router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, resource.delete_own]);
+    ResourceApiRouter.router.get("/api/mime/types", [resource.get_all_mimetypes]);
     ResourceApiRouter.router.post("/api/create", [exception.exception, exception.guard, exception.authenticate, resource.create_resource]);
     ResourceApiRouter.router.get("/api/query/:query/:option", [resource.get_resource_query]);
     ResourceApiRouter.router.get('/api/count/:query', [resource.get_resource_count]);

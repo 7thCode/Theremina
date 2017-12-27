@@ -7,18 +7,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ProfilePageRouter;
 (function (ProfilePageRouter) {
-    const express = require('express');
+    var express = require('express');
     ProfilePageRouter.router = express.Router();
-    const core = require(process.cwd() + '/gs');
-    const share = core.share;
-    const auth = core.auth;
-    const exception = core.exception;
-    const analysis = core.analysis;
-    const config = share.config;
-    const services_config = share.services_config;
-    const webfonts = services_config.webfonts;
-    let message = config.message;
-    ProfilePageRouter.router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request, response) => {
+    var core = require(process.cwd() + '/gs');
+    var share = core.share;
+    var auth = core.auth;
+    var exception = core.exception;
+    var analysis = core.analysis;
+    var config = share.config;
+    var services_config = share.services_config;
+    var webfonts = services_config.webfonts;
+    var message = config.message;
+    ProfilePageRouter.router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, function (request, response) {
             response.render("services/profile/index", {
                 config: config,
                 user: request.user,

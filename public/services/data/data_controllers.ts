@@ -8,8 +8,8 @@
 
 let DataControllers: angular.IModule = angular.module('DataControllers', ['ui.bootstrap', 'ngAnimate', 'flow', 'ui.ace']);
 
-DataControllers.controller('DataController', ['$scope', '$log', '$document', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
-    ($scope: any, $log: any, $document: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
+DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$document', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
+    ($scope: any,$rootScope:any, $log: any, $document: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
         let pagesize = 40;
 
@@ -412,8 +412,8 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
         Draw(() => {
         });
 
-        // Guidance
-
+// Guidance
+/*
         $scope.next = (): void => {
             $scope.step++;
             SessionService.Put({guidance: {data: {step: $scope.step}}}, (data: any): void => {
@@ -447,8 +447,13 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                 }
             }
         }, error_handler);
+        */
 
-
+        $rootScope.$on('change_namespace', (event, value): void => {
+            $scope.namespace = value;
+            Draw(() => {
+            });
+        });
 
         //tinymce
         $scope.tinymceOptions =
@@ -461,11 +466,7 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                 menubar: "table"
             };
 
-
-
-
-
-            /*{
+/*{
             selector: 'textarea',
             height: 500,
             theme: 'modern',
@@ -477,14 +478,11 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
             menubar: "table tools",
             toolbar: "code"
         } */
-
-        //froala
+//froala
     //    $scope.froalaOptions = {
     //        toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
     //    };
-
-
-        /*
+/*
                 $scope.scenario = [
                     {
                         outer: {
@@ -520,20 +518,13 @@ DataControllers.controller('DataController', ['$scope', '$log', '$document', '$c
                     }
                 ];
                 */
-
-
-
-      //  $(".resizeable-box").resizable({
+//  $(".resizeable-box").resizable({
       //      handleSelector: ".win-size-grip"
       //  });
-
 //        $(".panel-left").resizable({
 //            handleSelector: ".splitter",
 //            resizeHeight: false
   //      });
-
-
-
     }]);
 
 DataControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',

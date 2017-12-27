@@ -10,6 +10,16 @@ export namespace PagesApiRouter {
 
     const express: any = require("express");
     export const router = express.Router();
+
+    const core = require(process.cwd() + '/gs');
+    const share: any = core.share;
+    const exception: any = core.exception;
+
+    const PagesModule: any = require(share.Server("services/pages/controllers/pages_controller"));
+    const pages: any = new PagesModule.Pages;
+
+    //router.get("/api/getall", [pages.get_all]);
+    router.get("/api/getall", [exception.exception, exception.guard, exception.authenticate, pages.get_all]);
 }
 
 module.exports = PagesApiRouter.router;

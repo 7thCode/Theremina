@@ -4,38 +4,38 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-let BackOfficeControllers = angular.module('BackOfficeControllers', []);
+var BackOfficeControllers = angular.module('BackOfficeControllers', []);
 //Front
 BackOfficeControllers.controller('EventController', ['$scope',
-    ($scope) => {
+    function ($scope) {
         //     $scope.$on('change_controller', (event, value) => {
         //         $scope.controller_name = value;
         //     });
     }]);
 BackOfficeControllers.controller('BackOfficeController', ['$scope',
-    ($scope) => {
+    function ($scope) {
         /*
                 $scope.Notify = (message:any):void => {
                     Socket.emit("server", {value: message}, ():void => {
                         let hoge = 1;
                     });
                 };
-        
+
                 Socket.on("client", (data:any):void => {
                     let notifier = new NotifierModule.Notifier();
                     notifier.Pass(data);
                 });
-        
+
                 $scope.update_site = (message:string):void => {
                     Socket.emit("server", {value: message}, ():void => {
                         let hoge = 1;
                     });
                 };
         */
-        let progress = (value) => {
+        var progress = function (value) {
             $scope.$emit('progress', value);
         };
-        $scope.$on('progress', (event, value) => {
+        $scope.$on('progress', function (event, value) {
             $scope.progress = value;
         });
     }]);
