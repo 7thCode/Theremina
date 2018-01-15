@@ -124,8 +124,8 @@
     
 #####個々のDBの認証(auth-dbはtarget-db自体)
     
-    > use blog0
-    > db.createUser({user:"blog0master", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
+    > use theremina
+    > db.createUser({user:"thereminamaster", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
 
 ####ログ
 ##### Ubuntu
