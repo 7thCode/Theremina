@@ -1,7 +1,7 @@
 'use strict';
 
 let gulp = require('gulp');
-let fs = require('fs');
+let fs = require('graceful-fs');
 
 let rimraf = require('rimraf');
 let imagemin = require('gulp-imagemin');
@@ -22,10 +22,8 @@ gulp.task('copy', ['clean'], () => {
         [
             'config/systems/config.json',
             'config/systems/logs.json',
-            'config/services/**/*',
-            'config/plugins/**/*',
-            'config/applications/**/*',
-            'config/utility/**/*',
+            'config/default.json',
+            'config/production.json',
             'logs/*',
             'models/**/*.json',
             'public/css/**/*.css',
@@ -33,6 +31,7 @@ gulp.task('copy', ['clean'], () => {
             'public/js/**/*.js',
             'public/vendor/**/*',
             'public/favicons/**/*',
+            'public/applications/front/files/**/*',
             'public/systems/common/shape_edit/image/*',
             'server/systems/common/shape_edit/image/*',
             'public/systems/resources/files/**/*',
@@ -53,7 +52,6 @@ gulp.task('imgcpy', ['copy'], () => {
 
     return gulp.src(
         [
-            'config/systems/images/*.png',
             'public/img/**/*.jpg',
             'public/img/**/*.png',
             'public/applications/img/*.jpg',
@@ -91,7 +89,6 @@ gulp.task('scriptcpy', ['copy'], () => {
         ' Copyright (c) 2016 7thCode.',
         ' Version: 1.0.0',
         ' Author: 7thCode.',
-        ' License: MIT',
         ' Website: http://seventh-code.com',
         ' Issues: http://seventh-code.com',
         '*/',
@@ -118,7 +115,7 @@ gulp.task('scriptcpy', ['copy'], () => {
         .pipe(gulp.dest('product'));
 });
 
-gulp.task('debug build', ['imgcpy', 'csscpy', 'scriptcpy'], () => {
+gulp.task('debugbuild', ['imgcpy', 'csscpy', 'scriptcpy'], () => {
     console.log('debug build done');
 });
 
@@ -126,7 +123,6 @@ gulp.task('imgmin', [], () => {
 
     return gulp.src(
         [
-            'config/systems/images/*.png',
             'public/img/**/*.jpg',
             'public/img/**/*.png',
             'public/applications/img/*.jpg',
@@ -168,7 +164,6 @@ gulp.task('scriptmin', [], (cb) => {
         ' Copyright (c) 2017 7thCode.',
         ' Version: 1.0.0',
         ' Author: 7thCode.',
-        ' License: MIT',
         ' Website: http://seventh-code.com',
         ' Issues: http://seventh-code.com',
         '*/',

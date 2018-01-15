@@ -8,18 +8,20 @@
 
 export namespace ShareModule {
 
-    const fs = require('graceful-fs');
+    //const fs = require('graceful-fs');
+    const _config = require('config');
 
+    export const config = _config.get("systems");
+    export const services_config = _config.get("services");
+    export const plugins_config = _config.get("plugins");
+    export const applications_config = _config.get("applications");
+
+  /*
     export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
     export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
     export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
     export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-
- //   const _config = require('config');
- //   export const config = _config.get('systems');
- //   export const services_config = _config.get('services');
- //   export const plugins_config = _config.get('plugins');
- //   export const applications_config = _config.get('applications');
+  */
 
     const _ = require("lodash");
 
