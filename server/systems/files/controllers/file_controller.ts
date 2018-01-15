@@ -9,8 +9,7 @@
 export namespace FileModule {
 
     const _ = require('lodash');
-
-    const fs = require('fs');
+    const fs = require('graceful-fs');
 
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');

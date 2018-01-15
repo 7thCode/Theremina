@@ -19,7 +19,7 @@ export namespace PicturesModule {
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const sharp = require("sharp");
+    const sharp = require('sharp');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
