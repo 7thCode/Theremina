@@ -1,5 +1,5 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
@@ -21,7 +21,7 @@ namespace Adaptor {
         var request = require('request');
         var url = require('url');
         var fs = require('fs');
-        var Q = require('q');
+      //  var Q = require('q');
         var crypto = require('crypto');
     }
 

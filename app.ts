@@ -1,20 +1,20 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
- This software is released under the MIT License.
- //opensource.org/licenses/mit-license.php
+ * Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ * This software is released under the MIT License.
+ * //opensource.org/licenses/mit-license.php
  */
 
-'use strict';
+"use strict";
 
-const fs: any = require('graceful-fs');
-const path: any = require('path');
-const express: any = require('express');
+const fs: any = require("graceful-fs");
+const path: any = require("path");
+const express: any = require("express");
 
-let config_seed = null;
-let config_seed_file = fs.openSync(process.cwd() + "/config/systems/config.json", 'r');
+let config_seed: any = undefined;
+let config_seed_file: any = fs.openSync(process.cwd() + "/config/systems/config.json", "r");
 if (config_seed_file) {
     try {
-        config_seed = JSON.parse(fs.readFileSync(process.cwd() + "/config/systems/config.json", 'utf8'));
+        config_seed = JSON.parse(fs.readFileSync(process.cwd() + "/config/systems/config.json", "utf8"));
     } finally {
         fs.closeSync(config_seed_file);
     }
@@ -22,20 +22,20 @@ if (config_seed_file) {
 
 if (config_seed) {
 
-    let install = () => {
-        const app = express();
-        const router = express.Router();
+    let install: any = () => {
+        const app: any = express();
+        const router: any = express.Router();
 
-        app.set('views', path.join(__dirname, 'views'));
-        app.set('view engine', 'pug');
+        app.set("views", path.join(__dirname, "views"));
+        app.set("view engine", "pug");
 
-        const bodyParser = require('body-parser');
-        app.use(bodyParser.json({limit: '50mb'}));
-        app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+        const bodyParser: any = require("body-parser");
+        app.use(bodyParser.json({limit: "50mb"}));
+        app.use(bodyParser.urlencoded({limit: "50mb", extended: true}));
 
-        app.use(express.static(path.join(__dirname, 'public')));
+        app.use(express.static(path.join(__dirname, "public")));
 
-        const core = require(process.cwd() + '/gs');
+        const core: any = require(process.cwd() + "/gs");
         const share: any = core.share;
         const config: any = share.config;
         //     const logger:any = share.logger;
@@ -55,38 +55,38 @@ if (config_seed) {
     let normal = () => {
 
         // initialize
-        const morgan = require('morgan');
+        const morgan: any = require("morgan");
         morgan.format("original", "[:date] :method :url :status :response-time ms");
 
 
-        //const Q: any = require('q');
+        // const Q: any = require('q');
         const _ = require("lodash");
 
         const mongoose: any = require("mongoose");
         // mongoose.Promise = Q.Promise;
         mongoose.Promise = global.Promise;
 
-        const favicon = require('serve-favicon');
+        const favicon: any = require("serve-favicon");
 
-        const cookieParser = require('cookie-parser');
-        const bodyParser = require('body-parser');
+        const cookieParser: any = require("cookie-parser");
+        const bodyParser: any = require("body-parser");
 
         // passport
-        const passport: any = require('passport');
-        const LocalStrategy: any = require('passport-local').Strategy;
-        const FacebookStrategy: any = require('passport-facebook').Strategy;
-        const TwitterStrategy: any = require('passport-twitter').Strategy;
-        const InstagramStrategy: any = require('passport-instagram').Strategy;
-        const LineStrategy: any = require('passport-line').Strategy;
-        //const GooglePlusStrategy: any = require('passport-google-plus');
+        const passport: any = require("passport");
+        const LocalStrategy: any = require("passport-local").Strategy;
+        const FacebookStrategy: any = require("passport-facebook").Strategy;
+        const TwitterStrategy: any = require("passport-twitter").Strategy;
+        const InstagramStrategy: any = require("passport-instagram").Strategy;
+        const LineStrategy: any = require("passport-line").Strategy;
+        // const GooglePlusStrategy: any = require('passport-google-plus');
         // passport
 
-        const app = express();
+        const app: any = express();
 
         // helmet
-        const helmet = require('helmet');
+        const helmet: any = require("helmet");
         app.use(helmet());
-        app.use(helmet.hidePoweredBy({setTo: 'JSF/1.2'})); // Impersonation
+        app.use(helmet.hidePoweredBy({setTo: "JSF/1.2"}));  // impersonation
         // helmet
         /*
                 const minifyhtml = require('express-minify-html');
@@ -104,7 +104,7 @@ if (config_seed) {
                 }));
         */
 
-        const core = require(process.cwd() + '/gs');
+        const core: any = require(process.cwd() + "/gs");
         const share: any = core.share;
         const config: any = share.config;
         const Cipher: any = share.Cipher;
@@ -113,29 +113,29 @@ if (config_seed) {
         if (config.compression) {
 
             // compression result
-            const compression = require('compression');
+            const compression: any = require("compression");
             app.use(compression());
             // compression result
 
-            let minify = require('express-minify');
-            let uglifyjs = require('uglify-es');
+            let minify: any = require("express-minify");
+            let uglifyjs: any = require("uglify-es");
             app.use(minify({
-                uglifyJsModule: uglifyjs,
+                coffeeScriptMatch: false,
                 sassMatch: false,
-                coffeeScriptMatch: false
+                uglifyJsModule: uglifyjs,
             }));
         }
 
-        //passport
-        const session = require('express-session');
+        // passport
+        const session: any = require("express-session");
 
         if (config.csrfsecret) {
-            const csrf = require('csurf');
+            const csrf: any = require("csurf");
             app.use(session({secret: config.csrfsecret}));
             app.use(csrf({cookie: true}));
             app.use((req, res, next) => {
                 res.locals.csrftoken = req.csrfToken();
-                next()
+                next();
             });
         }
 
@@ -221,12 +221,12 @@ if (config_seed) {
             })
         }));
 
-        //passport
+        // passport
         app.use(passport.initialize());
         app.use(passport.session());
-        //passport
+        // passport
 
-        let load_module = (root: string, modules: any): void => {
+        let load_module: any = (root: string, modules: any): void => {
             if (modules) {
                 modules.forEach((module) => {
                     let path = root + module.path;
@@ -258,7 +258,7 @@ if (config_seed) {
         }
 
         // passport
-        const Account = core.LocalAccount;
+        const Account: any = core.LocalAccount;
         passport.use(new LocalStrategy(Account.authenticate()));
 
         passport.serializeUser((user, done): void => {
@@ -361,11 +361,11 @@ if (config_seed) {
             });
         });
 
-        //services
+        // services
         const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
         const form: any = new FormsController.Form();
         form.create_init_forms(applications_config.initforms);
-        //services
+        // services
 
         // DAV
         // //   if (config.dav) {
@@ -404,13 +404,13 @@ if (config_seed) {
          });
          }
          */
-        // Slack Bot
+        // slack Bot
 
         event.emitter.on('mail', (mail): void => {
             //       let a = mail;
         });
 
-        // MailReceiver
+        // mailReceiver
         if (config.receiver) {
             const MailerModule: any = require('./server/systems/common/mailer');
             let receiver = new MailerModule.MailReceiver();
@@ -426,7 +426,7 @@ if (config_seed) {
                     event.emitter.emit('mail', {message: message, body: body});
                 });
         }
-        // MailReceiver
+        // mailReceiver
 
         // error handlers
         app.use((req, res, next): void => {
@@ -475,17 +475,17 @@ if (config_seed) {
 
         });
 
-        let server = Serve(config, app);
-        let Socket = require('./server/systems/common/sio');
+        let server: any = Serve(config, app);
+        let Socket: any = require('./server/systems/common/sio');
         let io = new Socket.IO(server);
         io.wait(config, event);
 
     };
 
-    let maintenance = () => {
+    let maintenance: any = () => {
 
-        const app = express();
-        const router = express.Router();
+        const app: any = express();
+        const router: any = express.Router();
 
         app.set('views', path.join(__dirname, 'views'));
         app.set('view engine', 'pug');

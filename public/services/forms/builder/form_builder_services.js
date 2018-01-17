@@ -5,13 +5,13 @@
  */
 "use strict";
 //import {version} from "punycode";
-let FormBuilderServices = angular.module('FormBuilderServices', []);
+var FormBuilderServices = angular.module('FormBuilderServices', []);
 FormBuilderServices.factory('FormCreate', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/forms/api/create', {}, {});
     }]);
 FormBuilderServices.factory('Form', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/forms/api/:id', { id: "@id" }, {
             get: { method: 'GET' },
             put: { method: 'PUT' },
@@ -19,53 +19,54 @@ FormBuilderServices.factory('Form', ['$resource',
         });
     }]);
 FormBuilderServices.factory('FormQuery', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource("/forms/api/query/:query/:option", { query: '@query', option: '@optopn' }, {
             query: { method: 'GET' }
         });
     }]);
 FormBuilderServices.factory('FormCount', ['$resource',
-    ($resource) => {
+    function ($resource) {
         return $resource('/forms/api/count/:query', { query: '@query' }, {
             get: { method: 'GET' }
         });
     }]);
 FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Form", "FormQuery", "FormCount",
     function (HtmlEdit, FormCreate, Form, FormQuery, FormCount) {
+        var _this = this;
         this.$scope = null;
         this.$compile = null;
-        let change_watchers = [];
-        let click_watchers = [];
-        this.SetQuery = (query) => {
-            this.option.skip = 0;
-            this.query = {};
+        var change_watchers = [];
+        var click_watchers = [];
+        this.SetQuery = function (query) {
+            _this.option.skip = 0;
+            _this.query = {};
             if (query) {
-                this.query = query;
+                _this.query = query;
             }
         };
-        let init = () => {
-            this.option = { limit: 40, skip: 0 };
-            this.SetQuery(null);
-            this.current_page = null;
-            this.current_id = null;
+        var init = function () {
+            _this.option = { limit: 40, skip: 0 };
+            _this.SetQuery(null);
+            _this.current_page = null;
+            _this.current_id = null;
             change_watchers = [];
             click_watchers = [];
         };
-        this.Init = () => {
+        this.Init = function () {
             init();
         };
-        let click_handler = (id) => {
+        var click_handler = function (id) {
             return 'edit($event,"' + id + '");';
         };
-        let flatten_style = (a) => {
-            let result = "";
-            _.forEach(a, (v, k) => {
+        var flatten_style = function (a) {
+            var result = "";
+            _.forEach(a, function (v, k) {
                 result += k + ":" + v + ";";
             });
             return result;
         };
-        let flatten_collection = (a, b) => {
-            _.forEach(b, (v, k) => {
+        var flatten_collection = function (a, b) {
+            _.forEach(b, function (v, k) {
                 if (k == "style") {
                     a[k] = flatten_style(v);
                 }
@@ -75,27 +76,27 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
             });
             return a;
         };
-        let watchChangeClear = () => {
-            _.forEach(change_watchers, (change_watcher) => {
+        var watchChangeClear = function () {
+            _.forEach(change_watchers, function (change_watcher) {
                 change_watcher();
             });
         };
-        let watchClickClear = () => {
-            _.forEach(click_watchers, (click_watch_id) => {
-                this.$scope["click_" + click_watch_id] = null;
+        var watchClickClear = function () {
+            _.forEach(click_watchers, function (click_watch_id) {
+                _this.$scope["click_" + click_watch_id] = null;
             });
         };
-        let Elements = (page, callback) => {
-            let _continue = true;
-            _.forEach(page, (control) => {
-                _.forEach(control.elements, (element) => {
+        var Elements = function (page, callback) {
+            var _continue = true;
+            _.forEach(page, function (control) {
+                _.forEach(control.elements, function (element) {
                     _continue = callback(control, element);
                     return _continue;
                 });
                 return _continue;
             });
         };
-        let attributes_by_mode = (editmode, element) => {
+        var attributes_by_mode = function (editmode, element) {
             if (!element.attributes) {
                 element.attributes = {};
             }
@@ -104,17 +105,17 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
             //              element.attributes.style['cursor'] = 'crosshair';
             //        }
             //   }
-            let result = flatten_collection(element.attributes, { 'ng-click': click_handler(element.id) });
+            var result = flatten_collection(element.attributes, { 'ng-click': click_handler(element.id) });
             return result;
         };
-        this.Select = (id, select, deselect) => {
-            Elements(this.current_page, (control, element) => {
-                let _continue = true;
+        this.Select = function (id, select, deselect) {
+            Elements(_this.current_page, function (control, element) {
+                var _continue = true;
                 if (element) {
                     if (element.editable) {
                         if (element.id == id) {
-                            this.Deselect(deselect);
-                            this.selected = element;
+                            _this.Deselect(deselect);
+                            _this.selected = element;
                             select(element);
                             _continue = false;
                         }
@@ -123,110 +124,110 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 return _continue;
             });
         };
-        this.Deselect = (callback) => {
-            this.selected = null;
+        this.Deselect = function (callback) {
+            _this.selected = null;
             callback(null);
         };
-        this.Selected = () => {
-            return this.selected;
+        this.Selected = function () {
+            return _this.selected;
         };
-        this.UpElement = () => {
-            if (this.selected) {
-                Elements(this.current_page, (target, element) => {
-                    let _continue = true;
+        this.UpElement = function () {
+            if (_this.selected) {
+                Elements(_this.current_page, function (target, element) {
+                    var _continue = true;
                     if (element.editable) {
-                        if (element.id == this.selected.id) {
-                            let index = 0;
-                            _.forEach(this.current_page, (control) => {
+                        if (element.id == _this.selected.id) {
+                            var index_1 = 0;
+                            _.forEach(_this.current_page, function (control) {
                                 if (control == target) {
-                                    if (index > 0) {
-                                        let t = this.current_page[index - 1];
-                                        this.current_page[index - 1] = this.current_page[index];
-                                        this.current_page[index] = t;
+                                    if (index_1 > 0) {
+                                        var t = _this.current_page[index_1 - 1];
+                                        _this.current_page[index_1 - 1] = _this.current_page[index_1];
+                                        _this.current_page[index_1] = t;
                                         _continue = false;
                                     }
                                 }
-                                index++;
+                                index_1++;
                                 return _continue;
                             });
                         }
                     }
                     return _continue;
                 });
-                this.Draw();
+                _this.Draw();
             }
         };
-        this.DownElement = () => {
-            if (this.selected) {
-                Elements(this.current_page, (target, element) => {
-                    let _continue = true;
+        this.DownElement = function () {
+            if (_this.selected) {
+                Elements(_this.current_page, function (target, element) {
+                    var _continue = true;
                     if (element.editable) {
-                        if (element.id == this.selected.id) {
-                            let index = 0;
-                            _.forEach(this.current_page, (control) => {
-                                let result = true;
+                        if (element.id == _this.selected.id) {
+                            var index_2 = 0;
+                            _.forEach(_this.current_page, function (control) {
+                                var result = true;
                                 if (control == target) {
-                                    if (index < this.current_page.length - 1) {
-                                        let t = this.current_page[index + 1];
-                                        this.current_page[index + 1] = this.current_page[index];
-                                        this.current_page[index] = t;
+                                    if (index_2 < _this.current_page.length - 1) {
+                                        var t = _this.current_page[index_2 + 1];
+                                        _this.current_page[index_2 + 1] = _this.current_page[index_2];
+                                        _this.current_page[index_2] = t;
                                         _continue = false;
                                     }
                                 }
-                                index++;
+                                index_2++;
                                 return _continue;
                             });
                         }
                     }
                     return _continue;
                 });
-                this.Draw();
+                _this.Draw();
             }
         };
-        this.Find = (id) => {
-            return _.filter(this.current_page, { 'id': id });
+        this.Find = function (id) {
+            return _.filter(_this.current_page, { 'id': id });
         };
-        this.AddElement = (control) => {
-            this.current_page.push(control);
-            this.Draw();
+        this.AddElement = function (control) {
+            _this.current_page.push(control);
+            _this.Draw();
         };
-        let collect_family = (current_page, root_id, hit_indexes) => {
-            _.forEach(current_page, (control, index) => {
-                let elements = control.elements;
-                let element = elements[0];
+        var collect_family = function (current_page, root_id, hit_indexes) {
+            _.forEach(current_page, function (control, index) {
+                var elements = control.elements;
+                var element = elements[0];
                 if (element.parent == root_id) {
                     hit_indexes.push(index);
                     collect_family(current_page, control.id, hit_indexes);
                 }
             });
         };
-        this.DeleteElement = () => {
-            if (this.selected) {
-                let is_hit = false;
-                let hit_indexes = [];
-                _.forEach(this.current_page, (control, index) => {
-                    if (control.id == this.selected.id) {
-                        is_hit = true;
-                        hit_indexes.push(index);
+        this.DeleteElement = function () {
+            if (_this.selected) {
+                var is_hit_1 = false;
+                var hit_indexes_1 = [];
+                _.forEach(_this.current_page, function (control, index) {
+                    if (control.id == _this.selected.id) {
+                        is_hit_1 = true;
+                        hit_indexes_1.push(index);
                     }
                 });
-                collect_family(this.current_page, this.selected.id, hit_indexes);
-                let sorted_indexes = _.sortBy(hit_indexes).reverse();
+                collect_family(_this.current_page, _this.selected.id, hit_indexes_1);
+                var sorted_indexes = _.sortBy(hit_indexes_1).reverse();
                 // delayed delete for "forEach"
-                if (is_hit) {
-                    _.forEach(sorted_indexes, (hits_index) => {
-                        this.current_page.splice(hits_index, 1);
+                if (is_hit_1) {
+                    _.forEach(sorted_indexes, function (hits_index) {
+                        _this.current_page.splice(hits_index, 1);
                     });
                 }
-                this.Deselect(() => {
+                _this.Deselect(function () {
                 });
-                this.Draw();
+                _this.Draw();
             }
         };
-        this.idToNo = (id) => {
-            let result = "";
+        this.idToNo = function (id) {
+            var result = "";
             for (var i = id.length - 1; i >= 0; i--) {
-                let c = id[i];
+                var c = id[i];
                 if (_.includes(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], c)) {
                     result = c + result;
                 }
@@ -239,51 +240,51 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
             }
             return result * 1;
         };
-        this.ChildCount = (id) => {
-            let numbers = [0];
-            let children = angular.element("#" + id).children();
-            _.forEach(children, (element) => {
-                let number = this.idToNo(element.id);
+        this.ChildCount = function (id) {
+            var numbers = [0];
+            var children = angular.element("#" + id).children();
+            _.forEach(children, function (element) {
+                var number = _this.idToNo(element.id);
                 numbers.push(number);
             });
             return _.max(numbers) + 1;
             //        return angular.element("#" + id).children().length;
         };
-        this.ParentId = (_default) => {
-            let parent = this.Selected();
-            let result = _default;
+        this.ParentId = function (_default) {
+            var parent = _this.Selected();
+            var result = _default;
             if (parent) {
                 result = parent.id;
             }
             return result;
         };
-        this.SelectChild = (id) => {
-            let result = [];
-            _.forEach(this.current_page, (element) => {
+        this.SelectChild = function (id) {
+            var result = [];
+            _.forEach(_this.current_page, function (element) {
                 if (element.parent = id) {
                     result.push(element);
                 }
             });
             return result;
         };
-        this.CreateId = (_default_root) => {
-            let parent_id = this.ParentId(_default_root);
-            let num = this.ChildCount(parent_id);
+        this.CreateId = function (_default_root) {
+            var parent_id = _this.ParentId(_default_root);
+            var num = _this.ChildCount(parent_id);
             return parent_id + "_" + num;
         };
-        this.Draw = (callback) => {
+        this.Draw = function (callback) {
             watchChangeClear();
             watchClickClear();
             angular.element("#root").empty();
-            Elements(this.current_page, (control, element) => {
-                let field = [];
-                let id = element.id;
-                let parent = element.parent;
-                let label = element.label;
-                let type = element.type;
-                let attributes = attributes_by_mode(true, element);
-                let contents = element.contents;
-                let events = element.events;
+            Elements(_this.current_page, function (control, element) {
+                var field = [];
+                var id = element.id;
+                var parent = element.parent;
+                var label = element.label;
+                var type = element.type;
+                var attributes = attributes_by_mode(true, element);
+                var contents = element.contents;
+                var events = element.events;
                 switch (type) {
                     case "form":
                     case "div":
@@ -298,9 +299,9 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                                 "@": contents
                             }];
                         break;
-                    case "select":
-                        let contents_model_name = id + "_contents";
-                        this.$scope[contents_model_name] = contents;
+                    case "select":// for bootstrap 3
+                        var contents_model_name = id + "_contents";
+                        _this.$scope[contents_model_name] = contents;
                         field = [{
                                 "name": "div", "type": "element",
                                 "_$": { "class": "form-group" },
@@ -317,7 +318,7 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                                 ]
                             }];
                         break;
-                    case "button":
+                    case "button":// for bootstrap 3
                         field = [
                             {
                                 "name": "button", "type": "element",
@@ -334,25 +335,25 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                             }];
                         break;
                 }
-                let child_element = angular.element(HtmlEdit.toHtml(field, ""));
-                let parent_element = angular.element("#" + parent);
+                var child_element = angular.element(HtmlEdit.toHtml(field, ""));
+                var parent_element = angular.element("#" + parent);
                 parent_element.append(child_element);
                 return true;
             });
-            this.$compile(angular.element("#root").contents())(this.$scope);
+            _this.$compile(angular.element("#root").contents())(_this.$scope);
             if (callback) {
                 callback({ name: "exit" });
             }
         };
-        this.SetEditMode = (mode, callback) => {
-            this.Deselect(callback);
-            this.Draw();
+        this.SetEditMode = function (mode, callback) {
+            _this.Deselect(callback);
+            _this.Draw();
         };
-        this.Query = (callback, error) => {
+        this.Query = function (callback, error) {
             FormQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query)),
+                option: encodeURIComponent(JSON.stringify(_this.option))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -366,10 +367,10 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 }
             });
         };
-        this.Count = (callback, error) => {
+        this.Count = function (callback, error) {
             FormCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result) => {
+                query: encodeURIComponent(JSON.stringify(_this.query))
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -383,45 +384,45 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 }
             });
         };
-        this.Over = (callback, error) => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
+        this.Over = function (callback, error) {
+            _this.Count(function (count) {
+                callback((_this.option.skip + _this.option.limit) <= count);
             }, error);
         };
-        this.Under = (callback, error) => {
-            callback(this.option.skip > 0);
+        this.Under = function (callback, error) {
+            callback(_this.option.skip > 0);
         };
-        this.Next = (callback, error) => {
-            this.Over((hasnext) => {
+        this.Next = function (callback, error) {
+            _this.Over(function (hasnext) {
                 if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip + _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Prev = (callback, error) => {
-            this.Under((hasprev) => {
+        this.Prev = function (callback, error) {
+            _this.Under(function (hasprev) {
                 if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
+                    _this.option.skip = _this.option.skip - _this.option.limit;
+                    _this.Query(callback, error);
                 }
                 else {
                     callback(null);
                 }
             });
         };
-        this.Create = (name, type, callback, error) => {
+        this.Create = function (name, type, callback, error) {
             init();
-            let form = new FormCreate();
+            var form = new FormCreate();
             form.name = name;
             form.type = type;
-            form.$save({}, (result) => {
+            form.$save({}, function (result) {
                 if (result) {
                     if (result.code === 0) {
-                        this.current_id = result.value._id;
+                        _this.current_id = result.value._id;
                         callback(result.value);
                     }
                     else {
@@ -433,12 +434,12 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 }
             });
         };
-        this.Get = (id, callback, error) => {
+        this.Get = function (id, callback, error) {
             init();
-            this.current_id = id;
+            _this.current_id = id;
             Form.get({
-                id: this.current_id
-            }, (result) => {
+                id: _this.current_id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -452,12 +453,12 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 }
             });
         };
-        this.Put = (content, callback, error) => {
-            let form = new Form();
+        this.Put = function (content, callback, error) {
+            var form = new Form();
             form.content = content;
             form.$put({
-                id: this.current_id
-            }, (result) => {
+                id: _this.current_id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         callback(result.value);
@@ -471,10 +472,10 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
                 }
             });
         };
-        this.Delete = (callback, error) => {
+        this.Delete = function (callback, error) {
             Form.delete({
-                id: this.current_id
-            }, (result) => {
+                id: _this.current_id
+            }, function (result) {
                 if (result) {
                     if (result.code === 0) {
                         init();
@@ -493,10 +494,10 @@ FormBuilderServices.service('FormBuilderService', ["HtmlEdit", "FormCreate", "Fo
     }]);
 FormBuilderServices.service('ElementsService', ["FormBuilderService",
     function (FormBuilderService) {
-        this.Tag = (name, attributes) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_tag = {
+        this.Tag = function (name, attributes) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_tag = {
                 kind: "control",
                 type: name,
                 id: id,
@@ -515,10 +516,10 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_tag;
         };
-        this.Div = (klass) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_div = {
+        this.Div = function (klass) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_div = {
                 kind: "control",
                 type: "div",
                 id: id,
@@ -537,11 +538,11 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_div;
         };
-        this.Field = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "form-control no-zoom field-control", "ng-model": id, type: "text", name: id, style: {} };
+        this.Field = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom field-control", "ng-model": id, type: "text", name: id, style: {} };
                 if (val.max.message) {
                     result["ng-maxlength"] = val.max.value;
                 }
@@ -556,7 +557,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 }
                 return result;
             };
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "field",
                 id: id,
@@ -602,7 +603,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 ]
             };
             if (validator.min) {
-                let min = {
+                var min = {
                     type: "span",
                     id: id + "_fielderror_min",
                     parent: id + "_fielderrors",
@@ -614,7 +615,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(min);
             }
             if (validator.max) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_max",
                     parent: id + "_fielderrors",
@@ -628,7 +629,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.pattern) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_pattern",
                     parent: id + "_fielderrors",
@@ -642,7 +643,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.required) {
-                let required = {
+                var required = {
                     type: "span",
                     id: id + "_fielderror_required",
                     parent: id + "_fielderrors",
@@ -657,11 +658,11 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             }
             return new_field;
         };
-        this.HtmlField = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "form-control no-zoom field-control", "ng-model": id, type: "text", name: id, style: {} };
+        this.HtmlField = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom field-control", "ng-model": id, type: "text", name: id, style: {} };
                 if (val.max.message) {
                     result["ng-maxlength"] = val.max.value;
                 }
@@ -676,7 +677,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 }
                 return result;
             };
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "html",
                 id: id,
@@ -722,7 +723,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 ]
             };
             if (validator.min) {
-                let min = {
+                var min = {
                     type: "span",
                     id: id + "_fielderror_min",
                     parent: id + "_fielderrors",
@@ -734,7 +735,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(min);
             }
             if (validator.max) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_max",
                     parent: id + "_fielderrors",
@@ -748,7 +749,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.pattern) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_pattern",
                     parent: id + "_fielderrors",
@@ -762,7 +763,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.required) {
-                let required = {
+                var required = {
                     type: "span",
                     id: id + "_fielderror_required",
                     parent: id + "_fielderrors",
@@ -777,11 +778,131 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             }
             return new_field;
         };
-        this.TextArea = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "form-control no-zoom textarea-control", "ng-model": id, type: "text", name: id, style: {} };
+        this.Date = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom field-control", "ng-model": id, type: "text", name: id, style: {} };
+                if (val.max.message) {
+                    result["ng-maxlength"] = val.max.value;
+                }
+                if (val.min.message) {
+                    result["ng-minlength"] = val.min.value;
+                }
+                if (val.pattern.message) {
+                    result["ng-pattern"] = val.pattern.value;
+                }
+                if (val.required.message) {
+                    result["required"] = val.required.value;
+                }
+                return result;
+            };
+            var new_field = {
+                kind: "control",
+                type: "date",
+                id: id,
+                value: validator,
+                elements: [
+                    {
+                        type: "div",
+                        id: id,
+                        parent: parent_id,
+                        editable: true,
+                        label: "",
+                        attributes: { "class": "form-group", style: {} },
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "label",
+                        id: id + "_fieldlabel",
+                        parent: id,
+                        label: "",
+                        attributes: { "for": id + "_fieldinput", class: "field-label" },
+                        contents: label,
+                        events: {}
+                    },
+                    {
+                        type: "span",
+                        id: id + "_fielderrors",
+                        parent: id,
+                        label: "",
+                        attributes: { "ng-messages": "validate." + id + ".$error" },
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "input",
+                        id: id + "_fieldinput",
+                        parent: id,
+                        label: label,
+                        attributes: attribute(id, validator),
+                        contents: [],
+                        events: { onChange: "" }
+                    }
+                ]
+            };
+            if (validator.min) {
+                var min = {
+                    type: "span",
+                    id: id + "_fielderror_min",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: { "ng-message": "minlength", class: "error-message" },
+                    contents: validator.min.message,
+                    events: {}
+                };
+                new_field.elements.push(min);
+            }
+            if (validator.max) {
+                var max = {
+                    type: "span",
+                    id: id + "_fielderror_max",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: {
+                        "ng-message": "maxlength", class: "error-message"
+                    },
+                    contents: validator.max.message,
+                    events: {}
+                };
+                new_field.elements.push(max);
+            }
+            if (validator.pattern) {
+                var max = {
+                    type: "span",
+                    id: id + "_fielderror_pattern",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: {
+                        "ng-message": "pattern", class: "error-message"
+                    },
+                    contents: validator.pattern.message,
+                    events: {}
+                };
+                new_field.elements.push(max);
+            }
+            if (validator.required) {
+                var required = {
+                    type: "span",
+                    id: id + "_fielderror_required",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: {
+                        "ng-message": "required", class: "error-message"
+                    },
+                    contents: validator.required.message,
+                    events: {}
+                };
+                new_field.elements.push(required);
+            }
+            return new_field;
+        };
+        this.TextArea = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom textarea-control", "ng-model": id, type: "text", name: id, style: {} };
                 if (val.max.message) {
                     result["ng-maxlength"] = val.max.value;
                 }
@@ -793,7 +914,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 }
                 return result;
             };
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "textarea",
                 id: id,
@@ -840,7 +961,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 ]
             };
             if (validator.min) {
-                let min = {
+                var min = {
                     type: "span",
                     id: id + "_fielderror_min",
                     parent: id + "_fielderrors",
@@ -852,7 +973,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(min);
             }
             if (validator.max) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_max",
                     parent: id + "_fielderrors",
@@ -866,7 +987,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.required) {
-                let required = {
+                var required = {
                     type: "span",
                     id: id + "_fielderror_required",
                     parent: id + "_fielderrors",
@@ -881,11 +1002,11 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             }
             return new_field;
         };
-        this.Number = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "form-control no-zoom number-control", "ng-model": id, type: "number", name: id, style: {} };
+        this.Number = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom number-control", "ng-model": id, type: "number", name: id, style: {} };
                 /*
                  if (val.max) {
                  result["max"] = val.max.value;
@@ -899,7 +1020,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                  */
                 return result;
             };
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "number",
                 id: id,
@@ -945,7 +1066,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 ]
             };
             if (validator.min) {
-                let min = {
+                var min = {
                     type: "span",
                     id: id + "_fielderror_min",
                     parent: id + "_fielderrors",
@@ -957,7 +1078,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(min);
             }
             if (validator.max) {
-                let max = {
+                var max = {
                     type: "span",
                     id: id + "_fielderror_max",
                     parent: id + "_fielderrors",
@@ -971,7 +1092,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 new_field.elements.push(max);
             }
             if (validator.required) {
-                let required = {
+                var required = {
                     type: "span",
                     id: id + "_fielderror_required",
                     parent: id + "_fielderrors",
@@ -986,13 +1107,84 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             }
             return new_field;
         };
-        this.HtmlElement = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
+        /*
+        this.HtmlElement = (label: string, validator: any): any => {
+            let parent_id: any = FormBuilderService.ParentId("root");
             let id = FormBuilderService.CreateId("root");
+
             let attribute = (id, val) => {
-                return { class: "", "text-angular": "true", "ng-model": id, type: "text", style: {} };
+                return {class:"", "ui-tinymce":" tinymceOptions", "ng-model": id, type: "text", style: {}};
             };
-            let new_field = {
+
+            let new_field: any = {
+                kind: "control",
+                type: "html",
+                id: id,
+                value: validator,
+                elements: [
+                    {
+                        type: "div",
+                        id: id,
+                        parent: parent_id,
+                        editable: true,
+
+                        label: "",
+                        attributes: {class: "form-group", style: {}},
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "label",
+                        id: id + "_fieldlabel",
+                        parent: id,
+
+                        label: "",
+                        attributes: {for: id + "_fieldinput"},
+                        contents: label,
+                        events: {}
+                    },
+                    {
+                        type: "span",
+                        id: id + "_fielderrors",
+                        parent: id,
+
+                        label: "",
+                        attributes: {"ng-messages": "validate." + id + ".$error"},
+                        contents: [],
+                        events: {}
+                    },
+                    {
+                        type: "div",
+                        id: id + "_edit",
+                        parent: id,
+                        label: label,
+                        attributes: attribute(id, validator),
+                        contents: [],
+                        events: {}
+                    }
+                ]
+            };
+            return new_field;
+        };
+
+*/
+        this.HtmlElement = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "form-control no-zoom textarea-control", "ui-tinymce": " tinymceOptions", "ng-model": id, type: "text", name: id, style: {} };
+                if (val.max.message) {
+                    result["ng-maxlength"] = val.max.value;
+                }
+                if (val.min.message) {
+                    result["ng-minlength"] = val.min.value;
+                }
+                if (val.required.message) {
+                    result["required"] = val.required.value;
+                }
+                return result;
+            };
+            var new_field = {
                 kind: "control",
                 type: "html",
                 id: id,
@@ -1013,7 +1205,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                         id: id + "_fieldlabel",
                         parent: id,
                         label: "",
-                        attributes: { for: id + "_fieldinput" },
+                        attributes: { for: id + "_fieldinput", class: "textarea-label" },
                         contents: label,
                         events: {}
                     },
@@ -1027,22 +1219,63 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                         events: {}
                     },
                     {
-                        type: "div",
-                        id: id + "_edit",
+                        type: "textarea",
+                        id: id + "_textarea",
                         parent: id,
                         label: label,
                         attributes: attribute(id, validator),
+                        //attributes: {class: "form-control no-zoom", "ng-model": id, type: "text", name: id, style: {},"ng-maxlength": "2000", "ng-minlength": "1", required: "true"},
                         contents: [],
                         events: {}
                     }
                 ]
             };
+            if (validator.min) {
+                var min = {
+                    type: "span",
+                    id: id + "_fielderror_min",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: { "ng-message": "minlength", class: "error-message" },
+                    contents: validator.min.message,
+                    events: {}
+                };
+                new_field.elements.push(min);
+            }
+            if (validator.max) {
+                var max = {
+                    type: "span",
+                    id: id + "_fielderror_max",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: {
+                        "ng-message": "maxlength", class: "error-message"
+                    },
+                    contents: validator.max.message,
+                    events: {}
+                };
+                new_field.elements.push(max);
+            }
+            if (validator.required) {
+                var required = {
+                    type: "span",
+                    id: id + "_fielderror_required",
+                    parent: id + "_fielderrors",
+                    label: "",
+                    attributes: {
+                        "ng-message": "required", class: "error-message"
+                    },
+                    contents: validator.required.message,
+                    events: {}
+                };
+                new_field.elements.push(required);
+            }
             return new_field;
         };
-        this.Img = (label, property) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_field = {
+        this.Img = function (label, property) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_field = {
                 kind: "control",
                 type: "img",
                 id: id,
@@ -1080,14 +1313,14 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_field;
         };
-        this.Select = (label, validator) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attributes = { class: "form-control select-control", "ng-model": id, style: { "font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)" } };
+        this.Select = function (label, validator) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attributes = { class: "form-control select-control", "ng-model": id, style: { "font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)" } };
             if (validator.required) {
                 attributes = { class: "form-control select-control", "ng-model": id, required: validator.required.value, style: { "font-size": "12px", "border-width": "2px", "border-style": "solid", "border-color": "rgba(120,120,120,0.1)" } };
             }
-            let new_field = {
+            var new_field = {
                 kind: "control",
                 type: "select",
                 id: id,
@@ -1123,7 +1356,7 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
                 ]
             };
             if (validator.required) {
-                let required = {
+                var required = {
                     type: "span",
                     id: id + "_fielderror_required",
                     parent: id + "_fielderrors",
@@ -1138,10 +1371,10 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             }
             return new_field;
         };
-        this.Check = (label, property) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let new_field = {
+        this.Check = function (label, property) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var new_field = {
                 kind: "control",
                 type: "check",
                 id: id,
@@ -1178,14 +1411,14 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_field;
         };
-        this.Chips = (label, property) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "chips-control", "ng-model": id, name: id, style: {}, "ng-change": "contents_update(tab.element_contents);" };
+        this.Chips = function (label, property) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "chips-control", "ng-model": id, name: id, style: {}, "ng-change": "contents_update(tab.element_contents);" };
                 return result;
             };
-            let new_chips = {
+            var new_chips = {
                 kind: "control",
                 type: "chips",
                 id: id,
@@ -1258,14 +1491,14 @@ FormBuilderServices.service('ElementsService', ["FormBuilderService",
             };
             return new_chips;
         };
-        this.Address = (label, property) => {
-            let parent_id = FormBuilderService.ParentId("root");
-            let id = FormBuilderService.CreateId("root");
-            let attribute = (id, val) => {
-                let result = { class: "", "ng-model": id, name: id, style: {}, "ng-change": "contents_update(tab.element_contents);" };
+        this.Address = function (label, property) {
+            var parent_id = FormBuilderService.ParentId("root");
+            var id = FormBuilderService.CreateId("root");
+            var attribute = function (id, val) {
+                var result = { class: "", "ng-model": id, name: id, style: {}, "ng-change": "contents_update(tab.element_contents);" };
                 return result;
             };
-            let new_address = {
+            var new_address = {
                 kind: "control",
                 type: "chips",
                 id: id,

@@ -191,14 +191,30 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
 
                     if (current_id) {
                         ArticleService.Get(current_id, (result: any): void => {
-                            ArticleService.current_article = result;
-                            $scope.current_article = result;
-                            $scope.opened = true;
-                            page_type = result.content.type.value;  //!!
-                            DrawPage(page_type, () => {
-                                Map(result.content);
-                                progress(false);
-                            });
+                            if (result) {
+                                ArticleService.current_article = result;
+                                $scope.current_article = result;
+                                $scope.opened = true;
+                                if (result.content) {
+                                    if (result.content.type) {
+                                        if (result.content.type.value) {
+                                            page_type = result.content.type.value;  //!! content依存
+                                            DrawPage(page_type, () => {
+                                                Map(result.content);
+                                                progress(false);
+                                            });
+                                        } else {
+                                            error_handler(4,"type value");
+                                        }
+                                    } else {
+                                        error_handler(3,"no type");
+                                    }
+                                } else {
+                                    error_handler(2,"no content");
+                                }
+                            } else {
+                                error_handler(1,"network error");
+                            }
                         }, error_handler);
                     } else {
                         DrawPage(page_type, (): void => {
@@ -217,13 +233,17 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
             page_type = type;
             if (current_id) {
                 ArticleService.Get(current_id, (result: any): void => {
-                    ArticleService.current_article = result;
-                    $scope.current_article = result;
-                    $scope.opened = true;
-                    DrawPage(page_type, () => {
-                        Map(result.content);
-                        progress(false);
-                    });
+                    if (result) {
+                        ArticleService.current_article = result;
+                        $scope.current_article = result;
+                        $scope.opened = true;
+                        DrawPage(page_type, () => {
+                            Map(result.content);
+                            progress(false);
+                        });
+                    } else {
+                        error_handler(1,"");
+                    }
                 }, error_handler);
 
             } else {
@@ -241,14 +261,30 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
             progress(true);
             current_id = id;
             ArticleService.Get(current_id, (result: any): void => {
-                ArticleService.current_article = result;
-                $scope.current_article = result;
-                $scope.opened = true;
-                page_type = result.content.type.value;
-                DrawPage(page_type, () => {
-                    Map(result.content);
-                    progress(false);
-                });
+                if (result) {
+                    ArticleService.current_article = result;
+                    $scope.current_article = result;
+                    $scope.opened = true;
+                    if (result.content) {
+                        if (result.content.type) {
+                            if (result.content.type.value) {
+                                page_type = result.content.type.value;  //!! content依存
+                                DrawPage(page_type, () => {
+                                    Map(result.content);
+                                    progress(false);
+                                });
+                            }else {
+                                error_handler(4,"type value");
+                            }
+                        }else {
+                            error_handler(3,"no type");
+                        }
+                    }else {
+                        error_handler(2,"no content");
+                    }
+                } else {
+                    error_handler(1,"network error");
+                }
             }, error_handler);
         };
 
@@ -455,7 +491,8 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
             });
         });
 
-        //tinymce
+        // tinymce
+/*
         $scope.tinymceOptions =
             {
                 selector: "textarea",  // change this value according to your HTML
@@ -465,7 +502,49 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
                 toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
                 menubar: "table"
             };
+*/
+/*
 
+        $scope.tinymceOptions = {
+            selector: 'textarea',
+            height: 500,
+            plugins: 'visualblocks code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+            toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+            menubar: "table",
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css'
+            ],
+            style_formats: [
+                { title: 'Headers', items: [
+                    { title: 'h1', block: 'h1' },
+                    { title: 'h2', block: 'h2' },
+                    { title: 'h3', block: 'h3' },
+                    { title: 'h4', block: 'h4' },
+                    { title: 'h5', block: 'h5' },
+                    { title: 'h6', block: 'h6' }
+                ] },
+
+                { title: 'Blocks', items: [
+                    { title: 'p', block: 'p' },
+                    { title: 'div', block: 'div' },
+                    { title: 'pre', block: 'pre' }
+                ] },
+
+                { title: 'Containers', items: [
+                    { title: 'section', block: 'section', wrapper: true, merge_siblings: false },
+                    { title: 'article', block: 'article', wrapper: true, merge_siblings: false },
+                    { title: 'blockquote', block: 'blockquote', wrapper: true },
+                    { title: 'hgroup', block: 'hgroup', wrapper: true },
+                    { title: 'aside', block: 'aside', wrapper: true },
+                    { title: 'figure', block: 'figure', wrapper: true }
+                ] }
+            ],
+            visualblocks_default_state: true,
+            end_container_on_empty_block: true
+        }
+
+*/
 /*{
             selector: 'textarea',
             height: 500,

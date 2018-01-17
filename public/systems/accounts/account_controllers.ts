@@ -1,10 +1,11 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
 
 /// <reference path="../../../node_modules/@types/angular/index.d.ts" />
+/// <reference path="../../../node_modules/@types/lodash/index.d.ts" />
 
 "use strict";
 

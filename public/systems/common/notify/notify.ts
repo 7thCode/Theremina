@@ -1,5 +1,5 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
@@ -27,7 +27,7 @@ namespace NotifierModule {
                                 data.value, // 通知タイトル
                                 {
                                     body: data.value, // 通知内容
-                                    icon: "http://scrap.php.xdomain.jp/wp-content/uploads/favicon.ico", // アイコン
+                                    icon: "//scrap.php.xdomain.jp/wp-content/uploads/favicon.ico", // アイコン
                                 }
                             );
 
