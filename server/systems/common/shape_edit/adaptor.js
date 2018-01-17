@@ -16,7 +16,7 @@ var Adaptor;
         var http = require('http');
         var request = require('request');
         var url = require('url');
-        var fs = require('fs');
+        var fs = require('graceful-fs');
         var crypto = require('crypto');
     }
     var SVGAdaptor = (function () {

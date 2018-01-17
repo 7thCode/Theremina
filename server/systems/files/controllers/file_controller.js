@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var FileModule;
 (function (FileModule) {
     var _ = require('lodash');
-    var fs = require('fs');
+    var fs = require('graceful-fs');
     var mongoose = require('mongoose');
     var Grid = require('gridfs-stream');
     var share = require(process.cwd() + '/server/systems/common/share');

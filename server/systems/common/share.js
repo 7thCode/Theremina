@@ -7,16 +7,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ShareModule;
 (function (ShareModule) {
-    var fs = require('graceful-fs');
-    ShareModule.config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
-    ShareModule.services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
-    ShareModule.plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
-    ShareModule.applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-    //   const _config = require('config');
-    //   export const config = _config.get('systems');
-    //   export const services_config = _config.get('services');
-    //   export const plugins_config = _config.get('plugins');
-    //   export const applications_config = _config.get('applications');
+    //const fs = require('graceful-fs');
+    var _config = require('config');
+    ShareModule.config = _config.get("systems");
+    ShareModule.services_config = _config.get("services");
+    ShareModule.plugins_config = _config.get("plugins");
+    ShareModule.applications_config = _config.get("applications");
+    /*
+      export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
+      export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
+      export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
+      export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
+    */
     var _ = require("lodash");
     var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
