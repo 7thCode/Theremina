@@ -19,7 +19,7 @@ export namespace PagesApiRouter {
     const pages: any = new PagesModule.Pages;
 
     //router.get("/api/getall", [pages.get_all]);
-    router.get("/api/getall", [exception.exception, exception.guard, exception.authenticate, pages.get_all]);
+    router.get("/api/getall/:namespace", [exception.exception, exception.guard, exception.authenticate, pages.get_all]);
 }
 
 module.exports = PagesApiRouter.router;

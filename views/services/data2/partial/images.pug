@@ -1,5 +1,5 @@
 .box.box-info.pallete-shadow(ng-controller="PictureController", flow-init, draggablepane="image", style="width:300px;height:auto;left:230px;top:210px;background:#f0f0f0;")
-    .box-header.with-border
+    .box-header.with-border#box-header
         .row
             .col-xs-12
                 div
@@ -23,7 +23,8 @@
                     button.btn.btn-success.btn-xs(ng-click="editPicture(file.filename);", style="position:relative;top:10px;left:3rem;border-radius: 10px")
                         i.fa.fa-pencil(aria-hidden="true")
                     div(style="height:4rem;")
-                        img.center-block.thumbnail(ng-drag="true" ng-drag-data="obj" data-allow-transform="true", ng-src="/{{file.metadata.userid}}/{{namespace}}/doc/img/{{file.filename}}" , style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
+                        img.center-block.thumbnail(ng-drag="true", ng-drag-data="obj", data-allow-transform="true", ng-src="/{{file.metadata.userid}}/{{namespace}}/doc/img/{{file.filename}}", style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
                     div(style="height:2rem;text-align:center;")
                         div(style="word-wrap: break-word;font-size:1rem;" ng-bind="file.filename | filename:10")
+
 

@@ -3,7 +3,8 @@
         | #{message.brand}
         small(style="color:#607D8B;font-size:0.8rem;") Version 1.0
 
-        .row(ng-controller="NamespaceController")
+        .row
+            //(ng-controller="NamespaceController")
             .col-xs-1
                 a.btn.btn-sm.btn-warning.pull-left(href=config.protocol + "://" + config.domain + "/{{userid}}/{{namespace}}/doc/index.html" target="_blank" type="button", aria-label="") Open
             .col-xs-10

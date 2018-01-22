@@ -352,17 +352,20 @@ Services.directive('draggablepane', ['$document', ($document: any): any => {
                 element.bind('mousedown', ($event: any): boolean => {
                     let result = false;
 
-                    start_x = element.prop('offsetLeft');
-                    start_y = element.prop('offsetTop');
-                    clicked_x = $event.clientX;
-                    clicked_y = $event.clientY;
+                    let header = angular.element("#box-header")[0];
+                    if (header) {
+                        start_x = element.prop('offsetLeft');
+                        start_y = element.prop('offsetTop');
+                        clicked_x = $event.clientX;
+                        clicked_y = $event.clientY;
 
-                    let handle_y = clicked_y - start_y;
-                    if (handle_y < 30) {
-                        $document.bind('mousemove', mousemove);
-                        $document.bind('mouseup', mouseup);
-                    } else {
-                        result = true;
+                        let handle_y = clicked_y - start_y;
+                        if (handle_y < header.clientHeight) {
+                            $document.bind('mousemove', mousemove);
+                            $document.bind('mouseup', mouseup);
+                        } else {
+                            result = true;
+                        }
                     }
                     return result;
                 });

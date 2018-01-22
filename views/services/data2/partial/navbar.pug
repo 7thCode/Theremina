@@ -22,7 +22,8 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
                             li(ng-class="{disabled: !opened}" )
                                 a(href="", ng-click="opened && DeleteArticle();", role="menuitem") #{message.delete}
 
-                    li.dropdown(ng-class="{disabled: opened}", ng-controller="NamespaceController")
+                    li.dropdown(ng-class="{disabled: opened}")
+                        //,ng-controller="NamespaceController")
                         a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
                             | #{message.namespace} - {{namespace}} &nbsp;
                             i.fa.fa-caret-down(aria-hidden="true")
