@@ -57,6 +57,14 @@ export namespace PagesModule {
             return request.user.userid;
         }
 
+        static namespace(request: any): string {
+            let result = "";
+            if (request.user.data) {
+                result = request.user.data.namespace;
+            }
+            return result;
+        }
+
         /**
          *  let userid = Pages.userid(request);
          *  request.sessionID;
@@ -66,7 +74,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
+        static get_file_all(userid: string,namespace: string, tmp_path: string, callback: (error) => void): void {
 
             let number: number = 27000;
             let conn = Pages.connect(config.db.user);
@@ -77,7 +85,7 @@ export namespace PagesModule {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
                             if (!error) {
                                 if (collection) {
-                                    collection.find({"metadata.userid": userid}).toArray((error: any, docs: any): void => {
+                                    collection.find({$and:[{"metadata.namespace": namespace}, {"metadata.userid": userid}]}).toArray((error: any, docs: any): void => {
                                         if (!error) {
                                             let save = (doc: any): any => {
                                                 return new Promise((resolve: any, reject: any): void => {
@@ -134,8 +142,8 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_article_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            ArticleModel.find({userid: userid}, {}, {}).then((docs: any): void => {
+        static get_article_all(userid: string,namespace:string, tmp_path: string, callback: (error) => void): void {
+            ArticleModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
                 fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
                     callback(error);
                 });
@@ -151,10 +159,8 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_resource_all(userid: string, tmp_path: string, callback: (error) => void): void {
-
-            ResourceModel.find({userid: userid}, {}, {}).then((docs: any): void => {
-
+        static get_resource_all(userid: string,namespace:string, tmp_path: string, callback: (error) => void): void {
+            ResourceModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
                         if (doc) {
@@ -208,7 +214,7 @@ export namespace PagesModule {
 
             process.chdir(work);
             archive.pipe(output);
-            archive.glob("data/*");
+            archive.glob(target + "/*");
             archive.finalize();
         }
 
@@ -220,6 +226,7 @@ export namespace PagesModule {
          */
         public get_all(request: any, response: any): void {
             let userid = Pages.userid(request);
+            let namespace = Pages.namespace(request);
             let tmp_path = path.join("/tmp", request.sessionID);
 
             let rm = (tmp_path, callback) => {
@@ -231,15 +238,15 @@ export namespace PagesModule {
             };
 
             let make_file = (tmp_path,userid) => {
-                Pages.get_file_all(userid, path.join(tmp_path, "data"), (error: any): void => {
+                Pages.get_file_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
                             if (!error) {
-                                Pages.get_article_all(userid, path.join(tmp_path, "data/articles.txt"), (error: any): void => {
+                                Pages.get_article_all(userid,namespace, path.join(tmp_path, namespace + "/articles.txt"), (error: any): void => {
                                     if (!error) {
-                                        Pages.get_resource_all(userid, path.join(tmp_path, "data"), (error: any): void => {
+                                        Pages.get_resource_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
                                             if (!error) {
-                                                Pages.zip(tmp_path, "data", (error: any): void => {
+                                                Pages.zip(tmp_path, namespace, (error: any): void => {
                                                     if (!error) {
-                                                        response.download(path.join(tmp_path, "data.zip"), (error: any): void => {
+                                                        response.download(path.join(tmp_path, namespace + ".zip"), (error: any): void => {
                                                             if (!error) {
                                                                 rm(tmp_path, (error) => {
 
@@ -267,7 +274,7 @@ export namespace PagesModule {
             };
 
             let make_data = (tmp_path,userid) => {
-                fs.mkdir(path.join(tmp_path, "data"), (error): void => {
+                fs.mkdir(path.join(tmp_path, namespace), (error): void => {
                     if (!error) {
                         make_file(tmp_path,userid);
                     } else {

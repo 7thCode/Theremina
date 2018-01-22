@@ -43,7 +43,7 @@ export namespace PagesPageRouter {
         });
     }]);
 
-    router.get("/getall", [exception.page_guard, auth.page_valid, pages.get_all]);
+    router.get("/getall/:namespace", [exception.page_guard, auth.page_valid, pages.get_all]);
 
     router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/create_dialog', {message: message});

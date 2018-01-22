@@ -10,7 +10,8 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
             #bs-navbar.navbar-collapse.collapse
                 ul.nav.navbar-nav
                     if user
-                        li.dropdown(ng-controller="NamespaceController")
+                        li.dropdown
+                            //(ng-controller="NamespaceController")
                             a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
                                 | #{message.namespace} - {{namespace}} &nbsp;
                                 i.fa.fa-caret-down(aria-hidden="true")
