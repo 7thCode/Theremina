@@ -56,9 +56,10 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                             span #{message.backoffice}
 
                 li
-                    a(href="/pages/getall")
+                    //(ng-controller="NamespaceController")
+                    a(href="/pages/getall/{{namespace}}")
                         i.fa.fa-download.fa-fw.text-danger
-                        span Backup
+                        span Backup &nbsp;({{namespace}})
 
                 li
                     a(href='#', ng-click="Logout()")
