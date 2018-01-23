@@ -57,7 +57,7 @@
                 button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                     i.fa.fa-minus
         div
-            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="CreatePages($files);")
+            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UplodArticles($files);")
                 button.btn.btn-xs.btn-box-tool(flow-btn type="file")
                     i.fa.fa-plus-circle.text-primary
             div
@@ -80,7 +80,7 @@
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="article in articles")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
-                    a.btn.btn-success.btn-xs(download ng-href="/articles/json/{{article._id}}", target="_blank")
+                    a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank")
                         i.fa.fa-cloud-download
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{article.name}}", ng-click="SelectArticle(article._id)")
                         img.center-block.thumbnail(ng-src="{{article.content.type.value | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")

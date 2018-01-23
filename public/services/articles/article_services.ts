@@ -36,8 +36,13 @@ ArticleServices.factory('ArticleCount', ['$resource',
         });
     }]);
 
-ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQuery", "ArticleCount",
-    function (ArticleCreate: any, Article: any, ArticleQuery: any, ArticleCount: any): void {
+ArticleServices.factory('ArticlesCreateMany', ['$resource',
+    ($resource: any): any => {
+        return $resource('/articles/api/createmany', {}, {});
+    }]);
+
+ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQuery", "ArticleCount","ArticlesCreateMany",
+    function (ArticleCreate: any, Article: any, ArticleQuery: any, ArticleCount: any,ArticlesCreateMany:any): void {
 
         this.SetQuery = (query) => {
             this.option.skip = 0;
@@ -159,6 +164,27 @@ ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQ
                 }
             });
         };
+
+        this.CreateMany = (articles: string, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+            let article = new ArticlesCreateMany();
+            article.articles = articles;
+            article.$save({}, (result: any): void => {
+                if (result) {
+                    if (result.code === 0) {
+                        this.current_article = result.value;
+                        callback(result.value);
+                    } else {
+                        error(result.code, result.message);
+                    }
+                } else {
+                    error(10000, "network error");
+                }
+            });
+        };
+
+
+
+
 
         this.Get = (id: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             Article.get({
