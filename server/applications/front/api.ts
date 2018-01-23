@@ -14,7 +14,7 @@ export namespace ApiRouter {
     const core = require(process.cwd() + "/gs");
     const share: any = core.share;
     const event: any = share.Event;
-
+    
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 
