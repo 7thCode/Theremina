@@ -1,3 +1,5 @@
+/// <reference path="../../../../node_modules/@types/node/index.d.ts" />
+
 /**!
  Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  This software is released under the MIT License.
@@ -19,8 +21,6 @@ export namespace PagesModule {
 
     const archiver: any = require('archiver');
 
-    //const sharp = require("sharp");
-
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
@@ -29,12 +29,6 @@ export namespace PagesModule {
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
 
     const ArticleModel: any = require(share.Models("services/articles/article"));
-
-    //const validator: any = require('validator');
-    //const url: any = require('url');
-
- //   const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
- //   const resource = new ResourcesModule.Resource;
 
     // type 20   page
     // type 21   stamp
@@ -142,9 +136,9 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_article_all(userid: string,namespace:string, tmp_path: string, callback: (error) => void): void {
+        static get_article_all(userid: string,namespace:string, tmp_path: string, callback: (error:any) => void): void {
             ArticleModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
-                fs.writeFile(tmp_path, JSON.stringify(docs), (error) => {
+                fs.writeFile(tmp_path, JSON.stringify(docs), (error:any) => {
                     callback(error);
                 });
             }).catch((error: any): void => {
@@ -159,7 +153,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_resource_all(userid: string,namespace:string, tmp_path: string, callback: (error) => void): void {
+        static get_resource_all(userid: string,namespace:string, tmp_path: string, callback: (error:any) => void): void {
             ResourceModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
@@ -195,7 +189,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static zip(work: string, target: string, callback: (error) => void) {
+        static zip(work: string, target: string, callback: (error:any) => void) {
             let zip_file_name = path.join(work, target + ".zip");
             let archive = archiver.create('zip', {});
             let output = fs.createWriteStream(zip_file_name);
@@ -237,10 +231,10 @@ export namespace PagesModule {
                 });
             };
 
-            let make_file = (tmp_path,userid) => {
+            let make_file = (tmp_path:string,userid:string):void => {
                 Pages.get_file_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
                             if (!error) {
-                                Pages.get_article_all(userid,namespace, path.join(tmp_path, namespace + "/articles.txt"), (error: any): void => {
+                                Pages.get_article_all(userid,namespace, path.join(tmp_path, namespace + "/articles.json"), (error: any): void => {
                                     if (!error) {
                                         Pages.get_resource_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
                                             if (!error) {

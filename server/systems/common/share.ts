@@ -1,3 +1,5 @@
+/// <reference path="../../../node_modules/@types/node/index.d.ts" />
+
 /**!
  Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  This software is released under the MIT License.
@@ -78,17 +80,17 @@ export namespace ShareModule {
         return path.join(root_path, "views/" + relpath);
     };
 
-    const PersistentModel: any = require("./persistent");
-    export const Map = new PersistentModel.Map(Persistent("systems/storege.json"));
+    //const PersistentModel: any = require("./persistent");
+    //export const Map = new PersistentModel.Map(Persistent("systems/storege.json"));
 
     const FileUtility: any = require("./file_utility");
     export const Utility = new FileUtility.Utility(Public(""));
 
     export let Memory = [];
 
-    export class Share {
+    //export class Share {
 
-    }
+    //}
 
 }
 
