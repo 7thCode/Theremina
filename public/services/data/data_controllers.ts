@@ -8,8 +8,8 @@
 
 let DataControllers: angular.IModule = angular.module('DataControllers', ['ui.bootstrap', 'ngAnimate', 'flow', 'ui.ace']);
 
-DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$document', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
-    ($scope: any,$rootScope:any, $log: any, $document: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
+DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$document','$q', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
+    ($scope: any,$rootScope:any, $log: any, $document: any,$q:any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
         let pagesize = 40;
 
@@ -227,6 +227,35 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
             }, (): void => {
             });
         };
+
+        $scope.UplodArticles = (files: any): void => {
+            progress(true);
+            let promises = [];
+            _.forEach(files, (local_file) => {
+                let deferred = $q.defer();
+                let fileReader: any = new FileReader();
+                fileReader.onload = (event: any): void => {
+                    ArticleService.CreateMany(event.target.result, (result: any) => {
+                        deferred.resolve(true);
+                    }, (code: number, message: string) => {
+                        deferred.reject(false);
+                    });
+                };
+                fileReader.readAsText(local_file.file);
+                promises.push(deferred.promise);
+            });
+
+            $q.all(promises).then(function (result) {
+                DrawPage(page_type, (): void => {
+                    files.forEach((file) => {
+                        file.cancel();
+                    });
+                    progress(false);
+                });
+            }).finally(() => {
+            });
+        };
+
 
         $scope.SelectPage = (type: string): void => {
             progress(true);
@@ -447,43 +476,6 @@ DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$d
 
         Draw(() => {
         });
-
-// Guidance
-/*
-        $scope.next = (): void => {
-            $scope.step++;
-            SessionService.Put({guidance: {data: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.prev = (): void => {
-            $scope.step--;
-            SessionService.Put({guidance: {data: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        $scope.to = (step: number): void => {
-            $scope.step = step;
-            SessionService.Put({guidance: {data: {step: $scope.step}}}, (data: any): void => {
-            }, error_handler);
-        };
-
-        SessionService.Get((session: any): void => {
-            if (session) {
-                $scope.step = 0;
-                let _data = session.data;
-                if (_data) {
-                    let guidance = _data.guidance;
-                    if (guidance) {
-                        let data = guidance.data;
-                        if (data) {
-                            $scope.step = data.step;
-                        }
-                    }
-                }
-            }
-        }, error_handler);
-        */
 
         $rootScope.$on('change_namespace', (event, value): void => {
             $scope.namespace = value;
