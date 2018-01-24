@@ -33,6 +33,9 @@ export namespace NamespsceModule {
     const LayoutModule = require(share.Server("services/layouts/controllers/layouts_controller"));
     const layout = new LayoutModule.Layout;
 
+    const ArticlesModule = require(share.Server("services/articles/controllers/article_controller"));
+    const Article = new ArticlesModule.Article;
+
     export class Namespsces {
 
         static userid(request): string {
@@ -47,12 +50,17 @@ export namespace NamespsceModule {
                         if (!error) {
                             layout.namespaces(userid, (error, layout_namespaces): void => {
                                 if (!error) {
-                                    Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces,layout_namespaces)));
+                                    Article.namespaces(userid, (error, articles_namespaces): void => {
+                                        if (!error) {
+                                            Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces,layout_namespaces,articles_namespaces)));
+                                        } else {
+                                            Wrapper.SendError(response, 200, error.message, error);
+                                        }
+                                    });
                                 } else {
                                     Wrapper.SendError(response, 200, error.message, error);
                                 }
                             });
-
                         } else {
                             Wrapper.SendError(response, 200, error.message, error);
                         }

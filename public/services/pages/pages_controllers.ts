@@ -10,8 +10,8 @@ let PagesControllers: angular.IModule = angular.module('PagesControllers', ['ui.
 
 //Leaflet
 
-PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$document", "$log", "$uibModal", "ResourceBuilderService",
-    function ($scope: any,$rootScope:any, $q: any, $document: any, $log: any, $uibModal: any, ResourceBuilderService: any): void {
+PagesControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$document", "$log", "$uibModal", "ResourceBuilderService",
+    function ($scope: any, $rootScope: any, $q: any, $document: any, $log: any, $uibModal: any, ResourceBuilderService: any): void {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -74,7 +74,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
         let Query = (): any => {
             progress(true);
             // template query
-        //    ResourceBuilderService.AddQuery({type: 21});
+            //    ResourceBuilderService.AddQuery({type: 21});
             ResourceBuilderService.Query((result: any): void => {
                 ResourceBuilderService.InitQuery(null);
                 if (result) {
@@ -94,6 +94,7 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                         ResourceBuilderService.Under((hasprev) => {
                             $scope.under = !hasprev;
                         });
+                        AllMimeType();
                         progress(false);
                     }, error_handler);
                     //pages query
@@ -155,15 +156,15 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
         };
         AllMimeType();
 
-  /*
-        $scope.all_mimetypes = [
-            "all",
-            "text/html",
-            "text/css",
-            "text/javascript",
-            "application/json"
-        ];
-*/
+        /*
+              $scope.all_mimetypes = [
+                  "all",
+                  "text/html",
+                  "text/css",
+                  "text/javascript",
+                  "application/json"
+              ];
+      */
         $scope.content = localStorage.getItem("pages_find_resource");
         let FindResource = (value: string): any => {
             _Find("content.resource", {$regex: value});
@@ -338,7 +339,8 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 });
 
                 $rootScope.$emit('change_files', {});
-            //    Query();
+                $rootScope.$emit('change_namespace', {});
+                //    Query();
             }).finally(() => {
             });
         };
@@ -371,7 +373,8 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 }
 
                 $rootScope.$emit('change_files', {});
-             //   Query();
+                $rootScope.$emit('change_namespace', {});
+                //   Query();
                 editor.session.getUndoManager().markClean();
                 $scope.opened = true;
             }, (): void => {
@@ -442,7 +445,8 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                     ResourceBuilderService.Delete((result: any): void => {
                         ClosePreview();
                         $rootScope.$emit('change_files', {});
-                  //      Query();
+                        $rootScope.$emit('change_namespace', {});
+                        //      Query();
                         $scope.name = "";
                         progress(false);
                         $scope.opened = false;
@@ -451,40 +455,17 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
                 });
             }
         };
-/*
-        let BuildSite = (): void => {
 
-            let modalRegist: any = $uibModal.open({
-                controller: 'BuildSiteDialogController',
-                templateUrl: '/pages/dialogs/build_site_dialog',
-                resolve: {
-                    items: $scope
-                }
-            });
-
-            modalRegist.result.then((resource: any): void => {
-                $rootScope.$emit('change_files', {});
-              //  Query();
-            }, (): void => {
-            });
-        };
-*/
-           $rootScope.$on('change_files', (event, value): void => {
-               Query();
-           });
-
-     //   $rootScope.$on('get_namespaces', (event, value): void => {
-    ///        $scope.namespaces = value;
-     //   });
+        $rootScope.$on('change_files', (event, value): void => {
+            Query();
+        });
 
         $rootScope.$on('change_namespace', (event, value): void => {
-
             $scope.$evalAsync(      // $apply
                 ($scope: any): void => {
                     $scope.namespace = value;
                 }
             );
-
             Query();
         });
 
@@ -508,14 +489,14 @@ PagesControllers.controller('PagesController', ["$scope","$rootScope", "$q", "$d
         $scope.Update = Update;
         $scope.Delete = Delete;
 
-      //  $scope.BuildSite = BuildSite;
+        //  $scope.BuildSite = BuildSite;
 
         //$scope.OpenPreview = OpenPreview;
 
     }]);
 
-PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'SessionService','ResourceBuilderService', 'items','$timeout', '$window',
-    ($scope: any, $log: any, $uibModalInstance: any, SessionService:any, ResourceBuilderService: any, items: any,$timeout: any, $window: any): void => {
+PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$uibModalInstance', 'SessionService', 'ResourceBuilderService', 'items', '$timeout', '$window',
+    ($scope: any, $log: any, $uibModalInstance: any, SessionService: any, ResourceBuilderService: any, items: any, $timeout: any, $window: any): void => {
 
         let file = items.file;
         let target = items.target;
@@ -555,22 +536,23 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
         };
 
         $scope.answer = (): void => {
-
             progress(true);
-            ResourceBuilderService.Init();
-            ResourceBuilderService.current.content.type = $scope.mimetype;
-            if (target) {
-                ResourceBuilderService.current.content.resource = target.result;
-            }
-            ResourceBuilderService.Create($scope.title, $scope.type, (result: any): void => {
-                progress(false);
-                $scope.message = "";
-                $uibModalInstance.close(result);
-            }, error_handler);
 
+            SetNamespace(() => {
+                ResourceBuilderService.Init();
+                ResourceBuilderService.current.content.type = $scope.mimetype;
+                if (target) {
+                    ResourceBuilderService.current.content.resource = target.result;
+                }
+                ResourceBuilderService.Create($scope.title, $scope.type, (result: any): void => {
+                    progress(false);
+                    $scope.message = "";
+                    $uibModalInstance.close(result);
+                }, error_handler);
+            });
         };
 
-        let GetNamespace = (callback:() => void): void => {
+        let GetNamespace = (callback: () => void): void => {
             SessionService.Get((session: any): void => {
                 if (session) {
                     let data = session.data;
@@ -582,8 +564,16 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
             }, error_handler);
         };
 
-      //  let d = document;
-      //  let f = d.getElementById("validate");
+        let SetNamespace = (callback: () => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = {namespace:$scope.namespace};
+                    SessionService.Put(data, (result: any) => {
+                        callback();
+                    },  error_handler);
+                }
+            }, error_handler);
+        };
 
         $timeout(() => {
             let element = $window.document.getElementById("name");
@@ -592,15 +582,12 @@ PagesControllers.controller('PagesCreateDialogController', ['$scope', '$log', '$
             }
         });
 
-      //  focus('name');
-      //  document.validate.title.focus();
-     //   angular.element(document.getElementById( 'name' ) ).select();
-
-        GetNamespace(() => {});
+        GetNamespace(() => {
+        });
 
     }]);
 
-PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items','ResourceBuilderService',
+PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$uibModalInstance', '$uibModal', 'items', 'ResourceBuilderService',
     ($scope: any, $log: any, $uibModalInstance: any, $uibModal: any, items: any, ResourceBuilderService: any): void => {
 
         let progress = (value) => {
@@ -715,7 +702,6 @@ PagesControllers.controller('PagesOpenDialogController', ['$scope', '$log', '$ui
         $scope.hide = hide;
         $scope.cancel = cancel;
         $scope.LayoutQuery = (): any => Query;
-
 
 
     }]);
