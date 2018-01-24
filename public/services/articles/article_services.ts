@@ -182,10 +182,6 @@ ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQ
             });
         };
 
-
-
-
-
         this.Get = (id: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
             Article.get({
                 id: id

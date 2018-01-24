@@ -150,6 +150,7 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
                         switch (type) {
                             case "image/jpeg":
                             case "image/jpg":
+                            case "image/png":
                                 let modalInstance: any = $uibModal.open({
                                     controller: 'PictureResizeDialogController',
                                     templateUrl: '/images/dialogs/image_resize_dialog',
@@ -229,6 +230,7 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
                     switch (type) {
                         case "image/jpeg":
                         case "image/jpg":
+                        case "image/png":
                             let modalInstance: any = $uibModal.open({
                                 controller: 'PictureResizeDialogController',
                                 templateUrl: '/images/dialogs/image_resize_dialog',
@@ -364,11 +366,6 @@ PicturesControllers.controller('PictureController', ['$scope','$rootScope', '$q'
             }
         }, error_handler);
 
-
-     //   $rootScope.$on('get_namespaces', (event, value): void => {
-    //        $scope.namespaces = value;
-     //   });
-
         $rootScope.$on('change_namespace', (event, value): void => {
             $scope.namespace = value;
             Draw();
@@ -460,8 +457,8 @@ PicturesControllers.controller('PictureDeleteDialogController', ['$scope', '$uib
 
     }]);
 
-PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uibModalInstance', 'items', 'ImageService','SessionService',
-    ($scope: any, $uibModalInstance: any, items: any, ImageService:any,SessionService:any): void => {
+PicturesControllers.controller('PictureResizeDialogController', ['$scope','$log', '$uibModalInstance', 'items', 'ImageService','SessionService',
+    ($scope: any,$log:any, $uibModalInstance: any, items: any, ImageService:any,SessionService:any): void => {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -565,14 +562,6 @@ PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uib
             });
         };
 
-        /*  $scope.RatioChange = () => {
-              progress(true);
-              SetOrientation();
-              Deformation(() => {
-                  progress(false)
-              });
-          };*/
-
         $scope.Rotate = (n: number) => {
             progress(true);
             index += 1;
@@ -592,9 +581,10 @@ PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uib
         };
 
         $scope.answer = (answer: any): void => {
-            $uibModalInstance.close(result);
+            SetNamespace(() => {
+                $uibModalInstance.close(result);
+            });
         };
-
 
         let GetNamespace = (callback:() => void): void => {
             SessionService.Get((session: any): void => {
@@ -604,6 +594,17 @@ PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$uib
                         $scope.namespace = data.namespace;
                         callback();
                     }
+                }
+            }, error_handler);
+        };
+
+        let SetNamespace = (callback: () => void): void => {
+            SessionService.Get((session: any): void => {
+                if (session) {
+                    let data = {namespace:$scope.namespace};
+                    SessionService.Put(data, (result: any) => {
+                        callback();
+                    },  error_handler);
                 }
             }, error_handler);
         };
