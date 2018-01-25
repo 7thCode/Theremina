@@ -19,16 +19,11 @@ export namespace FrontModule {
 
     const archiver: any = require('archiver');
 
-  //  const sharp = require("sharp");
-
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const applications_config: any = share.applications_config;
     const Wrapper: any = share.Wrapper;
-
-  //  const validator: any = require('validator');
-  //  const url: any = require('url');
 
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
     const ArticleModel: any = require(share.Models("services/articles/article"));

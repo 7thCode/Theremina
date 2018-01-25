@@ -1,7 +1,7 @@
 aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
     section.sidebar(style="margin-top:12px;")
         if user
-            .user-panel
+            .user-panel(style="height:6rem;")
                 .pull-left.image
                     img.img-circle(src="/files/api/" + user.userid + "/" + user.username, style="width:5rem;height:5rem;", alt='')
                 .pull-left.info
@@ -128,7 +128,7 @@ aside.main-sidebar.sidebar-color-invert(ng-controller='LoginController')
                         input(type="checkbox" data-layout="sidebar-collapse")
                         span &nbsp;&nbsp;#{message.close}
         else
-            .user-panel
+            .user-panel(style="height:6rem;")
                 .pull-left.image
                     img.img-circle(src="systems/files/files/blank.png", style="width:5rem;height:5rem;", alt='')
 
