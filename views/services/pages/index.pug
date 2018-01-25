@@ -1,12 +1,12 @@
 extends ../../layout
 
 block content
-    div(ng-controller="FrontController")
-        section.content(ng-controller="PagesController")
-            include partial/navbar
-            .row
-                .col-xs-12
-                    div(style="font-size:2rem;color:#607D8B") #{message.page}
-            .row
-                .col-xs-12
-                    include partial/mid
+
+    section.content(ng-controller="PagesController")
+        include partial/navbar
+        .row
+            .col-xs-12
+                div(style="font-size:2rem;color:#607D8B") #{message.page}
+        .row
+            .col-xs-12
+                include partial/mid

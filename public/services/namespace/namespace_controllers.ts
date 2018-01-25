@@ -8,9 +8,8 @@
 
 let NamespaceControllers: angular.IModule = angular.module('NamespaceControllers', []);
 
-
-NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "$log",'SessionService', 'NamespaceService',
-    ($scope: any,$rootScope, $log, SessionService: any, NamespaceService: any): void => {
+NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "$log",'$uibModal', 'SessionService', 'NamespaceService',
+    ($scope: any,$rootScope, $log, $uibModal :any, SessionService: any, NamespaceService: any): void => {
 
         let progress = (value): void => {
             $scope.$emit('progress', value);
@@ -31,7 +30,7 @@ NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "
                 }, error_handler);
         };
 
-        $scope.SetNamespace = (namespace: string): void => {
+        let SetNamespace = (namespace: string): void => {
             SessionService.Put({namespace: namespace}, (data: any): void => {
                 $scope.namespace = namespace;
                 $rootScope.$emit('change_namespace', data.namespace);
@@ -61,12 +60,46 @@ NamespaceControllers.controller('NamespaceController', ['$scope',"$rootScope", "
         };
 
         $scope.GetNamespace = GetNamespace;
+        $scope.SetNamespace = SetNamespace;
 
         GetNamespaces();
 
+        $scope.OpenSetNamespaceDialog = (): void => {
+
+            let modalRegist: any = $uibModal.open({
+                controller: 'SetNamespaceDialogController',
+                templateUrl: '/namespace/dialogs/set_dialog',
+                resolve: {
+                    items: $scope
+                }
+            });
+
+            modalRegist.result.then((dialog_scope: any): void => {
+                let namespace: string = dialog_scope.namespace;
+                SetNamespace(namespace);
+            }, (): void => {
+            });
+        };
+
+
     }]);
 
+DataControllers.controller('SetNamespaceDialogController', ['$scope', '$uibModalInstance', 'items',
+    ($scope: any, $uibModalInstance: any, items: any): void => {
 
+        $scope.hide = (): void => {
+            $uibModalInstance.close();
+        };
+
+        $scope.cancel = (): void => {
+            $uibModalInstance.dismiss();
+        };
+
+        $scope.answer = (): void => {
+            $uibModalInstance.close($scope);
+        };
+
+    }]);
 
 
 /*! Controllers  */

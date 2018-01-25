@@ -74,11 +74,10 @@ PagesControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$
         let Query = (): any => {
             progress(true);
             // template query
-            //    ResourceBuilderService.AddQuery({type: 21});
-            ResourceBuilderService.Query((result: any): void => {
-                ResourceBuilderService.InitQuery(null);
-                if (result) {
-                    $scope.templates = result;
+      //      ResourceBuilderService.Query((result: any): void => {
+      //          ResourceBuilderService.InitQuery(null);
+       //         if (result) {
+       //             $scope.templates = result;
                     //pages query
 
                     ResourceBuilderService.InitQuery(JSON.parse(localStorage.getItem("pages_query")), 20, 36);
@@ -86,6 +85,7 @@ PagesControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$
                     ResourceBuilderService.Query((result: any): void => {
                         if (result) {
                             $scope.pages = result;
+                            $scope.templates = result;
                             localStorage.setItem("pages_query", JSON.stringify(ResourceBuilderService.GetQuery()));
                         }
                         ResourceBuilderService.Over((hasnext) => {
@@ -98,8 +98,8 @@ PagesControllers.controller('PagesController', ["$scope", "$rootScope", "$q", "$
                         progress(false);
                     }, error_handler);
                     //pages query
-                }
-            }, error_handler);
+     //           }
+     //       }, error_handler);
             // template query
         };
 

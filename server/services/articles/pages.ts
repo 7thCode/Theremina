@@ -22,12 +22,6 @@ export namespace ArticlePageRouter {
 
     let message = config.message;
 
-  //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-   // const analysis: any = new AnalysisModule.Analysis;
-
- //   const ArticleModule: any = require(share.Server("services/articles/controllers/article_controller"));
- //   const article: any = new ArticleModule.Article;
-
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
         response.render("services/articles/index", {
             config: config,

@@ -14,10 +14,6 @@
             .col-xs-12
                 include ../../../systems/common/next_prev
 
-                //div(ng-controller="NamespaceController")
-                    select.form-control#namespace(name="namespace", ng-model="namespace", ng-options="name for name in namespaces", ng-change="SetNamespace(namespace)")
-
-
     .box-body#images(style="height:100%;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="file in files")
