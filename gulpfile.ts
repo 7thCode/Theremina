@@ -4,6 +4,7 @@ let gulp = require('gulp');
 let fs = require('graceful-fs');
 
 let rimraf = require('rimraf');
+let typescript = require('gulp-typescript');
 let imagemin = require('gulp-imagemin');
 let cssmin = require('gulp-cssmin');
 
@@ -81,6 +82,29 @@ gulp.task('csscpy', ['copy'], () => {
     )
         .pipe(gulp.dest('product'));
 });
+
+gulp.task('scriptbuild', ['copy'], () => {
+
+    return gulp.src(
+        [
+            'models/**/*.ts',
+            'public/*.ts',
+            'public/js/**/*.ts',
+            'public/utility/**/*.ts',
+            'public/applications/**/*.ts',
+            'public/plugins/**/*.ts',
+            'public/services/**/*.ts',
+            'public/systems/**/*.ts',
+            'server/**/*.ts',
+            'app.ts',
+            'gs.ts'
+        ],
+        {base: '..'}
+    )
+        .pipe(typescript({ target: "ES5", removeComments: true }))
+        .pipe(gulp.dest('./'));
+});
+
 
 gulp.task('scriptcpy', ['copy'], () => {
 

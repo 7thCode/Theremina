@@ -12,8 +12,8 @@ let BlobControllers: angular.IModule = angular.module('BlobControllers', ['ui.bo
 
 //  4000 < key < 5999
 
-BlobControllers.controller('BlobController', ['$scope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
-    function ($scope: any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
+BlobControllers.controller('BlobController', ['$scope','$rootScope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
+    function ($scope: any,$rootScope:any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
 
         let progress = (value) => {
             $scope.$emit('progress', value);
@@ -172,6 +172,11 @@ BlobControllers.controller('BlobController', ['$scope', '$uibModal', '$q', '$doc
             FileService.SetQuery({filename: {$regex: name}}, 4000);
             Draw();
         };
+
+        $rootScope.$on('change_namespace', (event, value): void => {
+            $scope.namespace = value;
+            Draw();
+        });
 
         $scope.Type = Type;
         $scope.Count = Count;

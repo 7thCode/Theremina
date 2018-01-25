@@ -28,7 +28,7 @@ html(lang="ja")
         != '\n<![endif]-->\n'
 
     body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController", style="background:#eeeeee;")
-        .wrapper
+        .wrapper(ng-controller="NamespaceController")
             header.main-header(style="margin-top:1rem;")
             if user
                 include ../../applications/front/partial/front_sidebar
@@ -40,7 +40,7 @@ html(lang="ja")
                     include ../common/no_logged_navbar
                     include ./partial/no_logged
 
-                //guidance(scenario="{{scenario}}")
+
 
 
 include ../../systems/common/scripts

@@ -27,7 +27,6 @@ block content
                                             .ellipsis(style="width:30%;") address
                                             .ellipsis(style="width:30%;") headers
                                             .ellipsis(style="width:25%;") referer
-
                                     .flex-column(style="display:block;height:50vh;overflow-y:scroll;")
                                         .flex-row(ng-repeat="log in logs" ng-style="{'background-color': ($index % 2 === 0 ? '#ddddff':'#ffffff')}" style="justify-content:flex-start;align-items:center;")
                                             .ellipsis(style="width:15%;user-select: text;") {{log.content.time | date:medium}}

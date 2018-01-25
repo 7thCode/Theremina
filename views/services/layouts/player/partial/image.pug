@@ -1,4 +1,4 @@
-ul.list-group(ng-controller="ImageController", ng-cloak)
+ul.list-group(ng-controller="ImageController")
     li.list-group-item(ng-repeat="file in files")
         .row(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false")
             .col-xs-4

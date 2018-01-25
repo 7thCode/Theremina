@@ -1,4 +1,4 @@
-nav.navbar.navbar-fixed-top.navbar-color(ng-controller='LoginController', role="navigation")
+nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
     .container-fluid
         .navbar-header
             button.btn-primary.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-navbar')
@@ -8,25 +8,21 @@ nav.navbar.navbar-fixed-top.navbar-color(ng-controller='LoginController', role="
                 span.icon-bar
             a.navbar-brand.page-scroll.brand-font-local(href="/", ng-click="go('/')") #{message.brand}
         #bs-navbar.navbar-collapse.collapse
-            div
+            ul.nav.navbar-nav
                 if user
-
+                    li.dropdown(ng-class="{disabled: opened}")
+                        a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                            | #{message.namespace} - {{namespace}} &nbsp;
+                            i.fa.fa-caret-down(aria-hidden="true")
+                        ul.dropdown-menu(role="menu")
+                            li(ng-repeat="name in namespaces" ng-class="{active: name == namespace}")
+                                a(ng-click="SetNamespace(name)") {{name}}
+                    li
+                        button.btn.btn-warning(type="button", style="margin:14px;", ng-click='OpenSetNamespaceDialog();', ng-disabled="opened", aria-label="") New #{message.namespace}
+            //div
+                if user
                     span(style="float:right")
                         button.btn.btn-info(type="button" ,href='#', ng-click="Logout()", aria-label="", style="margin:12px;")
                             i.fa.fa-sign-in
                             span &nbsp;#{message.logout}
 
-                    //span(ng-controller="NamespaceController" style="float:right")
-
-                        span(style="float:right")
-                            ul.nav.nav-tabs
-                                li(ng-repeat="name in namespaces" ng-class="{active: name == namespace}")
-                                    a(ng-click="SetNamespace(name)") {{name}}
-
-                        span(style="float:right;margin:5px;")
-                                span(ng-messages="validate.namespace.$error")
-                                        span.error-message(ng-message="required") #{message.required}
-                                        span.error-message(ng-message="maxlength") #{message.long}
-                                input.form-control.no-zoom#namespace(ng-change="SetNamespace(namespace)", ng-model="namespace", type="text", name='namespace', required, ng-maxlength="50")
-
-                        span(style="float:right;margin:20px;") #{message.namespace}
