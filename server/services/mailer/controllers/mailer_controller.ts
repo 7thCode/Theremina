@@ -50,12 +50,21 @@ export namespace MailerModule {
             let referer = request.headers.referer;
             if (referer) {
                 let mailer = null;
+                let bcc = null;
                 switch (config.mailer.type) {
                     case "gmail":
                         mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+                        bcc = "";
+                        if (request.body.content.bcc) {
+                            bcc = request.body.content.bcc;
+                        }
                         break;
                     case "mailgun":
                         mailer = new MailerModule.MailGun(config.mailer.setting, config.mailer.account);
+                        bcc = [];
+                        if (request.body.content.bcc) {
+                            bcc.push(request.body.content.bcc);
+                        }
                         break;
                     default:
                 }
@@ -72,10 +81,6 @@ export namespace MailerModule {
                             if (request.body.content.report) {
                                 let thanks_to = request.body.content.thanks;
                                 let report_to = request.body.content.report;
-                                let bcc = "";
-                                if (request.body.content.bcc) {
-                                    bcc = request.body.content.bcc;
-                                }
                                 ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
                                         let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});

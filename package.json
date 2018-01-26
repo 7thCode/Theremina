@@ -42,7 +42,7 @@
     "lodash": "^4.3.0",
     "log4js": "^0.6.26",
     "logrotate-stream": "^0.2.5",
-    "mailgun-js": "^0.7.14",
+    "mailgun-js": "^0.14.2",
     "mailparser": "^2.0.1",
     "mecab-async": "^0.1.0",
     "moment": "^2.18.1",

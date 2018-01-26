@@ -26,7 +26,8 @@ export namespace SettingPageRouter {
     const exception: any = new ExceptionController.Exception();
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
-        response.render("systems/setting/index", {config:config, user: request.user, message: message, status: 200, fonts:webfonts});
+        response.render("systems/setting/index", {config:config, user: request.user,
+            role: auth.role(request.user), message: message, status: 200, fonts:webfonts});
     }]);
 
     router.get('/dialogs/backup_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {

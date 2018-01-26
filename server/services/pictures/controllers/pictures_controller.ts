@@ -9,13 +9,9 @@
 export namespace PicturesModule {
 
     const _ = require('lodash');
-    const fs: any = require('graceful-fs');
 
     const Grid = require('gridfs-stream');
 
-    const path: any = require('path');
-
-    const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
@@ -26,8 +22,6 @@ export namespace PicturesModule {
     const config: any = share.config;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
-
-    const url: any = require('url');
 
     export class Pictures {
 
@@ -111,9 +105,7 @@ export namespace PicturesModule {
             try {
                 let conn = Pictures.connect(config.db.user);
                 let namespace: string = request.params.namespace;
-                //   let namespace = Pictures.namespace(request.params.name);
                 let name = Pictures.localname(request.params.name);
-                //   let userid = request.params.userid;
                 let size = request.query;
 
                 conn.once('open', (error: any): void => {
@@ -169,7 +161,7 @@ export namespace PicturesModule {
                                                                     readstream.pipe(response);
                                                                 } catch (e) {
                                                                     // NOT FOUND IMAGE.
-                                                                    Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                                    Pictures.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                                         conn.db.close();
                                                                         next();
                                                                     });
@@ -180,7 +172,7 @@ export namespace PicturesModule {
                                                             }
                                                         } else {
                                                             // NOT FOUND IMAGE.
-                                                            Pictures.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                            Pictures.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                                 conn.db.close();
                                                                 next();
                                                             });

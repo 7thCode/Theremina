@@ -17,9 +17,6 @@ export namespace AuthModule {
 
     const passport: any = require('passport');
 
-//    const pug = require('pug');
-//    const path = require('path');
-
     const crypto = require('crypto');
 
     const share = require('../../common/share');
@@ -39,15 +36,19 @@ export namespace AuthModule {
     const ScannerBehaviorModule: any = require("../../common/html_scanner/scanner_behavior");
 
     let _mailer = null;
+    let bcc = null;
     switch (config.mailer.type) {
         case "mail":
             _mailer = new MailerModule.Mailer(config.mailer.setting, config.mailer.account);
+            bcc = "";
             break;
         case "gmail":
             _mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+            bcc = "";
             break;
         case "mailgun":
             _mailer = new MailerModule.MailGun(config.mailer.setting, config.mailer.account);
+            bcc = [];
             break;
         default:
     }
@@ -89,7 +90,7 @@ export namespace AuthModule {
 
         }
 
-        public create_init_user(initusers:any[]): void {
+        public create_init_user(initusers: any[]): void {
             if (initusers) {
                 _.forEach(initusers, (user) => {
                     let type: string = user.type;
@@ -137,10 +138,60 @@ export namespace AuthModule {
             }
         };
 
-        static isSystem(user: any): boolean {
-            let result: boolean = (user.type == "System");
+    /*    static isSystem(user: any): boolean {
+            //           let result: boolean = (user.type == "System");
+            let result: boolean = false;
             if (user.auth) {
                 result = (user.auth == 1);
+            }
+            return result;
+        }
+   */
+
+        static _role(user: any): any {
+            let result: any = {guest:true,categoly: 0};
+            if (user) {
+                switch (user.auth) {
+                    case 1:
+                        result.system = true;
+                    case 100:
+                        result.user = true;
+                    case 10000:
+                        result.guest = true;
+                    default:
+                }
+
+                switch (user.provider) {
+                    case "local":
+                        result.categoly = 0;
+                        break;
+                    default:
+                        result.categoly = 1;
+                }
+            }
+            return result;
+        }
+
+        public role(user: any): any {
+            let result: any = {guest:true,categoly: 0};
+            if (user) {
+                switch (user.auth) {
+                    case 1:
+                        result.system = true;
+                    case 100:
+                        result.user = true;
+                    case 10000:
+                        result.guest = true;
+                    default:
+                }
+
+                switch (user.provider) {
+                    case "local":
+                        result.categoly = 0;
+                        break;
+                    default:
+                        result.categoly = 1;
+                }
             }
             return result;
         }
@@ -175,7 +226,7 @@ export namespace AuthModule {
         public page_is_system(request: any, response: any, next: any): void {
             let user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 } else {
                     response.status(403).render('error', {status: 403, message: "Forbidden...", url: request.url});
@@ -195,13 +246,13 @@ export namespace AuthModule {
         public is_system(request: any, response: any, next: any): void {
             let user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 } else {
-                    Wrapper.SendError(response, 403, "Forbidden.", {code:403, message:"Forbidden."});
+                    Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
                 }
             } else {
-                Wrapper.SendError(response, 403, "Forbidden.", {code:403, message:"Forbidden."});
+                Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
             }
         }
 
@@ -215,16 +266,16 @@ export namespace AuthModule {
         public is_enabled_regist_user(request: any, response: any, next: any): void {
             let user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 } else {
-                    Wrapper.SendError(response, 403, "Forbidden.", {code:403, message:"Forbidden."});
+                    Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
                 }
             } else {
                 if (config.regist.user) {
                     next();
                 } else {
-                    Wrapper.SendError(response, 403, "Forbidden.", {code:403, message:"Forbidden."});
+                    Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
                 }
             }
         }
@@ -242,7 +293,7 @@ export namespace AuthModule {
                 if (config.regist.member) {
                     next();
                 } else {
-                    Wrapper.SendError(response, 403, "Forbidden.", {code:403, message:"Forbidden."});
+                    Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
                 }
             }
         }
@@ -289,10 +340,10 @@ export namespace AuthModule {
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
 
-                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid,"", null, true, {});
-                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, "", null, true, {});
+                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                         if (!error) {
-                                            _mailer.send(username,"", message.registconfirmtext, doc, (error: any) => {
+                                            _mailer.send(username, bcc, message.registconfirmtext, doc, (error: any) => {
                                                 if (!error) {
                                                     Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                 } else {
@@ -303,7 +354,7 @@ export namespace AuthModule {
                                     });
 
                                 } else {
-                                    Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
+                                    Wrapper.SendError(response, number + 200, "not found.", {code: number + 200, message: "not found."});
                                 }
                             }).catch((error: any): void => {
                                 Wrapper.SendFatal(response, error.code, error.message, error);
@@ -313,7 +364,7 @@ export namespace AuthModule {
                             Wrapper.SendFatal(response, e.code, e.message, e);
                         }
                     } else {
-                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code:number + 1, message: message.usernamealreadyregist});
+                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code: number + 1, message: message.usernamealreadyregist});
                     }
                 }
             );
@@ -410,7 +461,6 @@ export namespace AuthModule {
                     response.status(500).render('error', {status: 500, message: "timeout"});
                 }
             });
-
         }
 
         /**
@@ -457,10 +507,10 @@ export namespace AuthModule {
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_member_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
 
-                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid,"", null, true, {});
-                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, "", null, true, {});
+                                    HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                         if (!error) {
-                                            _mailer.send(username,"", message.memberconfirmtext, doc, (error: any) => {
+                                            _mailer.send(username, bcc, message.memberconfirmtext, doc, (error: any) => {
                                                 if (!error) {
                                                     Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                 } else {
@@ -471,7 +521,7 @@ export namespace AuthModule {
                                     });
 
                                 } else {
-                                    Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
+                                    Wrapper.SendError(response, number + 200, "not found.", {code: number + 200, message: "not found."});
                                 }
                             }).catch((error: any): void => {
                                 Wrapper.SendFatal(response, error.code, error.message, error);
@@ -480,12 +530,10 @@ export namespace AuthModule {
                             Wrapper.SendFatal(response, e.code, e.message, e);
                         }
                     } else {
-                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code:number + 1, message: message.usernamealreadyregist});
+                        Wrapper.SendWarn(response, number + 1, message.usernamealreadyregist, {code: number + 1, message: message.usernamealreadyregist});
                     }
                 }
             );
-
-
         }
 
         /**
@@ -617,10 +665,10 @@ export namespace AuthModule {
                                 ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "username_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                     if (record) {
 
-                                        let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid,"", null, true, {});
-                                        HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                        let datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid, "", null, true, {});
+                                        HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                             if (!error) {
-                                                _mailer.send(username,"", message.usernameconfirmtext, doc, (error: any) => {
+                                                _mailer.send(username, bcc, message.usernameconfirmtext, doc, (error: any) => {
                                                     if (!error) {
                                                         Wrapper.SendSuccess(response, {code: 0, message: ""});
                                                     } else {
@@ -631,7 +679,7 @@ export namespace AuthModule {
                                         });
 
                                     } else {
-                                        Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
+                                        Wrapper.SendError(response, number + 200, "not found.", {code: number + 200, message: "not found."});
                                     }
                                 }).catch((error: any): void => {
                                     Wrapper.SendFatal(response, error.code, error.message, error);
@@ -640,11 +688,11 @@ export namespace AuthModule {
                                 Wrapper.SendFatal(response, e.code, e.message, e);
                             }
                         } else {
-                            Wrapper.SendWarn(response, number + 2, message.usernamealreadyregist, {code:number + 2, message: message.usernamealreadyregist});
+                            Wrapper.SendWarn(response, number + 2, message.usernamealreadyregist, {code: number + 2, message: message.usernamealreadyregist});
                         }
                     });
                 } else {
-                    Wrapper.SendWarn(response, number + 3, message.usernamenotfound, {code:number + 3, message: message.usernamenotfound});
+                    Wrapper.SendWarn(response, number + 3, message.usernamenotfound, {code: number + 3, message: message.usernamenotfound});
                 }
             });
         }
@@ -679,7 +727,7 @@ export namespace AuthModule {
                         } else {
                             response.status(500).render("error", {message: "unknown error", status: 500}); // timeout
                         }
-                    })
+                    });
                 } else {
                     response.status(400).render("error", {message: "timeout", status: 400}); // timeout
                 }
@@ -719,10 +767,10 @@ export namespace AuthModule {
                         ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "password_mail.html"}, {"type": 12}]}).then((record: any): void => {
                             if (record) {
 
-                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid,"", null, true, {});
-                                HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link":link,"beacon":beacon},(error: any, doc: string) => {
+                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, "", null, true, {});
+                                HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                     if (!error) {
-                                        _mailer.send(username,"", message.passwordconfirmtext, doc, (error: any) => {
+                                        _mailer.send(username, bcc, message.passwordconfirmtext, doc, (error: any) => {
                                             if (!error) {
                                                 Wrapper.SendSuccess(response, {code: 0, message: ""});
                                             } else {
@@ -733,7 +781,7 @@ export namespace AuthModule {
                                 });
 
                             } else {
-                                Wrapper.SendError(response, number + 200, "not found.", {code:number + 200, message:"not found."});
+                                Wrapper.SendError(response, number + 200, "not found.", {code: number + 200, message: "not found."});
                             }
                         }).catch((error: any): void => {
                             Wrapper.SendFatal(response, error.code, error.message, error);
@@ -742,7 +790,7 @@ export namespace AuthModule {
                         Wrapper.SendFatal(response, e.code, e.message, e);
                     }
                 } else {
-                    Wrapper.SendWarn(response, number + 1, message.usernamenotfound, {code:number + 1, message: message.usernamenotfound});
+                    Wrapper.SendWarn(response, number + 1, message.usernamenotfound, {code: number + 1, message: message.usernamenotfound});
                 }
             });
         }
@@ -816,17 +864,17 @@ export namespace AuthModule {
                                     });
                                 });
                             } else {
-                                Wrapper.SendError(response, number + 2, message.wrongusername, {code:number + 2, message:message.wrongusername});
+                                Wrapper.SendError(response, number + 2, message.wrongusername, {code: number + 2, message: message.wrongusername});
                             }
                         } else {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     })(request, response);
                 } else {
-                    Wrapper.SendError(response, number + 4, "", {code:number + 4, message:""});
+                    Wrapper.SendError(response, number + 4, "", {code: number + 4, message: ""});
                 }
             } else {
-                Wrapper.SendError(response, number + 5, "", {code:number + 5, message:""});
+                Wrapper.SendError(response, number + 5, "", {code: number + 5, message: ""});
             }
         }
 

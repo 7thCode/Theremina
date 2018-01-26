@@ -26,6 +26,7 @@ export namespace RobotPageRouter {
         response.render("plugins/robot/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts

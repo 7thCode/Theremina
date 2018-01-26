@@ -35,6 +35,7 @@ export namespace ResourcePageRouter {
         response.render("systems/resources/player/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts
@@ -46,6 +47,7 @@ export namespace ResourcePageRouter {
             config: config,
             domain: share.config.domain,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts

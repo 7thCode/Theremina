@@ -15,6 +15,7 @@ export namespace PageRouter {
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
+    const auth: any = core.auth;
     const config: any = share.config;
     const analysis: any = core.analysis;
 
@@ -31,6 +32,7 @@ export namespace PageRouter {
         response.render("services/front/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts

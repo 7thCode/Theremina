@@ -36,12 +36,9 @@ html(lang="ja")
                     include ../common/navbar
                     include ./partial/logged
             else
-                div
+                div(ng-controller="LoginController")
                     include ../common/no_logged_navbar
                     include ./partial/no_logged
-
-
-
 
 include ../../systems/common/scripts
 include ../../services/common/scripts

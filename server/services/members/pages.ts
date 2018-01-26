@@ -30,6 +30,7 @@ export namespace MembersPageRouter {
         response.render("services/members/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts

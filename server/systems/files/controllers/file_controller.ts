@@ -14,11 +14,9 @@ export namespace FileModule {
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');
 
-
     const share = require(process.cwd() + '/server/systems/common/share');
     const config = share.config;
     const Wrapper = share.Wrapper;
-    //  const logger = share.logger;
 
     const result = require(share.Server('systems/common/result'));
 
@@ -49,23 +47,6 @@ export namespace FileModule {
             }
             return result;
         }
-
-        /*
-                static namespace(name: string): string {
-                    let result = "";
-                    if (name) {
-                        let names = name.split("#");
-                        let delimmiter = "";
-                        names.forEach((name, index) => {
-                            if (index < (names.length - 1)) {
-                                result += delimmiter + name;
-                                delimmiter = ":";
-                            }
-                        })
-                    }
-                    return result;
-                }
-        */
 
         static namespace(request: any): string {
             let result = "";
@@ -98,20 +79,7 @@ export namespace FileModule {
 
         static from_local(gfs: any, path_from: string, namespace: string,userid:string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
-/*
-                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 
-                let writestream = bucket.openUploadStream(name, {
-                    contentType: "binary/octet-stream",
-                    metadata: {
-                        userid: config.systems.userid,
-                        key: key,
-                        type: mimetype,
-                        namespace: namespace,
-                        parent: null
-                    }
-                });
-*/
                 let writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
@@ -343,7 +311,6 @@ export namespace FileModule {
             }
         }
 
-
         /**
          *
          * @param request
@@ -555,7 +522,7 @@ export namespace FileModule {
                                                     }
                                                 } else {
                                                     // NOT FOUND IMAGE.
-                                                    Files.result_file(conn, gfs, collection, "", "blank.png", config.systems.userid, response, next, () => {
+                                                    Files.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                         conn.db.close();
                                                         next();
                                                     });

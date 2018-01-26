@@ -22,14 +22,15 @@ export namespace FilePageRouter {
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     const auth: any = new AuthController.Auth();
 
-    const AnalysisController: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    const analysis: any = new AnalysisController.Analysis();
+  //  const AnalysisController: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+  //  const analysis: any = new AnalysisController.Analysis();
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
-        response.render("systems/files/index", {config:config, user: request.user, message: message, fonts:webfonts});
+        response.render("systems/files/index", {config:config, user: request.user,
+            role: auth.role(request.user), message: message, fonts:webfonts});
     }]);
 
     router.get('/dialogs/file_delete_dialog', [exception.page_guard, auth.page_valid, (req: any, res: any, next: any) => {

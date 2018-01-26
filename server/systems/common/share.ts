@@ -10,7 +10,6 @@
 
 export namespace ShareModule {
 
-    //const fs = require('graceful-fs');
     const _config = require('config');
 
     export const config = _config.get("systems");

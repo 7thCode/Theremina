@@ -26,6 +26,7 @@ export namespace ImagePageRouter {
         response.render("services/images/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts
