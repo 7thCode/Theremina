@@ -1,4 +1,4 @@
-aside.main-sidebar.sidebar-color(ng-controller='LoginController')
+aside.main-sidebar.sidebar-color(ng-controller="LoginController")
     section.sidebar(style="margin-top:12px;")
         if user
             .user-panel(style="height:6rem;")
@@ -42,12 +42,12 @@ aside.main-sidebar.sidebar-color(ng-controller='LoginController')
                             i.fa.fa-user-plus.fa-fw.text-warning
                             span #{message.member}
 
-                if user.provider == "local"
+                if role.categoly == 0
                     li
                         a(href='#', ng-click="showPasswordDialog()")
                             i.fa.fa-key.fa-fw.text-danger
                             span #{message.password}
-                if user.type == "System"
+                if role.system
                     li
                         a(href='/backoffice')
                             span.fa-stack

@@ -147,6 +147,7 @@ export namespace PageRouter {
         response.render("services/front/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts
@@ -163,6 +164,7 @@ export namespace PageRouter {
         response.render("services/start/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts
@@ -173,6 +175,7 @@ export namespace PageRouter {
         response.render("services/signup/index", {
             config: config,
             user: request.user,
+            role: auth.role(request.user),
             message: message,
             status: 200,
             fonts: webfonts
