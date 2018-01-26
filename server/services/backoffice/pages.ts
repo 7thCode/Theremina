@@ -23,7 +23,8 @@ export namespace BackofficePageRouter {
     let message = config.message;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
-        response.render("services/backoffice/index", {config:config, user: request.user, message: message, status: 200, fonts:webfonts});
+        response.render("services/backoffice/index", {config:config, user: request.user,
+            role: auth.role(request.user), message: message, status: 200, fonts:webfonts});
     }]);
 }
 

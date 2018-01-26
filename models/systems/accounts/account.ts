@@ -32,9 +32,9 @@ namespace AccountModule {
     Account.plugin(passport);
     Account.plugin(timestamp);
 
-    Account.method("IsSystem", function (): boolean {
-        return (this.type === "System");
-    });
+ //   Account.method("IsSystem", function (): boolean {
+ //       return (this.type === "System");
+ //   });
 
     module.exports = mongoose.model('Account', Account);
 }

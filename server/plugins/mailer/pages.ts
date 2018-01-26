@@ -23,7 +23,8 @@ export namespace MailerPageRouter {
     let message = config.message;
 
     router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, result: any, next: any) => {
-        result.render('plugins/mailer/index', {config:config, user: request.user, message: message, status: 200, fonts:webfonts});
+        result.render('plugins/mailer/index', {config:config, user: request.user,
+            role: auth.role(request.user), message: message, status: 200, fonts:webfonts});
     }]);
 
     router.get('/dialogs/send_mail_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
