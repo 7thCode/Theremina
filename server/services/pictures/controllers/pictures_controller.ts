@@ -57,7 +57,7 @@ export namespace PicturesModule {
             return request.user.username;
         }
 
-        static retrieve_account(userid, callback: (error: { code: number, message: string }, result: any) => void) {
+        static retrieve_account(userid, callback: (error: { code: number, message: string } | null, result: any) => void) {
             LocalAccount.findOne({username: userid}).then((account: any): void => {
                 callback(null, account);
             }).catch((error: any): void => {

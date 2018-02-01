@@ -17,7 +17,7 @@ export namespace SlackModule {
 
     const plugins_config = share.plugins_config;
 
-    let controller = null;
+    let controller:any | null = null;
 
     export class Slack {
 

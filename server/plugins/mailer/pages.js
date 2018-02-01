@@ -18,7 +18,8 @@ var MailerPageRouter;
     var webfonts = services_config.webfonts;
     var message = config.message;
     MailerPageRouter.router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, result, next) {
-            result.render('plugins/mailer/index', { config: config, user: request.user, message: message, status: 200, fonts: webfonts });
+            result.render('plugins/mailer/index', { config: config, user: request.user,
+                role: auth.role(request.user), message: message, status: 200, fonts: webfonts });
         }]);
     MailerPageRouter.router.get('/dialogs/send_mail_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('plugins/mailer/dialogs/send_mail_dialog', { message: message });

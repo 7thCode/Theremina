@@ -1,5 +1,3 @@
-/// <reference path="../../../node_modules/@types/node/index.d.ts" />
-
 /**!
  Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  This software is released under the MIT License.
@@ -59,7 +57,6 @@ export namespace PagesPageRouter {
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/delete_confirm_dialog', {message: message});
     }]);
-
 
 }
 

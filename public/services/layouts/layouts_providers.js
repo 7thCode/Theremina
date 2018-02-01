@@ -4,5 +4,8 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-var LayoutsProviders = angular.module('LayoutsProviders', []);
+var LayoutsProvidersModule;
+(function (LayoutsProvidersModule) {
+    var LayoutsProviders = angular.module('LayoutsProviders', []);
+})(LayoutsProvidersModule || (LayoutsProvidersModule = {}));
 //# sourceMappingURL=layouts_providers.js.map

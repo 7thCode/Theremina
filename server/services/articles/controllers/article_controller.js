@@ -55,6 +55,11 @@ var ArticleModule;
                                 article_1.content[key].value = content.value;
                             }
                         }
+                        else if (content.type == "date") {
+                            if (typeof content.value === 'string') {
+                                article_1.content[key].value = new Date(content.value);
+                            }
+                        }
                     });
                     article_1.open = true;
                     Wrapper.Save(response, 1000, article_1, function (response, object) {
@@ -66,6 +71,71 @@ var ArticleModule;
                         code: 3,
                         message: "article name must not contain '/'"
                     });
+                }
+            }
+            else {
+                Wrapper.SendError(response, 3, "no article name", { code: 3, message: "no article name" });
+            }
+        };
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        Article.prototype.create_article_many = function (request, response) {
+            if (request.body.articles) {
+                var articles = JSON.parse(request.body.articles);
+                var save_1 = function (data, callback, error) {
+                    if (data) {
+                        if (data.name) {
+                            if (data.name.indexOf('/') == -1) {
+                                var article_2 = new ArticleModel();
+                                article_2.userid = Article.userid(request);
+                                article_2.namespace = Article.namespace(request);
+                                article_2.version = data.version;
+                                article_2.status = data.status;
+                                article_2.name = data.name;
+                                article_2.type = data.type;
+                                article_2.content = data.content;
+                                article_2.open = data.open;
+                                _.forEach(article_2.content, function (content, key) {
+                                    if (content.type == "date") {
+                                        if (typeof content.value === 'string') {
+                                            article_2.content[key].value = new Date(content.value);
+                                        }
+                                    }
+                                });
+                                article_2.save().then(function () {
+                                    callback({});
+                                }).catch(function (e) {
+                                    error(e);
+                                });
+                            }
+                            else {
+                                error({ code: 3, message: "article name must not contain '/'" });
+                            }
+                        }
+                        else {
+                            error({ code: 3, message: "no article name" });
+                        }
+                    }
+                };
+                if (Array.isArray(articles)) {
+                    var save_promise_1 = function (data) {
+                        return new Promise(function (resolve, reject) {
+                            save_1(data, function (d) { return resolve(d); }, function (error) { return reject(error); });
+                        });
+                    };
+                    Promise.all(articles.map(function (data) {
+                        return save_promise_1(data);
+                    })).then(function (results) {
+                        Wrapper.SendSuccess(response, {});
+                    }).catch(function (error) {
+                        Wrapper.SendError(response, error.code, error.message, error);
+                    });
+                }
+                else {
+                    save_1(articles, function (d) { return Wrapper.SendSuccess(response, d); }, function (error) { return Wrapper.SendError(response, error.code, error.message, error); });
                 }
             }
             else {
@@ -173,7 +243,7 @@ var ArticleModule;
             var id = request.params.id;
             Wrapper.FindOne(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, { _id: id }] }, function (response, article) {
                 if (article) {
-                    response.jsonp(JSON.stringify(article));
+                    response.send(JSON.stringify([article]));
                 }
                 else {
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
@@ -220,7 +290,7 @@ var ArticleModule;
             var namespace = Article.namespace(request);
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, { "_id": 0, "version": 1, "status": 1, "namespace": 1, "modify": 1, "create": 1, "open": 1, "content": 1, "type": 1, "name": 1, "userid": 1 }, option, function (response, articles) {
+            Wrapper.Find(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, { "_id": 0 }, option, function (response, articles) {
                 Wrapper.SendSuccess(response, articles);
             });
         };
@@ -235,6 +305,25 @@ var ArticleModule;
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, 2800, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, function (response, count) {
                 Wrapper.SendSuccess(response, count);
+            });
+        };
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        Article.prototype.namespaces = function (userid, callback) {
+            var number = 1400;
+            ArticleModel.find({ userid: userid }, { "namespace": 1, "_id": 0 }, {}).then(function (pages) {
+                var result = [];
+                _.forEach(pages, function (page) {
+                    if (page.namespace) {
+                        result.push(page.namespace);
+                    }
+                });
+                callback(null, _.uniqBy(result));
+            }).catch(function (error) {
+                callback(error, null);
             });
         };
         return Article;

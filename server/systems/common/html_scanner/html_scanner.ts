@@ -1,5 +1,3 @@
-/// <reference path="../../../../node_modules/@types/node/index.d.ts" />
-
 /**!
  * Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  * This software is released under the MIT License.
@@ -921,9 +919,9 @@ namespace HTMLScanner {
     * */
     export class Builder {
 
-        static Build(source: any, datasource: any, page_init: any, config: any, callback: (error: any, result: string) => void): void {
+        static Build(source: any, datasource: any, page_init: any, config: any, callback: (error: any, result: string | undefined) => void): void {
 
-            let build: any = (source: any, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+            let build: any = (source: any, datasource: any, page_init, callback: (error: any, result: string | undefined) => void) => {
                 let datasource_resolver: any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
                     if (!error) {
                         let url_resolver: any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
@@ -958,7 +956,7 @@ namespace HTMLScanner {
 
         };
 
-        static Resolve(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string) => void): void {
+        static Resolve(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string | undefined) => void): void {
             let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
                 if (!error) {
                     callback(undefined, expand_result);
@@ -970,9 +968,9 @@ namespace HTMLScanner {
         }
 
         // todo:1path
-        static Build2(source: string, datasource: any, page_init: any, config: any, callback: (error: any, result: string) => void): void {
+        static Build2(source: string, datasource: any, page_init: any, config: any, callback: (error: any, result: string | undefined) => void): void {
 
-            let build: any = (source: string, datasource: any, page_init, callback: (error: any, result: string) => void) => {
+            let build: any = (source: string, datasource: any, page_init, callback: (error: any, result: string | undefined) => void) => {
                 let datasource_resolver: any = new HTMLScanner.DataSourceResolver(datasource, (error: any, datasource_result: any): void => {
                     if (!error) {
                         let url_resolver: any = new HTMLScanner.UrlResolver(datasource, config, (error: any, url_result: any): void => {
@@ -1013,7 +1011,7 @@ namespace HTMLScanner {
 
         };
 
-        static Resolve2(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string) => void): void {
+        static Resolve2(source: any, datasource: ScannerBehavior.Behavior, url_result: any, callback: (error: any, result: string | undefined) => void): void {
             let expander: any = new HTMLScanner.Expander(datasource, (error: any, expand_result: any): void => {
                 if (!error) {
                     callback(undefined, expand_result);

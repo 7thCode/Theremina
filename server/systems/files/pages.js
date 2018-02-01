@@ -16,12 +16,13 @@ var FilePageRouter;
     var message = config.message;
     var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     var auth = new AuthController.Auth();
-    var AnalysisController = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    var analysis = new AnalysisController.Analysis();
+    //  const AnalysisController: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+    //  const analysis: any = new AnalysisController.Analysis();
     var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
     var exception = new ExceptionController.Exception();
     FilePageRouter.router.get("/", [exception.page_guard, auth.page_valid, function (request, response) {
-            response.render("systems/files/index", { config: config, user: request.user, message: message, fonts: webfonts });
+            response.render("systems/files/index", { config: config, user: request.user,
+                role: auth.role(request.user), message: message, fonts: webfonts });
         }]);
     FilePageRouter.router.get('/dialogs/file_delete_dialog', [exception.page_guard, auth.page_valid, function (req, res, next) {
             res.render('systems/files/dialogs/file_delete_dialog', { message: message });

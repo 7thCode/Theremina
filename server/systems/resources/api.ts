@@ -15,8 +15,8 @@ export namespace ResourceApiRouter {
     const share: any = core.share;
     const exception: any = core.exception;
 
-    const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth: any = new AuthController.Auth;
+  //  const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
+  //  const auth: any = new AuthController.Auth;
 
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resource = new ResourcesModule.Resource;

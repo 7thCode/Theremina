@@ -679,7 +679,7 @@ export namespace FileModule {
                                                     if (!error) {
                                                         if (!item) {
                                                             let parseDataURL = (dataURL: any): any => {
-                                                                let result = {
+                                                                let result:any = {
                                                                     mediaType: null,
                                                                     encoding: null,
                                                                     isBase64: null,
@@ -791,7 +791,7 @@ export namespace FileModule {
             let username = Files.username(request);
 
             let parseDataURL = (dataURL: any): any => {
-                let result = {
+                let result:any = {
                     mediaType: null,
                     encoding: null,
                     isBase64: null,
@@ -1065,7 +1065,7 @@ export namespace FileModule {
             if (name) {
                 if (name.indexOf('/') == -1) {
                     let parseDataURL = (dataURL: any): any => {
-                        let result = {
+                        let result:any = {
                             mediaType: null,
                             encoding: null,
                             isBase64: null,

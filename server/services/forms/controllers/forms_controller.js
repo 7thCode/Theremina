@@ -233,6 +233,19 @@ var FormsModule;
                 Wrapper.SendSuccess(response, count);
             });
         };
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        Form.prototype.get_form_json = function (request, response) {
+            var userid = builder_userid;
+            var namespace = "";
+            var name = request.params.name;
+            Wrapper.Find(response, 1400, FormModel, { $and: [{ namespace: namespace }, { userid: userid }, { name: name }] }, { "_id": 0, "__v": 0 }, {}, function (response, forms) {
+                Wrapper.SendSuccess(response, forms);
+            });
+        };
         return Form;
     }());
     FormsModule.Form = Form;

@@ -6,38 +6,42 @@
 
 "use strict";
 
-let RobotControllers: angular.IModule = angular.module('RobotControllers', ["ngResource"]);
+namespace RobotControllersModule {
 
-RobotControllers.controller('RobotController', ['$scope', '$log', 'RobotService',
-    ($scope: any, $log: any, RobotService: any): void => {
+    let RobotControllers: angular.IModule = angular.module('RobotControllers', ["ngResource"]);
 
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
+    RobotControllers.controller('RobotController', ['$scope', '$log', 'RobotService',
+        ($scope: any, $log: any, RobotService: any): void => {
 
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
+            let progress = (value) => {
+                $scope.$emit('progress', value);
+            };
 
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-        };
+            $scope.$on('progress', (event, value) => {
+                $scope.progress = value;
+            });
 
-        //   let url = "https://www.npmjs.com/package/wgxpath";
-        //    let path = '/html/body//a/@href';
+            let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+                progress(false);
+                $scope.message = message;
+                $log.error(message);
+            };
 
-        $scope.Get = () => {
+            //   let url = "https://www.npmjs.com/package/wgxpath";
+            //    let path = '/html/body//a/@href';
 
-            let url = $scope.url;
-            let path = $scope.path;
+            $scope.Get = () => {
 
-            RobotService.Get(url, path, (links: any): void => {
-                if (links) {
-                    $scope.links = links;
-                }
-            }, error_handler);
-        }
+                let url = $scope.url;
+                let path = $scope.path;
 
-    }]);
+                RobotService.Get(url, path, (links: any): void => {
+                    if (links) {
+                        $scope.links = links;
+                    }
+                }, error_handler);
+            }
+
+        }]);
+
+}

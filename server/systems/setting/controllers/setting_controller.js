@@ -10,7 +10,7 @@ var SettingModule;
     //const fs: any = require('graceful-fs');
     //const _ = require('lodash');
     var share = require(process.cwd() + '/server/systems/common/share');
-    var logger = share.logger;
+    //   const logger: any = share.logger;
     var Persistent = share.Persistent;
     var Wrapper = share.Wrapper;
     var config = share.config;

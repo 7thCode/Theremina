@@ -94,7 +94,7 @@ var Adaptor;
         SVGAdaptor.prototype.Text = function (data, callback) {
             var text = '';
             var defs = '';
-            var error = null;
+            var error = { code: 0, message: "" };
             var create_def = function (fonts) {
                 var result = '<defs><style type="text/css">';
                 _.forEach(fonts, function (font) {

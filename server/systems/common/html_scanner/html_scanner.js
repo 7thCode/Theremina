@@ -1,7 +1,7 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
- This software is released under the MIT License.
- //opensource.org/licenses/mit-license.php
+ * Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ * This software is released under the MIT License.
+ * //opensource.org/licenses/mit-license.php
  */
 "use strict";
 var __extends = (this && this.__extends) || (function () {
@@ -16,8 +16,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var HTMLScanner;
 (function (HTMLScanner) {
-    var url = require('url');
-    var _ = require('lodash');
+    var url = require("url");
+    var _ = require("lodash");
     var jsdom = require("jsdom");
     var JSDOM = jsdom.JSDOM;
     var PREFIX = "ds";
@@ -31,7 +31,7 @@ var HTMLScanner;
         NodeScanner.prefix = function (name) {
             var result = "";
             var splited_name = name.toLowerCase().split(":");
-            if (splited_name.length == 2) {
+            if (splited_name.length === 2) {
                 result = splited_name[0];
             }
             return result;
@@ -54,7 +54,7 @@ var HTMLScanner;
                 this.depth--;
             }
             else {
-                this.callback({ code: 1, message: "ScanChild node is null." }, null);
+                this.callback({ code: 1, message: "ScanChild node is null." }, undefined);
             }
         };
         NodeScanner.prototype.ScanNode = function (node, data, position) {
@@ -92,29 +92,10 @@ var HTMLScanner;
             _this.base_url = "";
             return _this;
         }
-        LinkScanner.prototype.UrlNormalize = function (partial_url) {
-            return url.resolve(this.base_url, partial_url);
-        };
-        LinkScanner.prototype.ScanLinks = function (node, data) {
-            if (node.attributes) {
-                if (node.attributes.href) {
-                    var url_value = node.attributes.href.nodeValue;
-                    var target_url_string = this.UrlNormalize(url_value);
-                    if (_.indexOf(this.links, target_url_string) == -1) {
-                        this.links.push(target_url_string);
-                        var parsed_base_url = url.parse(this.base_url);
-                        var parsed_target_url = url.parse(target_url_string);
-                        if (parsed_target_url.hostname == parsed_base_url.hostname) {
-                            this.ScanHtml(target_url_string);
-                        }
-                    }
-                }
-            }
-        };
         LinkScanner.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:// element
                         switch (node.localName) {
                             case "a":
                                 this.ScanLinks(node, data);
@@ -129,7 +110,26 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "ScanNode node is null," }, null);
+                this.callback({ code: 1, message: "ScanNode node is null," }, undefined);
+            }
+        };
+        LinkScanner.prototype.UrlNormalize = function (partial_url) {
+            return url.resolve(this.base_url, partial_url);
+        };
+        LinkScanner.prototype.ScanLinks = function (node, data) {
+            if (node.attributes) {
+                if (node.attributes.href) {
+                    var url_value = node.attributes.href.nodeValue;
+                    var target_url_string = this.UrlNormalize(url_value);
+                    if (_.indexOf(this.links, target_url_string) === -1) {
+                        this.links.push(target_url_string);
+                        var parsed_base_url = url.parse(this.base_url);
+                        var parsed_target_url = url.parse(target_url_string);
+                        if (parsed_target_url.hostname === parsed_base_url.hostname) {
+                            this.ScanHtml(target_url_string);
+                        }
+                    }
+                }
             }
         };
         return LinkScanner;
@@ -152,42 +152,42 @@ var HTMLScanner;
             return _this;
         }
         DataSourceResolver.prototype.PromisedDataSource = function (node) {
-            var result = null;
+            var result = undefined;
             try {
                 var query = node.attributes.query.nodeValue;
                 result = this.datasource.GetDatasource(query, this);
             }
             catch (e) {
-                this.callback(e, null);
+                this.callback(e, undefined);
             }
             return result;
         };
         DataSourceResolver.prototype.PromisedDataCount = function (node) {
-            var result = null;
+            var result = undefined;
             try {
                 var query = node.attributes.query.nodeValue;
                 result = this.datasource.GetCount(query, this);
             }
             catch (e) {
-                this.callback(e, null);
+                this.callback(e, undefined);
             }
             return result;
         };
         DataSourceResolver.prototype.Aggregate = function (node) {
-            var result = null;
+            var result = undefined;
             try {
                 var aggrigate = node.attributes.aggrigate.nodeValue;
                 result = this.datasource.Aggregate(aggrigate, this);
             }
             catch (e) {
-                this.callback(e, null);
+                this.callback(e, undefined);
             }
             return result;
         };
         DataSourceResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:// element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = DataSourceResolver.prefix(tagname);
@@ -201,14 +201,14 @@ var HTMLScanner;
                                                 name: query.nodeValue,
                                                 promise: this.PromisedDataSource(node),
                                                 count: this.PromisedDataCount(node),
-                                                resolved: ""
+                                                resolved: "",
                                             });
                                         }
                                     }
                                     break;
                                 case "resolve":
                                 case "foreach":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.query) {
                                                 var query = node.attributes.query;
@@ -216,7 +216,7 @@ var HTMLScanner;
                                                     name: query.nodeValue,
                                                     promise: this.PromisedDataSource(node),
                                                     count: this.PromisedDataCount(node),
-                                                    resolved: ""
+                                                    resolved: "",
                                                 });
                                             }
                                             else if (node.attributes.aggrigate) {
@@ -224,8 +224,8 @@ var HTMLScanner;
                                                 this.datasource_promises.push({
                                                     name: aggrigate.nodeValue,
                                                     promise: this.Aggregate(node),
-                                                    count: null,
-                                                    resolved: ""
+                                                    count: undefined,
+                                                    resolved: "",
                                                 });
                                             }
                                         }
@@ -237,14 +237,14 @@ var HTMLScanner;
                             this.ScanChild(node, data, position);
                         }
                         else {
-                            this.callback({ code: 1, message: "ScanNode tagname is null" }, null);
+                            this.callback({ code: 1, message: "ScanNode tagname is null" }, undefined);
                         }
                         break;
                     default:
                 }
             }
             else {
-                this.callback({ code: 2, message: "ScanNode node is null" }, null);
+                this.callback({ code: 2, message: "ScanNode node is null" }, undefined);
             }
         };
         DataSourceResolver.prototype.ResolveDataSource = function (source, result) {
@@ -256,18 +256,18 @@ var HTMLScanner;
                 if (childnodes) {
                     _.forEach(childnodes, function (element, index) {
                         _this.position = index;
-                        _this.ScanNode(element, null, 0);
+                        _this.ScanNode(element, undefined, 0);
                     });
                 }
             }
             else {
-                this.callback({ code: 1, message: "ResolveDataSource dom is null." }, null);
+                this.callback({ code: 1, message: "ResolveDataSource dom is null." }, undefined);
             }
             this.document_depth--;
-            if (this.document_depth == 0) {
+            if (this.document_depth === 0) {
                 // resolve all [record reference] in document.
                 Promise.all(this.datasource_promises.map(function (doc) {
-                    var result1 = null;
+                    var result1 = undefined;
                     if (doc.promise) {
                         result1 = doc.promise;
                     }
@@ -277,21 +277,21 @@ var HTMLScanner;
                         result[_this.datasource_promises[index].name] = { content: entry, count: 0 };
                     });
                     Promise.all(_this.datasource_promises.map(function (doc) {
-                        var result2 = null;
+                        var result2 = undefined;
                         if (doc.count) {
                             result2 = doc.count;
                         }
                         return result2;
-                    })).then(function (resolved) {
-                        _.forEach(resolved, function (count, index) {
+                    })).then(function (_resolved) {
+                        _.forEach(_resolved, function (count, index) {
                             result[_this.datasource_promises[index].name].count = count;
                         });
-                        _this.callback(null, result);
+                        _this.callback(undefined, result);
                     }).catch(function (error) {
-                        _this.callback(error, null);
+                        _this.callback(error, undefined);
                     });
                 }).catch(function (error) {
-                    _this.callback(error, null);
+                    _this.callback(error, undefined);
                 });
             }
         };
@@ -301,12 +301,12 @@ var HTMLScanner;
             if (childnodes) {
                 _.forEach(childnodes, function (element, index) {
                     _this.position = index;
-                    _this.ScanNode(element, null, 0);
+                    _this.ScanNode(element, undefined, 0);
                 });
             }
             // resolve all [record reference] in document.
             Promise.all(this.datasource_promises.map(function (doc) {
-                var result1 = null;
+                var result1 = undefined;
                 if (doc.promise) {
                     result1 = doc.promise;
                 }
@@ -316,21 +316,21 @@ var HTMLScanner;
                     result[_this.datasource_promises[index].name] = { content: entry, count: 0 };
                 });
                 Promise.all(_this.datasource_promises.map(function (doc) {
-                    var result2 = null;
+                    var result2 = undefined;
                     if (doc.count) {
                         result2 = doc.count;
                     }
                     return result2;
-                })).then(function (resolved) {
-                    _.forEach(resolved, function (count, index) {
+                })).then(function (_resolved) {
+                    _.forEach(_resolved, function (count, index) {
                         result[_this.datasource_promises[index].name].count = count;
                     });
-                    _this.callback(null, result);
+                    _this.callback(undefined, result);
                 }).catch(function (error) {
-                    _this.callback(error, null);
+                    _this.callback(error, undefined);
                 });
             }).catch(function (error) {
-                _this.callback(error, null);
+                _this.callback(error, undefined);
             });
         };
         return DataSourceResolver;
@@ -354,17 +354,17 @@ var HTMLScanner;
             return _this;
         }
         UrlResolver.prototype.PromisedUrl = function (target_url_string) {
-            var result = null;
+            var result = undefined;
             try {
                 result = this.datasource.GetUrl(target_url_string, this);
             }
             catch (e) {
-                this.callback(e, null);
+                this.callback(e, undefined);
             }
             return result;
         };
-        //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
-        //よって、"meta"タグをInclude命令に使用する。
+        // js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
+        // よって、"meta"タグをInclude命令に使用する。
         UrlResolver.prototype.Include = function (node) {
             if (node.attributes) {
                 var number = node.attributes.length;
@@ -372,13 +372,13 @@ var HTMLScanner;
                     var attribute = node.attributes[index];
                     var prefix = Expander.prefix(attribute.name);
                     var localname = Expander.localName(attribute.name);
-                    if (prefix == PREFIX) {
-                        if (localname == "include") {
+                    if (prefix === PREFIX) {
+                        if (localname === "include") {
                             this.url_promises.push({
                                 name: attribute.nodeValue,
                                 promise: this.PromisedUrl(attribute.nodeValue),
                                 count: 1,
-                                resolved: ""
+                                resolved: "",
                             });
                         }
                     }
@@ -388,7 +388,7 @@ var HTMLScanner;
         UrlResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:// element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = UrlResolver.prefix(tagname);
@@ -401,7 +401,7 @@ var HTMLScanner;
                                     break;
                                 //    case "resolve":
                                 case "include":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.src) {
                                                 var src = node.attributes.src;
@@ -409,7 +409,7 @@ var HTMLScanner;
                                                     name: src.nodeValue,
                                                     promise: this.PromisedUrl(src.nodeValue),
                                                     count: 1,
-                                                    resolved: ""
+                                                    resolved: "",
                                                 });
                                             }
                                         }
@@ -425,7 +425,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "ScanNode node is null." }, null);
+                this.callback({ code: 1, message: "ScanNode node is null." }, undefined);
             }
         };
         UrlResolver.prototype.ResolveUrl = function (source, result) {
@@ -437,17 +437,17 @@ var HTMLScanner;
                 if (childnodes) {
                     _.forEach(childnodes, function (element, index) {
                         _this.position = index;
-                        _this.ScanNode(element, null, 0);
+                        _this.ScanNode(element, undefined, 0);
                     });
                 }
             }
             else {
-                this.callback({ code: 1, message: "ResolveUrl dom is null." }, null);
+                this.callback({ code: 1, message: "ResolveUrl dom is null." }, undefined);
             }
             this.document_depth--;
-            if (this.document_depth == 0) {
+            if (this.document_depth === 0) {
                 Promise.all(this.url_promises.map(function (doc) {
-                    var promise = null;
+                    var promise = undefined;
                     if (doc.promise) {
                         promise = doc.promise;
                     }
@@ -456,14 +456,14 @@ var HTMLScanner;
                     _.forEach(resolved, function (entry, index) {
                         result[_this.url_promises[index].name] = { content: entry, count: 1 };
                     });
-                    _this.callback(null, result);
+                    _this.callback(undefined, result);
                 }).catch(function (error) {
                     switch (error.statusCode) {
                         case 404:
-                            _this.callback({ code: 404, message: error.options.uri }, null);
+                            _this.callback({ code: 404, message: error.options.uri }, undefined);
                             break;
                         default:
-                            _this.callback(error, null);
+                            _this.callback(error, undefined);
                     }
                 });
             }
@@ -474,11 +474,11 @@ var HTMLScanner;
             if (childnodes) {
                 _.forEach(childnodes, function (element, index) {
                     _this.position = index;
-                    _this.ScanNode(element, null, 0);
+                    _this.ScanNode(element, undefined, 0);
                 });
             }
             Promise.all(this.url_promises.map(function (doc) {
-                var promise = null;
+                var promise = undefined;
                 if (doc.promise) {
                     promise = doc.promise;
                 }
@@ -487,9 +487,9 @@ var HTMLScanner;
                 _.forEach(resolved, function (entry, index) {
                     result[_this.url_promises[index].name] = { content: entry, count: 1 };
                 });
-                _this.callback(null, result);
+                _this.callback(undefined, result);
             }).catch(function (error) {
-                _this.callback(error, null);
+                _this.callback(error, undefined);
             });
         };
         return UrlResolver;
@@ -516,8 +516,8 @@ var HTMLScanner;
             _this.datasource = datasource;
             return _this;
         }
-        //js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
-        //よって、"meta"タグをInclude命令に使用する。
+        // js-domはHTMLを厳密にパースする。そのためHeader要素が限られる。
+        // よって、"meta"タグをInclude命令に使用する。
         Expander.prototype.Meta = function (node, data, position) {
             var resolved = false;
             if (node.attributes) {
@@ -526,63 +526,62 @@ var HTMLScanner;
                     var attribute = node.attributes[index];
                     var prefix = Expander.prefix(attribute.name);
                     var localname = Expander.localName(attribute.name);
-                    if (prefix == PREFIX) {
+                    if (prefix === PREFIX) {
                         switch (localname) {
                             case "include":
                                 this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], position, this);
                                 resolved = true;
                                 break;
-                            case "title":
-                                {
-                                    var query_attribute = node.attributes["query"];
-                                    if (query_attribute) {
-                                        var datas = data[query_attribute.nodeValue];
-                                        if (datas.content.length > 0) {
-                                            var first_data = datas.content[0];
-                                            this.html += '<title>' + this.datasource.ResolveFormat(first_data, {
-                                                content: attribute.value,
-                                                count: 1
-                                            }, position, this) + '</title>';
-                                        }
-                                        resolved = true;
+                            case "title": {
+                                var query_attribute = node.attributes["query"];
+                                if (query_attribute) {
+                                    var datas = data[query_attribute.nodeValue];
+                                    if (datas.content.length > 0) {
+                                        var first_data = datas.content[0];
+                                        this.html += "<title>" + this.datasource.ResolveFormat(first_data, {
+                                            content: attribute.value,
+                                            count: 1,
+                                        }, position, this) + "</title>";
                                     }
+                                    resolved = true;
                                 }
                                 break;
-                            case "content":
-                                {
-                                    var query_attribute = node.attributes["query"];
-                                    if (query_attribute) {
-                                        var datas = data[query_attribute.nodeValue];
-                                        if (datas.content.length > 0) {
-                                            var first_data = datas.content[0];
-                                            /*
-                                                                                  let name_attribute: any = node.attributes["name"];
-                                                                                  let name = "";
-                                                                                  if (name_attribute) {
-                                                                                      name = 'name="' + name_attribute.nodeValue + '"';
-                                                                                  }
-                                          */
-                                            var name_1 = "";
-                                            var number_1 = node.attributes.length;
-                                            for (var index = 0; index < number_1; index++) {
-                                                var attribute_1 = node.attributes[index];
-                                                var prefix_1 = Expander.prefix(attribute_1.name);
-                                                var localname_1 = Expander.localName(attribute_1.name);
-                                                if (prefix_1 != PREFIX) {
-                                                    if (localname_1 != "query") {
-                                                        name_1 = attribute_1.name + '="' + attribute_1.nodeValue + '" ';
-                                                    }
+                            }
+                            case "content": {
+                                var query_attribute = node.attributes["query"];
+                                if (query_attribute) {
+                                    var datas = data[query_attribute.nodeValue];
+                                    if (datas.content.length > 0) {
+                                        var first_data = datas.content[0];
+                                        /*
+                                                                              let name_attribute: any = node.attributes["name"];
+                                                                              let name = "";
+                                                                              if (name_attribute) {
+                                                                                  name = 'name="' + name_attribute.nodeValue + '"';
+                                                                              }
+                                      */
+                                        var name_1 = "";
+                                        var _number = node.attributes.length;
+                                        for (var _index = 0; index < _number; index++) {
+                                            var _attribute = node.attributes[_index];
+                                            var _prefix = Expander.prefix(_attribute.name);
+                                            var _localname = Expander.localName(_attribute.name);
+                                            if (_prefix !== PREFIX) {
+                                                if (_localname !== "query") {
+                                                    name_1 = _attribute.name + '="' + _attribute.nodeValue + '" ';
                                                 }
                                             }
-                                            this.html += '<meta ' + name_1 + ' content="' + this.datasource.ResolveFormat(first_data, {
-                                                content: attribute.value,
-                                                count: 1
-                                            }, position, this) + '"/>';
                                         }
-                                        resolved = true;
+                                        this.html += "<meta " + name_1 + ' content="' + this.datasource.ResolveFormat(first_data, {
+                                            content: attribute.value,
+                                            count: 1,
+                                        }, position, this) + '"/>';
                                     }
+                                    resolved = true;
                                 }
                                 break;
+                            }
+                            default:
                         }
                         //     if (localname == "include") {
                         //         this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
@@ -602,22 +601,22 @@ var HTMLScanner;
                 var number = node.attributes.length;
                 for (var index = 0; index < number; index++) {
                     var attribute = node.attributes[index];
-                    var prefix_2 = Expander.prefix(attribute.name);
-                    var localname_2 = Expander.localName(attribute.name);
-                    if (prefix_2 == PREFIX) {
-                        attribute_string += ' ' + localname_2 + '="' + this.datasource.ResolveFormat(data, {
+                    var _prefix = Expander.prefix(attribute.name);
+                    var _localname = Expander.localName(attribute.name);
+                    if (_prefix === PREFIX) {
+                        attribute_string += " " + _localname + '="' + this.datasource.ResolveFormat(data, {
                             content: attribute.value,
-                            count: 1
+                            count: 1,
                         }, position, this) + '"';
                     }
                     else {
-                        attribute_string += ' ' + attribute.name + '="' + attribute.value + '"';
+                        attribute_string += " " + attribute.name + '="' + attribute.value + '"';
                     }
                 }
             }
             var localname = DataSourceResolver.localName(tagname);
             var prefix = DataSourceResolver.prefix(tagname);
-            if (prefix != PREFIX) {
+            if (prefix !== PREFIX) {
                 localname = tagname;
             }
             if (node.childNodes.length > 0) {
@@ -649,7 +648,7 @@ var HTMLScanner;
             var _this = this;
             if (node) {
                 switch (node.nodeType) {
-                    case 1://element
+                    case 1:// element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = Expander.prefix(tagname);
@@ -669,7 +668,7 @@ var HTMLScanner;
                                     this.Meta(node, data, position);
                                     break;
                                 case "foreach":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.query) {
                                                 var query = node.attributes.query;
@@ -693,13 +692,13 @@ var HTMLScanner;
                                                 var field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
-                                                    count: 1
+                                                    count: 1,
                                                 }, position, this);
                                             }
                                             else if (node.attributes.scope) {
                                                 if (data) {
                                                     var scope = node.attributes.scope;
-                                                    var result = this.datasource.FieldValue(data, scope.nodeValue, position, this); //fragment
+                                                    var result = this.datasource.FieldValue(data, scope.nodeValue, position, this); // fragment
                                                     if (result) {
                                                         if (_.isArray(result)) {
                                                             _.forEach(result, function (resolved_data, position) {
@@ -713,7 +712,7 @@ var HTMLScanner;
                                     }
                                     break;
                                 case "resolve":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.query) {
                                                 var query = node.attributes.query;
@@ -736,7 +735,7 @@ var HTMLScanner;
                                                 var field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
-                                                    count: 1
+                                                    count: 1,
                                                 }, position, this);
                                             }
                                             else if (node.attributes.scope) {
@@ -759,7 +758,7 @@ var HTMLScanner;
                                     }
                                     break;
                                 case "include":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.src) {
                                                 var src = node.attributes.src;
@@ -769,21 +768,21 @@ var HTMLScanner;
                                     }
                                     break;
                                 case "if":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 var exist = node.attributes.exist;
-                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
+                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); // model
                                                 if (node.attributes.equal) {
                                                     var equal = node.attributes.equal;
-                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
-                                                    if (result == result2) {
+                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); // model
+                                                    if (result === result2) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
                                                 else if (node.attributes.match) {
                                                     var match = node.attributes.match;
-                                                    if (result == match.nodeValue) {
+                                                    if (result === match.nodeValue) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
@@ -797,21 +796,21 @@ var HTMLScanner;
                                     }
                                     break;
                                 case "ifn":
-                                    if (prefix == PREFIX) {
+                                    if (prefix === PREFIX) {
                                         if (node.attributes) {
                                             if (node.attributes.exist) {
                                                 var exist = node.attributes.exist;
-                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); //model
+                                                var result = this.datasource.FieldValue(data, exist.nodeValue, position, this); // model
                                                 if (node.attributes.equal) {
                                                     var equal = node.attributes.equal;
-                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); //model
-                                                    if (result != result2) {
+                                                    var result2 = this.datasource.FieldValue(data, equal.nodeValue, position, this); // model
+                                                    if (result !== result2) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
                                                 else if (node.attributes.match) {
                                                     var match = node.attributes.match;
-                                                    if (result != match.nodeValue) {
+                                                    if (result !== match.nodeValue) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
@@ -830,14 +829,14 @@ var HTMLScanner;
                             }
                         }
                         break;
-                    case 3://text
+                    case 3:// text
                         if (node.parentNode) {
                             var parent_name = node.parentNode.localName;
                             var prefix = Expander.prefix(parent_name);
-                            if (prefix == PREFIX) {
+                            if (prefix === PREFIX) {
                                 this.html += this.datasource.ResolveFormat(data, {
                                     content: node.data,
-                                    count: 1
+                                    count: 1,
                                 }, position, this);
                             }
                             else {
@@ -857,7 +856,7 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "ScanNode node is null." }, null);
+                this.callback({ code: 1, message: "ScanNode node is null." }, undefined);
             }
         };
         Expander.prototype.ExpandHtml = function (source, fragments) {
@@ -875,11 +874,11 @@ var HTMLScanner;
                 }
             }
             else {
-                this.callback({ code: 1, message: "ExpandHtml dom is null." }, null);
+                this.callback({ code: 1, message: "ExpandHtml dom is null." }, undefined);
             }
             this.document_depth--;
-            if (this.document_depth == 0) {
-                this.callback(null, this.html);
+            if (this.document_depth === 0) {
+                this.callback(undefined, this.html);
             }
         };
         // todo:1path
@@ -890,7 +889,7 @@ var HTMLScanner;
                     _this.position = index;
                     _this.ScanNode(element, fragments, position);
                 });
-                this.callback(null, this.html);
+                this.callback(undefined, this.html);
             }
         };
         return Expander;
@@ -912,22 +911,22 @@ var HTMLScanner;
                             if (!error) {
                                 var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                                     if (!error) {
-                                        callback(null, expand_result);
+                                        callback(undefined, expand_result);
                                     }
                                     else {
-                                        callback(error, null);
+                                        callback(error, undefined);
                                     }
                                 });
                                 expander.ExpandHtml(source, url_result);
                             }
                             else {
-                                callback(error, null);
+                                callback(error, undefined);
                             }
                         });
                         url_resolver.ResolveUrl(source, datasource_result);
                     }
                     else {
-                        callback(error, null);
+                        callback(error, undefined);
                     }
                 });
                 datasource_resolver.datasource_promises.push(page_init);
@@ -944,10 +943,10 @@ var HTMLScanner;
         Builder.Resolve = function (source, datasource, url_result, callback) {
             var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                 if (!error) {
-                    callback(null, expand_result);
+                    callback(undefined, expand_result);
                 }
                 else {
-                    callback(error, null);
+                    callback(error, undefined);
                 }
             });
             expander.ExpandHtml(source, url_result);
@@ -961,22 +960,22 @@ var HTMLScanner;
                             if (!error) {
                                 var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                                     if (!error) {
-                                        callback(null, expand_result);
+                                        callback(undefined, expand_result);
                                     }
                                     else {
-                                        callback(error, null);
+                                        callback(error, undefined);
                                     }
                                 });
                                 expander.ExpandHtml2(source, url_result);
                             }
                             else {
-                                callback(error, null);
+                                callback(error, undefined);
                             }
                         });
                         url_resolver.ResolveUrl2(source, datasource_result);
                     }
                     else {
-                        callback(error, null);
+                        callback(error, undefined);
                     }
                 });
                 datasource_resolver.datasource_promises.push(page_init);
@@ -993,17 +992,17 @@ var HTMLScanner;
                 }
             }
             else {
-                callback({ code: 1, message: "" }, null);
+                callback({ code: 1, message: "" }, undefined);
             }
         };
         ;
         Builder.Resolve2 = function (source, datasource, url_result, callback) {
             var expander = new HTMLScanner.Expander(datasource, function (error, expand_result) {
                 if (!error) {
-                    callback(null, expand_result);
+                    callback(undefined, expand_result);
                 }
                 else {
-                    callback(error, null);
+                    callback(error, undefined);
                 }
             });
             expander.ExpandHtml(source, url_result);

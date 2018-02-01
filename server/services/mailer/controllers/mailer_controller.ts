@@ -49,8 +49,8 @@ export namespace MailerModule {
 
             let referer = request.headers.referer;
             if (referer) {
-                let mailer = null;
-                let bcc = null;
+                let mailer:any = null;
+                let bcc: string | any[] | null = null;
                 switch (config.mailer.type) {
                     case "gmail":
                         mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);

@@ -11,7 +11,7 @@ export namespace MembersModule {
     const _ = require('lodash');
     const fs: any = require('graceful-fs');
 
-    const mongodb: any = require('mongodb');
+    //const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 

@@ -4,18 +4,21 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-var FormsProviders = angular.module('FormsProviders', []);
-FormsProviders.provider('HtmlEdit', [function () {
-        this.$get = function () {
-            return {
-                toHtml: function (object, init) {
-                    return HtmlEdit.Render.toHtml(object, init);
-                },
-                fromHtml: function (html, callback) {
-                    HtmlEdit.Render.fromHtml(html, callback);
-                },
+var FormsProvidersModule;
+(function (FormsProvidersModule) {
+    var FormsProviders = angular.module('FormsProviders', []);
+    FormsProviders.provider('HtmlEdit', [function () {
+            this.$get = function () {
+                return {
+                    toHtml: function (object, init) {
+                        return HtmlEdit.Render.toHtml(object, init);
+                    },
+                    fromHtml: function (html, callback) {
+                        HtmlEdit.Render.fromHtml(html, callback);
+                    },
+                };
             };
-        };
-    }
-]);
+        }
+    ]);
+})(FormsProvidersModule || (FormsProvidersModule = {}));
 //# sourceMappingURL=forms_providers.js.map

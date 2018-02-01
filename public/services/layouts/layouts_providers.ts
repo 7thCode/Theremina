@@ -6,5 +6,7 @@
 
 "use strict";
 
-let LayoutsProviders: angular.IModule = angular.module('LayoutsProviders', []);
+namespace LayoutsProvidersModule {
+    let LayoutsProviders: angular.IModule = angular.module('LayoutsProviders', []);
+}
 

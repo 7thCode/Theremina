@@ -30,6 +30,8 @@ export namespace FormApiRouter {
     router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.delete_form]);
 
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.delete_own]);
+
+    router.get("/json/:name", [form.get_form_json]);
 }
 
 module.exports = FormApiRouter.router;

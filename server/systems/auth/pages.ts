@@ -18,8 +18,8 @@ export namespace AuthPageRouter {
 
     let message = config.message;
 
-    const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth: any = new AuthController.Auth;
+   // const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
+    //const auth: any = new AuthController.Auth;
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception;

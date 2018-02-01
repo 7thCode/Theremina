@@ -24,6 +24,7 @@ var FormPageRouter;
             response.render("services/forms/player/index", {
                 config: config,
                 user: request.user,
+                role: FormPageRouter.auth.role(request.user),
                 message: message,
                 status: 200,
                 fonts: webfonts
@@ -34,6 +35,7 @@ var FormPageRouter;
                 config: config,
                 domain: share.config.domain,
                 user: request.user,
+                role: FormPageRouter.auth.role(request.user),
                 message: message,
                 status: 200,
                 fonts: webfonts

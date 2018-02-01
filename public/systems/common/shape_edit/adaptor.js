@@ -1,5 +1,5 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
@@ -17,7 +17,7 @@ var Adaptor;
         var request = require('request');
         var url = require('url');
         var fs = require('fs');
-        var Q = require('q');
+        //  var Q = require('q');
         var crypto = require('crypto');
     }
     var SVGAdaptor = (function () {
@@ -95,7 +95,7 @@ var Adaptor;
         SVGAdaptor.prototype.Text = function (data, callback) {
             var text = '';
             var defs = '';
-            var error = null;
+            var error = { code: 0, message: "" };
             var create_def = function (fonts) {
                 var result = '<defs><style type="text/css">';
                 _.forEach(fonts, function (font) {

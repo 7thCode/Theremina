@@ -22,6 +22,7 @@ var ArticleApiRouter;
     ArticleApiRouter.router.get("/api/:id", [article.get_article]);
     ArticleApiRouter.router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.put_article]);
     ArticleApiRouter.router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.delete_article]);
+    ArticleApiRouter.router.post("/api/createmany", [exception.exception, exception.guard, exception.authenticate, article.create_article_many]);
     ArticleApiRouter.router.get('/api/query/:query', [article.get_article_query]);
     ArticleApiRouter.router.get('/api/query/:query/:option', [article.get_article_query_query]);
     ArticleApiRouter.router.get("/api/count/:query", [article.get_article_count]);

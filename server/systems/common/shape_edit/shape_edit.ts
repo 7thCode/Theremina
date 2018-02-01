@@ -52,7 +52,7 @@ namespace ShapeEdit {
 
         }
 
-        public Exec(name: string, target: ShapeEdit.BaseShape, e: any): void {
+        public Exec(name: string, target: BaseShape, e: any): void {
             if (this.handlers[name]) {
                 this.handlers[name](target, e);
             }

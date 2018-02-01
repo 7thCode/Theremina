@@ -23,6 +23,7 @@ var FormApiRouter;
     FormApiRouter.router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, FormApiRouter.auth.is_system, form.put_form]);
     FormApiRouter.router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, FormApiRouter.auth.is_system, form.delete_form]);
     FormApiRouter.router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, FormApiRouter.auth.is_system, form.delete_own]);
+    FormApiRouter.router.get("/json/:name", [form.get_form_json]);
 })(FormApiRouter = exports.FormApiRouter || (exports.FormApiRouter = {}));
 module.exports = FormApiRouter.router;
 //# sourceMappingURL=api.js.map

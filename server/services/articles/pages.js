@@ -17,14 +17,11 @@ var ArticlePageRouter;
     var services_config = share.services_config;
     var webfonts = services_config.webfonts;
     var message = config.message;
-    //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    // const analysis: any = new AnalysisModule.Analysis;
-    //   const ArticleModule: any = require(share.Server("services/articles/controllers/article_controller"));
-    //   const article: any = new ArticleModule.Article;
     ArticlePageRouter.router.get("/", [exception.page_guard, auth.page_valid, function (request, response) {
             response.render("services/articles/index", {
                 config: config,
                 user: request.user,
+                role: auth.role(request.user),
                 message: message,
                 status: 200,
                 fonts: webfonts
