@@ -1,11 +1,51 @@
 extends ../../layout
 
 block content
-        section.content(ng-controller="DataController")
-            include partial/navbar
-            .row
-                .col-xs-12
-                    div(style="font-size:2rem;color:#607D8B") #{message.page}
-            .row
-                .col-xs-12
-                    include partial/mid
+    section.content(ng-controller="DataController")
+        include partial/navbar
+        .flex-row
+            .flex-column
+                div(style="font-size:2rem;color:#607D8B") #{message.article}
+        .flex-row#draggable_area
+            .flex-column(style="flex:1;padding:0 5px;margin-top:12px;min-width:250px;")
+                div(style="padding:0 5px;")
+                    include partial/pallete
+            .flex-column(style="flex:5;padding:0 5px;margin-top:12px;")
+                //div(style="padding:0 5px;")
+                    include partial/select
+                div(style="padding:0 5px;")
+                    .box.box-primary
+                        .box-header
+                            div(style="font-size:2rem;")
+                                span(ng-show="current_page.name") #{message.dimension}: {{current_page.name}} &nbsp;
+                                span(ng-show="current_article.name") #{message.name}: {{current_article.name}}
+                            .box-tools.pull-right
+                                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                        .box-body
+                            .flex-row
+                                ul.flex-auto.nav.nav-tabs
+                                    li(ng-repeat="page in pages", ng-class="{active: hover || PageSelected(page.name)}")
+                                        a(ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="SelectPage(page.name);")
+                                            div(style="font-size:1.6rem;") {{page.name | limit:10}}
+
+                            ng-form(name="validate", ng-show="opened")
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                            i.fa.fa-cloud
+                                            span.hidden-xs.hidden-sm #{message.save}
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        #root
+                                .flex-row
+                                    .flex-auto(style="padding:0 5px;")
+                                        button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
+                                            i.fa.fa-cloud
+                                            span.hidden-xs.hidden-sm #{message.save}
+                        .box-footer.clearfix
+                            div(ng-bind="message")
+
+            include partial/images
+
+    guidance(scenario="{{scenario}}")

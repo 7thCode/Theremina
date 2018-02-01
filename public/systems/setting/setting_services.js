@@ -1,11 +1,11 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-var Setting;
-(function (Setting) {
+var SettingModule;
+(function (SettingModule) {
     var SettingServices = angular.module('SettingServices', []);
     SettingServices.factory('Backup', ['$resource',
         function ($resource) {
@@ -247,5 +247,5 @@ var Setting;
                 });
             };
         }]);
-})(Setting || (Setting = {}));
+})(SettingModule || (SettingModule = {}));
 //# sourceMappingURL=setting_services.js.map

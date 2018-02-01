@@ -97,18 +97,17 @@ export namespace ArticleModule {
                             if (data.name.indexOf('/') == -1) {
 
                                 let article: any = new ArticleModel();
-                                article.userid = data.userid;
+                                article.userid = Article.userid(request);
+                                article.namespace = Article.namespace(request);
                                 article.version = data.version;
                                 article.status = data.status;
-                                article.userid = data.userid;
-                                article.namespace = data.namespace;
                                 article.name = data.name;
                                 article.type = data.type;
                                 article.content = data.content;
                                 article.open = data.open;
 
                                 _.forEach(article.content, (content: any, key): void => {
-                                    if (content.type == "date") {//単純記事はエスケープ
+                                    if (content.type == "date") {
                                         if (typeof content.value === 'string') {
                                             article.content[key].value = new Date(content.value);
                                         }
@@ -301,7 +300,7 @@ export namespace ArticleModule {
             let namespace = Article.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, {"_id": 0, "version": 1, "status": 1, "namespace": 1, "modify": 1, "create": 1, "open": 1, "content": 1, "type": 1, "name": 1, "userid": 1}, option, (response: any, articles: any): any => {
+            Wrapper.Find(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, {"_id": 0}, option, (response: any, articles: any): any => {
                 Wrapper.SendSuccess(response, articles);
             });
         }
@@ -328,8 +327,8 @@ export namespace ArticleModule {
         public namespaces(userid: string, callback: any): void {
             const number: number = 1400;
             ArticleModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
-                let result = [];
-                _.forEach(pages, (page) => {
+                let result:string[] = [];
+                _.forEach(pages, (page:{namespace:string}) => {
                     if (page.namespace) {
                         result.push(page.namespace);
                     }

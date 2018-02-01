@@ -4,25 +4,28 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-var YahooServices = angular.module('YahooServices', []);
-YahooServices.service('ZipService', ["$http",
-    function ($http) {
-        this.Zip = function (zip_code, callback) {
-            $http.jsonp('http://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip_code, { callback: 'JSONP_CALLBACK' }).then(function (response) {
-                callback(null, response.data);
-            }).catch(function (data) {
-                callback(data, null);
-            });
-        };
-    }]);
-YahooServices.service('ZipService2', ["$http",
-    function ($http) {
-        this.Zip = function (zip_code, callback) {
-            $http.jsonp('https://map.yahooapis.jp/search/zip/V1/zipCodeSearch?output=json&query=' + zip_code + '&appid=dj0zaiZpPURPNXRydGRpZFZhaSZzPWNvbnN1bWVyc2VjcmV0Jng9ZGU-', { callback: 'JSONP_CALLBACK' }).then(function (response) {
-                callback(null, response.data);
-            }).catch(function (data) {
-                callback(data, null);
-            });
-        };
-    }]);
+var YahooServicesModule;
+(function (YahooServicesModule) {
+    var YahooServices = angular.module('YahooServices', []);
+    YahooServices.service('ZipService', ["$http",
+        function ($http) {
+            this.Zip = function (zip_code, callback) {
+                $http.jsonp('http://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip_code, { callback: 'JSONP_CALLBACK' }).then(function (response) {
+                    callback(null, response.data);
+                }).catch(function (data) {
+                    callback(data, null);
+                });
+            };
+        }]);
+    YahooServices.service('ZipService2', ["$http",
+        function ($http) {
+            this.Zip = function (zip_code, callback) {
+                $http.jsonp('https://map.yahooapis.jp/search/zip/V1/zipCodeSearch?output=json&query=' + zip_code + '&appid=dj0zaiZpPURPNXRydGRpZFZhaSZzPWNvbnN1bWVyc2VjcmV0Jng9ZGU-', { callback: 'JSONP_CALLBACK' }).then(function (response) {
+                    callback(null, response.data);
+                }).catch(function (data) {
+                    callback(data, null);
+                });
+            };
+        }]);
+})(YahooServicesModule || (YahooServicesModule = {}));
 //# sourceMappingURL=yahoo_services.js.map

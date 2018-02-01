@@ -126,7 +126,7 @@ namespace Adaptor {
         public Text(data: any, callback: (error: any) => void): void {
             let text: string = '';
             let defs: string = '';
-            let error = null;
+            let error:{code: number, message: string} = {code: 0, message: ""};
 
             let create_def = (fonts: any[]) => {
                 let result: string = '<defs><style type="text/css">';
@@ -370,7 +370,7 @@ namespace Adaptor {
     export class PDFAdaptor {
 
         private path: string;
-        private doc = null;
+        private doc:any = null;
         private serif = "";
         private sans_serif = "";
         private pagehight = 0;

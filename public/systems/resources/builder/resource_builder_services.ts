@@ -6,253 +6,257 @@
 
 "use strict";
 
-let ResourceBuilderServices: angular.IModule = angular.module('ResourceBuilderServices', []);
+namespace ResourceBuilderServicesModule {
 
-ResourceBuilderServices.factory('ResourceCreate', ['$resource',
-    ($resource: any): any => {
-        return $resource('/resources/api/create', {}, {});
-    }]);
+    let ResourceBuilderServices: angular.IModule = angular.module('ResourceBuilderServices', []);
 
-ResourceBuilderServices.factory('Resource', ['$resource',
-    ($resource: any): any => {
-        return $resource('/resources/api/:id', {id: "@id"}, {
-            get: {method: 'GET'},
-            put: {method: 'PUT'},
-            delete: {method: 'DELETE'}
-        });
-    }]);
+    ResourceBuilderServices.factory('ResourceCreate', ['$resource',
+        ($resource: any): any => {
+            return $resource('/resources/api/create', {}, {});
+        }]);
 
-ResourceBuilderServices.factory('ResourceQuery', ['$resource',
-    ($resource: any): any => {
-        return $resource("/resources/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
-            query: {method: 'GET'}
-        });
-    }]);
+    ResourceBuilderServices.factory('Resource', ['$resource',
+        ($resource: any): any => {
+            return $resource('/resources/api/:id', {id: "@id"}, {
+                get: {method: 'GET'},
+                put: {method: 'PUT'},
+                delete: {method: 'DELETE'}
+            });
+        }]);
 
-ResourceBuilderServices.factory('ResourceCount', ['$resource',
-    ($resource: any): any => {
-        return $resource('/resources/api/count/:query', {query: '@query'}, {
-            get: {method: 'GET'}
-        });
-    }]);
+    ResourceBuilderServices.factory('ResourceQuery', ['$resource',
+        ($resource: any): any => {
+            return $resource("/resources/api/query/:query/:option", {query: '@query', option: '@optopn'}, {
+                query: {method: 'GET'}
+            });
+        }]);
 
-ResourceBuilderServices.factory('MimeTypes', ['$resource',
-    ($resource: any): any => {
-        return $resource('/resources/api/mime/types', {}, {
-            get: {method: 'GET'}
-        });
-    }]);
+    ResourceBuilderServices.factory('ResourceCount', ['$resource',
+        ($resource: any): any => {
+            return $resource('/resources/api/count/:query', {query: '@query'}, {
+                get: {method: 'GET'}
+            });
+        }]);
 
-ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount","MimeTypes",
-    function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any,MimeTypes:any): void {
+    ResourceBuilderServices.factory('MimeTypes', ['$resource',
+        ($resource: any): any => {
+            return $resource('/resources/api/mime/types', {}, {
+                get: {method: 'GET'}
+            });
+        }]);
 
-        this.InitQuery = (query: any, type: number = 0, pagesize: number = 40) => {
-            this.option.skip = 0;
-            this.option.limit = pagesize;
+    ResourceBuilderServices.service('ResourceBuilderService', ["HtmlEdit", "ResourceCreate", "Resource", "ResourceQuery", "ResourceCount", "MimeTypes",
+        function (HtmlEdit: any, ResourceCreate: any, Resource: any, ResourceQuery: any, ResourceCount: any, MimeTypes: any): void {
 
-            this.query = {$and: [{}]};
-            if (query) {
-                this.query = query;
-            }
-        };
+            this.InitQuery = (query: any, type: number = 0, pagesize: number = 40) => {
+                this.option.skip = 0;
+                this.option.limit = pagesize;
 
-        this.GetQuery = (): any => {
-            return this.query;
-        };
-
-        this.AddQuery = (query: any) => {
-            if (this.query) {
-                if (this.query.$and) {
-                    if (Object.keys(query).length !== 0) {
-                        this.query.$and.push(query);
-                    }
+                this.query = {$and: [{}]};
+                if (query) {
+                    this.query = query;
                 }
-            }
-        };
+            };
 
-        this.RemoveQuery = (name: string) => {
-            if (this.query) {
-                if (this.query.$and) {
-                    let filted = [{}];
-                    this.query.$and.forEach((query) => {
-                        if (!query[name]) {
-                            if (Object.keys(query).length !== 0) {
-                                filted.push(query);
-                            }
+            this.GetQuery = (): any => {
+                return this.query;
+            };
+
+            this.AddQuery = (query: any) => {
+                if (this.query) {
+                    if (this.query.$and) {
+                        if (Object.keys(query).length !== 0) {
+                            this.query.$and.push(query);
                         }
-                    });
-
-                    this.query.$and = filted;
-                    if (filted.length == 0) {
-                        this.query = {$and: [{}]};
                     }
                 }
-            }
-        };
+            };
 
-        let init = () => {
-            this.option = {limit: 40, skip: 0};
-            this.InitQuery();
-            this.current = {content: {}};
-        };
+            this.RemoveQuery = (name: string) => {
+                if (this.query) {
+                    if (this.query.$and) {
+                        let filted = [{}];
+                        this.query.$and.forEach((query) => {
+                            if (!query[name]) {
+                                if (Object.keys(query).length !== 0) {
+                                    filted.push(query);
+                                }
+                            }
+                        });
 
-        this.Init = () => {
-            init();
-        };
+                        this.query.$and = filted;
+                        if (filted.length == 0) {
+                            this.query = {$and: [{}]};
+                        }
+                    }
+                }
+            };
 
-        this.Query = (callback: (result: any) => void, error: (code: number, message: string) => void) => {
-            ResourceQuery.query({
-                query: encodeURIComponent(JSON.stringify(this.query)),
-                option: encodeURIComponent(JSON.stringify(this.option))
-            }, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        callback(result.value);
+            let init = () => {
+                this.option = {limit: 40, skip: 0};
+                this.InitQuery();
+                this.current = {content: {}};
+            };
+
+            this.Init = () => {
+                init();
+            };
+
+            this.Query = (callback: (result: any) => void, error: (code: number, message: string) => void) => {
+                ResourceQuery.query({
+                    query: encodeURIComponent(JSON.stringify(this.query)),
+                    option: encodeURIComponent(JSON.stringify(this.option))
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
                     } else {
-                        error(result.code, result.message);
+                        error(10000, "network error");
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.Count = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            ResourceCount.get({
-                query: encodeURIComponent(JSON.stringify(this.query))
-            }, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        callback(result.value);
+            this.Count = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                ResourceCount.get({
+                    query: encodeURIComponent(JSON.stringify(this.query))
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
                     } else {
-                        error(result.code, result.message);
+                        error(10000, "network error");
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.MimeTypes = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            MimeTypes.get({}, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        callback(result.value);
+            this.MimeTypes = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                MimeTypes.get({}, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
                     } else {
-                        error(result.code, result.message);
+                        error(10000, "network error");
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
-            this.Count((count) => {
-                callback((this.option.skip + this.option.limit) <= count);
-            }, error);
-        };
+            this.Over = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+                this.Count((count) => {
+                    callback((this.option.skip + this.option.limit) <= count);
+                }, error);
+            };
 
-        this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
-            callback(this.option.skip > 0);
-        };
+            this.Under = (callback: (result: boolean) => void, error: (code: number, message: string) => void): void => {
+                callback(this.option.skip > 0);
+            };
 
-        this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Over((hasnext) => {
-                if (hasnext) {
-                    this.option.skip = this.option.skip + this.option.limit;
-                    this.Query(callback, error);
-                } else {
-                    callback(null);
-                }
-            });
-        };
-
-        this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            this.Under((hasprev) => {
-                if (hasprev) {
-                    this.option.skip = this.option.skip - this.option.limit;
-                    this.Query(callback, error);
-                } else {
-                    callback(null);
-                }
-            });
-        };
-
-        this.Create = (name: string, type: number, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            let resource = new ResourceCreate();
-            resource.name = name;
-            resource.type = type;
-            resource.content = this.current.content;
-            resource.$save({}, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        this.current = result.value;
-                        callback(this.current.content);
+            this.Next = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                this.Over((hasnext) => {
+                    if (hasnext) {
+                        this.option.skip = this.option.skip + this.option.limit;
+                        this.Query(callback, error);
                     } else {
-                        error(result.code, result.message);
+                        callback(null);
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.Get = (id: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-      //      init();
-            Resource.get({
-                id: id
-            }, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        this.current = result.value;
-                        callback(this.current.content);
+            this.Prev = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                this.Under((hasprev) => {
+                    if (hasprev) {
+                        this.option.skip = this.option.skip - this.option.limit;
+                        this.Query(callback, error);
                     } else {
-                        error(result.code, result.message);
+                        callback(null);
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.Put = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            let resource = new Resource();
-            resource.content = this.current.content;
-            resource.$put({
-                id: this.current._id,
-            }, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        callback(result.value.content);
+            this.Create = (name: string, type: number, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                let resource = new ResourceCreate();
+                resource.name = name;
+                resource.type = type;
+                resource.content = this.current.content;
+                resource.$save({}, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            this.current = result.value;
+                            callback(this.current.content);
+                        } else {
+                            error(result.code, result.message);
+                        }
                     } else {
-                        error(result.code, result.message);
+                        error(10000, "network error");
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.Delete = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
-            Resource.delete({
-                id: this.current._id
-            }, (result: any): void => {
-                if (result) {
-                    if (result.code === 0) {
-                        init();
-                        callback(result.value);
+            this.Get = (id: any, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                //      init();
+                Resource.get({
+                    id: id
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            this.current = result.value;
+                            callback(this.current.content);
+                        } else {
+                            error(result.code, result.message);
+                        }
                     } else {
-                        error(result.code, result.message);
+                        error(10000, "network error");
                     }
-                } else {
-                    error(10000, "network error");
-                }
-            });
-        };
+                });
+            };
 
-        this.preview = document.getElementById("view");
+            this.Put = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                let resource = new Resource();
+                resource.content = this.current.content;
+                resource.$put({
+                    id: this.current._id,
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value.content);
+                        } else {
+                            error(result.code, result.message);
+                        }
+                    } else {
+                        error(10000, "network error");
+                    }
+                });
+            };
 
-        this.Init();
+            this.Delete = (callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                Resource.delete({
+                    id: this.current._id
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            init();
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
+                    } else {
+                        error(10000, "network error");
+                    }
+                });
+            };
 
-    }]);
+            this.preview = document.getElementById("view");
+
+            this.Init();
+
+        }]);
+
+}

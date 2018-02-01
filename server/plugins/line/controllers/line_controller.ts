@@ -71,12 +71,12 @@ export namespace LineModule {
         public bot_hook(request: any, response: any): void {
 
             if (request.body.events) {
-                let line_client = new line.Client(plugins_config.line.token);
+                let line_client:any = new line.Client(plugins_config.line.token);
 
-                let promises = [];
+                let promises:any[] = [];
                 request.body.events.map((line_event: any): void => {
                     if (line_event.type == "message" || line_event.message.type == "text") {
-                        let reply: any = {
+                        let reply:{type:string,text:string} = {
                             type: "text",
                             text: line_event.message.text + "?"
                         };

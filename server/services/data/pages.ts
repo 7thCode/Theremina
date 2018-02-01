@@ -19,7 +19,7 @@ export namespace DataPageRouter {
     const config: any = share.config;
     const auth: any = core.auth;
     const exception: any = core.exception;
-    const analysis: any = core.analysis;
+ //   const analysis: any = core.analysis;
 
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts;
@@ -32,7 +32,7 @@ export namespace DataPageRouter {
     let message = config.message;
 
     //data
-    router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
+    router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {
         response.render("services/data/index", {
             config: config,
             user: request.user,

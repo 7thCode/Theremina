@@ -1,5 +1,3 @@
-/// <reference path="../../../../node_modules/@types/node/index.d.ts" />
-
 /**!
  Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  This software is released under the MIT License.
@@ -68,8 +66,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_file_all(userid: string,namespace: string, tmp_path: string, callback: (error) => void): void {
-
+        static get_file_all(userid: string, namespace: string, tmp_path: string, callback: (error) => void): void {
             let number: number = 27000;
             let conn = Pages.connect(config.db.user);
             if (conn) {
@@ -79,7 +76,7 @@ export namespace PagesModule {
                         conn.db.collection('fs.files', (error: any, collection: any): void => {
                             if (!error) {
                                 if (collection) {
-                                    collection.find({$and:[{"metadata.namespace": namespace}, {"metadata.userid": userid}]}).toArray((error: any, docs: any): void => {
+                                    collection.find({$and: [{"metadata.namespace": namespace}, {"metadata.userid": userid}]}).toArray((error: any, docs: any): void => {
                                         if (!error) {
                                             let save = (doc: any): any => {
                                                 return new Promise((resolve: any, reject: any): void => {
@@ -136,9 +133,9 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_article_all(userid: string,namespace:string, tmp_path: string, callback: (error:any) => void): void {
-            ArticleModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
-                fs.writeFile(tmp_path, JSON.stringify(docs), (error:any) => {
+        static get_article_all(userid: string, namespace: string, tmp_path: string, callback: (error: any) => void): void {
+            ArticleModel.find({$and: [{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
+                fs.writeFile(tmp_path, JSON.stringify(docs), (error: any) => {
                     callback(error);
                 });
             }).catch((error: any): void => {
@@ -153,8 +150,8 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static get_resource_all(userid: string,namespace:string, tmp_path: string, callback: (error:any) => void): void {
-            ResourceModel.find({$and:[{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
+        static get_resource_all(userid: string, namespace: string, tmp_path: string, callback: (error: any) => void): void {
+            ResourceModel.find({$and: [{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
                         if (doc) {
@@ -179,7 +176,6 @@ export namespace PagesModule {
             }).catch((error: any): void => {
                 callback(error);
             });
-
         }
 
         /**
@@ -189,7 +185,7 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static zip(work: string, target: string, callback: (error:any) => void) {
+        static zip(work: string, target: string, callback: (error: any) => void) {
             let zip_file_name = path.join(work, target + ".zip");
             let archive = archiver.create('zip', {});
             let output = fs.createWriteStream(zip_file_name);
@@ -227,27 +223,22 @@ export namespace PagesModule {
                 let exec = require('child_process').exec;
                 exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
                     callback(error);
-                    //        Wrapper.SendSuccess(response, {code: 0, message: ""});
                 });
             };
 
-            let make_file = (tmp_path:string,userid:string):void => {
-                Pages.get_file_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
+            let make_file = (tmp_path: string, userid: string): void => {
+                Pages.get_file_all(userid, namespace, path.join(tmp_path, namespace), (error: any): void => {
+                    if (!error) {
+                        Pages.get_article_all(userid, namespace, path.join(tmp_path, namespace + "/articles.json"), (error: any): void => {
                             if (!error) {
-                                Pages.get_article_all(userid,namespace, path.join(tmp_path, namespace + "/articles.json"), (error: any): void => {
+                                Pages.get_resource_all(userid, namespace, path.join(tmp_path, namespace), (error: any): void => {
                                     if (!error) {
-                                        Pages.get_resource_all(userid,namespace, path.join(tmp_path, namespace), (error: any): void => {
+                                        Pages.zip(tmp_path, namespace, (error: any): void => {
                                             if (!error) {
-                                                Pages.zip(tmp_path, namespace, (error: any): void => {
+                                                response.download(path.join(tmp_path, namespace + ".zip"), (error: any): void => {
                                                     if (!error) {
-                                                        response.download(path.join(tmp_path, namespace + ".zip"), (error: any): void => {
-                                                            if (!error) {
-                                                                rm(tmp_path, (error) => {
+                                                        rm(tmp_path, (error) => {
 
-                                                                });
-                                                            } else {
-                                                                Wrapper.SendError(response, error.code, error.message, error);
-                                                            }
                                                         });
                                                     } else {
                                                         Wrapper.SendError(response, error.code, error.message, error);
@@ -265,16 +256,20 @@ export namespace PagesModule {
                                 Wrapper.SendError(response, error.code, error.message, error);
                             }
                         });
+                    } else {
+                        Wrapper.SendError(response, error.code, error.message, error);
+                    }
+                });
             };
 
-            let make_data = (tmp_path,userid) => {
+            let make_data = (tmp_path, userid) => {
                 fs.mkdir(path.join(tmp_path, namespace), (error): void => {
                     if (!error) {
-                        make_file(tmp_path,userid);
+                        make_file(tmp_path, userid);
                     } else {
                         if (error.code == "EEXIST") {
                             rm(tmp_path, (error) => {
-                                make_file(tmp_path,userid);
+                                make_file(tmp_path, userid);
                             });
                         } else {
                             Wrapper.SendError(response, error.code, error.message, error);
@@ -285,10 +280,10 @@ export namespace PagesModule {
 
             fs.mkdir(tmp_path, (error): void => {
                 if (!error) {
-                    make_data(tmp_path,userid);
+                    make_data(tmp_path, userid);
                 } else {
                     if (error.code == "EEXIST") {
-                        make_data(tmp_path,userid);
+                        make_data(tmp_path, userid);
                     } else {
                         Wrapper.SendError(response, error.code, error.message, error);
                     }
@@ -395,8 +390,7 @@ export namespace PagesModule {
                         }
                     });
                 });
-            })
-
+            });
         }
 
         /**
@@ -431,45 +425,8 @@ export namespace PagesModule {
                         }
                     });
                 });
-            })
-
+            });
         }
-
-        /**
-         * @param request
-         * @param response
-         * @returns none
-         */
-/*
-        public build(request: any, response: any): void {
-            let userid = Pages.userid(request);
-            let name = request.params.name;
-
-            const core = require(process.cwd() + '/gs');
-            const file: any = core.file;
-            const resource: any = core.resource;
-
-            let all_resource_set = applications_config.sites;
-            if (all_resource_set) {
-                let target_resource_set = all_resource_set[name];
-                if (target_resource_set) {
-                    file.create_init_files(userid, target_resource_set.files, (error: any, result: any): void => {
-                        if (!error) {
-                            resource.create_init_resources(userid, target_resource_set.resources, (error: any, result: any): void => {
-                                if (!error) {
-                                    Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                } else {
-                                    Wrapper.SendError(response, error.code, error.message, error);
-                                }
-                            });
-                        } else {
-                            Wrapper.SendError(response, error.code, error.message, error);
-                        }
-                    });
-                }
-            }
-        }
-*/
     }
 
 }

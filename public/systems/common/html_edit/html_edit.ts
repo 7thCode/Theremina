@@ -142,7 +142,7 @@ namespace HtmlEdit {
         }
 
         static MakeNode(node): any {
-            let result = null;
+            let result:any = null;
             switch (node.nodeType) {
                 case 1:
                     result = this.MakeElement(node);

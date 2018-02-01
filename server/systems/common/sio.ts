@@ -14,8 +14,8 @@ export namespace Socket {
 
     export class IO {
 
-        public sio = null;
-        public socket = null;
+        public sio:any = null;
+        public socket:any = null;
         public clients = [];
 
         constructor(server) {

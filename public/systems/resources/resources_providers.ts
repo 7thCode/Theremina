@@ -6,20 +6,23 @@
 
 "use strict";
 
-let ResourcesProviders: angular.IModule = angular.module('ResourcesProviders', []);
+namespace ResourcesProvidersModule {
 
-ResourcesProviders.provider('HtmlEdit', [function():void {
+    let ResourcesProviders: angular.IModule = angular.module('ResourcesProviders', []);
 
-    this.$get = ():any => {
-        return {
-            toHtml: (object: any, init: string): string => {
-                return HtmlEdit.Render.toHtml(object, init);
-            },
-            fromHtml: (html: string, callback: (errors, doc) => void): void => {
-                HtmlEdit.Render.fromHtml(html, callback);
-            },
+    ResourcesProviders.provider('HtmlEdit', [function (): void {
+
+        this.$get = (): any => {
+            return {
+                toHtml: (object: any, init: string): string => {
+                    return HtmlEdit.Render.toHtml(object, init);
+                },
+                fromHtml: (html: string, callback: (errors, doc) => void): void => {
+                    HtmlEdit.Render.fromHtml(html, callback);
+                },
+            }
         }
-    }
 
+    }
+    ]);
 }
-]);

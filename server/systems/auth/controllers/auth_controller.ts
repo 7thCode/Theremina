@@ -35,8 +35,8 @@ export namespace AuthModule {
     const HtmlScannerModule: any = require("../../common/html_scanner/html_scanner");
     const ScannerBehaviorModule: any = require("../../common/html_scanner/scanner_behavior");
 
-    let _mailer = null;
-    let bcc = null;
+    let _mailer:any = null;
+    let bcc: string | any[] = "";
     switch (config.mailer.type) {
         case "mail":
             _mailer = new MailerModule.Mailer(config.mailer.setting, config.mailer.account);
@@ -51,6 +51,9 @@ export namespace AuthModule {
             bcc = [];
             break;
         default:
+            _mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+            bcc = "";
+            break;
     }
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
@@ -544,7 +547,7 @@ export namespace AuthModule {
          */
         public get_member_token(request: any, response: any): void {
             Wrapper.Exception(request, response, (request: any, response: any): void => {
-                let token = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
+                let token:any = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
                 let tokenDateTime: any = token.timestamp;
                 let nowDate: any = Date.now();
                 if ((tokenDateTime - nowDate) < (config.regist.expire * 60 * 1000)) {

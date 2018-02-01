@@ -238,8 +238,8 @@ export namespace LayoutsModule {
         public namespaces(userid:string, callback:any): void {
             const number: number = 1400;
             LayoutModel.find( {userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
-                let result = [];
-                _.forEach(pages, (page) => {
+                let result:string[] = [];
+                _.forEach(pages, (page:{namespace:string}) => {
                     if (page.namespace) {
                         result.push(page.namespace);
                     }

@@ -1,5 +1,3 @@
-/// <reference path="../../../node_modules/@types/node/index.d.ts" />
-
 /**!
  Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  This software is released under the MIT License.
@@ -12,7 +10,7 @@ export namespace FileUtility {
 
     const fs: any = require('graceful-fs');
 
-    const share = require('./share');
+  //  const share = require('./share');
     //const config = share.config;
 
     export class Utility {

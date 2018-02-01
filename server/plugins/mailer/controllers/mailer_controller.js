@@ -15,7 +15,7 @@ var MailerModule;
     var Wrapper = share.Wrapper;
     var AssetModel = require(share.Models("plugins/asset/asset"));
     var MailerModule = require('../../../systems/common/mailer');
-    var validator = require('validator');
+    // const validator = require('validator');
     var Mailer = (function () {
         function Mailer() {
         }

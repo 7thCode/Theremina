@@ -10,7 +10,7 @@ export namespace AssetsModule {
 
     const _ = require('lodash');
 
-    const mongodb: any = require('mongodb');
+    //const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 

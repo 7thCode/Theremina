@@ -6,27 +6,30 @@
 
 "use strict";
 
-let YahooServices = angular.module('YahooServices', []);
+namespace YahooServicesModule {
 
-YahooServices.service('ZipService', ["$http",
-    function ($http): void {
-        this.Zip = (zip_code, callback: (error: any, result: any) => void): void => {
-            $http.jsonp('http://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip_code, {callback: 'JSONP_CALLBACK'}).then(function (response) {
-                callback(null, response.data);
-            }).catch(function (data) {
-                callback(data, null);
-            });
-        };
-    }]);
+    let YahooServices = angular.module('YahooServices', []);
+
+    YahooServices.service('ZipService', ["$http",
+        function ($http): void {
+            this.Zip = (zip_code, callback: (error: any, result: any) => void): void => {
+                $http.jsonp('http://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip_code, {callback: 'JSONP_CALLBACK'}).then(function (response) {
+                    callback(null, response.data);
+                }).catch(function (data) {
+                    callback(data, null);
+                });
+            };
+        }]);
 
 
-YahooServices.service('ZipService2', ["$http",
-    function ($http): void {
-        this.Zip = (zip_code, callback: (error: any, result: any) => void): void => {
-            $http.jsonp('https://map.yahooapis.jp/search/zip/V1/zipCodeSearch?output=json&query='+ zip_code +'&appid=dj0zaiZpPURPNXRydGRpZFZhaSZzPWNvbnN1bWVyc2VjcmV0Jng9ZGU-', {callback: 'JSONP_CALLBACK'}).then(function (response) {
-                callback(null, response.data);
-            }).catch(function (data) {
-                callback(data, null);
-            });
-        };
-    }]);
+    YahooServices.service('ZipService2', ["$http",
+        function ($http): void {
+            this.Zip = (zip_code, callback: (error: any, result: any) => void): void => {
+                $http.jsonp('https://map.yahooapis.jp/search/zip/V1/zipCodeSearch?output=json&query=' + zip_code + '&appid=dj0zaiZpPURPNXRydGRpZFZhaSZzPWNvbnN1bWVyc2VjcmV0Jng9ZGU-', {callback: 'JSONP_CALLBACK'}).then(function (response) {
+                    callback(null, response.data);
+                }).catch(function (data) {
+                    callback(data, null);
+                });
+            };
+        }]);
+}

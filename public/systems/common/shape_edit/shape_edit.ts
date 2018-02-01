@@ -3931,7 +3931,7 @@ namespace ShapeEdit {
                                                             context.restore();
                                                         }
 
-                                                        let current = null;
+                                                        let current:number = 0;
                                                         if (this.modifier === Key.shift) {
                                                             current = BaseShape.Degree(shape.center, new ShapeEdit.Location(pointx, pointy));
                                                         } else {

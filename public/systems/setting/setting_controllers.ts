@@ -6,7 +6,7 @@
 
 "use strict";
 
-namespace Setting {
+namespace SettingModule {
 
     let SettingControllers: angular.IModule = angular.module('SettingControllers', ["ngResource"]);
 

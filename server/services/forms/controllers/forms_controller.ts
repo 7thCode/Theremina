@@ -36,7 +36,7 @@ export namespace FormsModule {
                         result += delimmiter + name;
                         delimmiter = ":";
                     }
-                })
+                });
             }
             return result;
         }
@@ -49,7 +49,7 @@ export namespace FormsModule {
                     if (index == (names.length - 1)) {
                         result = name;
                     }
-                })
+                });
             }
             return result;
         }
@@ -60,14 +60,14 @@ export namespace FormsModule {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
 
-                     //   let namespace: string = Form.namespace(doc.name);
+                        //   let namespace: string = Form.namespace(doc.name);
                         let localname: string = Form.localname(doc.name);
                         let userid = doc.userid;
                         let namespace = "";
                         let type: string = doc.type;
                         let content: any = doc.content;
 
-                        let query =  {$and: [{namespace:namespace},{userid: userid}, {type: type},{status: 1}, {open: true}, {name: localname}]};
+                        let query = {$and: [{namespace: namespace}, {userid: userid}, {type: type}, {status: 1}, {open: true}, {name: localname}]};
 
                         Wrapper.FindOne(null, 1000, FormModel, query, (response: any, page: any): void => {
                             if (!page) {
@@ -85,7 +85,7 @@ export namespace FormsModule {
                                 });
                             }
                         });
-                    })
+                    });
                 };
 
                 Promise.all(docs.map((doc: any): void => {
@@ -113,7 +113,7 @@ export namespace FormsModule {
 
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, FormModel, {$and: [{name: name}, {type: type},{namespace:namespace}, {userid: userid}]}, (response: any, exists: any): void => {
+                    Wrapper.FindOne(response, number, FormModel, {$and: [{name: name}, {type: type}, {namespace: namespace}, {userid: userid}]}, (response: any, exists: any): void => {
                         if (!exists) {
                             let page: any = new FormModel();
                             page.userid = userid;
@@ -150,7 +150,7 @@ export namespace FormsModule {
             let namespace = "";
             let id = request.params.id;
 
-            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id},{namespace:namespace}, {userid: userid}]}, (response: any, page: any): void => {
+            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
                     page.content = request.body.content;
                     page.open = true;
@@ -174,7 +174,7 @@ export namespace FormsModule {
             let namespace = "";
             let id = request.params.id;
 
-            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id},{namespace:namespace}, {userid: userid}]}, (response: any, page: any): void => {
+            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
                     Wrapper.Remove(response, number, page, (response: any): void => {
                         Wrapper.SendSuccess(response, {});
@@ -196,7 +196,7 @@ export namespace FormsModule {
             let namespace = "";
             let id = request.params.id;
 
-            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id},{namespace:namespace}, {userid: userid}]}, (response: any, page: any): void => {
+            Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
                     Wrapper.SendSuccess(response, page);
                 } else {
@@ -215,7 +215,7 @@ export namespace FormsModule {
             let userid = builder_userid;
             let namespace = "";
 
-            Wrapper.Delete(response, number, FormModel, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any): void => {
+            Wrapper.Delete(response, number, FormModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -232,7 +232,7 @@ export namespace FormsModule {
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
-            Wrapper.Find(response, number, FormModel, {$and: [{userid: userid},{namespace:namespace}, query]}, {}, option, (response: any, pages: any): any => {
+            Wrapper.Find(response, number, FormModel, {$and: [{userid: userid}, {namespace: namespace}, query]}, {}, option, (response: any, pages: any): any => {
 
                 _.forEach(pages, (page) => {
                     page.content = null;
@@ -253,8 +253,23 @@ export namespace FormsModule {
             let namespace = "";
             let query: any = Wrapper.Decode(request.params.query);
 
-            Wrapper.Count(response, number, FormModel, {$and: [{userid: userid},{namespace:namespace}, query]}, (response: any, count: any): any => {
+            Wrapper.Count(response, number, FormModel, {$and: [{userid: userid}, {namespace: namespace}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
+            });
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public get_form_json(request: any, response: any): void {
+            let userid = builder_userid;
+            let namespace = "";
+            let name = request.params.name;
+
+            Wrapper.Find(response, 1400, FormModel, {$and: [{namespace: namespace}, {userid: userid}, {name: name}]}, {"_id": 0,"__v":0}, {}, (response: any, forms: any): any => {
+                Wrapper.SendSuccess(response, forms);
             });
         }
 

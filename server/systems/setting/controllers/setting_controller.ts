@@ -12,7 +12,7 @@ export namespace SettingModule {
     //const _ = require('lodash');
 
     const share = require(process.cwd() + '/server/systems/common/share');
-    const logger: any = share.logger;
+ //   const logger: any = share.logger;
     const Persistent: any = share.Persistent;
     const Wrapper: any = share.Wrapper;
     const config: any = share.config;

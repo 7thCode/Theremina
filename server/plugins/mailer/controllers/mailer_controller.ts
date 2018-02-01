@@ -22,7 +22,7 @@ export namespace MailerModule {
 
     const MailerModule: any = require('../../../systems/common/mailer');
 
-    const validator = require('validator');
+   // const validator = require('validator');
 
     export class Mailer {
 
@@ -47,7 +47,7 @@ export namespace MailerModule {
          */
         public send(request: any, response: any, next: any): void {
 
-            let mailer = null;
+            let mailer:any | null = null;
             switch (config.mailer.type) {
                 case "gmail":
                     mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);

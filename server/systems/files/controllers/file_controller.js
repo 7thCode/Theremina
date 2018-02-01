@@ -8,13 +8,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var FileModule;
 (function (FileModule) {
     var _ = require('lodash');
-    var fs = require('fs');
+    var fs = require('graceful-fs');
     var mongoose = require('mongoose');
     var Grid = require('gridfs-stream');
     var share = require(process.cwd() + '/server/systems/common/share');
     var config = share.config;
     var Wrapper = share.Wrapper;
-    //  const logger = share.logger;
     var result = require(share.Server('systems/common/result'));
     var Files = (function () {
         function Files() {
@@ -41,22 +40,6 @@ var FileModule;
             }
             return result;
         };
-        /*
-                static namespace(name: string): string {
-                    let result = "";
-                    if (name) {
-                        let names = name.split("#");
-                        let delimmiter = "";
-                        names.forEach((name, index) => {
-                            if (index < (names.length - 1)) {
-                                result += delimmiter + name;
-                                delimmiter = ":";
-                            }
-                        })
-                    }
-                    return result;
-                }
-        */
         Files.namespace = function (request) {
             var result = "";
             if (request.user.data) {
@@ -84,20 +67,6 @@ var FileModule;
         };
         Files.from_local = function (gfs, path_from, namespace, userid, key, name, mimetype, callback) {
             try {
-                /*
-                                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
-                
-                                let writestream = bucket.openUploadStream(name, {
-                                    contentType: "binary/octet-stream",
-                                    metadata: {
-                                        userid: config.systems.userid,
-                                        key: key,
-                                        type: mimetype,
-                                        namespace: namespace,
-                                        parent: null
-                                    }
-                                });
-                */
                 var writestream = gfs.createWriteStream({
                     filename: name,
                     metadata: {
@@ -551,7 +520,7 @@ var FileModule;
                                                 }
                                                 else {
                                                     // NOT FOUND IMAGE.
-                                                    Files.result_file(conn_3, gfs_3, collection, "", "blank.png", config.systems.userid, response, next, function () {
+                                                    Files.result_file(conn_3, gfs_3, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, function () {
                                                         conn_3.db.close();
                                                         next();
                                                     });

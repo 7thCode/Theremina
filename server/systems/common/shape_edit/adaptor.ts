@@ -125,7 +125,7 @@ namespace Adaptor {
         public Text(data: any, callback: (error: any) => void): void {
             let text: string = '';
             let defs: string = '';
-            let error = null;
+            let error:{code: number, message: string} = {code: 0, message: ""};
 
             let create_def = (fonts: any[]) => {
                 let result: string = '<defs><style type="text/css">';
@@ -368,20 +368,20 @@ namespace Adaptor {
     export class PDFAdaptor {
 
         private path: string;
-        private doc = null;
-        private serif = "";
-        private sans_serif = "";
-        private pagehight = 0;
-        private originx = 40;
-        private originy = 40;
+        private doc:any = null;
+        private serif:string = "";
+        private sans_serif:string = "";
+        private pagehight:number = 0;
+        private originx:number = 40;
+        private originy:number = 40;
         private nameboxwidth = 250;
         private valueboxwidth = 250;
-        private boxhight = 20;
-        private stringoffsetx = 3;
-        private stringoffsety = 2;
+        private boxhight:number = 20;
+        private stringoffsetx:number = 3;
+        private stringoffsety:number = 2;
 
-        private tilesizew = 64;
-        private tilesizeh = 64;
+        private tilesizew:number = 64;
+        private tilesizeh:number = 64;
 
         constructor(work_path: string, paper: any) {
             this.path = work_path;
@@ -409,7 +409,7 @@ namespace Adaptor {
         }
 
         public Bezier(data: any, callback: (error: any) => void): void {
-            let startpoint: ShapeEdit.Location = null;
+            let startpoint: ShapeEdit.Location | null = null;
             ShapeEdit.CurveShape.Each(data.vertex.list, (vertex) => {
                 this.doc.moveTo(vertex.x, vertex.y);
                 startpoint = vertex;
@@ -427,7 +427,7 @@ namespace Adaptor {
         }
 
         public Polygon(data: any, callback: (error: any) => void): void {
-            let startpoint: ShapeEdit.Location = null;
+            let startpoint: ShapeEdit.Location | null = null;
             ShapeEdit.LineShape.Each(data.vertex.list, (vertex) => {
                     this.doc.moveTo(vertex.x, vertex.y);
                     startpoint = vertex;
@@ -524,15 +524,15 @@ namespace Adaptor {
 
                 let regex = /^data:.+\/(.+);base64,(.*)$/;
                 let matches = path.match(regex);
-                let ext = matches[1];
+                let ext:any = matches[1];
 
                 switch (ext) {
                     case "jpg": // for pdfkit
                     case "jpeg":
                     case "png": {
                         // dataToImage
-                        let content = matches[2];
-                        let buffer = new Buffer(content, 'base64');
+                        let content:any = matches[2];
+                        let buffer:Buffer = new Buffer(content, 'base64');
                         let target_file_path = temp_path + "/" + file_name;
                         fs.writeFile(target_file_path, buffer, 'binary', (error: any): void => {
                             if (!error) {

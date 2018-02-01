@@ -6,634 +6,637 @@
 
 "use strict";
 
-let DataControllers: angular.IModule = angular.module('DataControllers', ['ui.bootstrap', 'ngAnimate', 'flow', 'ui.ace']);
+namespace DataControllersModule {
 
-DataControllers.controller('DataController', ['$scope','$rootScope', '$log', '$document','$q', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
-    ($scope: any,$rootScope:any, $log: any, $document: any,$q:any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
+    let DataControllers: angular.IModule = angular.module('DataControllers', ['ui.bootstrap', 'ngAnimate', 'flow', 'ui.ace']);
 
-        let pagesize = 40;
+    DataControllers.controller('DataController', ['$scope', '$rootScope', '$log', '$document', '$q', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
+        ($scope: any, $rootScope: any, $log: any, $document: any, $q: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
-        let progress = (value) => {
-            $scope.$emit('progress', value);
-        };
+            let pagesize = 40;
 
-        $scope.$on('progress', (event, value) => {
-            $scope.progress = value;
-        });
+            let progress = (value) => {
+                $scope.$emit('progress', value);
+            };
 
-        let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
-            progress(false);
-            $scope.message = message;
-            $log.error(message);
-            alert(message);
-        };
-
-        let alert = (message): void => {
-            let modalInstance: any = $uibModal.open({
-                controller: 'AlertDialogController',
-                templateUrl: '/common/dialogs/alert_dialog',
-                resolve: {
-                    items: (): any => {
-                        return message;
-                    }
-                }
+            $scope.$on('progress', (event, value) => {
+                $scope.progress = value;
             });
-            modalInstance.result.then((answer: any): void => {
-            }, (): void => {
-            });
-        };
 
-        $document.on('drop dragover', (e: any): void => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
+            let error_handler: (code: number, message: string) => void = (code: number, message: string): void => {
+                progress(false);
+                $scope.message = message;
+                $log.error(message);
+                alert(message);
+            };
 
-        $scope.opened = false;
-
-        ArticleService.option.limit = pagesize;
-
-        let current_id: any = null;
-        let page_type: string = "";
-        let direction: number = -1;
-
-        let Clear = (): void => {
-            let page: any = FormPlayerService.current_page;
-            _.forEach(page, (control): void => {
-                _.forEach(control.elements, (element: any): void => {
-                    let attributes: any = element.attributes;
-                    if (attributes) {
-                        let name: string = attributes["ng-model"];
-                        if (name) {
-                            $scope[name] = "";
+            let alert = (message): void => {
+                let modalInstance: any = $uibModal.open({
+                    controller: 'AlertDialogController',
+                    templateUrl: '/common/dialogs/alert_dialog',
+                    resolve: {
+                        items: (): any => {
+                            return message;
                         }
                     }
-                })
-            });
-            Draw(() => {
-            });
-        };
+                });
+                modalInstance.result.then((answer: any): void => {
+                }, (): void => {
+                });
+            };
 
-        $scope.Close = (): void => {
+            $document.on('drop dragover', (e: any): void => {
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
             $scope.opened = false;
-        };
-        /*
-         resultで与えられたObjectのelementのlabelで示される値を取り出す。
-         ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を設定する。
-         */
-        let Map: (present: any) => void = (present: any): void => {
 
-            function unescapeHTML(value: any): any {
-                let result = value;
-                if (typeof value == "string") {
-                    let div = document.createElement("div");
-                    div.innerHTML = value.replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/ /g, "&nbsp;")
-                        .replace(/\r/g, "&#13;")
-                        .replace(/\n/g, "&#10;");
-                    result = div.textContent || div.innerText;
-                }
-                return result;
-            }
+            ArticleService.option.limit = pagesize;
 
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control): void => {
-                _.forEach(control.elements, (element: any): void => {
-                    let attributes = element.attributes;
-                    if (attributes) {
-                        let name = attributes["ng-model"];
-                        if (name) {
-                            let value = "";
-                            if (present) {
-                                if (present[element.label]) {
-                                    value = present[element.label].value;
-                                }
+            let current_id: any = null;
+            let page_type: string = "";
+            let direction: number = -1;
+
+            let Clear = (): void => {
+                let page: any = FormPlayerService.current_page;
+                _.forEach(page, (control): void => {
+                    _.forEach(control.elements, (element: any): void => {
+                        let attributes: any = element.attributes;
+                        if (attributes) {
+                            let name: string = attributes["ng-model"];
+                            if (name) {
+                                $scope[name] = "";
                             }
-                            $scope[name] = unescapeHTML(value); //todo
                         }
-                    }
-                })
-            });
-        };
+                    })
+                });
+                Draw(() => {
+                });
+            };
 
-        /*
-         ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を取り出す。
-         elementのlabelを名前として、その値をresultに。
-         */
-        let Reduce: () => void = (): any => {
-            let result = {};// ArticleService.current_article.content;
-            if (!result) {
-                result = {};
-            }
-            let page = FormPlayerService.current_page;
-            _.forEach(page, (control): void => {
-                _.forEach(control.elements, (element: any): void => {
-                    let attributes = element.attributes;
-                    if (attributes) {
-                        let name = attributes["ng-model"];
-                        if (name) {
-                            if ($scope[name]) {
-                                let type: string = "quoted";
-                                let value = $scope[name];
-                                switch (element.type) {
-                                    case "img":
-                                        type = "url";
-                                        break;
-                                    default:
-                                        if (Array.isArray(value)) {
-                                            type = "array";
-                                        } else {
-                                            switch (control.type) {
-                                                case "html" :
-                                                    type = "html";
-                                                    break;
-                                                case "date" :
-                                                    type = "date";
-                                                    break;
-                                                default:
+            $scope.Close = (): void => {
+                $scope.opened = false;
+            };
+            /*
+             resultで与えられたObjectのelementのlabelで示される値を取り出す。
+             ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を設定する。
+             */
+            let Map: (present: any) => void = (present: any): void => {
+
+                function unescapeHTML(value: any): any {
+                    let result = value;
+                    if (typeof value == "string") {
+                        let div = document.createElement("div");
+                        div.innerHTML = value.replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/ /g, "&nbsp;")
+                            .replace(/\r/g, "&#13;")
+                            .replace(/\n/g, "&#10;");
+                        result = div.textContent || div.innerText;
+                    }
+                    return result;
+                }
+
+                let page = FormPlayerService.current_page;
+                _.forEach(page, (control): void => {
+                    _.forEach(control.elements, (element: any): void => {
+                        let attributes = element.attributes;
+                        if (attributes) {
+                            let name = attributes["ng-model"];
+                            if (name) {
+                                let value = "";
+                                if (present) {
+                                    if (present[element.label]) {
+                                        value = present[element.label].value;
+                                    }
+                                }
+                                $scope[name] = unescapeHTML(value); //todo
+                            }
+                        }
+                    })
+                });
+            };
+
+            /*
+             ng-modelの"名前"を取り出し、$scopeからその名前に対応する値を取り出す。
+             elementのlabelを名前として、その値をresultに。
+             */
+            let Reduce: () => void = (): any => {
+                let result = {};// ArticleService.current_article.content;
+                if (!result) {
+                    result = {};
+                }
+                let page = FormPlayerService.current_page;
+                _.forEach(page, (control): void => {
+                    _.forEach(control.elements, (element: any): void => {
+                        let attributes = element.attributes;
+                        if (attributes) {
+                            let name = attributes["ng-model"];
+                            if (name) {
+                                if ($scope[name]) {
+                                    let type: string = "quoted";
+                                    let value = $scope[name];
+                                    switch (element.type) {
+                                        case "img":
+                                            type = "url";
+                                            break;
+                                        default:
+                                            if (Array.isArray(value)) {
+                                                type = "array";
+                                            } else {
+                                                switch (control.type) {
+                                                    case "html" :
+                                                        type = "html";
+                                                        break;
+                                                    case "date" :
+                                                        type = "date";
+                                                        break;
+                                                    default:
+                                                }
                                             }
-                                        }
+                                    }
+                                    result[element.label] = {type: type, value: value}; // todo
                                 }
-                                result[element.label] = {type: type, value: value}; // todo
                             }
                         }
+                    })
+                });
+                return result;
+            };
+
+            $scope.Selected = (): any => {
+                return current_id;
+            };
+
+            $scope.CreateArticle = (): void => {
+
+                let modalRegist: any = $uibModal.open({
+                    controller: 'DataCreateDialogController',
+                    templateUrl: '/data/dialogs/create_dialog',
+                    resolve: {
+                        items: $scope
                     }
-                })
-            });
-            return result;
-        };
+                });
 
-        $scope.Selected = (): any => {
-            return current_id;
-        };
+                modalRegist.result.then((dialog_scope: any): void => {
+                    progress(true);
+                    let name: string = dialog_scope.title;
+                    ArticleService.Create(name, {
+                        type: {
+                            "type": "quoted",
+                            "value": dialog_scope.type
+                        }
+                    }, (result: any): void => {
+                        current_id = result._id;
+                        ArticleService.option.skip = 0;
 
-        $scope.CreateArticle = (): void => {
-
-            let modalRegist: any = $uibModal.open({
-                controller: 'DataCreateDialogController',
-                templateUrl: '/data/dialogs/create_dialog',
-                resolve: {
-                    items: $scope
-                }
-            });
-
-            modalRegist.result.then((dialog_scope: any): void => {
-                progress(true);
-                let name: string = dialog_scope.title;
-                ArticleService.Create(name, {
-                    type: {
-                        "type": "quoted",
-                        "value": dialog_scope.type
-                    }
-                }, (result: any): void => {
-                    current_id = result._id;
-                    ArticleService.option.skip = 0;
-
-                    if (current_id) {
-                        ArticleService.Get(current_id, (result: any): void => {
-                            if (result) {
-                                ArticleService.current_article = result;
-                                $scope.current_article = result;
-                                $scope.opened = true;
-                                if (result.content) {
-                                    if (result.content.type) {
-                                        if (result.content.type.value) {
-                                            page_type = result.content.type.value;  //!! content依存
-                                            DrawPage(page_type, () => {
-                                                Map(result.content);
-                                                progress(false);
-                                            });
+                        if (current_id) {
+                            ArticleService.Get(current_id, (result: any): void => {
+                                if (result) {
+                                    ArticleService.current_article = result;
+                                    $scope.current_article = result;
+                                    $scope.opened = true;
+                                    if (result.content) {
+                                        if (result.content.type) {
+                                            if (result.content.type.value) {
+                                                page_type = result.content.type.value;  //!! content依存
+                                                DrawPage(page_type, () => {
+                                                    Map(result.content);
+                                                    progress(false);
+                                                });
+                                            } else {
+                                                error_handler(4, "type value");
+                                            }
                                         } else {
-                                            error_handler(4,"type value");
+                                            error_handler(3, "no type");
                                         }
                                     } else {
-                                        error_handler(3,"no type");
+                                        error_handler(2, "no content");
                                     }
                                 } else {
-                                    error_handler(2,"no content");
+                                    error_handler(1, "network error");
                                 }
-                            } else {
-                                error_handler(1,"network error");
-                            }
-                        }, error_handler);
-                    } else {
-                        DrawPage(page_type, (): void => {
-                            progress(false);
-                        });
-                    }
+                            }, error_handler);
+                        } else {
+                            DrawPage(page_type, (): void => {
+                                progress(false);
+                            });
+                        }
 
-                    Clear();
-                }, error_handler);
-            }, (): void => {
-            });
-        };
-
-        $scope.UplodArticles = (files: any): void => {
-            progress(true);
-            let promises = [];
-            _.forEach(files, (local_file) => {
-                let deferred = $q.defer();
-                let fileReader: any = new FileReader();
-                fileReader.onload = (event: any): void => {
-                    ArticleService.CreateMany(event.target.result, (result: any) => {
-                        deferred.resolve(true);
-                    }, (code: number, message: string) => {
-                        deferred.reject(false);
-                    });
-                };
-                fileReader.readAsText(local_file.file);
-                promises.push(deferred.promise);
-            });
-
-            $q.all(promises).then(function (result) {
-                DrawPage(page_type, (): void => {
-                    files.forEach((file) => {
-                        file.cancel();
-                    });
-                    progress(false);
+                        Clear();
+                    }, error_handler);
+                }, (): void => {
                 });
-            }).finally(() => {
-            });
-        };
+            };
+
+            $scope.UplodArticles = (files: any): void => {
+                progress(true);
+                let promises = [];
+                _.forEach(files, (local_file) => {
+                    let deferred = $q.defer();
+                    let fileReader: any = new FileReader();
+                    fileReader.onload = (event: any): void => {
+                        ArticleService.CreateMany(event.target.result, (result: any) => {
+                            deferred.resolve(true);
+                        }, (code: number, message: string) => {
+                            deferred.reject(false);
+                        });
+                    };
+                    fileReader.readAsText(local_file.file);
+                    promises.push(deferred.promise);
+                });
+
+                $q.all(promises).then(function (result) {
+                    DrawPage(page_type, (): void => {
+                        files.forEach((file) => {
+                            file.cancel();
+                        });
+                        progress(false);
+                    });
+                }).finally(() => {
+                });
+            };
 
 
-        $scope.SelectPage = (type: string): void => {
-            progress(true);
-            page_type = type;
-            if (current_id) {
+            $scope.SelectPage = (type: string): void => {
+                progress(true);
+                page_type = type;
+                if (current_id) {
+                    ArticleService.Get(current_id, (result: any): void => {
+                        if (result) {
+                            ArticleService.current_article = result;
+                            $scope.current_article = result;
+                            $scope.opened = true;
+                            DrawPage(page_type, () => {
+                                Map(result.content);
+                                progress(false);
+                            });
+                        } else {
+                            error_handler(1, "");
+                        }
+                    }, error_handler);
+
+                } else {
+                    DrawPage(page_type, (): void => {
+                        progress(false);
+                    });
+                }
+            };
+
+            $scope.PageSelected = (type: string): boolean => {
+                return (page_type == type);
+            };
+
+            $scope.SelectArticle = (id: string): void => {
+                progress(true);
+                current_id = id;
                 ArticleService.Get(current_id, (result: any): void => {
                     if (result) {
                         ArticleService.current_article = result;
                         $scope.current_article = result;
                         $scope.opened = true;
-                        DrawPage(page_type, () => {
-                            Map(result.content);
-                            progress(false);
-                        });
+                        if (result.content) {
+                            if (result.content.type) {
+                                if (result.content.type.value) {
+                                    page_type = result.content.type.value;  //!! content依存
+                                    DrawPage(page_type, () => {
+                                        Map(result.content);
+                                        progress(false);
+                                    });
+                                } else {
+                                    error_handler(4, "type value");
+                                }
+                            } else {
+                                error_handler(3, "no type");
+                            }
+                        } else {
+                            error_handler(2, "no content");
+                        }
                     } else {
-                        error_handler(1,"");
+                        error_handler(1, "network error");
                     }
                 }, error_handler);
-
-            } else {
-                DrawPage(page_type, (): void => {
-                    progress(false);
-                });
-            }
-        };
-
-        $scope.PageSelected = (type: string): boolean => {
-            return (page_type == type);
-        };
-
-        $scope.SelectArticle = (id: string): void => {
-            progress(true);
-            current_id = id;
-            ArticleService.Get(current_id, (result: any): void => {
-                if (result) {
-                    ArticleService.current_article = result;
-                    $scope.current_article = result;
-                    $scope.opened = true;
-                    if (result.content) {
-                        if (result.content.type) {
-                            if (result.content.type.value) {
-                                page_type = result.content.type.value;  //!! content依存
-                                DrawPage(page_type, () => {
-                                    Map(result.content);
-                                    progress(false);
-                                });
-                            }else {
-                                error_handler(4,"type value");
-                            }
-                        }else {
-                            error_handler(3,"no type");
-                        }
-                    }else {
-                        error_handler(2,"no content");
-                    }
-                } else {
-                    error_handler(1,"network error");
-                }
-            }, error_handler);
-        };
-
-        $scope.ArticleSelected = (id: string): boolean => {
-            return (current_id == id);
-        };
-
-        $scope.SaveArticle = (): void => {
-            progress(true);
-            let new_record: any = Reduce();
-            ArticleService.Put(current_id, new_record, (result: any): void => {
-                progress(false);
-        //        $scope.opened = false;
-            }, error_handler);
-        };
-
-        $scope.DeleteArticle = (): void => {
-            if (current_id) {
-                let modalRegist: any = $uibModal.open({
-                    controller: 'DataDeleteConfirmController',
-                    templateUrl: '/data/dialogs/delete_confirm_dialog',
-                    resolve: {
-                        items: (): any => {
-                        }
-                    }
-                });
-
-                modalRegist.result.then((content: any): void => {
-                    progress(true);
-                    ArticleService.Delete(current_id, (result: any): void => {
-                        current_id = null;
-                        DrawArticles(() => {
-                            $scope.opened = false;
-                            progress(false);
-                        });
-                    }, error_handler);
-                }, (): void => {
-                });
-            }
-        };
-
-        $scope.FindArticles = (field:string, value: any): void => {
-
-            ArticleService.SetQuery(null);
-            if (field) {
-                if (value) {
-                    let query = {};
-                    query[field] = {$regex: value};
-                    ArticleService.SetQuery(query);
-                }
-            }
-
-            Draw(() => {
-            });
-        };
-
-        $scope.Find = (newValue: any): void => {
-
-            ArticleService.SetQuery(null);
-            if (newValue) {
-                ArticleService.SetQuery({name: {$regex: newValue}});
-            }
-
-            Draw(() => {
-            });
-        };
-
-        $scope.Sort = (name: string): void => {
-            if (name) {
-                direction = -direction;
-                ArticleService.option.sort[name] = direction;
-            }
-            Draw(() => {
-            });
-        };
-
-        $scope.Next = (): void => {
-            progress(true);
-            ArticleService.Next((result: any): void => {
-                if (result) {
-                    $scope.articles = result;
-                }
-                ArticleService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ArticleService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        $scope.Prev = (): void => {
-            progress(true);
-            ArticleService.Prev((result: any): void => {
-                if (result) {
-                    $scope.articles = result;
-                }
-                ArticleService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ArticleService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-                progress(false);
-            }, error_handler);
-        };
-
-        $scope.onDrop = (data: any, evt: any, id: any): void => {
-            $scope[id] = evt.element[0].src;
-        };
-
-        FormPlayerService.$scope = $scope;
-        FormPlayerService.$compile = $compile;
-
-        let DrawPage: (name: string, callback: () => void) => void = (name: string, callback: () => void): void => {
-            FormPlayerService.query = {name: name};
-            FormPlayerService.Query((value: any): void => {
-                if (value.length > 0) {
-                    FormPlayerService.Get(value[0]._id, (result: any) => {
-                        FormPlayerService.current_page = result.content;
-                        $scope.current_page = result;
-                        FormPlayerService.Draw();
-                        callback();
-                    }, error_handler);
-                } else {
-                    callback();
-                }
-            }, error_handler);
-        };
-
-        let DrawPages: (callback: () => void) => void = (callback: () => void): void => {
-            FormPlayerService.query = {type: 1};
-            FormPlayerService.Query((value: any): void => {
-                $scope.pages = value;
-                callback();
-            }, error_handler);
-        };
-
-        let DrawArticles: (callback: () => void) => void = (callback: () => void): void => {
-            ArticleService.Query((data: any): void => {
-                $scope.articles = data;
-                callback();
-                ArticleService.Over((hasnext) => {
-                    $scope.over = !hasnext;
-                });
-                ArticleService.Under((hasprev) => {
-                    $scope.under = !hasprev;
-                });
-            }, error_handler);
-        };
-
-        let Draw: (callback: () => void) => void = (callback: () => void): void => {
-            DrawPage(page_type, (): void => {
-                DrawPages(() => {
-                    DrawArticles(callback);
-                });
-            });
-        };
-
-        Draw(() => {
-        });
-
-        $rootScope.$on('change_namespace', (event, value): void => {
-            $scope.namespace = value;
-            Draw(() => {
-            });
-        });
-
-        // tinymce
-/*
-        $scope.tinymceOptions =
-            {
-                selector: "textarea",  // change this value according to your HTML
-                height: 500,
-                theme: 'modern',
-                plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-                toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-                menubar: "table"
             };
-*/
-/*
 
-        $scope.tinymceOptions = {
-            selector: 'textarea',
-            height: 500,
-            plugins: 'visualblocks code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-            toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-            menubar: "table",
-            content_css: [
-                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-                '//www.tinymce.com/css/codepen.min.css'
-            ],
-            style_formats: [
-                { title: 'Headers', items: [
-                    { title: 'h1', block: 'h1' },
-                    { title: 'h2', block: 'h2' },
-                    { title: 'h3', block: 'h3' },
-                    { title: 'h4', block: 'h4' },
-                    { title: 'h5', block: 'h5' },
-                    { title: 'h6', block: 'h6' }
-                ] },
+            $scope.ArticleSelected = (id: string): boolean => {
+                return (current_id == id);
+            };
 
-                { title: 'Blocks', items: [
-                    { title: 'p', block: 'p' },
-                    { title: 'div', block: 'div' },
-                    { title: 'pre', block: 'pre' }
-                ] },
+            $scope.SaveArticle = (): void => {
+                progress(true);
+                let new_record: any = Reduce();
+                ArticleService.Put(current_id, new_record, (result: any): void => {
+                    progress(false);
+                    //        $scope.opened = false;
+                }, error_handler);
+            };
 
-                { title: 'Containers', items: [
-                    { title: 'section', block: 'section', wrapper: true, merge_siblings: false },
-                    { title: 'article', block: 'article', wrapper: true, merge_siblings: false },
-                    { title: 'blockquote', block: 'blockquote', wrapper: true },
-                    { title: 'hgroup', block: 'hgroup', wrapper: true },
-                    { title: 'aside', block: 'aside', wrapper: true },
-                    { title: 'figure', block: 'figure', wrapper: true }
-                ] }
-            ],
-            visualblocks_default_state: true,
-            end_container_on_empty_block: true
-        }
+            $scope.DeleteArticle = (): void => {
+                if (current_id) {
+                    let modalRegist: any = $uibModal.open({
+                        controller: 'DataDeleteConfirmController',
+                        templateUrl: '/data/dialogs/delete_confirm_dialog',
+                        resolve: {
+                            items: (): any => {
+                            }
+                        }
+                    });
 
-*/
-/*{
-            selector: 'textarea',
-            height: 500,
-            theme: 'modern',
-            plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-            toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-            image_advtab: true,
-            templates: [],
-            content_css: ['//fonts.googleapis.com/css?family=Lato:300,300i,400,400i'],
-            menubar: "table tools",
-            toolbar: "code"
-        } */
-//froala
-    //    $scope.froalaOptions = {
-    //        toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
-    //    };
-/*
-                $scope.scenario = [
-                    {
-                        outer: {
-                            top: -210, left: 80, width: 400, height: 400,
-                            background: "/applications/img/balloon/right.svg",
-                            target: "image"
-                        },
-                        inner: {
-                            top: 0, left: 100, width: 300, height: 350,
-                            content: "<h3>プロファイル画像</h3>" +
-                            "<br>" +
-                            "<p>プロファイル画像をドロップしてください</p>" +
-                            "<button class='btn btn-warning' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                        },
-                        _class: "tada",
-                        style: "animation-duration:1s;animation-delay:0.3s;"
-                    },
-                    {
-                        outer: {
-                            top: -250, left: 360, width: 500, height: 500,
-                            background: "/applications/img/balloon/right.svg",
-                            target: "image"
-                        },
-                        inner: {
-                            top: 50, left: 150, width: 300, height: 300,
-                            content: "<h3>ニックネーム</h3>" +
-                            "<br>" +
-                            "<p>ニックネームを入力してください</p>" +
-                            "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                        },
-                        _class: "shake",
-                        style: "animation-duration:1s;animation-delay:0.3s;"
+                    modalRegist.result.then((content: any): void => {
+                        progress(true);
+                        ArticleService.Delete(current_id, (result: any): void => {
+                            current_id = null;
+                            DrawArticles(() => {
+                                $scope.opened = false;
+                                progress(false);
+                            });
+                        }, error_handler);
+                    }, (): void => {
+                    });
+                }
+            };
+
+            $scope.FindArticles = (field: string, value: any): void => {
+
+                ArticleService.SetQuery(null);
+                if (field) {
+                    if (value) {
+                        let query = {};
+                        query[field] = {$regex: value};
+                        ArticleService.SetQuery(query);
                     }
-                ];
-                */
+                }
+
+                Draw(() => {
+                });
+            };
+
+            $scope.Find = (newValue: any): void => {
+
+                ArticleService.SetQuery(null);
+                if (newValue) {
+                    ArticleService.SetQuery({name: {$regex: newValue}});
+                }
+
+                Draw(() => {
+                });
+            };
+
+            $scope.Sort = (name: string): void => {
+                if (name) {
+                    direction = -direction;
+                    ArticleService.option.sort[name] = direction;
+                }
+                Draw(() => {
+                });
+            };
+
+            $scope.Next = (): void => {
+                progress(true);
+                ArticleService.Next((result: any): void => {
+                    if (result) {
+                        $scope.articles = result;
+                    }
+                    ArticleService.Over((hasnext) => {
+                        $scope.over = !hasnext;
+                    });
+                    ArticleService.Under((hasprev) => {
+                        $scope.under = !hasprev;
+                    });
+                    progress(false);
+                }, error_handler);
+            };
+
+            $scope.Prev = (): void => {
+                progress(true);
+                ArticleService.Prev((result: any): void => {
+                    if (result) {
+                        $scope.articles = result;
+                    }
+                    ArticleService.Over((hasnext) => {
+                        $scope.over = !hasnext;
+                    });
+                    ArticleService.Under((hasprev) => {
+                        $scope.under = !hasprev;
+                    });
+                    progress(false);
+                }, error_handler);
+            };
+
+            $scope.onDrop = (data: any, evt: any, id: any): void => {
+                $scope[id] = evt.element[0].src;
+            };
+
+            FormPlayerService.$scope = $scope;
+            FormPlayerService.$compile = $compile;
+
+            let DrawPage: (name: string, callback: () => void) => void = (name: string, callback: () => void): void => {
+                FormPlayerService.query = {name: name};
+                FormPlayerService.Query((value: any): void => {
+                    if (value.length > 0) {
+                        FormPlayerService.Get(value[0]._id, (result: any) => {
+                            FormPlayerService.current_page = result.content;
+                            $scope.current_page = result;
+                            FormPlayerService.Draw();
+                            callback();
+                        }, error_handler);
+                    } else {
+                        callback();
+                    }
+                }, error_handler);
+            };
+
+            let DrawPages: (callback: () => void) => void = (callback: () => void): void => {
+                FormPlayerService.query = {type: 1};
+                FormPlayerService.Query((value: any): void => {
+                    $scope.pages = value;
+                    callback();
+                }, error_handler);
+            };
+
+            let DrawArticles: (callback: () => void) => void = (callback: () => void): void => {
+                ArticleService.Query((data: any): void => {
+                    $scope.articles = data;
+                    callback();
+                    ArticleService.Over((hasnext) => {
+                        $scope.over = !hasnext;
+                    });
+                    ArticleService.Under((hasprev) => {
+                        $scope.under = !hasprev;
+                    });
+                }, error_handler);
+            };
+
+            let Draw: (callback: () => void) => void = (callback: () => void): void => {
+                DrawPage(page_type, (): void => {
+                    DrawPages(() => {
+                        DrawArticles(callback);
+                    });
+                });
+            };
+
+            Draw(() => {
+            });
+
+            $rootScope.$on('change_namespace', (event, value): void => {
+                $scope.namespace = value;
+                Draw(() => {
+                });
+            });
+
+            // tinymce
+            /*
+                    $scope.tinymceOptions =
+                        {
+                            selector: "textarea",  // change this value according to your HTML
+                            height: 500,
+                            theme: 'modern',
+                            plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+                            toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+                            menubar: "table"
+                        };
+            */
+            /*
+
+                    $scope.tinymceOptions = {
+                        selector: 'textarea',
+                        height: 500,
+                        plugins: 'visualblocks code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+                        toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+                        menubar: "table",
+                        content_css: [
+                            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                            '//www.tinymce.com/css/codepen.min.css'
+                        ],
+                        style_formats: [
+                            { title: 'Headers', items: [
+                                { title: 'h1', block: 'h1' },
+                                { title: 'h2', block: 'h2' },
+                                { title: 'h3', block: 'h3' },
+                                { title: 'h4', block: 'h4' },
+                                { title: 'h5', block: 'h5' },
+                                { title: 'h6', block: 'h6' }
+                            ] },
+
+                            { title: 'Blocks', items: [
+                                { title: 'p', block: 'p' },
+                                { title: 'div', block: 'div' },
+                                { title: 'pre', block: 'pre' }
+                            ] },
+
+                            { title: 'Containers', items: [
+                                { title: 'section', block: 'section', wrapper: true, merge_siblings: false },
+                                { title: 'article', block: 'article', wrapper: true, merge_siblings: false },
+                                { title: 'blockquote', block: 'blockquote', wrapper: true },
+                                { title: 'hgroup', block: 'hgroup', wrapper: true },
+                                { title: 'aside', block: 'aside', wrapper: true },
+                                { title: 'figure', block: 'figure', wrapper: true }
+                            ] }
+                        ],
+                        visualblocks_default_state: true,
+                        end_container_on_empty_block: true
+                    }
+
+            */
+            /*{
+                        selector: 'textarea',
+                        height: 500,
+                        theme: 'modern',
+                        plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
+                        toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+                        image_advtab: true,
+                        templates: [],
+                        content_css: ['//fonts.googleapis.com/css?family=Lato:300,300i,400,400i'],
+                        menubar: "table tools",
+                        toolbar: "code"
+                    } */
+//froala
+            //    $scope.froalaOptions = {
+            //        toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+            //    };
+            /*
+                            $scope.scenario = [
+                                {
+                                    outer: {
+                                        top: -210, left: 80, width: 400, height: 400,
+                                        background: "/applications/img/balloon/right.svg",
+                                        target: "image"
+                                    },
+                                    inner: {
+                                        top: 0, left: 100, width: 300, height: 350,
+                                        content: "<h3>プロファイル画像</h3>" +
+                                        "<br>" +
+                                        "<p>プロファイル画像をドロップしてください</p>" +
+                                        "<button class='btn btn-warning' type='button' ng-click='next();' aria-label=''>次へ</button>"
+                                    },
+                                    _class: "tada",
+                                    style: "animation-duration:1s;animation-delay:0.3s;"
+                                },
+                                {
+                                    outer: {
+                                        top: -250, left: 360, width: 500, height: 500,
+                                        background: "/applications/img/balloon/right.svg",
+                                        target: "image"
+                                    },
+                                    inner: {
+                                        top: 50, left: 150, width: 300, height: 300,
+                                        content: "<h3>ニックネーム</h3>" +
+                                        "<br>" +
+                                        "<p>ニックネームを入力してください</p>" +
+                                        "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
+                                    },
+                                    _class: "shake",
+                                    style: "animation-duration:1s;animation-delay:0.3s;"
+                                }
+                            ];
+                            */
 //  $(".resizeable-box").resizable({
-      //      handleSelector: ".win-size-grip"
-      //  });
+            //      handleSelector: ".win-size-grip"
+            //  });
 //        $(".panel-left").resizable({
 //            handleSelector: ".splitter",
 //            resizeHeight: false
-  //      });
-    }]);
+            //      });
+        }]);
 
-DataControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',
-    ($scope: any, $uibModalInstance: any, items: any): void => {
+    DataControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',
+        ($scope: any, $uibModalInstance: any, items: any): void => {
 
-        $scope.pages = items.pages;
+            $scope.pages = items.pages;
 
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
 
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
 
-        $scope.answer = (): void => {
-            $uibModalInstance.close($scope);
-        };
+            $scope.answer = (): void => {
+                $uibModalInstance.close($scope);
+            };
 
-    }]);
+        }]);
 
-DataControllers.controller('DataDeleteConfirmController', ['$scope', '$uibModalInstance', 'items', 'ArticleService',
-    ($scope: any, $uibModalInstance: any, items: any, ArticleService: any): void => {
+    DataControllers.controller('DataDeleteConfirmController', ['$scope', '$uibModalInstance', 'items', 'ArticleService',
+        ($scope: any, $uibModalInstance: any, items: any, ArticleService: any): void => {
 
-        $scope.name = ArticleService.current_article.name;
+            $scope.name = ArticleService.current_article.name;
 
-        $scope.hide = (): void => {
-            $uibModalInstance.close();
-        };
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
 
-        $scope.cancel = (): void => {
-            $uibModalInstance.dismiss();
-        };
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
 
-        $scope.answer = (): void => {
-            $uibModalInstance.close({});
-        };
+            $scope.answer = (): void => {
+                $uibModalInstance.close({});
+            };
 
-    }]);
+        }]);
 
+}
 /*! Controllers  */

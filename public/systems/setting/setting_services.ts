@@ -6,7 +6,7 @@
 
 "use strict";
 
-namespace Setting {
+namespace SettingModule {
 
     let SettingServices: angular.IModule = angular.module('SettingServices', []);
 

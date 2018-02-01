@@ -263,7 +263,7 @@ var ScannerBehavior;
                     });
                 }
                 catch (e) {
-                    var a_1 = e;
+                    var a = e;
                 }
             }
             var collection = "";
@@ -344,9 +344,9 @@ var ScannerBehavior;
             var full_params = params.trim();
             if (full_params) {
                 var full_param_array = full_params.split("==");
-                var path_1 = full_param_array[0].trim();
+                var path = full_param_array[0].trim();
                 // parse object path
-                if (path_1) {
+                if (path) {
                     var isObject_1 = function (value) {
                         var result = false;
                         if (value !== null) {
@@ -371,12 +371,12 @@ var ScannerBehavior;
                             }
                         }
                     };
-                    var splited_path_1 = path_1.split("."); // resolve path ex:  a.b.c
+                    var splited_path_1 = path.split("."); // resolve path ex:  a.b.c
                     if (splited_path_1.length == 1) {
-                        if (path_1[0] == "#") {
-                            var field_name = path_1; // filter_names[0] := #specialname
+                        if (path[0] == "#") {
+                            var field_name = path; // filter_names[0] := #specialname
                             var postfix = "#init";
-                            var split_field_name = path_1.split(":");
+                            var split_field_name = path.split(":");
                             if (split_field_name) {
                                 field_name = split_field_name[0];
                                 if (split_field_name.length == 2) {

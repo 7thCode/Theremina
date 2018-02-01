@@ -41,7 +41,12 @@ div
                                     .col-xs-4.h7 H: {{height| number:0}}
                                 .row
                                     .col-xs-12(style="position: relative;height:300px;")
-                                        img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
+                                        //img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
+                                        // cropper
+                                        img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-cropper, ng-cropper-proxy="cropperProxy",ng-cropper-show="showEvent",ng-cropper-hide="hideEvent",ng-cropper-options="options" ng-src="{{image}}")
+
+
+
         .row
             .col-xs-12
                 .progress(ng-show="progress")
@@ -56,7 +61,7 @@ div
                     button.btn.btn-warning(type="button", ng-click='cancel();', aria-label="") #{message.cancel}
                     //button.btn.btn-info(type="button", ng-click='no();', ng-disabled="progress || deformation", aria-label="") No Deformation
                     button.btn.btn-primary(type="button", ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}
-
+                    //button.btn.btn-primary(type="button", ng-click='Crop();', ng-disabled="progress || validate.$invalid", aria-label="") Crop
                     button.btn.btn-info(type="button", ng-click='Rotate(1);', ng-disabled="progress || validate.$invalid", aria-label="")
                         i.fa.fa-rotate-right
                 // button.btn.btn-info(type="button", ng-click='Rotate(-1);', ng-disabled="progress || validate.$invalid", aria-label="")

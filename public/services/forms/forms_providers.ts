@@ -6,20 +6,23 @@
 
 "use strict";
 
-let FormsProviders: angular.IModule = angular.module('FormsProviders', []);
+namespace FormsProvidersModule {
 
-FormsProviders.provider('HtmlEdit', [function():void {
+    let FormsProviders: angular.IModule = angular.module('FormsProviders', []);
 
-    this.$get = ():any => {
-        return {
-            toHtml: (object: any, init: string): string => {
-                return HtmlEdit.Render.toHtml(object, init);
-            },
-            fromHtml: (html: string, callback: (errors, doc) => void): void => {
-                HtmlEdit.Render.fromHtml(html, callback);
-            },
+    FormsProviders.provider('HtmlEdit', [function (): void {
+
+        this.$get = (): any => {
+            return {
+                toHtml: (object: any, init: string): string => {
+                    return HtmlEdit.Render.toHtml(object, init);
+                },
+                fromHtml: (html: string, callback: (errors, doc) => void): void => {
+                    HtmlEdit.Render.fromHtml(html, callback);
+                },
+            }
         }
-    }
 
+    }
+    ]);
 }
-]);

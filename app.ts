@@ -1,5 +1,3 @@
-/// <reference path="node_modules/@types/node/index.d.ts" />
-
 /**!
  * Copyright (c) 2016 7thCode.(http://seventh-code.com/)
  * This software is released under the MIT License.

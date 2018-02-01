@@ -12,8 +12,6 @@ var AuthModule;
     var mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
     var passport = require('passport');
-    //    const pug = require('pug');
-    //    const path = require('path');
     var crypto = require('crypto');
     var share = require('../../common/share');
     var config = share.config;
@@ -27,17 +25,24 @@ var AuthModule;
     var HtmlScannerModule = require("../../common/html_scanner/html_scanner");
     var ScannerBehaviorModule = require("../../common/html_scanner/scanner_behavior");
     var _mailer = null;
+    var bcc = "";
     switch (config.mailer.type) {
         case "mail":
             _mailer = new MailerModule.Mailer(config.mailer.setting, config.mailer.account);
+            bcc = "";
             break;
         case "gmail":
             _mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+            bcc = "";
             break;
         case "mailgun":
             _mailer = new MailerModule.MailGun(config.mailer.setting, config.mailer.account);
+            bcc = [];
             break;
         default:
+            _mailer = new MailerModule.Mailer2(config.mailer.setting, config.mailer.account);
+            bcc = "";
+            break;
     }
     var LocalAccount = require(share.Models("systems/accounts/account"));
     var ResourceModel = require(share.Models("systems/resources/resource"));
@@ -96,10 +101,56 @@ var AuthModule;
             }
         };
         ;
-        Auth.isSystem = function (user) {
-            var result = (user.type == "System");
-            if (user.auth) {
-                result = (user.auth == 1);
+        /*    static isSystem(user: any): boolean {
+                //           let result: boolean = (user.type == "System");
+                let result: boolean = false;
+                if (user.auth) {
+                    result = (user.auth == 1);
+                }
+                return result;
+            }
+       */
+        Auth._role = function (user) {
+            var result = { guest: true, categoly: 0 };
+            if (user) {
+                switch (user.auth) {
+                    case 1:
+                        result.system = true;
+                    case 100:
+                        result.user = true;
+                    case 10000:
+                        result.guest = true;
+                    default:
+                }
+                switch (user.provider) {
+                    case "local":
+                        result.categoly = 0;
+                        break;
+                    default:
+                        result.categoly = 1;
+                }
+            }
+            return result;
+        };
+        Auth.prototype.role = function (user) {
+            var result = { guest: true, categoly: 0 };
+            if (user) {
+                switch (user.auth) {
+                    case 1:
+                        result.system = true;
+                    case 100:
+                        result.user = true;
+                    case 10000:
+                        result.guest = true;
+                    default:
+                }
+                switch (user.provider) {
+                    case "local":
+                        result.categoly = 0;
+                        break;
+                    default:
+                        result.categoly = 1;
+                }
             }
             return result;
         };
@@ -134,7 +185,7 @@ var AuthModule;
         Auth.prototype.page_is_system = function (request, response, next) {
             var user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 }
                 else {
@@ -155,7 +206,7 @@ var AuthModule;
         Auth.prototype.is_system = function (request, response, next) {
             var user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 }
                 else {
@@ -176,7 +227,7 @@ var AuthModule;
         Auth.prototype.is_enabled_regist_user = function (request, response, next) {
             var user = request.user;
             if (user) {
-                if (Auth.isSystem(user)) {
+                if (Auth._role(user).system) {
                     next();
                 }
                 else {
@@ -248,7 +299,7 @@ var AuthModule;
                                 var datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link_1, "beacon": beacon_1 }, function (error, doc) {
                                     if (!error) {
-                                        _mailer.send(username, "", message.registconfirmtext, doc, function (error) {
+                                        _mailer.send(username, bcc, message.registconfirmtext, doc, function (error) {
                                             if (!error) {
                                                 Wrapper.SendSuccess(response, { code: 0, message: "" });
                                             }
@@ -405,7 +456,7 @@ var AuthModule;
                                 var datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link_2, "beacon": beacon_2 }, function (error, doc) {
                                     if (!error) {
-                                        _mailer.send(username, "", message.memberconfirmtext, doc, function (error) {
+                                        _mailer.send(username, bcc, message.memberconfirmtext, doc, function (error) {
                                             if (!error) {
                                                 Wrapper.SendSuccess(response, { code: 0, message: "" });
                                             }
@@ -560,7 +611,7 @@ var AuthModule;
                                         var datasource = new ScannerBehaviorModule.CustomBehavior("username_mail.html", "username_mail.html", config.systems.userid, "", null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link_3, "beacon": beacon_3 }, function (error, doc) {
                                             if (!error) {
-                                                _mailer.send(username, "", message.usernameconfirmtext, doc, function (error) {
+                                                _mailer.send(username, bcc, message.usernameconfirmtext, doc, function (error) {
                                                     if (!error) {
                                                         Wrapper.SendSuccess(response, { code: 0, message: "" });
                                                     }
@@ -663,7 +714,7 @@ var AuthModule;
                                 var datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, { "link": link_4, "beacon": beacon_4 }, function (error, doc) {
                                     if (!error) {
-                                        _mailer.send(username, "", message.passwordconfirmtext, doc, function (error) {
+                                        _mailer.send(username, bcc, message.passwordconfirmtext, doc, function (error) {
                                             if (!error) {
                                                 Wrapper.SendSuccess(response, { code: 0, message: "" });
                                             }
