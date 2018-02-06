@@ -13,7 +13,7 @@ div
                         .box.box-info
                             .box-body
                                 .row.ng-form(name="validate")
-                                    .col-xs-12
+                                    //.col-xs-12
                                         .form-group
                                             label.control-label(for="namespace") #{message.namespace}
                                             span(ng-messages="validate.namespace.$error")
@@ -44,8 +44,6 @@ div
                                         //img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-src="{{image}}")
                                         // cropper
                                         img.img-responsive#image(style="max-width:250px;max-height:250px;position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" ng-cropper, ng-cropper-proxy="cropperProxy",ng-cropper-show="showEvent",ng-cropper-hide="hideEvent",ng-cropper-options="options" ng-src="{{image}}")
-
-
 
         .row
             .col-xs-12

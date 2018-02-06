@@ -14,7 +14,8 @@ div
                     li(ng-repeat="layout in layouts")
                         div.select-item(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false",ng-click="Get(layout)",style="height:12rem;width:8rem;", ng-hide="progress")
                             div(style="height:4rem;")
-                                img.center-block.thumbnail(ng-src="/layouts/layout/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
+                                img.center-block.thumbnail(ng-src="/{{namespace}}/doc/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
+                                //img.center-block.thumbnail(ng-src="/layouts/layout/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
                             div(style="height:8rem;text-align:center;")
                                 .row
                                     .col-xs-12
@@ -25,7 +26,9 @@ div
                                         div.hidden-xs(style="font-size:0.5rem;") {{layout.modify | date:'yyyy/MM/dd' }}
                         div(style="height:12rem;width:8rem;", ng-show="progress")
                             div(style="height:4rem;")
-                                img.center-block.thumbnail(ng-src="/layouts/layout/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
+
+                                img.center-block.thumbnail(ng-src="/{{namespace}}/doc/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
+                                //img.center-block.thumbnail(ng-src="/layouts/layout/svg/{{layout.name}}", style="border: 0.1rem #404040 solid;max-height: 4rem;max-width: 6rem;")
                             div(style="height:8rem;text-align:center;")
                                 .row
                                     .col-xs-12

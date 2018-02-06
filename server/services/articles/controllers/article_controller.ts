@@ -34,11 +34,14 @@ export namespace ArticleModule {
 
         static namespace(request: any): string {
             let result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
             }
             return result;
         }
+
 
         /**
          * @param request

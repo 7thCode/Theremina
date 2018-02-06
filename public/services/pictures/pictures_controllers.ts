@@ -459,7 +459,7 @@ namespace PicturesControllersModule {
 
         }]);
 
-    PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$log', '$uibModalInstance', 'items', 'ImageService', 'SessionService','$timeout' ,'Cropper',
+    PicturesControllers.controller('PictureResizeDialogController', ['$scope', '$log', '$uibModalInstance', 'items', 'ImageService', 'SessionService','$timeout' , 'Cropper',
         ($scope: any, $log: any, $uibModalInstance: any, items: any, ImageService: any, SessionService: any, $timeout:any, Cropper:any): void => {
 
             let progress = (value) => {

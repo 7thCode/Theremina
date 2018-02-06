@@ -15,11 +15,6 @@ export namespace Promised {
     const _ = require("lodash");
     const result: any = require("./result");
 
-//    const core = require(process.cwd() + '/gs');
-//    const share: any = core.share;
-//    const config: any = share.config;
-//    const logger = share.logger;
-
     const config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
     const log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
@@ -65,80 +60,80 @@ export namespace Promised {
             }
         }
 
-        public FindById(res: any, code: number, model: any, id: any, callback: (res: any, object: any) => void): void {
-            model.findById(id).then((object: any): void => {
+        public FindById(res: any, code: number, model: any, id: any, callback: (res: any, object: any) => void): any {
+           return model.findById(id).then((object: any): void => {
                 callback(res, object);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public FindOne(res: any, code: number, model: any, query: any, callback: (res: any, object: any) => void): void {
-            model.findOne(query).then((doc: any): void => {
+        public FindOne(res: any, code: number, model: any, query: any, callback: (res: any, object: any) => void): any {
+            return model.findOne(query).then((doc: any): void => {
                 callback(res, doc);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Find(res: any, code: number, model: any, query: any, fields: any, option: any, callback: (res: any, object: any) => void): void {
-            model.find(query, fields, option).then((docs: any): void => {
+        public Find(res: any, code: number, model: any, query: any, fields: any, option: any, callback: (res: any, object: any) => void): any {
+            return model.find(query, fields, option).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Count(response: any, code: number, model: any, query: any, callback: (response: any, object: any) => void): void {
-            model.count(query).then((count) => {
+        public Count(response: any, code: number, model: any, query: any, callback: (response: any, object: any) => void): any {
+            return model.count(query).then((count) => {
                 callback(response, count);
             }).catch((error) => {
                 this.SendError(response, error.code, error.message, error);
             });
         }
 
-        public FindAndModify(res: any, code: number, model: any, query: any, sort: any, update: any, options: any, callback: (res: any, object: any) => void): void {
-            model.findAndModify(query, sort, update, options).then((docs: any): void => {
+        public FindAndModify(res: any, code: number, model: any, query: any, sort: any, update: any, options: any, callback: (res: any, object: any) => void): any {
+            return model.findAndModify(query, sort, update, options).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Save(res: any, code: number, instance: any, callback: (res: any, object: any) => void): void {
-            instance.save().then(() => {
+        public Save(res: any, code: number, instance: any, callback: (res: any, object: any) => void): any {
+            return instance.save().then(() => {
                 callback(res, instance);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Update(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): void {
-            model.findOneAndUpdate(query, update, {upsert: false}).then(() => {
+        public Update(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
+            return model.findOneAndUpdate(query, update, {upsert: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Upsert(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): void {
-            model.update(query, update, {upsert: true, multi: false}).then(() => {
+        public Upsert(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
+            return model.update(query, update, {upsert: true, multi: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Remove(res: any, code: number, instance: any, callback: (res: any) => void): void {
-            instance.remove().then(() => {
+        public Remove(res: any, code: number, instance: any, callback: (res: any) => void): any {
+            return instance.remove().then(() => {
                 callback(res);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public Delete(res: any, code: number, model: any, query: any, callback: (res: any) => void): void {
-            model.remove(query).then(() => {
+        public Delete(res: any, code: number, model: any, query: any, callback: (res: any) => void): any {
+            return model.remove(query).then(() => {
                 callback(res);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);

@@ -3348,7 +3348,7 @@ namespace ShapeEdit {
         }
 
         public getShapeById(id: string): string {
-            let result = null;
+            let result:any = null;
             if (this.parent) {
                 if (id == this.ID()) {
                     result = this;
@@ -3809,7 +3809,7 @@ namespace ShapeEdit {
                                                         context.restore();
                                                     }
 
-                                                    let current = null;
+                                                    let current:any = null;
                                                     if (this.modifier === Key.shift) { //制限回転
                                                         current = BaseShape.Degree(shape.center, new ShapeEdit.Location(e.offsetX, e.offsetY));
                                                     } else {
@@ -3931,7 +3931,7 @@ namespace ShapeEdit {
                                                             context.restore();
                                                         }
 
-                                                        let current = null;
+                                                        let current:any = null;
                                                         if (this.modifier === Key.shift) {
                                                             current = BaseShape.Degree(shape.center, new ShapeEdit.Location(pointx, pointy));
                                                         } else {

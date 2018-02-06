@@ -10,13 +10,13 @@ export namespace ApiAiModule {
 
     const _ = require('lodash');
 
-    const apiai = require('apiai-promise');
+    const apiai:any = require('apiai-promise');
 
-    const core = require(process.cwd() + '/gs');
+    const core:any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const plugins_config = share.plugins_config;
-    const ai = apiai(plugins_config.apiai.token);
+    const plugins_config:any = share.plugins_config;
+    const ai:any = apiai(plugins_config.apiai.token);
 
     export class ApiAi {
 
@@ -29,16 +29,6 @@ export namespace ApiAiModule {
                 sessionId: sessionId
             }).then((result) => {
                 callback(null, result);
-                /*     switch (response.result.source) {
-                 case "agent":
-                 callback(response.result.fulfillment.speech);
-                 break;
-                 case "domains":
-                 callback(response.result.source.action);
-                 break;
-                 default:
-                 }
-                 */
             }).catch((error) => {
                 callback(error, null);
             });

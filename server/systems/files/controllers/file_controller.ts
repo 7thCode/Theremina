@@ -4,6 +4,9 @@
  //opensource.org/licenses/mit-license.php
  */
 
+/// <reference path="../../../../node_modules/@types/node/index.d.ts" />
+/// <reference path="../../../../node_modules/@types/express/index.d.ts" />
+
 "use strict";
 
 export namespace FileModule {
@@ -14,11 +17,13 @@ export namespace FileModule {
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');
 
+    const MongoClient = require('mongodb').MongoClient;
+
     const share = require(process.cwd() + '/server/systems/common/share');
     const config = share.config;
     const Wrapper = share.Wrapper;
 
-    const result = require(share.Server('systems/common/result'));
+    //const result = require(share.Server('systems/common/result'));
 
     export class Files {
 
@@ -37,24 +42,20 @@ export namespace FileModule {
             return type;
         }
 
-        static connect(user): any {
-            let result = null;
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
+        static connect(callback: (error, db) => void): void {
+            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         static namespace(request: any): string {
             let result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
             }
             return result;
         }
+
 
         static localname(name: string): string {
             let result = "";
@@ -64,7 +65,7 @@ export namespace FileModule {
                     if (index == (names.length - 1)) {
                         result = name;
                     }
-                })
+                });
             }
             return result;
         }
@@ -77,7 +78,7 @@ export namespace FileModule {
             return request.user.username;
         }
 
-        static from_local(gfs: any, path_from: string, namespace: string,userid:string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
+        static from_local(gfs: any, path_from: string, namespace: string, userid: string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
 
                 let writestream = gfs.createWriteStream({
@@ -112,30 +113,25 @@ export namespace FileModule {
             }
         }
 
-        static result_file(conn, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
+        static result_file(db, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
             collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
                 if (!error) {
                     if (item) {
                         let readstream = gfs.createReadStream({_id: item._id});
                         if (readstream) {
                             response.setHeader('Content-Type', item.metadata.type);
-                            //    response.setHeader("Cache-Control", "no-cache");
                             readstream.on('close', (): void => {
-                                conn.db.close();
                             });
                             readstream.on('error', (error: any): void => {
-                                conn.db.close();
                             });
                             readstream.pipe(response);
                         } else {
-                            conn.db.close();
                             next();
                         }
                     } else {
                         not_found();
                     }
                 } else {
-                    conn.db.close();
                     next();
                 }
             });
@@ -145,166 +141,139 @@ export namespace FileModule {
          *
          * @returns none
          */
-        public create_init_files(userid:string,initfiles: any[], callback: (error:any, result:any) => void): void {
+        public create_init_files(userid: string, initfiles: any[], callback: (error: any, result: any) => void): void {
             if (initfiles) {
                 if (initfiles.length > 0) {
-                    let conn = Files.connect(config.db.user);
-                    if (conn) {
-                        conn.once('open', (error: any): void => {
-                            if (!error) {
-                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                                if (gfs) {
-                                    conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                        if (!error) {
-                                            if (collection) {
-                                                // ensureIndex
-                                                collection.createIndex({
-                                                    "filename": 1,
-                                                    "metadata.namespace": 1,
-                                                    "metadata.userid": 1
-                                                }, (error) => {
-                                                    if (!error) {
-                                                        let save = (doc: any): any => {
-                                                            return new Promise((resolve: any, reject: any): void => {
-                                                                let path = process.cwd() + doc.path;
-                                                                let filename = doc.name;
-                                                                let namespace = doc.namespace;
-                                                                let mimetype = doc.content.type;
-                                                                let type: number = doc.type;
-                                                                let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
+                    Files.connect((error, db) => {
+                        if (!error) {
+                            let gfs = Grid(db, mongoose.mongo); //missing parameter
+                            if (gfs) {
+                                db.collection('fs.files', (error: any, collection: any): void => {
+                                    if (!error) {
+                                        if (collection) {
+                                            // ensureIndex
+                                            collection.createIndex({
+                                                "filename": 1,
+                                                "metadata.namespace": 1,
+                                                "metadata.userid": 1
+                                            }, (error) => {
+                                                if (!error) {
+                                                    let save = (doc: any): any => {
+                                                        return new Promise((resolve: any, reject: any): void => {
+                                                            let path = process.cwd() + doc.path;
+                                                            let filename = doc.name;
+                                                            let namespace = doc.namespace;
+                                                            let mimetype = doc.content.type;
+                                                            let type: number = doc.type;
+                                                            let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
 
-                                                                collection.findOne(query, (error: any, item: any): void => {
-                                                                    if (!error) {
-                                                                        if (!item) {
-                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
-                                                                                if (!error) {
-                                                                                    resolve(file);
-                                                                                } else {
-                                                                                    reject(error);
-                                                                                }
-                                                                            });
-                                                                        } else {
-                                                                            resolve({});
-                                                                        }
+                                                            collection.findOne(query, (error: any, item: any): void => {
+                                                                if (!error) {
+                                                                    if (!item) {
+                                                                        Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
+                                                                            if (!error) {
+                                                                                resolve(file);
+                                                                            } else {
+                                                                                reject(error);
+                                                                            }
+                                                                        });
                                                                     } else {
-                                                                        reject(error);
+                                                                        resolve({});
                                                                     }
-                                                                });
+                                                                } else {
+                                                                    reject(error);
+                                                                }
                                                             });
-                                                        };
-
-                                                        let docs = initfiles;
-                                                        Promise.all(docs.map((doc: any): void => {
-                                                            return save(doc);
-                                                        })).then((results: any[]): void => {
-                                                            conn.db.close();
-                                                            callback(null, results);
-                                                        }).catch((error: any): void => {
-                                                            conn.db.close();
-                                                            callback(error, null);
                                                         });
-                                                    }
-                                                });
-                                            } else {
-                                                conn.db.close();
-                                            }
-                                        } else {
-                                            conn.db.close();
+                                                    };
+
+                                                    let docs = initfiles;
+                                                    Promise.all(docs.map((doc: any): void => {
+                                                        return save(doc);
+                                                    })).then((results: any[]): void => {
+                                                        callback(null, results);
+                                                    }).catch((error: any): void => {
+                                                        callback(error, null);
+                                                    });
+                                                }
+                                            });
                                         }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                }
-                            } else {
-                                conn.db.close();
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 } else {
                     callback(null, null);
                 }
             }
         }
 
-
         /**
          *
          * @returns none
          */
-        public create_files(userid:string, namespace:string, initfiles: any[], callback: (error:any, result:any) => void): void {
+        public create_files(userid: string, namespace: string, initfiles: any[], callback: (error: any, result: any) => void): void {
             if (initfiles) {
                 if (initfiles.length > 0) {
-                    let conn = Files.connect(config.db.user);
-                    if (conn) {
-                        conn.once('open', (error: any): void => {
-                            if (!error) {
-                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                                if (gfs) {
-                                    conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                        if (!error) {
-                                            if (collection) {
-                                                // ensureIndex
-                                                collection.createIndex({
-                                                    "filename": 1,
-                                                    "metadata.namespace": 1,
-                                                    "metadata.userid": 1
-                                                }, (error) => {
-                                                    if (!error) {
-                                                        let save = (doc: any): any => {
-                                                            return new Promise((resolve: any, reject: any): void => {
-                                                                let path = process.cwd() + doc.path;
-                                                                let filename = doc.name;
-                                                                let mimetype = doc.content.type;
-                                                                let type: number = doc.type;
-                                                                let query = {$and: [{filename: filename}, {namespace:namespace}, {"metadata.userid": userid}]};
+                    Files.connect((error, db) => {
+                        if (!error) {
+                            let gfs = Grid(db, mongoose.mongo); //missing parameter
+                            if (gfs) {
+                                db.collection('fs.files', (error: any, collection: any): void => {
+                                    if (!error) {
+                                        if (collection) {
+                                            // ensureIndex
+                                            collection.createIndex({
+                                                "filename": 1,
+                                                "metadata.namespace": 1,
+                                                "metadata.userid": 1
+                                            }, (error) => {
+                                                if (!error) {
+                                                    let save = (doc: any): any => {
+                                                        return new Promise((resolve: any, reject: any): void => {
+                                                            let path = process.cwd() + doc.path;
+                                                            let filename = doc.name;
+                                                            let mimetype = doc.content.type;
+                                                            let type: number = doc.type;
+                                                            let query = {$and: [{filename: filename}, {namespace: namespace}, {"metadata.userid": userid}]};
 
-                                                                collection.findOne(query, (error: any, item: any): void => {
-                                                                    if (!error) {
-                                                                        if (!item) {
-                                                                            Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
-                                                                                if (!error) {
-                                                                                    resolve(file);
-                                                                                } else {
-                                                                                    reject(error);
-                                                                                }
-                                                                            });
-                                                                        } else {
-                                                                            resolve({});
-                                                                        }
+                                                            collection.findOne(query, (error: any, item: any): void => {
+                                                                if (!error) {
+                                                                    if (!item) {
+                                                                        Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
+                                                                            if (!error) {
+                                                                                resolve(file);
+                                                                            } else {
+                                                                                reject(error);
+                                                                            }
+                                                                        });
                                                                     } else {
-                                                                        reject(error);
+                                                                        resolve({});
                                                                     }
-                                                                });
+                                                                } else {
+                                                                    reject(error);
+                                                                }
                                                             });
-                                                        };
-
-                                                        let docs = initfiles;
-                                                        Promise.all(docs.map((doc: any): void => {
-                                                            return save(doc);
-                                                        })).then((results: any[]): void => {
-                                                            conn.db.close();
-                                                            callback(null, results);
-                                                        }).catch((error: any): void => {
-                                                            conn.db.close();
-                                                            callback(error, null);
                                                         });
-                                                    }
-                                                });
-                                            } else {
-                                                conn.db.close();
-                                            }
-                                        } else {
-                                            conn.db.close();
+                                                    };
+
+                                                    let docs = initfiles;
+                                                    Promise.all(docs.map((doc: any): void => {
+                                                        return save(doc);
+                                                    })).then((results: any[]): void => {
+                                                        callback(null, results);
+                                                    }).catch((error: any): void => {
+                                                        callback(error, null);
+                                                    });
+                                                }
+                                            });
                                         }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                }
-                            } else {
-                                conn.db.close();
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 } else {
                     callback(null, null);
                 }
@@ -319,62 +288,49 @@ export namespace FileModule {
          */
         public get_file_query_query(request: any, response: any): void {
             let number: number = 27000;
-            let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
             let namespace: string = Files.namespace(request);
 
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
+            Files.connect((error, db) => {
+                if (!error) {
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
 
-                                    let query: any = Wrapper.Decode(request.params.query) || {};
-                                    let option: any = Wrapper.Decode(request.params.option) || {};
+                                let query: any = Wrapper.Decode(request.params.query) || {};
+                                let option: any = Wrapper.Decode(request.params.option) || {};
 
-                                    let limit = 10;
-                                    if (option.limit) {
-                                        limit = option.limit;
-                                    }
-
-                                    let skip = 0;
-                                    if (option.skip) {
-                                        skip = option.skip;
-                                    }
-
-                                    collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
-                                        if (!error) {
-                                            conn.db.close();
-                                            Wrapper.SendSuccess(response, docs);
-                                        } else {
-                                            conn.db.close();
-                                            Wrapper.SendError(response, error.code, error.message, error);
-                                        }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                    Wrapper.SendFatal(response, number + 30, "no collection", {
-                                        code: number + 30,
-                                        message: "no collection"
-                                    });
+                                let limit = 10;
+                                if (option.limit) {
+                                    limit = option.limit;
                                 }
+
+                                let skip = 0;
+                                if (option.skip) {
+                                    skip = option.skip;
+                                }
+
+                                collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
+                                    if (!error) {
+                                        Wrapper.SendSuccess(response, docs);
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
                             } else {
-                                conn.db.close();
-                                Wrapper.SendError(response, error.code, error.message, error);
+                                Wrapper.SendFatal(response, number + 30, "no collection", {
+                                    code: number + 30,
+                                    message: "no collection"
+                                });
                             }
-                        });
-                    } else {
-                        conn.db.close();
-                        Wrapper.SendError(response, error.code, error.message, error);
-                    }
-                });
-            } else {
-                Wrapper.SendError(response, number + 10, "connection error", {
-                    code: number + 10,
-                    message: "connection error"
-                });
-            }
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
+                }
+            });
         }
 
         /**
@@ -385,50 +341,36 @@ export namespace FileModule {
          */
         public get_file_query_count(request: any, response: any): void {
             let number: number = 28000;
-            let conn = Files.connect(config.db.user);
             let userid = Files.userid(request);
             let namespace: string = Files.namespace(request);
 
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    let query: any = Wrapper.Decode(request.params.query);
-                                    collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).count((error: any, count: any): void => {
-                                        if (!error) {
-                                            conn.db.close();
-                                            Wrapper.SendSuccess(response, count);
-                                        } else {
-                                            conn.db.close();
-                                            Wrapper.SendError(response, error.code, error.message, error);
-                                        }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                    Wrapper.SendFatal(response, number + 30, "no collection", {
-                                        code: number + 30,
-                                        message: "no collection"
-                                    });
-                                }
+            Files.connect((error, db) => {
+                if (!error) {
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
+                                let query: any = Wrapper.Decode(request.params.query);
+                                collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).count((error: any, count: any): void => {
+                                    if (!error) {
+                                        Wrapper.SendSuccess(response, count);
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
                             } else {
-                                conn.db.close();
-                                Wrapper.SendError(response, error.code, error.message, error);
+                                Wrapper.SendFatal(response, number + 30, "no collection", {
+                                    code: number + 30,
+                                    message: "no collection"
+                                });
                             }
-                        });
-
-                    } else {
-                        conn.db.close();
-                        Wrapper.SendError(response, error.code, error.message, error);
-                    }
-                });
-            } else {
-                Wrapper.SendError(response, number + 10, "connection error", {
-                    code: number + 10,
-                    message: "connection error"
-                });
-            }
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
+                }
+            });
         }
 
         /**
@@ -437,47 +379,36 @@ export namespace FileModule {
          * @param response
          * @returns none
          */
-        public namespaces(userid:string, callback:any): void {
-            let number: number = 27000;
-            let conn = Files.connect(config.db.user);
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    collection.find({"metadata.userid": userid}, {"metadata.namespace": 1, "_id": 0}).toArray((error: any, docs: any): void => {
-                                        if (!error) {
-                                            conn.db.close();
-                                            let result = [];
-                                            _.forEach(docs, (page) => {
-                                                if (page.metadata.namespace) {
-                                                    result.push(page.metadata.namespace);
-                                                }
-                                            });
-                                            callback(null, _.uniqBy(result));
-                                        } else {
-                                            callback(error, null);
-                                            conn.db.close();
-                                        }
-                                    });
-                                } else {
-                                    callback({message:"", code:1}, null);
-                                    conn.db.close();
-                                }
+        public namespaces(userid: string, callback: any): void {
+            Files.connect((error, db) => {
+                if (!error) {
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
+                                collection.find({"metadata.userid": userid}, {"metadata.namespace": 1, "_id": 0}).toArray((error: any, docs: any): void => {
+                                    if (!error) {
+                                        let result:any[] = [];
+                                        _.forEach(docs, (page: any) => {
+                                            if (page.metadata.namespace) {
+                                                result.push(page.metadata.namespace);
+                                            }
+                                        });
+                                        callback(null, _.uniqBy(result));
+                                    } else {
+                                        callback(error, null);
+                                    }
+                                });
                             } else {
-                                callback(error, null);
-                                conn.db.close();
+                                callback({message: "", code: 1}, null);
                             }
-                        });
-                    } else {
-                        callback(error, null);
-                        conn.db.close();
-                    }
-                });
-            } else {
-                callback({message:"2", code:1}, null);
-            }
+                        } else {
+                            callback(error, null);
+                        }
+                    });
+                } else {
+                    callback(error, null);
+                }
+            });
         }
 
         /**
@@ -489,16 +420,15 @@ export namespace FileModule {
          */
         public get_file(request: any, response: any, next: any): void {
             try {
-                let conn = Files.connect(config.db.user);
                 let namespace: string = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = request.params.userid;
 
-                conn.once('open', (error: any): void => {
+                Files.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        let gfs = Grid(db, mongoose.mongo); //missing parameter
                         if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
                                         let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
@@ -508,45 +438,37 @@ export namespace FileModule {
                                                     let readstream = gfs.createReadStream({_id: item._id});
                                                     if (readstream) {
                                                         response.setHeader('Content-Type', item.metadata.type);
-                                                        //         response.setHeader("Cache-Control", "no-cache");
                                                         readstream.on('close', (): void => {
-                                                            conn.db.close();
+
                                                         });
                                                         readstream.on('error', (error: any): void => {
-                                                            conn.db.close();
+
                                                         });
                                                         readstream.pipe(response);
                                                     } else {
-                                                        conn.db.close();
                                                         next();
                                                     }
                                                 } else {
                                                     // NOT FOUND IMAGE.
-                                                    Files.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                        conn.db.close();
+                                                    Files.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                         next();
                                                     });
                                                 }
                                             } else {
-                                                conn.db.close();
                                                 next();
                                             }
                                         });
                                     } else {
-                                        conn.db.close();
                                         next();
                                     }
                                 } else {
-                                    conn.db.close();
                                     next();
                                 }
                             });
                         } else {
-                            conn.db.close();
                             next();
                         }
                     } else {
-                        conn.db.close();
                         next();
                     }
                 });
@@ -564,8 +486,6 @@ export namespace FileModule {
          */
         public get_file_data_name(request: any, response: any, next: any): void {
             try {
-                let conn = Files.connect(config.db.user);
-               // let namespace: string = request.params.namespace;
                 let namespace: string = Files.namespace(request);
                 let name = Files.localname(request.params.name);
                 let userid = Files.userid(request);
@@ -574,11 +494,11 @@ export namespace FileModule {
                     return new Buffer(str, 'binary').toString('base64');
                 };
 
-                conn.once('open', (error: any): void => {
+                Files.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        let gfs = Grid(db, mongoose.mongo); //missing parameter
                         if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
                                         let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
@@ -594,53 +514,44 @@ export namespace FileModule {
                                                         });
 
                                                         readstream.on('close', (): void => {
-                                                            conn.db.close();
                                                             let dataurl = "data:" + item.metadata.type + ";base64," + BinaryToBase64(buffer);
                                                             Wrapper.SendSuccess(response, dataurl);
                                                         });
 
                                                         readstream.on('error', (error: any): void => {
-                                                            conn.db.close();
                                                             Wrapper.SendError(response, error.code, error.message, error);
                                                         });
 
                                                     } else {
-                                                        conn.db.close();
                                                         Wrapper.SendError(response, 10000, "no stream", {
                                                             code: 10000,
                                                             message: "no stream"
                                                         });
                                                     }
                                                 } else {
-                                                    conn.db.close();
                                                     Wrapper.SendFatal(response, 10000, "no item", {
                                                         code: 10000,
                                                         message: "no item"
                                                     });
                                                 }
                                             } else {
-                                                conn.db.close();
                                                 Wrapper.SendError(response, error.code, error.message, error);
                                             }
                                         });
                                     } else {
-                                        conn.db.close();
                                         Wrapper.SendFatal(response, 10000, "no collection", {
                                             code: 10000,
                                             message: "no collection"
                                         });
                                     }
                                 } else {
-                                    conn.db.close();
                                     Wrapper.SendError(response, error.code, error.message, error);
                                 }
                             });
                         } else {
-                            conn.db.close();
                             Wrapper.SendFatal(response, 10000, "no gfs", {code: 10000, message: "no gfs"});
                         }
                     } else {
-                        conn.db.close();
                         Wrapper.SendError(response, error.code, error.message, error);
                     }
                 });
@@ -657,7 +568,6 @@ export namespace FileModule {
          */
         public post_file_name(request: any, response: any): void {
             let number: number = 24000;
-            let conn = Files.connect(config.db.user);
             let namespace: string = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let key = request.params.key;
@@ -666,104 +576,89 @@ export namespace FileModule {
 
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    if (conn) {
-                        conn.once('open', (error: any): void => {
-                            if (!error) {
-                                let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                                if (gfs) {
-                                    conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                        if (!error) {
-                                            if (collection) {
-                                                let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                                collection.findOne(query, (error: any, item: any): void => {
-                                                    if (!error) {
-                                                        if (!item) {
-                                                            let parseDataURL = (dataURL: any): any => {
-                                                                let result:any = {
-                                                                    mediaType: null,
-                                                                    encoding: null,
-                                                                    isBase64: null,
-                                                                    data: null
-                                                                };
-                                                                if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
-                                                                    result.mediaType = RegExp.$1 || 'text/plain';
-                                                                    result.encoding = RegExp.$3 || 'US-ASCII';
-                                                                    result.isBase64 = String(RegExp.$4) === ';base64';
-                                                                    result.data = RegExp.$5;
-                                                                }
-                                                                return result;
+                    Files.connect((error, db) => {
+                        if (!error) {
+                            let gfs = Grid(db, mongoose.mongo); //missing parameter
+                            if (gfs) {
+                                db.collection('fs.files', (error: any, collection: any): void => {
+                                    if (!error) {
+                                        if (collection) {
+                                            let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                            collection.findOne(query, (error: any, item: any): void => {
+                                                if (!error) {
+                                                    if (!item) {
+                                                        let parseDataURL = (dataURL: any): any => {
+                                                            let result: any = {
+                                                                mediaType: null,
+                                                                encoding: null,
+                                                                isBase64: null,
+                                                                data: null
                                                             };
-
-                                                            let info = parseDataURL(request.body.url);
-                                                            let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
-
-                                                            let writestream = gfs.createWriteStream({
-                                                                filename: name,
-                                                                metadata: {
-                                                                    userid: userid,
-                                                                    username: username,
-                                                                    key: key * 1,
-                                                                    type: Files.to_mime(request),
-                                                                    namespace: namespace,
-                                                                    parent: null
-                                                                }
-                                                            });
-                                                            if (writestream) {
-                                                                writestream.write(chunk);
-                                                                writestream.on('close', (file: any): void => {
-                                                                    conn.db.close();
-                                                                    Wrapper.SendSuccess(response, file);
-                                                                });
-                                                                writestream.end();
-                                                            } else {
-                                                                conn.db.close();
-                                                                Wrapper.SendFatal(response, number + 40, "stream not open", {
-                                                                    code: number + 40,
-                                                                    message: "stream not open"
-                                                                });
+                                                            if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
+                                                                result.mediaType = RegExp.$1 || 'text/plain';
+                                                                result.encoding = RegExp.$3 || 'US-ASCII';
+                                                                result.isBase64 = String(RegExp.$4) === ';base64';
+                                                                result.data = RegExp.$5;
                                                             }
+                                                            return result;
+                                                        };
+
+                                                        let info = parseDataURL(request.body.url);
+                                                        let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
+
+                                                        let writestream = gfs.createWriteStream({
+                                                            filename: name,
+                                                            metadata: {
+                                                                userid: userid,
+                                                                username: username,
+                                                                key: key * 1,
+                                                                type: Files.to_mime(request),
+                                                                namespace: namespace,
+                                                                parent: null
+                                                            }
+                                                        });
+                                                        if (writestream) {
+                                                            writestream.write(chunk);
+                                                            writestream.on('close', (file: any): void => {
+                                                                Wrapper.SendSuccess(response, file);
+                                                            });
+                                                            writestream.end();
                                                         } else {
-                                                            conn.db.close();
-                                                            Wrapper.SendWarn(response, number + 1, "already found", {
-                                                                code: number + 1,
-                                                                message: "already found"
+                                                            Wrapper.SendFatal(response, number + 40, "stream not open", {
+                                                                code: number + 40,
+                                                                message: "stream not open"
                                                             });
                                                         }
                                                     } else {
-                                                        conn.db.close();
-                                                        Wrapper.SendError(response, error.code, error.message, error);
+                                                        Wrapper.SendWarn(response, number + 1, "already found", {
+                                                            code: number + 1,
+                                                            message: "already found"
+                                                        });
                                                     }
-                                                });
-                                            } else {
-                                                conn.db.close();
-                                                Wrapper.SendFatal(response, number + 30, "no collection", {
-                                                    code: number + 30,
-                                                    message: "no collection"
-                                                });
-                                            }
+                                                } else {
+                                                    Wrapper.SendError(response, error.code, error.message, error);
+                                                }
+                                            });
                                         } else {
-                                            conn.db.close();
-                                            Wrapper.SendError(response, error.code, error.message, error);
+                                            Wrapper.SendFatal(response, number + 30, "no collection", {
+                                                code: number + 30,
+                                                message: "no collection"
+                                            });
                                         }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                    Wrapper.SendFatal(response, number + 20, "no gfs", {
-                                        code: number + 20,
-                                        message: "no gfs"
-                                    });
-                                }
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
                             } else {
-                                conn.db.close();
-                                Wrapper.SendError(response, error.code, error.message, error);
+                                Wrapper.SendFatal(response, number + 20, "no gfs", {
+                                    code: number + 20,
+                                    message: "no gfs"
+                                });
                             }
-                        });
-                    } else {
-                        Wrapper.SendError(response, number + 10, "connection error", {
-                            code: number + 10,
-                            message: "connection error"
-                        });
-                    }
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
                 } else {
                     Wrapper.SendError(response, number + 30, "name invalid", {
                         code: number + 30,
@@ -783,7 +678,6 @@ export namespace FileModule {
          */
         public put_file_name(request: any, response: any): void {
             let number: number = 25000;
-            let conn = Files.connect(config.db.user);
             let namespace: string = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let key = request.params.key;
@@ -791,7 +685,7 @@ export namespace FileModule {
             let username = Files.username(request);
 
             let parseDataURL = (dataURL: any): any => {
-                let result:any = {
+                let result: any = {
                     mediaType: null,
                     encoding: null,
                     isBase64: null,
@@ -806,110 +700,95 @@ export namespace FileModule {
                 return result;
             };
 
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
-                        if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                        collection.findOne(query, (error: any, item: any): void => {
-                                            if (!error) {
-                                                if (item) {
-                                                    collection.remove({_id: item._id}, (error) => {
-                                                        if (!error) {
-                                                            let info = parseDataURL(request.body.url);
-                                                            let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
-                                                            let writestream = gfs.createWriteStream({
-                                                                filename: name,
-                                                                username: username,
-                                                                metadata: {
-                                                                    userid: userid,
-                                                                    key: key * 1,
-                                                                    type: Files.to_mime(request),
-                                                                    namespace: namespace,
-                                                                    parent: null
-                                                                }
-                                                            });
-                                                            if (writestream) {
-                                                                writestream.write(chunk);
-                                                                writestream.on('close', (file: any): void => {
-                                                                    conn.db.close();
-                                                                    Wrapper.SendSuccess(response, file);
-                                                                });
-                                                                writestream.end();
-                                                            } else {
-                                                                conn.db.close();
-                                                                Wrapper.SendFatal(response, number + 40, "stream not open", {
-                                                                    code: number + 40,
-                                                                    message: "stream not open"
-                                                                });
+            Files.connect((error, db) => {
+                if (!error) {
+                    let gfs = Grid(db, mongoose.mongo); //missing parameter
+                    if (gfs) {
+                        db.collection('fs.files', (error: any, collection: any): void => {
+                            if (!error) {
+                                if (collection) {
+                                    let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                    collection.findOne(query, (error: any, item: any): void => {
+                                        if (!error) {
+                                            if (item) {
+                                                collection.remove({_id: item._id}, (error) => {
+                                                    if (!error) {
+                                                        let info = parseDataURL(request.body.url);
+                                                        let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
+                                                        let writestream = gfs.createWriteStream({
+                                                            filename: name,
+                                                            username: username,
+                                                            metadata: {
+                                                                userid: userid,
+                                                                key: key * 1,
+                                                                type: Files.to_mime(request),
+                                                                namespace: namespace,
+                                                                parent: null
                                                             }
-                                                        }
-                                                    });
-                                                } else {
-                                                    let info = parseDataURL(request.body.url);
-                                                    let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
-                                                    let writestream = gfs.createWriteStream({
-                                                        filename: name,
-                                                        username: username,
-                                                        metadata: {
-                                                            userid: userid,
-                                                            key: key * 1,
-                                                            type: Files.to_mime(request),
-                                                            namespace: namespace,
-                                                            parent: null
-                                                        }
-                                                    });
-                                                    if (writestream) {
-                                                        writestream.write(chunk);
-                                                        writestream.on('close', (file: any): void => {
-                                                            conn.db.close();
-                                                            Wrapper.SendSuccess(response, file);
                                                         });
-                                                        writestream.end();
-                                                    } else {
-                                                        conn.db.close();
-                                                        Wrapper.SendFatal(response, number + 40, "stream not open", {
-                                                            code: number + 40,
-                                                            message: "stream not open"
-                                                        });
+                                                        if (writestream) {
+                                                            writestream.write(chunk);
+                                                            writestream.on('close', (file: any): void => {
+                                                                Wrapper.SendSuccess(response, file);
+                                                            });
+                                                            writestream.end();
+                                                        } else {
+                                                            Wrapper.SendFatal(response, number + 40, "stream not open", {
+                                                                code: number + 40,
+                                                                message: "stream not open"
+                                                            });
+                                                        }
                                                     }
-
-                                                }
+                                                });
                                             } else {
-                                                conn.db.close();
-                                                Wrapper.SendError(response, error.code, error.message, error);
+                                                let info = parseDataURL(request.body.url);
+                                                let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
+                                                let writestream = gfs.createWriteStream({
+                                                    filename: name,
+                                                    username: username,
+                                                    metadata: {
+                                                        userid: userid,
+                                                        key: key * 1,
+                                                        type: Files.to_mime(request),
+                                                        namespace: namespace,
+                                                        parent: null
+                                                    }
+                                                });
+                                                if (writestream) {
+                                                    writestream.write(chunk);
+                                                    writestream.on('close', (file: any): void => {
+                                                        Wrapper.SendSuccess(response, file);
+                                                    });
+                                                    writestream.end();
+                                                } else {
+                                                    Wrapper.SendFatal(response, number + 40, "stream not open", {
+                                                        code: number + 40,
+                                                        message: "stream not open"
+                                                    });
+                                                }
+
                                             }
-                                        });
-                                    } else {
-                                        Wrapper.SendFatal(response, number + 30, "no collection", {
-                                            code: number + 30,
-                                            message: "no collection"
-                                        });
-                                    }
+                                        } else {
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 } else {
-                                    conn.db.close();
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, number + 30, "no collection", {
+                                        code: number + 30,
+                                        message: "no collection"
+                                    });
                                 }
-                            });
-                        } else {
-                            conn.db.close();
-                            Wrapper.SendFatal(response, number + 20, "no gfs", {code: number + 20, message: "no gfs"});
-                        }
+                            } else {
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     } else {
-                        conn.db.close();
-                        Wrapper.SendError(response, error.code, error.message, error);
+                        Wrapper.SendFatal(response, number + 20, "no gfs", {code: number + 20, message: "no gfs"});
                     }
-                });
-            } else {
-                Wrapper.SendError(response, number + 10, "connection error", {
-                    code: number + 10,
-                    message: "connection error"
-                });
-            }
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
+                }
+            });
         }
 
         /**
@@ -920,66 +799,51 @@ export namespace FileModule {
          */
         public delete_file_name(request: any, response: any): void {
             let number: number = 26000;
-            let conn = Files.connect(config.db.user);
             let namespace: string = Files.namespace(request);
             let name = Files.localname(request.params.name);
             let userid = Files.userid(request);
 
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                    collection.findOne(query, (error: any, item: any): void => {
-                                        if (!error) {
-                                            if (item) {
-                                                collection.remove({_id: item._id}, (error): void => {
-                                                    if (!error) {
-                                                        conn.db.close();
-                                                        Wrapper.SendSuccess(response, {});
-                                                    } else {
-                                                        conn.db.close();
-                                                        Wrapper.SendError(response, error.code, error.message, error);
-                                                    }
-                                                });
-                                            } else {
-                                                conn.db.close();
-                                                Wrapper.SendWarn(response, number + 1, "not found", {
-                                                    code: number + 1,
-                                                    message: "not found"
-                                                });
-                                            }
+            Files.connect((error, db) => {
+                if (!error) {
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
+                                let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                collection.findOne(query, (error: any, item: any): void => {
+                                    if (!error) {
+                                        if (item) {
+                                            collection.remove({_id: item._id}, (error): void => {
+                                                if (!error) {
+                                                    Wrapper.SendSuccess(response, {});
+                                                } else {
+                                                    Wrapper.SendError(response, error.code, error.message, error);
+                                                }
+                                            });
                                         } else {
-                                            conn.db.close();
-                                            Wrapper.SendError(response, error.code, error.message, error);
+                                            Wrapper.SendWarn(response, number + 1, "not found", {
+                                                code: number + 1,
+                                                message: "not found"
+                                            });
                                         }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                    Wrapper.SendFatal(response, number + 30, "no collection", {
-                                        code: number + 30,
-                                        message: "no collection"
-                                    });
-                                }
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
                             } else {
-                                conn.db.close();
-                                Wrapper.SendError(response, error.code, error.message, error);
+                                Wrapper.SendFatal(response, number + 30, "no collection", {
+                                    code: number + 30,
+                                    message: "no collection"
+                                });
                             }
-                        });
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
+                }
+            });
 
-                    } else {
-                        conn.db.close();
-                        Wrapper.SendError(response, error.code, error.message, error);
-                    }
-                });
-            } else {
-                Wrapper.SendError(response, number + 10, "connection error", {
-                    code: number + 10,
-                    message: "connection error"
-                });
-            }
         }
 
         /**
@@ -990,48 +854,34 @@ export namespace FileModule {
          */
         public delete_own(request: any, response: any): void {
             let number: number = 29000;
-            let conn: any = Files.connect(config.db.user);
             let userid: string = Files.userid(request);
 
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    collection.remove({"metadata.userid": userid}, (error: any): void => {
-                                        if (!error) {
-                                            conn.db.close();
-                                            Wrapper.SendSuccess(response, {});
-                                        } else {
-                                            conn.db.close();
-                                            Wrapper.SendError(response, error.code, error.message, error);
-                                        }
-                                    });
-                                } else {
-                                    conn.db.close();
-                                    Wrapper.SendFatal(response, number + 30, "no collection", {
-                                        code: number + 30,
-                                        message: "no connection"
-                                    });
-                                }
+            Files.connect((error, db) => {
+                if (!error) {
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
+                                collection.remove({"metadata.userid": userid}, (error: any): void => {
+                                    if (!error) {
+                                        Wrapper.SendSuccess(response, {});
+                                    } else {
+                                        Wrapper.SendError(response, error.code, error.message, error);
+                                    }
+                                });
                             } else {
-                                conn.db.close();
-                                Wrapper.SendError(response, error.code, error.message, error);
+                                Wrapper.SendFatal(response, number + 30, "no collection", {
+                                    code: number + 30,
+                                    message: "no connection"
+                                });
                             }
-                        });
-
-                    } else {
-                        conn.db.close();
-                        Wrapper.SendError(response, error.code, error.message, error);
-                    }
-                });
-            } else {
-                Wrapper.SendError(response, number + 10, "connection error", {
-                    code: number + 10,
-                    message: "connection error"
-                });
-            }
+                        } else {
+                            Wrapper.SendError(response, error.code, error.message, error);
+                        }
+                    });
+                } else {
+                    Wrapper.SendError(response, error.code, error.message, error);
+                }
+            });
         }
     }
 
@@ -1056,7 +906,7 @@ export namespace FileModule {
             if (!TemporaryFiles.isExistFile(path)) {
                 fs.mkdir(path, '0777', callback);
             } else {
-                callback(null)
+                callback(null);
             }
         }
 
@@ -1065,7 +915,7 @@ export namespace FileModule {
             if (name) {
                 if (name.indexOf('/') == -1) {
                     let parseDataURL = (dataURL: any): any => {
-                        let result:any = {
+                        let result: any = {
                             mediaType: null,
                             encoding: null,
                             isBase64: null,

@@ -10,19 +10,12 @@ export namespace NamespsceModule {
 
     const _ = require('lodash');
 
-    //const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
-
-    //const archiver: any = require('archiver');
-
-    //const sharp = require("sharp");
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const Wrapper: any = share.Wrapper;
-
-    //const validator: any = require('validator');
 
     const FileModule: any = require(share.Server("systems/files/controllers/file_controller"));
     const file: any = new FileModule.Files();
@@ -70,7 +63,6 @@ export namespace NamespsceModule {
                 }
             });
         }
-
     }
 
 }

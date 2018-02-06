@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {Pages} from "../../../services/pages/controllers/pages_controller";
+
 export namespace ResourcesModule {
 
     const fs = require('graceful-fs');
@@ -14,6 +16,8 @@ export namespace ResourcesModule {
     const share = require('../../common/share');
     const config = share.config;
     const applications_config = share.applications_config;
+
+    const MongoClient = require('mongodb').MongoClient;
 
     const Wrapper = share.Wrapper;
 
@@ -34,11 +38,14 @@ export namespace ResourcesModule {
 
         static namespace(request: any): string {
             let result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
             }
             return result;
         }
+
 
         /*
         static namespace(name: string): string {
@@ -455,15 +462,8 @@ export namespace ResourcesModule {
 
     export class Pages {
 
-        static connect(user: any): any {
-            let result = null;
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
+        static connect(callback: (error, db) => void): any {
+            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         static userid(request: { user: { userid: string } }): string {

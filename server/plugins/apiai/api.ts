@@ -8,8 +8,8 @@
 
 export namespace ApiaiApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express:any = require('express');
+    export const router:any = express.Router();
 
 }
 
