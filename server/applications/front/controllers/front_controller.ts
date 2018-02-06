@@ -6,6 +6,8 @@
 
 "use strict";
 
+//import {Beacon} from "../../../plugins/beacon/controllers/beacon_controller";
+
 export namespace FrontModule {
 
     const _ = require('lodash');
@@ -16,6 +18,8 @@ export namespace FrontModule {
     const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
+
+    const MongoClient = require('mongodb').MongoClient;
 
     const archiver: any = require('archiver');
 
@@ -30,15 +34,8 @@ export namespace FrontModule {
 
     export class Front {
 
-        static connect(user): any {
-            let result = null;
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
+        static connect(callback: (error, db) => void): any {
+            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         static userid(request): string {
@@ -55,64 +52,52 @@ export namespace FrontModule {
          * @returns none
          */
         static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
-
             let number: number = 27000;
-            let conn = Front.connect(config.db.user);
-            if (conn) {
-                conn.once('open', (error: any): void => {
-                    if (!error) {
-                        let bucket = new mongodb.GridFSBucket(conn.db, {});
-                        conn.db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    collection.find({"metadata.userid": userid}).toArray((error: any, docs: any): void => {
-                                        if (!error) {
-                                            let save = (doc: any): any => {
-                                                return new Promise((resolve: any, reject: any): void => {
-                                                    if (doc) {
-                                                        bucket.openDownloadStreamByName(doc.filename)
-                                                            .pipe(fs.createWriteStream(path.join(tmp_path, doc.filename)))
-                                                            .on('error', (error): void => {
-                                                                reject(error);
-                                                            })
-                                                            .on('finish', (): void => {
-                                                                resolve({});
-                                                            });
-                                                    }
-                                                });
-                                            };
-
-                                            Promise.all(docs.map((doc: any): void => {
-                                                return save(doc);
-                                            })).then((results: any[]): void => {
-                                                callback(null);
-                                                conn.db.close();
-                                            }).catch((error: any): void => {
-                                                callback(error);
-                                                conn.db.close();
+            Front.connect((error, db) => {
+                if (!error) {
+                    let bucket = new mongodb.GridFSBucket(db, {});
+                    db.collection('fs.files', (error: any, collection: any): void => {
+                        if (!error) {
+                            if (collection) {
+                                collection.find({"metadata.userid": userid}).toArray((error: any, docs: any): void => {
+                                    if (!error) {
+                                        let save = (doc: any): any => {
+                                            return new Promise((resolve: any, reject: any): void => {
+                                                if (doc) {
+                                                    bucket.openDownloadStreamByName(doc.filename)
+                                                        .pipe(fs.createWriteStream(path.join(tmp_path, doc.filename)))
+                                                        .on('error', (error): void => {
+                                                            reject(error);
+                                                        })
+                                                        .on('finish', (): void => {
+                                                            resolve({});
+                                                        });
+                                                }
                                             });
+                                        };
 
-                                        } else {
-                                            callback({code: error.code, message: error.message});
-                                            conn.db.close();
-                                        }
-                                    });
-                                } else {
-                                    callback({code: number + 20, message: "gfs error"});
-                                    conn.db.close();
-                                }
+                                        Promise.all(docs.map((doc: any): void => {
+                                            return save(doc);
+                                        })).then((results: any[]): void => {
+                                            callback(null);
+                                        }).catch((error: any): void => {
+                                            callback(error);
+                                        });
+                                    } else {
+                                        callback({code: error.code, message: error.message});
+                                    }
+                                });
                             } else {
-                                callback({code: error.code, message: error.message});
-                                conn.db.close();
+                                callback({code: number + 20, message: "gfs error"});
                             }
-                        });
-                    } else {
-                        callback({code: error.code, message: error.message});
-                    }
-                });
-            } else {
-                callback({code: number + 40, message: "db error"});
-            }
+                        } else {
+                            callback({code: error.code, message: error.message});
+                        }
+                    });
+                } else {
+                    callback({code: error.code, message: error.message});
+                }
+            });
         }
 
         /**
@@ -275,10 +260,10 @@ export namespace FrontModule {
                         }
                     });
                 } else {
-                    Wrapper.SendError(response, 200,"resource not found.", {code:200, message:"resource not found."});
+                    Wrapper.SendError(response, 200, "resource not found.", {code: 200, message: "resource not found."});
                 }
             } else {
-                Wrapper.SendError(response, 100,"resource set not found.", {code:100, message:"resource set not found."});
+                Wrapper.SendError(response, 100, "resource set not found.", {code: 100, message: "resource set not found."});
             }
         }
     }

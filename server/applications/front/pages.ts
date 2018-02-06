@@ -33,6 +33,7 @@ export namespace PageRouter {
     const pictures: any = new PicturesModule.Pictures;
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
+    const layout: any = new LayoutsModule.Layout;
 
     let message = config.message;
 
@@ -312,13 +313,25 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/img/:name", [(request: any, response: any): void => {
+    router.get("/img/:name", [exception.page_catch, (request: any, response: any): void => {
         let userid = applications_config.first_responder["default"].userid;
         let namespace = applications_config.first_responder["default"].namespace;
         let name = request.params.name;
         let query = request.query;
 
         pictures.get_picture({
+            params: {userid: userid, name: name, namespace: namespace},
+            query: query
+        }, response);
+    }]);
+
+    router.get("/svg/:name", [exception.page_catch, (request: any, response: any): void => {
+        let userid = applications_config.first_responder["default"].userid;
+        let namespace = applications_config.first_responder["default"].namespace;
+        let name = request.params.name;
+        let query = request.query;
+
+        layout.get_layout_svg({
             params: {userid: userid, name: name, namespace: namespace},
             query: query
         }, response);
@@ -367,6 +380,18 @@ export namespace PageRouter {
         }
 
         pictures.get_picture(request, response);
+    }]);
+
+    router.get("/:namespace/doc/svg/:name", [exception.page_catch, (request: any, response: any): void => {
+        let namespace = request.params.namespace;
+        request.params.userid = applications_config.first_responder["default"].userid;
+        try {
+            request.params.userid = applications_config.first_responder[namespace].userid;
+        } catch (e) {
+
+        }
+
+        layout.get_layout_svg(request, response);
     }]);
 
     router.get("/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
@@ -441,17 +466,7 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/:namespace/svg/:name", [exception.page_catch, (request: any, response: any): void => {
-        let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
 
-        }
-
-        LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
-    }]);
 
     router.get("/:namespace/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
 
@@ -540,7 +555,7 @@ export namespace PageRouter {
     }]);
 
     router.get("/:userid/:namespace/svg/:name", [exception.page_catch, (request: any, response: any): void => {
-        LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
+        layout.get_layout_svg(request, response);
     }]);
 
     router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {

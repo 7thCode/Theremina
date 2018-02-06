@@ -83,9 +83,9 @@ namespace FrontControllersModule {
                     // put logic here for keypress and cut/paste changes
                 },
                 inline: false,
-                plugins: "visualblocks code table advlist autolink link image lists charmap print preview",
+                plugins: "visualblocks code table advlist autolink link image lists charmap print preview textcolor",
                 menubar: "table tools",
-                toolbar: "code formatselect | bold italic strikethrough underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat",
+                toolbar: "code formatselect | forecolor backcolor bold italic strikethrough underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat",
                 style_formats: [
                     {
                         title: "Headers", items: [
