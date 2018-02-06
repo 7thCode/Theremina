@@ -125,12 +125,12 @@ namespace Adaptor {
         public Text(data: any, callback: (error: any) => void): void {
             let text: string = '';
             let defs: string = '';
-            let error:{code: number, message: string} = {code: 0, message: ""};
+            let error: { code: number, message: string } = {code: 0, message: ""};
 
             let create_def = (fonts: any[]) => {
                 let result: string = '<defs><style type="text/css">';
                 _.forEach(fonts, (font) => {
-                    result += '@import url(' + font.url + ');'
+                    result += '@import url(' + font.url + ');';
                 });
                 result += '</style></defs>';
                 return result;
@@ -153,21 +153,28 @@ namespace Adaptor {
 
                             defs = create_def(this.webfonts);
 
+                            this.doc += text;// + defs;
+                            callback(null);
+
                         } else {
                             error = {code: 1, message: ""};
+                            callback(error);
                         }
                     } else {
                         error = {code: 1, message: ""};
+                        callback(error);
                     }
                 } else {
                     error = {code: 1, message: ""};
+                    callback(error);
                 }
             } else {
                 error = {code: 1, message: ""};
+                callback(error);
             }
 
-            this.doc += text;// + defs;
-            callback(error);
+            //     this.doc += text;// + defs;
+            //         callback(error);
         }
 
         public Box(data: any, callback: (error: any) => void): void {
@@ -257,8 +264,6 @@ namespace Adaptor {
         }
 
         public ImageRect(data: any, callback: (error: any) => void): void {
-
-
             let path = "";
             if (data.property.path) {
                 path = data.property.path;
@@ -268,33 +273,34 @@ namespace Adaptor {
 
                 let defs = '<image xlink:href="' + image_url + '" preserveAspectRatio="none" x="' + data.rectangle.location.x + '" y="' + data.rectangle.location.y + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />';
 
-                this.doc +=  defs;
+                this.doc += defs;
                 callback(null);
             });
         }
-/*
-        public ImageRect(data: any, callback: (error: any) => void): void {
 
-            let rect = '<rect id="' + data.ID() + '" stroke="none" fill="url(#' + data.ID() + ')" x="' + data.rectangle.location.x + '" y="' + data.rectangle.location.y + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />';
+        /*
+                public ImageRect(data: any, callback: (error: any) => void): void {
 
-            let path = "";
-            if (data.property.path) {
-                path = data.property.path;
-            }
+                    let rect = '<rect id="' + data.ID() + '" stroke="none" fill="url(#' + data.ID() + ')" x="' + data.rectangle.location.x + '" y="' + data.rectangle.location.y + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />';
 
-            this.get_image(path, (error, image_url) => {
+                    let path = "";
+                    if (data.property.path) {
+                        path = data.property.path;
+                    }
 
-                let defs = '<defs>' +
-                    '<pattern id="' + data.ID() + '" x="' + data.rectangle.location.x + '" y="' + (data.rectangle.location.y + data.rectangle.size.h) + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" patternUnits="userSpaceOnUse" viewBox="0 0 ' + data.rectangle.size.w + ' ' + data.rectangle.size.h + '">' +
-                    '<image xlink:href="' + image_url + '" preserveAspectRatio="none" x="0" y="0" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />' +
-                    '</pattern>' +
-                    '</defs>';
+                    this.get_image(path, (error, image_url) => {
 
-                this.doc += rect + defs;
-                callback(null);
-            });
-        }
-*/
+                        let defs = '<defs>' +
+                            '<pattern id="' + data.ID() + '" x="' + data.rectangle.location.x + '" y="' + (data.rectangle.location.y + data.rectangle.size.h) + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" patternUnits="userSpaceOnUse" viewBox="0 0 ' + data.rectangle.size.w + ' ' + data.rectangle.size.h + '">' +
+                            '<image xlink:href="' + image_url + '" preserveAspectRatio="none" x="0" y="0" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />' +
+                            '</pattern>' +
+                            '</defs>';
+
+                        this.doc += rect + defs;
+                        callback(null);
+                    });
+                }
+        */
         public Shapes(data: any, callback: (error: any) => void): void {
             let draw = (shape: any): any => {
                 return (): any => {
@@ -332,6 +338,7 @@ namespace Adaptor {
             }).catch((error) => {
                 callback(error);
             });
+
         }
 
         public Canvas(canvas: any, callback: (error: any) => void): void {
@@ -339,7 +346,7 @@ namespace Adaptor {
             let create_def = (fonts: any[]) => {
                 let result: string = '<defs><style type="text/css">';
                 _.forEach(fonts, (font) => {
-                    result += '@import url(' + font.url + ');'
+                    result += '@import url(' + font.url + ');';
                 });
                 result += '</style></defs>';
                 return result;
@@ -368,20 +375,20 @@ namespace Adaptor {
     export class PDFAdaptor {
 
         private path: string;
-        private doc:any = null;
-        private serif:string = "";
-        private sans_serif:string = "";
-        private pagehight:number = 0;
-        private originx:number = 40;
-        private originy:number = 40;
+        private doc: any = null;
+        private serif: string = "";
+        private sans_serif: string = "";
+        private pagehight: number = 0;
+        private originx: number = 40;
+        private originy: number = 40;
         private nameboxwidth = 250;
         private valueboxwidth = 250;
-        private boxhight:number = 20;
-        private stringoffsetx:number = 3;
-        private stringoffsety:number = 2;
+        private boxhight: number = 20;
+        private stringoffsetx: number = 3;
+        private stringoffsety: number = 2;
 
-        private tilesizew:number = 64;
-        private tilesizeh:number = 64;
+        private tilesizew: number = 64;
+        private tilesizeh: number = 64;
 
         constructor(work_path: string, paper: any) {
             this.path = work_path;
@@ -523,16 +530,16 @@ namespace Adaptor {
                 let file_name = md5hash.digest('hex');  // generate unique filename.
 
                 let regex = /^data:.+\/(.+);base64,(.*)$/;
-                let matches = path.match(regex);
-                let ext:any = matches[1];
+                let matches: any | null[] | null = path.match(regex);
+                let ext: any | null = matches[1];
 
                 switch (ext) {
                     case "jpg": // for pdfkit
                     case "jpeg":
                     case "png": {
                         // dataToImage
-                        let content:any = matches[2];
-                        let buffer:Buffer = new Buffer(content, 'base64');
+                        let content: any | null = matches[2];
+                        let buffer: Buffer = new Buffer(content, 'base64');
                         let target_file_path = temp_path + "/" + file_name;
                         fs.writeFile(target_file_path, buffer, 'binary', (error: any): void => {
                             if (!error) {
@@ -595,13 +602,13 @@ namespace Adaptor {
                                             } else {
                                                 callback(error);
                                             }
-                                        })
-                                    })
+                                        });
+                                    });
                                 });
 
                                 innner_req.on('error', (e: any): void => {
                                     callback(e);
-                                })
+                                });
                             } else {
                                 callback({code: 100000, message: error.message});  //Because timeout occurs temporarily, it is not an error.
                             }

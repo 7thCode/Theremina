@@ -10,8 +10,8 @@
             include pallete/player
     .box-body(ng-show="SelectType == 'Text'" )
         ng-form(name="content" ng-cloak ng-show="opened")
-            include pallete/text
             include pallete/player
+            include pallete/text
     .box-body(ng-show="SelectType == 'Image'")
         ng-form(name="content" ng-cloak ng-show="opened")
             include pallete/image

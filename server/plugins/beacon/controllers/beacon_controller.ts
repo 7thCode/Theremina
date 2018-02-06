@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {Files} from "../../../systems/files/controllers/file_controller";
+
 export namespace BeaconModule {
 
     const _ = require('lodash');
@@ -16,6 +18,8 @@ export namespace BeaconModule {
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
 
+    const MongoClient = require('mongodb').MongoClient;
+
     const config = share.config;
     const Cipher = share.Cipher;
 
@@ -25,15 +29,8 @@ export namespace BeaconModule {
 
         }
 
-        static connect(user): any {
-            let result = null;
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
+        static connect(callback: (error, db) => void): any {
+            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         /**
@@ -49,13 +46,11 @@ export namespace BeaconModule {
                 } catch (e) {
                 }
 
-                let conn = Beacon.connect(config.db.user);
-
-                conn.once('open', (error: any): void => {
+                Beacon.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        let gfs = Grid(db, mongoose.mongo); //missing parameter
                         if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
                                         collection.findOne({filename: "blank.png"}, (error: any, item: any): void => {
@@ -66,31 +61,24 @@ export namespace BeaconModule {
                                                         response.setHeader("Content-Type", item.metadata.type);
                                                         response.setHeader("Cache-Control", "no-cache");
                                                         readstream.on('close', (file: any): void => {
-                                                            conn.db.close();
                                                         });
                                                         readstream.on('error', (error: any): void => {
-                                                            conn.db.close();
                                                         });
                                                         readstream.pipe(response);
                                                     } else {
-                                                        conn.db.close();
                                                         next();
                                                     }
                                                 } else {
-                                                    conn.db.close();
                                                     next();
                                                 }
                                             } else {
-                                                conn.db.close();
                                                 next();
                                             }
                                         });
                                     } else {
-                                        conn.db.close();
                                         next();
                                     }
                                 } else {
-                                    conn.db.close();
                                     next();
                                 }
                             });

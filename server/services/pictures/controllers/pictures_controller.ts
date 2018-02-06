@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {Files} from "../../../systems/files/controllers/file_controller";
+
 export namespace PicturesModule {
 
     const _ = require('lodash');
@@ -14,6 +16,8 @@ export namespace PicturesModule {
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
+
+    const MongoClient = require('mongodb').MongoClient;
 
     const sharp = require('sharp');
 
@@ -25,15 +29,8 @@ export namespace PicturesModule {
 
     export class Pictures {
 
-        static connect(user): any {
-            let result = null;
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            } else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
+        static connect(callback: (error, db) => void): any {
+            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         static localname(name: string): string {
@@ -65,7 +62,7 @@ export namespace PicturesModule {
             });
         }
 
-        static result_file(conn, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
+        static result_file(db, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
             collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
                 if (!error) {
                     if (item) {
@@ -74,21 +71,17 @@ export namespace PicturesModule {
                             response.setHeader("Content-Type", item.metadata.type);
                             response.setHeader("Cache-Control", "no-cache");
                             readstream.on('close', (): void => {
-                                conn.db.close();
                             });
                             readstream.on('error', (error: any): void => {
-                                conn.db.close();
                             });
                             readstream.pipe(response);
                         } else {
-                            conn.db.close();
                             next();
                         }
                     } else {
                         not_found();
                     }
                 } else {
-                    conn.db.close();
                     next();
                 }
             });
@@ -103,16 +96,15 @@ export namespace PicturesModule {
          */
         public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
             try {
-                let conn = Pictures.connect(config.db.user);
                 let namespace: string = request.params.namespace;
                 let name = Pictures.localname(request.params.name);
                 let size = request.query;
 
-                conn.once('open', (error: any): void => {
+                Pictures.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(conn.db, mongoose.mongo); //missing parameter
+                        let gfs = Grid(db, mongoose.mongo); //missing parameter
                         if (gfs) {
-                            conn.db.collection('fs.files', (error: any, collection: any): void => {
+                            db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
                                     if (collection) {
                                         let userid: string = request.params.userid;
@@ -132,11 +124,8 @@ export namespace PicturesModule {
                                                                 response.setHeader("Content-Type", type);
                                                                 response.setHeader("Cache-Control", config.cache);
                                                                 readstream.on('close', (): void => {
-                                                                    conn.db.close();
                                                                 });
-
                                                                 readstream.on('error', (error: any): void => {
-                                                                    conn.db.close();
                                                                 });
 
                                                                 try {
@@ -161,47 +150,38 @@ export namespace PicturesModule {
                                                                     readstream.pipe(response);
                                                                 } catch (e) {
                                                                     // NOT FOUND IMAGE.
-                                                                    Pictures.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                        conn.db.close();
+                                                                    Pictures.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                                         next();
                                                                     });
                                                                 }
                                                             } else {
-                                                                conn.db.close();
                                                                 next();
                                                             }
                                                         } else {
                                                             // NOT FOUND IMAGE.
-                                                            Pictures.result_file(conn, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                conn.db.close();
+                                                            Pictures.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
                                                                 next();
                                                             });
                                                         }
                                                     } else {
-                                                        conn.db.close();
                                                         next();
                                                     }
                                                 });
                                             } else {
-                                                conn.db.close();
                                                 next();
                                             }
                                         });
                                     } else {
-                                        conn.db.close();
                                         next();
                                     }
                                 } else {
-                                    conn.db.close();
                                     next();
                                 }
                             });
                         } else {
-                            conn.db.close();
                             next();
                         }
                     } else {
-                        conn.db.close();
                         next();
                     }
                 });

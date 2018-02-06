@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {Pictures} from "../../pictures/controllers/pictures_controller";
+
 export namespace LayoutsModule {
 
     const fs = require('graceful-fs');
@@ -40,9 +42,22 @@ export namespace LayoutsModule {
          * @param request
          * @returns userid
          */
-        static userid(request): string {
+
+        static userid(request: any): string {
             return request.user.userid;
         }
+
+        static namespace(request: any): string {
+            let result = "";
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
+            }
+            return result;
+        }
+
+
 
         /**
          * @param request
@@ -63,13 +78,7 @@ export namespace LayoutsModule {
             Layout.create(request, response, 2);
         }
 
-        static namespace(request: any): string {
-            let result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
-            }
-            return result;
-        }
+
 
         /**
          * @param request
@@ -142,7 +151,7 @@ export namespace LayoutsModule {
         static put(request: any, response: any, layout_type: number): void {
             const number: number = 2000;
             let userid = Layout.userid(request);
-            const namespace: string = request.body.namespace;
+            const namespace: string = Layout.namespace(request);
             let name = request.body.name;
             if (name) {
                 Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, exists: any): void => {
@@ -390,9 +399,8 @@ export namespace LayoutsModule {
          * @returns none
          */
         public get_template_svg(request: any, response: any): void {
-            let userid = Layout.userid(request);
-            let name = request.params.name;
-            Layout.get_svg(request, response, userid, name, 1);
+
+            Layout.get_svg(request, response, 1);
         }
 
         /**
@@ -401,9 +409,7 @@ export namespace LayoutsModule {
          * @returns none
          */
         public get_layout_svg(request: any, response: any): void {
-            let userid = Layout.userid(request);
-            let name = request.params.name;
-            Layout.get_svg(request, response, userid, name, 2);
+            Layout.get_svg(request, response, 2);
         }
 
         /**
@@ -414,13 +420,15 @@ export namespace LayoutsModule {
          * @param layout_type
          * @returns none
          */
-        static get_svg(request: any, response: any, userid: string, name: string, layout_type: number): void {
+        static get_svg(request: any, response: any, layout_type: number): void {
             const number: number = 3000;
-         //   const namespace: string = request.params.namespace;
             let namespace: string = Layout.namespace(request);
             // layout_type
             //     1   --- system template
             //   other --- own
+
+            let userid = request.params.userid;
+            let name = request.params.name;
 
             let query: any = {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]};
             switch (layout_type) {

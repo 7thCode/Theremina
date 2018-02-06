@@ -126,7 +126,7 @@ namespace FormBuilderControllersModule {
                 }
             ];
 
-            let mark = document.getElementById("mark");
+            let mark:any | null = document.getElementById("mark");
             mark.style.setProperty('display', 'none');
             mark.style.backgroundColor = 'rgba(100,100,100,0.5)';
             mark.style.position = 'absolute';
@@ -135,7 +135,7 @@ namespace FormBuilderControllersModule {
                 redraw_select();
             });
 
-            let editor = null;
+            let editor:any | null = null;
             $scope.aceLoaded = (_editor: any): void => {
                 editor = _editor;
                 editor.setTheme("ace/theme/chrome");

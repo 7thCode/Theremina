@@ -35,7 +35,7 @@ export namespace AuthModule {
     const HtmlScannerModule: any = require("../../common/html_scanner/html_scanner");
     const ScannerBehaviorModule: any = require("../../common/html_scanner/scanner_behavior");
 
-    let _mailer:any = null;
+    let _mailer: any = null;
     let bcc: string | any[] = "";
     switch (config.mailer.type) {
         case "mail":
@@ -141,20 +141,20 @@ export namespace AuthModule {
             }
         };
 
-    /*    static isSystem(user: any): boolean {
-            //           let result: boolean = (user.type == "System");
-            let result: boolean = false;
-            if (user.auth) {
-                result = (user.auth == 1);
+        /*    static isSystem(user: any): boolean {
+                //           let result: boolean = (user.type == "System");
+                let result: boolean = false;
+                if (user.auth) {
+                    result = (user.auth == 1);
+                }
+                return result;
             }
-            return result;
-        }
-   */
+       */
 
         static _role(user: any): any {
-            let result: any = {guest:true,categoly: 0};
+            let result: any = {guest: true, categoly: 0};
             if (user) {
-                switch (user.auth) {
+                switch (user.auth) { // cumulative, it does not "break".
                     case 1:
                         result.system = true;
                     case 100:
@@ -176,9 +176,9 @@ export namespace AuthModule {
         }
 
         public role(user: any): any {
-            let result: any = {guest:true,categoly: 0};
+            let result: any = {guest: true, categoly: 0};
             if (user) {
-                switch (user.auth) {
+                switch (user.auth) { // cumulative, it does not "break".
                     case 1:
                         result.system = true;
                     case 100:
@@ -227,7 +227,7 @@ export namespace AuthModule {
          * @returns none
          */
         public page_is_system(request: any, response: any, next: any): void {
-            let user = request.user;
+            let user:any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -247,7 +247,7 @@ export namespace AuthModule {
          * @returns none
          */
         public is_system(request: any, response: any, next: any): void {
-            let user = request.user;
+            let user:any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -267,7 +267,7 @@ export namespace AuthModule {
          * @returns none
          */
         public is_enabled_regist_user(request: any, response: any, next: any): void {
-            let user = request.user;
+            let user:any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -291,7 +291,7 @@ export namespace AuthModule {
          * @returns none
          */
         public is_enabled_regist_member(request: any, response: any, next: any): void {
-            let user = request.user;
+            let user:any = request.user;
             if (user) {
                 if (config.regist.member) {
                     next();
@@ -547,7 +547,7 @@ export namespace AuthModule {
          */
         public get_member_token(request: any, response: any): void {
             Wrapper.Exception(request, response, (request: any, response: any): void => {
-                let token:any = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
+                let token: any = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
                 let tokenDateTime: any = token.timestamp;
                 let nowDate: any = Date.now();
                 if ((tokenDateTime - nowDate) < (config.regist.expire * 60 * 1000)) {
@@ -555,7 +555,7 @@ export namespace AuthModule {
                         if (!error) {
                             if (!account_data) {
 
-                                let content = definition.account_content;
+                                let content:any = definition.account_content;
                                 content.mails.push(token.username);
                                 content.nickname = token.displayName;
 

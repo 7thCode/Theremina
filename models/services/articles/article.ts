@@ -9,7 +9,6 @@
 export namespace ArticleModule {
 
     const mongoose = require('mongoose');
-   // const request = require('request-promise');
     const Schema = mongoose.Schema;
     const timestamp: any = require('../../systems/plugins/timestamp/timestamp');
     const userdata: any = require('../../systems/plugins/userdata/userdata');

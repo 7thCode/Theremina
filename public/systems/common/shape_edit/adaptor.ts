@@ -312,7 +312,7 @@ namespace Adaptor {
                 };
             };
 
-            let promises = [];
+            let promises:any[] = [];
             this.doc += '<g id="' + data.ID() + '">';
             _.forEach(data.Shapes(), (shape: ShapeEdit.BaseShape) => {
                 promises.push(draw(shape));
@@ -348,7 +348,7 @@ namespace Adaptor {
             };
 
             canvas.shapes.ToSVG((error) => {
-                let defs = create_def(this.webfonts);
+                let defs:any = create_def(this.webfonts);
                 let result: string = '<?xml version="1.0" encoding="UTF-8"?>' +
                     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' +
                     //     '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + canvas.canvas.width + '" height="' + canvas.canvas.height + '"  xml:space="preserve">' +
@@ -411,7 +411,7 @@ namespace Adaptor {
         }
 
         public Bezier(data: any, callback: (error: any) => void): void {
-            let startpoint: ShapeEdit.Location = null;
+            let startpoint: ShapeEdit.Location | null = null;
             ShapeEdit.CurveShape.Each(data.vertex.list, (vertex) => {
                 this.doc.moveTo(vertex.x, vertex.y);
                 startpoint = vertex;
@@ -429,7 +429,7 @@ namespace Adaptor {
         }
 
         public Polygon(data: any, callback: (error: any) => void): void {
-            let startpoint: ShapeEdit.Location = null;
+            let startpoint: ShapeEdit.Location | null = null;
             ShapeEdit.LineShape.Each(data.vertex.list, (vertex) => {
                     this.doc.moveTo(vertex.x, vertex.y);
                     startpoint = vertex;
@@ -525,15 +525,15 @@ namespace Adaptor {
                 let file_name = md5hash.digest('hex');  // generate unique filename.
 
                 let regex = /^data:.+\/(.+);base64,(.*)$/;
-                let matches = path.match(regex);
-                let ext = matches[1];
+                let matches:any | null = path.match(regex);
+                let ext:any = matches[1];
 
                 switch (ext) {
                     case "jpg": // for pdfkit
                     case "jpeg":
                     case "png": {
                         // dataToImage
-                        let content = matches[2];
+                        let content:any = matches[2];
                         let buffer = new Buffer(content, 'base64');
                         let target_file_path = temp_path + "/" + file_name;
                         fs.writeFile(target_file_path, buffer, 'binary', (error: any): void => {

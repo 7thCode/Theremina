@@ -80,7 +80,7 @@ export namespace LayoutsPageRouter {
     }]);
 
     router.get("/render/:userid/:name", [exception.page_catch, (request: any, response: any): void => {
-        LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
+        LayoutsModule.Layout.get_svg(request, response, 2);
     }]);
 
 }

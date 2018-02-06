@@ -35,7 +35,7 @@ export namespace LayoutsApiRouter {
     router.delete("/template/:id", [exception.exception, exception.guard, exception.authenticate, auth.is_system, layout.delete_template]);
 
     // for layout
-    router.get("/layout/svg/:name", [layout.get_layout_svg]);
+    //router.get("/layout/svg/:name", [layout.get_layout_svg]);
 
     router.post("/layout/create", [exception.exception, exception.guard, exception.authenticate, layout.create_layout]);
     router.get("/layout/query/:query/:option", [layout.get_layout_query]);

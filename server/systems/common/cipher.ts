@@ -13,7 +13,7 @@ export namespace CipherModule {
 
     export class Cipher {
 
-        static FixedCrypt(name: string, password: string): string {
+        static FixedCrypt(name: string, password: string): string | undefined {
             let cipher: any = cipher_crypto.createCipher('aes192', password);
             try {
                 let crypted: string = cipher.update(name, 'utf8', 'hex');
@@ -24,7 +24,7 @@ export namespace CipherModule {
             }
         }
 
-        static FixedDecrypt(name: string, password: string): string {
+        static FixedDecrypt(name: string, password: string): string | undefined {
             let decipher: any = cipher_crypto.createDecipher('aes192', password);
             try {
                 let decrypted: string = decipher.update(name, 'hex', 'utf8');
