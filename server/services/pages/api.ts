@@ -12,6 +12,7 @@ export namespace PagesApiRouter {
     export const router = express.Router();
 
     const core = require(process.cwd() + '/gs');
+    const auth: any = core.auth;
     const share: any = core.share;
     const exception: any = core.exception;
 
@@ -19,7 +20,7 @@ export namespace PagesApiRouter {
     const pages: any = new PagesModule.Pages;
 
     //router.get("/api/getall", [pages.get_all]);
-    router.get("/api/getall/:namespace", [exception.exception, exception.guard, exception.authenticate, pages.get_all]);
+    router.get("/api/getall/:namespace", [exception.exception, exception.guard, exception.authenticate, auth.is_user, pages.get_all]);
 }
 
 module.exports = PagesApiRouter.router;

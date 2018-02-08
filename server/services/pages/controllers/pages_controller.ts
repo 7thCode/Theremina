@@ -6,7 +6,7 @@
 
 "use strict";
 
-import {Pictures} from "../../pictures/controllers/pictures_controller";
+//import {Pictures} from "../../pictures/controllers/pictures_controller";
 
 export namespace PagesModule {
 
@@ -18,7 +18,6 @@ export namespace PagesModule {
     const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
-
 
     const moment = require("moment");
     const archiver: any = require('archiver');
@@ -79,14 +78,16 @@ export namespace PagesModule {
                                         let save = (doc: any): any => {
                                             return new Promise((resolve: any, reject: any): void => {
                                                 if (doc) {
-                                                    bucket.openDownloadStreamByName(doc.filename)
-                                                        .pipe(fs.createWriteStream(path.join(path.join(path.join(tmp_path, namespace), sub_path), doc.filename)))
+                                                    let read_db = bucket.openDownloadStreamByName(doc.filename)
                                                         .on('error', (error): void => {
                                                             reject(error);
                                                         })
-                                                        .on('finish', (): void => {
+                                                        .on('end', (): void => {
                                                             resolve({});
                                                         });
+
+                                                    let write_file = fs.createWriteStream(path.join(path.join(path.join(tmp_path, namespace), sub_path), doc.filename));
+                                                    read_db.pipe(write_file);
                                                 }
                                             });
                                         };
@@ -183,11 +184,12 @@ export namespace PagesModule {
          *  let userid = Pages.userid(request);
          * @param work
          * @param target
+         * @param filename
          * @param callback
          * @returns none
          */
-        static zip(work: string, target: string, callback: (error: any) => void) {
-            let zip_file_name = path.join(work, target);
+        static zip(work: string, target: string, filename:string, callback: (error: any) => void) {
+            let zip_file_name = path.join(work, filename);
             let archive = archiver.create('zip', {});
             let output = fs.createWriteStream(zip_file_name);
 
@@ -220,11 +222,11 @@ export namespace PagesModule {
             let namespace: string = Pages.namespace(request);
             let tmp_path: string = path.join("/tmp", request.sessionID);
 
-            let error_handler = (error) => {
+            let error_handler = (error:any):void => {
                 Wrapper.SendError(response, error.code, error.message, error);
             };
 
-            let rm = (tmp_path: string, callback: (error) => void) => {
+            let rm = (tmp_path: string, callback: (error) => void):void => {
                 let exec = require('child_process').exec;
                 exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
                     callback(error);
@@ -239,9 +241,9 @@ export namespace PagesModule {
                                 Pages.get_resource_all(tmp_path, userid, namespace, "pages", (error: any): void => {
                                     if (!error) {
                                         let date: any = moment();
-                                        let datestring = date.format("YY_MM_DD_");
+                                        let datestring = date.format("YY_MM_DD_HH_mm_ss_");
                                         let filename = datestring + namespace + ".zip";
-                                        Pages.zip(tmp_path, filename, (error: any): void => {
+                                        Pages.zip(tmp_path, namespace, filename, (error: any): void => {
                                             if (!error) {
                                                 response.download(path.join(tmp_path, filename), (error: any): void => {
                                                     if (!error) {
@@ -290,7 +292,7 @@ export namespace PagesModule {
                             });
                         };
             */
-            let make_dir = (path, callback: () => void, error: (_error) => void) => {
+            let make_dir = (path, callback: () => void, error: (_error) => void):void => {
                 fs.mkdir(path, (_error): void => {
                     if (!_error) {
                         callback();
@@ -354,7 +356,7 @@ export namespace PagesModule {
                                                     });
 
                                                     if (writestream) {
-                                                        writestream.on('close', (file: any): void => {
+                                                        writestream.once('finish', (file: any): void => {
                                                             resolve(file);
                                                         });
                                                         readstream.on('error', (error: any): void => {

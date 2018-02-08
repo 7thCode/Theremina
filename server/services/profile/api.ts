@@ -8,10 +8,10 @@
 
 export namespace ProfileApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: any = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
