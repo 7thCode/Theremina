@@ -281,7 +281,7 @@ export namespace PageRouter {
 
         let query = request.query;
         if (!Object.keys(query).length) {
-             query = applications_config.first_responder["default"].query;
+            query = applications_config.first_responder["default"].query;
         }
 
         resources.render_html({
@@ -375,7 +375,7 @@ export namespace PageRouter {
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
 
@@ -401,7 +401,7 @@ export namespace PageRouter {
         let userid = applications_config.first_responder["default"].userid;
         try {
             userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
 
@@ -451,7 +451,7 @@ export namespace PageRouter {
         request.params.userid = applications_config.first_responder["default"].userid;
         try {
             request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e){
+        } catch (e) {
 
         }
 
@@ -465,7 +465,6 @@ export namespace PageRouter {
             }
         });
     }]);
-
 
 
     router.get("/:namespace/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {

@@ -64,14 +64,16 @@ export namespace FrontModule {
                                         let save = (doc: any): any => {
                                             return new Promise((resolve: any, reject: any): void => {
                                                 if (doc) {
-                                                    bucket.openDownloadStreamByName(doc.filename)
-                                                        .pipe(fs.createWriteStream(path.join(tmp_path, doc.filename)))
+                                                    let read_db = bucket.openDownloadStreamByName(doc.filename)
                                                         .on('error', (error): void => {
                                                             reject(error);
                                                         })
-                                                        .on('finish', (): void => {
+                                                        .on('end', (): void => {
                                                             resolve({});
                                                         });
+
+                                                    let write_file = fs.createWriteStream(path.join(tmp_path, doc.filename));
+                                                    read_db.pipe(write_file);
                                                 }
                                             });
                                         };

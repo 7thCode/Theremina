@@ -9,7 +9,7 @@
 namespace FrontApplicationModule {
 
     let FrontApplication: any = angular.module('FrontApplication', [
-        'ngMessages', "ngResource", 'ngAnimate', 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar','ngCropper',
+        'ngMessages', "ngResource", 'ngAnimate', 'ui.bootstrap', 'angular.chips', 'ui.ace', 'ngDraggable', 'angular-loading-bar', 'ngCropper',
 
         'ngSanitize',
 

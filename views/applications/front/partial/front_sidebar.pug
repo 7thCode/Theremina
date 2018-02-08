@@ -16,12 +16,13 @@ aside.main-sidebar.sidebar-color(ng-controller="LoginController")
                     a(href='/self')
                         i.fa.fa-user-circle.text-primary
                         span #{message.profile}
+                if role.user
+                    li
+                        a(href="/pages")
+                            i.fa.fa-file-text.text-success
+                            span #{message.page}
                 li
-                    a(href="/pages")
-                        i.fa.fa-file-text.text-success
-                        span #{message.page}
-                li
-                    a(href="/data/2")
+                    a(href="/data")
                         i.fa.fa-database.text-primary
                         span #{message.article}
                 li
@@ -36,11 +37,13 @@ aside.main-sidebar.sidebar-color(ng-controller="LoginController")
                     a(href="/blob")
                         i.fa.fa-file-text.text-info
                         span #{message.blob}
-                if config.regist.member
-                    li
-                        a(href="/members")
-                            i.fa.fa-user-plus.fa-fw.text-warning
-                            span #{message.member}
+
+                if role.user
+                    if config.regist.member
+                        li
+                            a(href="/members")
+                                i.fa.fa-user-plus.fa-fw.text-warning
+                                span #{message.member}
 
                 if role.categoly == 0
                     li
