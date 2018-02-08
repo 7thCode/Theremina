@@ -259,6 +259,47 @@ export namespace AuthModule {
             }
         }
 
+
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
+        public page_is_user(request: any, response: any, next: any): void {
+            let user:any = request.user;
+            if (user) {
+                if (Auth._role(user).user) {
+                    next();
+                } else {
+                    response.status(403).render('error', {status: 403, message: "Forbidden...", url: request.url});
+                }
+            } else {
+                response.status(403).render('error', {status: 403, message: "Forbidden...", url: request.url});
+            }
+        }
+
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
+        public is_user(request: any, response: any, next: any): void {
+            let user:any = request.user;
+            if (user) {
+                if (Auth._role(user).user) {
+                    next();
+                } else {
+                    Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
+                }
+            } else {
+                Wrapper.SendError(response, 403, "Forbidden.", {code: 403, message: "Forbidden."});
+            }
+        }
+
         /**
          *
          * @param request

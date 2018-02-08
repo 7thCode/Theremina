@@ -8,26 +8,23 @@
 
 export namespace PicturesPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: any = express.Router();
 
-    const _ = require('lodash');
-    const minify = require('html-minifier').minify;
+    const _: any = require('lodash');
+    const minify: any = require('html-minifier').minify;
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const auth: any = core.auth;
     const exception: any = core.exception;
     const analysis: any = core.analysis;
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-  //  const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-   // const resources = new ResourcesModule.Pages;
-
-    let message = config.message;
+    let message: any = config.message;
 
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("services/pictures/index", {

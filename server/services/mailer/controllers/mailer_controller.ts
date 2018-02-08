@@ -17,7 +17,7 @@ export namespace MailerModule {
     const share: any = core.share;
     const config: any = share.config;
     const Wrapper: any = share.Wrapper;
-    const applications_config:any = share.applications_config;
+    const applications_config: any = share.applications_config;
 
     const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
     const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
@@ -49,7 +49,7 @@ export namespace MailerModule {
 
             let referer = request.headers.referer;
             if (referer) {
-                let mailer:any = null;
+                let mailer: any = null;
                 let bcc: string | any[] | null = null;
                 switch (config.mailer.type) {
                     case "gmail":
@@ -88,9 +88,9 @@ export namespace MailerModule {
                                             create: "",
                                             modify: "",
                                             content: request.body.content
-                                        }, (error: any, doc: string):void => {
+                                        }, (error: any, doc: string): void => {
                                             if (!error) {
-                                                mailer.send(report_to,bcc, report_title, doc, (error: any): void => {
+                                                mailer.send(report_to, bcc, report_title, doc, (error: any): void => {
                                                     if (!error) {
                                                         ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
@@ -101,7 +101,7 @@ export namespace MailerModule {
                                                                     content: request.body.content
                                                                 }, (error: any, doc: string): void => {
                                                                     if (!error) {
-                                                                        mailer.send(thanks_to,bcc, thanks_title, doc, (error: any) :void => {
+                                                                        mailer.send(thanks_to, bcc, thanks_title, doc, (error: any): void => {
                                                                             if (!error) {
                                                                                 Wrapper.SendSuccess(response, {
                                                                                     code: 0,

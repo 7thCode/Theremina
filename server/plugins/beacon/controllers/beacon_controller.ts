@@ -11,7 +11,7 @@ import {Files} from "../../../systems/files/controllers/file_controller";
 export namespace BeaconModule {
 
     const _ = require('lodash');
-
+    const mongodb: any = require('mongodb');
     const mongoose = require('mongoose');
     const Grid = require('gridfs-stream');
 
@@ -48,7 +48,8 @@ export namespace BeaconModule {
 
                 Beacon.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(db, mongoose.mongo); //missing parameter
+                     //   let gfs = Grid(db, mongoose.mongo); //missing parameter
+                        let gfs = new mongodb.GridFSBucket(db, {});
                         if (gfs) {
                             db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
@@ -56,11 +57,12 @@ export namespace BeaconModule {
                                         collection.findOne({filename: "blank.png"}, (error: any, item: any): void => {
                                             if (!error) {
                                                 if (item) {
-                                                    let readstream = gfs.createReadStream({_id: item._id});
+                                               //     let readstream = gfs.createReadStream({_id: item._id});
+                                                    let readstream = gfs.openDownloadStream(item._id);
                                                     if (readstream) {
                                                         response.setHeader("Content-Type", item.metadata.type);
                                                         response.setHeader("Cache-Control", "no-cache");
-                                                        readstream.on('close', (file: any): void => {
+                                                        readstream.on('end', (file: any): void => {
                                                         });
                                                         readstream.on('error', (error: any): void => {
                                                         });

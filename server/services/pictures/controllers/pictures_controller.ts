@@ -6,14 +6,14 @@
 
 "use strict";
 
-import {Files} from "../../../systems/files/controllers/file_controller";
+//import {Files} from "../../../systems/files/controllers/file_controller";
 
 export namespace PicturesModule {
 
-    const _ = require('lodash');
+    const _:any = require('lodash');
 
-    const Grid = require('gridfs-stream');
-
+    const Grid:any = require('gridfs-stream');
+    const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
@@ -29,12 +29,12 @@ export namespace PicturesModule {
 
     export class Pictures {
 
-        static connect(callback: (error, db) => void): any {
+        static connect(callback: (error:any, db:any) => void): any {
             MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
         }
 
         static localname(name: string): string {
-            let result = "";
+            let result:string = "";
             if (name) {
                 let names = name.split("#");
                 names.forEach((name, index) => {
@@ -54,7 +54,7 @@ export namespace PicturesModule {
             return request.user.username;
         }
 
-        static retrieve_account(userid, callback: (error: { code: number, message: string } | null, result: any) => void) {
+        static retrieve_account(userid, callback: (error: { code: number, message: string } | null, result: any) => void):void {
             LocalAccount.findOne({username: userid}).then((account: any): void => {
                 callback(null, account);
             }).catch((error: any): void => {
@@ -62,15 +62,16 @@ export namespace PicturesModule {
             });
         }
 
-        static result_file(db, gfs, collection, namespace, name, userid, response, next, not_found: () => void) {
+        static result_file(db, gfs, collection, namespace, name, userid, response, next, not_found: () => void):void {
             collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
                 if (!error) {
                     if (item) {
-                        let readstream = gfs.createReadStream({_id: item._id});
+                    //    let readstream = gfs.createReadStream({_id: item._id});
+                        let readstream = gfs.openDownloadStream(item._id);
                         if (readstream) {
                             response.setHeader("Content-Type", item.metadata.type);
                             response.setHeader("Cache-Control", "no-cache");
-                            readstream.on('close', (): void => {
+                            readstream.on('end', (): void => {
                             });
                             readstream.on('error', (error: any): void => {
                             });
@@ -102,7 +103,8 @@ export namespace PicturesModule {
 
                 Pictures.connect((error, db) => {
                     if (!error) {
-                        let gfs = Grid(db, mongoose.mongo); //missing parameter
+                //        let gfs = Grid(db, mongoose.mongo); //missing parameter
+                        let gfs = new mongodb.GridFSBucket(db, {});
                         if (gfs) {
                             db.collection('fs.files', (error: any, collection: any): void => {
                                 if (!error) {
@@ -118,12 +120,13 @@ export namespace PicturesModule {
                                                 collection.findOne(query, (error: any, item: any): void => {
                                                     if (!error) {
                                                         if (item) {
-                                                            let readstream = gfs.createReadStream({_id: item._id});
+                                                            //let readstream = gfs.createReadStream({_id: item._id});
+                                                            let readstream = gfs.openDownloadStream(item._id);
                                                             if (readstream) {
                                                                 let type = item.metadata.type;
                                                                 response.setHeader("Content-Type", type);
                                                                 response.setHeader("Cache-Control", config.cache);
-                                                                readstream.on('close', (): void => {
+                                                                readstream.on('end', (): void => {
                                                                 });
                                                                 readstream.on('error', (error: any): void => {
                                                                 });
