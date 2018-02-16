@@ -8,9 +8,11 @@
 
 export namespace EventModule {
 
-    const Emitter = require('events');
+    const Emitter: any = require('events');
+
     export class Event {
-        public emitter = null;
+        public emitter: any = null;
+
         constructor() {
             this.emitter = new Emitter();
         }

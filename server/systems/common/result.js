@@ -4,7 +4,7 @@
  //opensource.org/licenses/mit-license.php
  */
 "use strict";
-var Result = (function () {
+var Result = /** @class */ (function () {
     function Result(code, message, value) {
         this.code = code;
         this.message = message;

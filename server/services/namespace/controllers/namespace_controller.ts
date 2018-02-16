@@ -8,7 +8,7 @@
 
 export namespace NamespsceModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
@@ -20,14 +20,14 @@ export namespace NamespsceModule {
     const FileModule: any = require(share.Server("systems/files/controllers/file_controller"));
     const file: any = new FileModule.Files();
 
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resource = new ResourcesModule.Resource;
+    const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
+    const resource: any = new ResourcesModule.Resource;
 
-    const LayoutModule = require(share.Server("services/layouts/controllers/layouts_controller"));
-    const layout = new LayoutModule.Layout;
+    const LayoutModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
+    const layout: any = new LayoutModule.Layout;
 
-    const ArticlesModule = require(share.Server("services/articles/controllers/article_controller"));
-    const Article = new ArticlesModule.Article;
+    const ArticlesModule: any = require(share.Server("services/articles/controllers/article_controller"));
+    const Article: any = new ArticlesModule.Article;
 
     export class Namespsces {
 
@@ -36,7 +36,7 @@ export namespace NamespsceModule {
         }
 
         public namespaces(request: any, response: any): void {
-            let userid = Namespsces.userid(request);
+            let userid: string = Namespsces.userid(request);
             file.namespaces(userid, (error, files_namespaces): void => {
                 if (!error) {
                     resource.namespaces(userid, (error, resource_namespaces): void => {
@@ -45,7 +45,7 @@ export namespace NamespsceModule {
                                 if (!error) {
                                     Article.namespaces(userid, (error, articles_namespaces): void => {
                                         if (!error) {
-                                            Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces,layout_namespaces,articles_namespaces)));
+                                            Wrapper.SendSuccess(response, _.uniq(_.union(files_namespaces, resource_namespaces, layout_namespaces, articles_namespaces)));
                                         } else {
                                             Wrapper.SendError(response, 200, error.message, error);
                                         }

@@ -159,7 +159,6 @@ namespace FileControllersModule {
                         file.cancel();
                     });
                     Draw();
-                }).finally(() => {
                 });
             };
 

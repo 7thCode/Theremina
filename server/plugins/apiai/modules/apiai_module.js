@@ -13,7 +13,7 @@ var ApiAiModule;
     var share = core.share;
     var plugins_config = share.plugins_config;
     var ai = apiai(plugins_config.apiai.token);
-    var ApiAi = (function () {
+    var ApiAi = /** @class */ (function () {
         function ApiAi() {
         }
         ApiAi.prototype.inquiry = function (sessionId, ask, callback) {
@@ -21,16 +21,6 @@ var ApiAiModule;
                 sessionId: sessionId
             }).then(function (result) {
                 callback(null, result);
-                /*     switch (response.result.source) {
-                 case "agent":
-                 callback(response.result.fulfillment.speech);
-                 break;
-                 case "domains":
-                 callback(response.result.source.action);
-                 break;
-                 default:
-                 }
-                 */
             }).catch(function (error) {
                 callback(error, null);
             });

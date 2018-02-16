@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var MailerModule;
 (function (MailerModule) {
     var _ = require('lodash');
-    var Mailer = (function () {
+    var Mailer = /** @class */ (function () {
         function Mailer(mailsetting, mailaccount) {
             this.mailer = require('nodemailer');
             this.account = mailaccount;
@@ -47,7 +47,7 @@ var MailerModule;
         return Mailer;
     }());
     MailerModule.Mailer = Mailer;
-    var Mailer2 = (function () {
+    var Mailer2 = /** @class */ (function () {
         function Mailer2(mailsetting, mailaccount) {
             var mailer = require('nodemailer');
             this.account = mailaccount;
@@ -85,7 +85,7 @@ var MailerModule;
         return Mailer2;
     }());
     MailerModule.Mailer2 = Mailer2;
-    var MailGun = (function () {
+    var MailGun = /** @class */ (function () {
         function MailGun(mailsetting, mailaccount) {
             this.account = mailaccount;
             this.api_key = mailsetting.api_key;
@@ -112,7 +112,7 @@ var MailerModule;
         return MailGun;
     }());
     MailerModule.MailGun = MailGun;
-    var MailReceiver = (function () {
+    var MailReceiver = /** @class */ (function () {
         function MailReceiver() {
             var iconv = require('iconv');
             this.conv = new iconv.Iconv("UTF-8", "UTF-8");

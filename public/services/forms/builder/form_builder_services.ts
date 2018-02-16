@@ -299,7 +299,7 @@ namespace FormBuilderServicesModule {
             };
 
             this.SelectChild = (id: string): any => {
-                let result = [];
+                let result:any[] = [];
                 _.forEach(this.current_page, (element: any): void => {
                     if (element.parent = id) {
                         result.push(element);
@@ -321,7 +321,7 @@ namespace FormBuilderServicesModule {
 
                 angular.element("#root").empty();
                 Elements(this.current_page, (control, element) => {
-                    let field = [];
+                    let field:any[] = [];
                     let id = element.id;
                     let parent = element.parent;
                     let label = element.label;
@@ -329,7 +329,7 @@ namespace FormBuilderServicesModule {
 
                     let attributes = attributes_by_mode(true, element);
                     let contents = element.contents;
-                    let events = element.events;
+                  //  let events = element.events;
                     switch (type) {
                         case "form":
                         case "div":

@@ -7,17 +7,17 @@
 "use strict";
 
 namespace LayoutModule {
-    const mongoose = require('mongoose');
+    const mongoose: any = require('mongoose');
     const Schema = mongoose.Schema;
     const timestamp: any = require('../../systems/plugins/timestamp/timestamp');
     const userdata: any = require('../../systems/plugins/userdata/userdata');
 
-    const Layout = new Schema({});
+    const Layout: any = new Schema({});
 
     Layout.plugin(timestamp);
     Layout.plugin(userdata, {});
 
-    Layout.index({namespace: 1,name: 1, type: 1, userid:1}, {unique: true});
+    Layout.index({namespace: 1, name: 1, type: 1, userid: 1}, {unique: true});
 
     module.exports = mongoose.model('Layout', Layout);
 }

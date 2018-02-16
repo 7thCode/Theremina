@@ -6,25 +6,27 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace PublicKeyApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require('../common/share');
+    const share: any = require('../common/share');
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 
     /*! public key */
-    const PublicKeyController:any = require(share.Server("systems/publickey/controllers/publickey_controller"));
-    const publickey:any = new PublicKeyController.PublicKey();
+    const PublicKeyController: any = require(share.Server("systems/publickey/controllers/publickey_controller"));
+    const publickey: any = new PublicKeyController.PublicKey();
 
     router.get("/fixed", [publickey.get_fixed_public_key]);
 
-    router.get("/dynamic", [exception.exception,exception.guard, exception.authenticate, publickey.get_public_key]);
+    router.get("/dynamic", [exception.exception, exception.guard, exception.authenticate, publickey.get_public_key]);
 
-    router.get("/token", [exception.exception,exception.guard, exception.authenticate, publickey.get_access_token]);
+    router.get("/token", [exception.exception, exception.guard, exception.authenticate, publickey.get_access_token]);
 }
 
 module.exports = PublicKeyApiRouter.router;

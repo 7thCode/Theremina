@@ -8,15 +8,15 @@
 
 export namespace FormsModule {
 
-    const fs = require('graceful-fs');
+    //   const fs = require('graceful-fs');
     const _ = require('lodash');
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const config = share.config;
-    const Wrapper = share.Wrapper;
+    const config: any = share.config;
+    const Wrapper: any = share.Wrapper;
 
-    const builder_userid = config.systems.userid;// template maker user id
+    const builder_userid: string = config.systems.userid;// template maker user id
 
     const FormModel: any = require(share.Models("services/forms/form"));
 
@@ -27,7 +27,7 @@ export namespace FormsModule {
         }
 
         static namespace(name: string): string {
-            let result = "";
+            let result: string = "";
             if (name) {
                 let names = name.split("#");
                 let delimmiter = "";
@@ -42,7 +42,7 @@ export namespace FormsModule {
         }
 
         static localname(name: string): string {
-            let result = "";
+            let result: string = "";
             if (name) {
                 let names = name.split("#");
                 names.forEach((name, index) => {
@@ -55,7 +55,7 @@ export namespace FormsModule {
         }
 
         public create_init_forms(initforms: any[]): void {
-            let docs = initforms;
+            let docs: any = initforms;
             if (docs) {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
@@ -106,10 +106,10 @@ export namespace FormsModule {
          */
         public create_form(request: any, response: any): void {
             const number: number = 1000;
-            let userid = builder_userid;
-            let namespace = "";
-            let name = request.body.name;
-            let type = request.body.type;
+            let userid: string = builder_userid;
+            let namespace: string = "";
+            let name: string = request.body.name;
+            let type: string = request.body.type;
 
             if (name) {
                 if (name.indexOf('/') == -1) {
@@ -146,9 +146,9 @@ export namespace FormsModule {
          */
         public put_form(request: any, response: any): void {
             const number: number = 1100;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
+            let userid: string = builder_userid;
+            let namespace: string = "";
+            let id: string = request.params.id;
 
             Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
@@ -170,9 +170,9 @@ export namespace FormsModule {
          */
         public delete_form(request: any, response: any): void {
             const number: number = 1200;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
+            let userid: string = builder_userid;
+            let namespace: string = "";
+            let id: string = request.params.id;
 
             Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
@@ -192,9 +192,9 @@ export namespace FormsModule {
          */
         public get_form(request: any, response: any): void {
             const number: number = 1300;
-            let userid = builder_userid;
-            let namespace = "";
-            let id = request.params.id;
+            let userid: string = builder_userid;
+            let namespace: string = "";
+            let id: string = request.params.id;
 
             Wrapper.FindOne(response, number, FormModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
@@ -212,8 +212,8 @@ export namespace FormsModule {
          */
         public delete_own(request: any, response: any): void {
             const number: number = 1200;
-            let userid = builder_userid;
-            let namespace = "";
+            let userid: string = builder_userid;
+            let namespace: string = "";
 
             Wrapper.Delete(response, number, FormModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
@@ -227,8 +227,8 @@ export namespace FormsModule {
          */
         public get_form_query(request: any, response: any): void {
             const number: number = 1400;
-            let userid = builder_userid;
-            let namespace = "";
+            let userid: string = builder_userid;
+            let namespace: string = "";
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
@@ -249,8 +249,8 @@ export namespace FormsModule {
          */
         public get_form_count(request: any, response: any): void {
             const number: number = 2800;
-            let userid = builder_userid;
-            let namespace = "";
+            let userid: string = builder_userid;
+            let namespace: string = "";
             let query: any = Wrapper.Decode(request.params.query);
 
             Wrapper.Count(response, number, FormModel, {$and: [{userid: userid}, {namespace: namespace}, query]}, (response: any, count: any): any => {
@@ -264,11 +264,11 @@ export namespace FormsModule {
          * @returns none
          */
         public get_form_json(request: any, response: any): void {
-            let userid = builder_userid;
-            let namespace = "";
-            let name = request.params.name;
+            let userid: string = builder_userid;
+            let namespace: string = "";
+            let name: string = request.params.name;
 
-            Wrapper.Find(response, 1400, FormModel, {$and: [{namespace: namespace}, {userid: userid}, {name: name}]}, {"_id": 0,"__v":0}, {}, (response: any, forms: any): any => {
+            Wrapper.Find(response, 1400, FormModel, {$and: [{namespace: namespace}, {userid: userid}, {name: name}]}, {"_id": 0, "__v": 0}, {}, (response: any, forms: any): any => {
                 Wrapper.SendSuccess(response, forms);
             });
         }

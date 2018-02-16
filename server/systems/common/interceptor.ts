@@ -8,14 +8,14 @@
 
 export namespace InterceptorModule {
 
-    const _ = require("lodash");
+    const _: any = require("lodash");
 
     const share = require(process.cwd() + '/server/systems/common/share');
 
     const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
     const analysis: any = new AnalysisModule.Analysis;
 
-    export const Handler = (request: any, response: any,next:any): any => {
+    export const Handler = (request: any, response: any, next: any): any => {
         return {
             isInterceptable: (): boolean => {
                 let result: boolean = false;

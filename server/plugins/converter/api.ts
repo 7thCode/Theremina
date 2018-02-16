@@ -6,16 +6,15 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ConverterApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-
-    const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    const auth: any = new AuthController.Auth();
 
     const ConverterModule: any = require(share.Server("plugins/converter/controllers/converter_controller"));
     const excel: any = new ConverterModule.Excel();

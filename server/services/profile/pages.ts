@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ProfilePageRouter {
 
     const express: any = require('express');
-    export const router: any = express.Router();
+    export const router: IRouter = express.Router();
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -21,7 +23,7 @@ export namespace ProfilePageRouter {
     const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message: any = config.message;
 
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
         response.render("services/profile/index", {

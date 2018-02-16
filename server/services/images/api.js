@@ -15,7 +15,7 @@ var ImageApiRouter;
     ImageApiRouter.auth = new AuthController.Auth();
     var FileModule = require(share.Server("systems/files/controllers/file_controller"));
     var file = new FileModule.Files();
-    ImageApiRouter.router.get('/api/:userid/:name', file.get_file);
+    ImageApiRouter.router.get('/api/:userid/:name', [file.get_file]);
 })(ImageApiRouter = exports.ImageApiRouter || (exports.ImageApiRouter = {}));
 module.exports = ImageApiRouter.router;
 //# sourceMappingURL=api.js.map

@@ -13,7 +13,7 @@ var AnalysisModule;
     var Wrapper = share.Wrapper;
     var Memory = share.Memory;
     var QueueModel = require(share.Models("systems/queues/queue"));
-    var Analysis = (function () {
+    var Analysis = /** @class */ (function () {
         function Analysis() {
         }
         Analysis.process_queue = function (queue, callback) {
@@ -103,8 +103,6 @@ var AnalysisModule;
          */
         Analysis.prototype.get_queue_query = function (request, response) {
             var number = 1400;
-            //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //    let option: any = JSON.parse(decodeURIComponent(request.params.option));
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, number, QueueModel, query, {}, option, function (response, pages) {
@@ -118,7 +116,6 @@ var AnalysisModule;
          */
         Analysis.prototype.get_queue_count = function (request, response) {
             var number = 2800;
-            //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, number, QueueModel, query, function (response, count) {
                 Wrapper.SendSuccess(response, count);

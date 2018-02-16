@@ -11,7 +11,7 @@ var FacebookModule;
     var share = core.share;
     var plugins_config = share.plugins_config;
     var request = require('request');
-    var Facebook = (function () {
+    var Facebook = /** @class */ (function () {
         function Facebook() {
         }
         /**
@@ -19,18 +19,18 @@ var FacebookModule;
          * @param response
          * @returns none
          */
-        Facebook.prototype.bot_hook = function (req, response) {
+        Facebook.prototype.bot_hook = function (request, response) {
             var verify_token = plugins_config.facebook.token;
-            var token = req.query["hub.verify_token"];
+            var token = request.query["hub.verify_token"];
             if (token == verify_token) {
-                response.send(req.query["hub.challenge"]);
+                response.send(request.query["hub.challenge"]);
             }
             else {
                 response.send("");
             }
         };
         /**
-         * @param request
+         * @param req
          * @param response
          * @returns none
          */
@@ -52,9 +52,9 @@ var FacebookModule;
                             }
                         }, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
-                                var recipientId = body.recipient_id;
+                                var recipientId_1 = body.recipient_id;
                                 var messageId = body.message_id;
-                                console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId);
+                                console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId_1);
                             }
                             else {
                                 console.error("Unable to send message.");
@@ -79,7 +79,7 @@ var FacebookModule;
                 var message = event.message;
                 console.log("Received message for user %d and page %d at %d with message:", senderID, recipientID, timeOfMessage);
                 console.log(JSON.stringify(message));
-                var messageId = message.mid;
+                //        let messageId:any = message.mid;
                 var messageText = message.text;
                 var messageAttachments = message.attachments;
                 if (messageText) {
@@ -98,8 +98,8 @@ var FacebookModule;
             var data = req.body;
             if (data.object === 'page') {
                 data.entry.forEach(function (entry) {
-                    var pageID = entry.id;
-                    var timeOfEvent = entry.time;
+                    //     let pageID:any = entry.id;
+                    //     let timeOfEvent:any = entry.time;
                     entry.messaging.forEach(function (event) {
                         if (event.message) {
                             receivedMessage(event);

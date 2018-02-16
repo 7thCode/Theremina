@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FormsModule;
 (function (FormsModule) {
-    var fs = require('graceful-fs');
+    //   const fs = require('graceful-fs');
     var _ = require('lodash');
     var core = require(process.cwd() + '/gs');
     var share = core.share;
@@ -15,7 +15,7 @@ var FormsModule;
     var Wrapper = share.Wrapper;
     var builder_userid = config.systems.userid; // template maker user id
     var FormModel = require(share.Models("services/forms/form"));
-    var Form = (function () {
+    var Form = /** @class */ (function () {
         function Form() {
         }
         Form.userid = function (request) {

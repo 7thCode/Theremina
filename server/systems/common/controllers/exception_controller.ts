@@ -8,8 +8,8 @@
 
 export namespace ExceptionModule {
 
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const Wrapper = share.Wrapper;
+    const share: any = require(process.cwd() + '/server/systems/common/share');
+    const Wrapper: any = share.Wrapper;
 
     export class Exception {
 

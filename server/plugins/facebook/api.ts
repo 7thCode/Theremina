@@ -6,17 +6,19 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace FacebookApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const bodyParser = require('body-parser');
-    const jsonParser = bodyParser.json();
+    const bodyParser: any = require('body-parser');
+    const jsonParser: any = bodyParser.json();
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const plugins_config = share.plugins_config;
+    const plugins_config: any = share.plugins_config;
     if (plugins_config.facebook) {
         const exception: any = core.exception;
 
@@ -25,7 +27,6 @@ export namespace FacebookApiRouter {
 
         router.get("/webhook/", [exception.exception, facebook.bot_hook]);
         router.post("/webhook/", [exception.exception, jsonParser, facebook.bot_push]);
-
     }
 }
 

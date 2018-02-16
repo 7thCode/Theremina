@@ -8,7 +8,7 @@
 
 export namespace MailerModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     interface MailSender {
         from: any;
@@ -19,7 +19,7 @@ export namespace MailerModule {
     }
 
     export interface MailModule {
-        send(mail_address: string,bcc_address:string, title: string, message: string, callback: (error: any) => void): void;
+        send(mail_address: string, bcc_address: string, title: string, message: string, callback: (error: any) => void): void;
     }
 
     export class Mailer implements MailModule {
@@ -35,7 +35,7 @@ export namespace MailerModule {
             this.mailsetting = mailsetting;
         }
 
-        public send(mail_address: string,bcc_address:string, title: string, message: string, callback: (error: any) => void): void {
+        public send(mail_address: string, bcc_address: string, title: string, message: string, callback: (error: any) => void): void {
 
             this.smtpUser = this.mailer.createTransport('SMTP', this.mailsetting); //SMTPの接続
 
@@ -77,7 +77,7 @@ export namespace MailerModule {
             this.smtpUser = mailer.createTransport(mailsetting);
         }
 
-        public send(mail_address: string,bcc_address:string, title: string, message: string, callback: (error: any) => void): void {
+        public send(mail_address: string, bcc_address: string, title: string, message: string, callback: (error: any) => void): void {
 
             if (this.smtpUser) {
                 let resultMail: MailSender = {
@@ -120,7 +120,7 @@ export namespace MailerModule {
             this.mailgun = require('mailgun-js')({apiKey: this.api_key, domain: this.domain});
         }
 
-        public send(mail_address: string,bcc_address:string, title: string, message: string, callback: (error: any) => void): void {
+        public send(mail_address: string, bcc_address: string, title: string, message: string, callback: (error: any) => void): void {
 
             let data: MailSender = {
                 from: this.account,
@@ -151,7 +151,7 @@ export namespace MailerModule {
             this.inbox = require('inbox');
         }
 
-        public connect(receiver_setting: any, connect: (error:any) => {}, receive: (message:any, body:any) => {}):void {
+        public connect(receiver_setting: any, connect: (error: any) => {}, receive: (message: any, body: any) => {}): void {
 
             let imap;
 
@@ -164,19 +164,19 @@ export namespace MailerModule {
                 );
 
                 imap.on('connect', () => {
-                    imap.openMailbox('INBOX', (error:any) => {
+                    imap.openMailbox('INBOX', (error: any) => {
                         connect(error);
                     });
                 });
 
-                imap.on('new', (message:any) => {
+                imap.on('new', (message: any) => {
                     let stream = imap.createMessageStream(message.UID);
                     let simpleParser = require("mailparser").simpleParser;
                     simpleParser(stream).then((mail) => {
                         receive(message, mail);
-                    }).catch((error)=>{
+                    }).catch((error) => {
                         let a = error;
-                    })
+                    });
                 });
 
                 imap.connect();

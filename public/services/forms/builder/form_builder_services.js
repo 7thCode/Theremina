@@ -286,7 +286,7 @@ var FormBuilderServicesModule;
                     var type = element.type;
                     var attributes = attributes_by_mode(true, element);
                     var contents = element.contents;
-                    var events = element.events;
+                    //  let events = element.events;
                     switch (type) {
                         case "form":
                         case "div":

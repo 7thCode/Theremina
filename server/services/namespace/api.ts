@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace NamespaceApiRouter {
 
     const express: any = require("express");
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -20,7 +22,7 @@ export namespace NamespaceApiRouter {
     const NamespsceModule: any = require(share.Server("services/namespace/controllers/namespace_controller"));
     const namespaces: any = new NamespsceModule.Namespsces;
 
-    router.get('/api/namespaces', [exception.exception, exception.authenticate,namespaces.namespaces]);
+    router.get('/api/namespaces', [exception.exception, exception.authenticate, namespaces.namespaces]);
 
 }
 

@@ -62,7 +62,7 @@ namespace AuthControllersModule {
                 }, (): void => {
                 });
             };
-
+/*
             let confirmMember = () => {
                 let modalRegistConfirm = $uibModal.open({
                     controller: 'MemberConfirmDialogController',
@@ -75,7 +75,7 @@ namespace AuthControllersModule {
                 }, (): void => {
                 });
             };
-
+*/
             $scope.about = true;
 
             ProfileService.Get((self) => {
@@ -113,7 +113,7 @@ namespace AuthControllersModule {
                     progress(false);
                 });
             };
-
+/*
             $scope.showMemberDialog = (): void => {
                 let modalRegist = $uibModal.open({
                     controller: 'MemberDialogController',
@@ -131,7 +131,7 @@ namespace AuthControllersModule {
                 }, (): void => {
                 });
             };
-
+*/
             $scope.showLoginDialog = (): void => {
                 let modalInstance = $uibModal.open({
                     controller: 'LoginDialogController',
@@ -287,7 +287,7 @@ namespace AuthControllersModule {
             };
 
         }]);
-
+/*
     AuthControllers.controller('MemberDialogController', ['$scope', '$uibModalInstance', 'AuthService',
         ($scope: any, $uibModalInstance: any, AuthService: any): void => {
 
@@ -337,7 +337,7 @@ namespace AuthControllersModule {
             };
 
         }]);
-
+*/
     /**
      * パスワード変更ダイアログ
      * @param target  Comment for parameter ´target´.

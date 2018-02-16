@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Persistent;
 (function (Persistent) {
     var fs = require('graceful-fs');
-    var Map = (function () {
+    var Map = /** @class */ (function () {
         function Map(filename) {
             this.filename = filename;
             this.map = {};

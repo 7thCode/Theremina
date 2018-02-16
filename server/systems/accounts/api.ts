@@ -6,12 +6,14 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace AccountApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require(process.cwd() + '/server/systems/common/share');
+    const share: any = require(process.cwd() + '/server/systems/common/share');
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     export const auth: any = new AuthController.Auth();

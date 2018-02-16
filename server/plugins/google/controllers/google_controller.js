@@ -7,8 +7,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GoogleModule;
 (function (GoogleModule) {
-    var fs = require('graceful-fs');
-    var _ = require('lodash');
+    // const fs = require('graceful-fs');
+    // const _: any = require('lodash');
     var mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
     var google = require('googleapis');
@@ -18,7 +18,7 @@ var GoogleModule;
     var share = core.share;
     var Wrapper = share.Wrapper;
     var plugins_config = share.plugins_config;
-    var Calendar = (function () {
+    var Calendar = /** @class */ (function () {
         // plugins_config.google_api.
         function Calendar(calendar) {
             var clientSecret = calendar.client_secret;
@@ -39,11 +39,10 @@ var GoogleModule;
         };
         // new auth step1
         Calendar.prototype.authorize_url = function (scopes) {
-            var authUrl = this.oauth2Client.generateAuthUrl({
+            return this.oauth2Client.generateAuthUrl({
                 access_type: 'offline',
                 scope: scopes
             });
-            return authUrl;
         };
         // new auth step2
         Calendar.prototype.authorize_callback = function (code, callback) {
@@ -79,7 +78,7 @@ var GoogleModule;
                     callback(null, result);
                 }
                 else {
-                    callback(error, null);
+                    callback(error, "");
                 }
             });
         };
@@ -121,13 +120,12 @@ var GoogleModule;
                     callback(null, response.htmlLink);
                 }
                 else {
-                    callback(error, null);
+                    callback(error, "");
                 }
             });
         };
         // etc etc...
         Calendar.prototype.analytics = function (auth, callback) {
-            var result = "";
             var analytics = google.analytics({ auth: auth, version: "v3" });
             analytics.data.ga.get({
                 ids: "ga:" + "76780519",
@@ -140,14 +138,14 @@ var GoogleModule;
                     callback(null, rows);
                 }
                 else {
-                    callback(error, null);
+                    callback(error, "");
                 }
             });
         };
         return Calendar;
     }());
     GoogleModule.Calendar = Calendar;
-    var Analytics = (function () {
+    var Analytics = /** @class */ (function () {
         function Analytics() {
         }
         Analytics.prototype.get = function (request, response) {

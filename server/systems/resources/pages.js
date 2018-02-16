@@ -21,7 +21,7 @@ var ResourcePageRouter;
     var AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
     var analysis = new AnalysisModule.Analysis;
     var ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    var resources = new ResourcesModule.Resource;
+    // const resources:any = new ResourcesModule.Resource;
     var pages = new ResourcesModule.Pages;
     ResourcePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
             response.render("systems/resources/player/index", {
@@ -87,57 +87,63 @@ var ResourcePageRouter;
                 });
         }
     };
-    var render_static = function (request, response) {
-        pages.render_direct(request, function (error, result) {
-            if (!error) {
-                response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
-                response.write(result.content);
-                response.end();
-            }
-            else {
-                Error(error, request, response);
-            }
-        });
-    };
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, function (request, response) {
-            render_static(request, response);
-        }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, function (request, response) {
-            render_static(request, response);
-        }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, function (request, response) {
-            render_static(request, response);
-        }]);
-    var render_html = function (request, response) {
-        pages.render_html(request, function (error, result) {
-            if (!error) {
-                response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
-                response.write(result.content);
-                response.end();
-            }
-            else {
-                Error(error, request, response);
-            }
-        });
-    };
-    ResourcePageRouter.router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, function (request, response) {
-            render_html(request, response);
-        }]);
-    // router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-    //     render_html(request, response);
-    // }]);
-    ResourcePageRouter.router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, function (request, response) {
-            pages.render_fragment(request, function (error, result) {
+    /*
+        let render_static = (request: any,sub_path:string[], response: any): void => {
+            pages.render_direct(request, sub_path, (error: { code: number, message: string }, result: any): void => {
                 if (!error) {
-                    response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
+                    response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
                     response.write(result.content);
                     response.end();
+                } else {
+                    Error(error, request, response);
                 }
-                else {
+            });
+        };
+
+        router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+            render_static(request,["doc", "js"], response);
+        }]);
+
+        router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+            render_static(request,["doc", "css"], response);
+        }]);
+
+        router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+            render_static(request,["static"], response);
+        }]);
+
+        let render_html = (request: any, response: any): void => {
+            pages.render_html(request, (error: { code: number, message: string }, result: any): void => {
+                if (!error) {
+                    response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
+                    response.write(result.content);
+                    response.end();
+                } else {
+                    Error(error, request, response);
+                }
+            });
+        };
+
+        router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+            render_html(request, response);
+        }]);
+
+        // router.get("/:userid/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        //     render_html(request, response);
+        // }]);
+
+        router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+            pages.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
+                if (!error) {
+                    response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
+                    response.write(result.content);
+                    response.end();
+                } else {
                     Error(error, request, response);
                 }
             });
         }]);
+    */
 })(ResourcePageRouter = exports.ResourcePageRouter || (exports.ResourcePageRouter = {}));
 module.exports = ResourcePageRouter.router;
 //# sourceMappingURL=pages.js.map

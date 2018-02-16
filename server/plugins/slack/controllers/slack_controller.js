@@ -13,7 +13,7 @@ var SlackModule;
     var share = core.share;
     var plugins_config = share.plugins_config;
     var controller = null;
-    var Slack = (function () {
+    var Slack = /** @class */ (function () {
         function Slack() {
             controller = Botkit.slackbot({
                 debug: false

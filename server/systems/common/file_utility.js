@@ -8,9 +8,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var FileUtility;
 (function (FileUtility) {
     var fs = require('graceful-fs');
-    var share = require('./share');
-    var config = share.config;
-    var Utility = (function () {
+    var exec = require('child_process').exec;
+    var path = require('path');
+    var Utility = /** @class */ (function () {
         function Utility(current) {
             this.current = '';
             this.current = current;
@@ -52,18 +52,6 @@ var FileUtility;
                 callback(error, data);
             });
         };
-        Utility.prototype.delete_folder_recursive = function (path) {
-            fs.readdirSync(path).forEach(function (file, index) {
-                var curPath = path + "/" + file;
-                if (fs.lstatSync(curPath).isDirectory()) {
-                    this.delete_folder_recursive(curPath);
-                }
-                else {
-                    fs.unlinkSync(curPath);
-                }
-            });
-            fs.rmdirSync(path);
-        };
         Utility.prototype.writefileSync = function (filename, data) {
             var result = false;
             var fd = fs.openSync(filename, 'w');
@@ -84,7 +72,7 @@ var FileUtility;
             fs.open(filename, 'w', function (error, fd) {
                 if (!error) {
                     try {
-                        fs.writefile(fd, data, function (error) {
+                        fs.writeFile(fd, data, function (error) {
                             if (!error) {
                                 callback(null);
                             }
@@ -101,6 +89,69 @@ var FileUtility;
                 else {
                     callback(error);
                 }
+            });
+        };
+        Utility.rm = function (tmp_path, callback) {
+            exec('rm -r ' + tmp_path, function (error, stdout, stderr) {
+                callback(error);
+            });
+        };
+        ;
+        Utility.prototype.unlink = function (path, callback) {
+            fs.unlink(path, function (error) {
+                callback(error);
+            });
+        };
+        Utility.prototype.make_dir = function (path, callback, error) {
+            fs.mkdir(path, function (_error) {
+                if (!_error) {
+                    callback();
+                }
+                else {
+                    if (_error.code == "EEXIST") {
+                        callback();
+                    }
+                    else {
+                        error(_error);
+                    }
+                }
+            });
+        };
+        ;
+        Utility.prototype.delete_folder_recursive = function (path) {
+            exec('rm -r ' + path, function (error, stdout, stderr) {
+            });
+            /*
+            fs.readdirSync(path).forEach(function (file, index) {
+                let curPath = path + "/" + file;
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    this.delete_folder_recursive(curPath);
+                } else {
+                    fs.unlinkSync(curPath);
+                }
+            });
+            fs.rmdirSync(path);
+            */
+        };
+        Utility.prototype.create_dir = function (root, pathes, callback, error_handler) {
+            var _this = this;
+            var current_path = root;
+            var sequentialExec = function (arr) {
+                return arr.reduce(function (prev, current, index, array) {
+                    return prev.then(function (prevResult) {
+                        return new Promise(function (resolve, reject) {
+                            current_path = path.join(current_path, current);
+                            _this.make_dir(current_path, function () {
+                                resolve(current);
+                            }, error_handler);
+                        });
+                    });
+                }, Promise.resolve());
+            };
+            sequentialExec(pathes).then(function (lastResult) {
+                callback(current_path);
+            }).catch(function (e) {
+                error_handler(e);
             });
         };
         return Utility;

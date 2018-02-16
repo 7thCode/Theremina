@@ -289,14 +289,10 @@ namespace HTMLScanner {
                     }).catch((error: any): void => {
                         this.callback(error, undefined);
                     });
-
-
                 }).catch((error: any): void => {
                     this.callback(error, undefined);
                 });
-
             }
-
         }
 
         // todo:1path
@@ -337,8 +333,6 @@ namespace HTMLScanner {
                 }).catch((error: any): void => {
                     this.callback(error, undefined);
                 });
-
-
             }).catch((error: any): void => {
                 this.callback(error, undefined);
             });
@@ -479,8 +473,6 @@ namespace HTMLScanner {
                         default:
                             this.callback(error, undefined);
                     }
-
-
                 });
             }
 
@@ -511,11 +503,7 @@ namespace HTMLScanner {
             }).catch((error: any): void => {
                 this.callback(error, undefined);
             });
-
-
         }
-
-
     }
 
     /* Expander
@@ -747,7 +735,7 @@ namespace HTMLScanner {
                                                 _.forEach(node.childNodes, (childnode: any, index: number): void => {
                                                     this.position = index;
                                                     this.ScanNode(childnode, current_datasource[0], 0);
-                                                })
+                                                });
                                             } else if (node.attributes.aggrigate) { // aggrigate
                                                 let aggrigate: any = node.attributes.aggrigate;
                                                 let result: any = this.fragments[aggrigate.nodeValue].content;

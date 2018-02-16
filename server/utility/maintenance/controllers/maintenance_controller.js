@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var MaintenanceModule;
 (function (MaintenanceModule) {
-    var Installer = (function () {
+    var Installer = /** @class */ (function () {
         function Installer() {
         }
         return Installer;

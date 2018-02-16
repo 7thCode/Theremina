@@ -9,7 +9,7 @@ var LayoutsModule;
 (function (LayoutsModule) {
     var fs = require('graceful-fs');
     var _ = require('lodash');
-    var mongoose = require('mongoose');
+    //   const mongoose = require('mongoose');
     var core = require(process.cwd() + '/gs');
     var share = core.share;
     var config = share.config;
@@ -22,7 +22,7 @@ var LayoutsModule;
     var LayoutModel = require(share.Models("/services/layouts/layout"));
     var builder_userid = config.systems.userid; // template maker user id
     var webfonts = services_config.webfonts;
-    var Layout = (function () {
+    var Layout = /** @class */ (function () {
         function Layout() {
         }
         /**
@@ -31,6 +31,15 @@ var LayoutsModule;
          */
         Layout.userid = function (request) {
             return request.user.userid;
+        };
+        Layout.namespace = function (request) {
+            var result = "";
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
+            }
+            return result;
         };
         /**
          * @param request
@@ -48,13 +57,6 @@ var LayoutsModule;
          */
         Layout.prototype.create_layout = function (request, response) {
             Layout.create(request, response, 2);
-        };
-        Layout.namespace = function (request) {
-            var result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
-            }
-            return result;
         };
         /**
          * @param request
@@ -127,7 +129,7 @@ var LayoutsModule;
         Layout.put = function (request, response, layout_type) {
             var number = 2000;
             var userid = Layout.userid(request);
-            var namespace = request.body.namespace;
+            var namespace = Layout.namespace(request);
             var name = request.body.name;
             if (name) {
                 Wrapper.FindOne(response, number, LayoutModel, { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { userid: userid }] }, function (response, exists) {
@@ -355,19 +357,16 @@ var LayoutsModule;
          * @returns none
          */
         Layout.prototype.get_template_svg = function (request, response) {
-            var userid = Layout.userid(request);
-            var name = request.params.name;
-            Layout.get_svg(request, response, userid, name, 1);
+            Layout.get_svg(request, response, 1);
         };
         /**
+         * public
          * @param request
          * @param response
          * @returns none
          */
         Layout.prototype.get_layout_svg = function (request, response) {
-            var userid = Layout.userid(request);
-            var name = request.params.name;
-            Layout.get_svg(request, response, userid, name, 2);
+            Layout.get_svg(request, response, 2);
         };
         /**
          * @param request
@@ -377,13 +376,14 @@ var LayoutsModule;
          * @param layout_type
          * @returns none
          */
-        Layout.get_svg = function (request, response, userid, name, layout_type) {
+        Layout.get_svg = function (request, response, layout_type) {
             var number = 3000;
-            //   const namespace: string = request.params.namespace;
             var namespace = Layout.namespace(request);
             // layout_type
             //     1   --- system template
             //   other --- own
+            var userid = request.params.userid;
+            var name = request.params.name;
             var query = { $and: [{ name: name }, { type: layout_type }, { namespace: namespace }, { userid: userid }] };
             switch (layout_type) {
                 case 1:

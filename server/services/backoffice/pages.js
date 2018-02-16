@@ -18,7 +18,10 @@ var BackofficePageRouter;
     var webfonts = services_config.webfonts;
     var message = config.message;
     BackofficePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
-            response.render("services/backoffice/index", { config: config, user: request.user, message: message, status: 200, fonts: webfonts });
+            response.render("services/backoffice/index", {
+                config: config, user: request.user,
+                role: auth.role(request.user), message: message, status: 200, fonts: webfonts
+            });
         }]);
 })(BackofficePageRouter = exports.BackofficePageRouter || (exports.BackofficePageRouter = {}));
 module.exports = BackofficePageRouter.router;

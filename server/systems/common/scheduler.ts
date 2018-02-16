@@ -8,7 +8,7 @@
 
 export namespace SchedulerModule {
 
-    let schedule = require("node-schedule");
+    let schedule: any = require("node-schedule");
 
     export class Scheduler {
 
@@ -18,7 +18,7 @@ export namespace SchedulerModule {
             this.Scheduled_jobs = [];
         }
 
-        public Add(item:any) {
+        public Add(item: any) {
             let job = schedule.scheduleJob(item.timing, item.job);
             this.Scheduled_jobs.push(job);
         }

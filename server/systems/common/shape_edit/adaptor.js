@@ -19,7 +19,7 @@ var Adaptor;
         var fs = require('graceful-fs');
         var crypto = require('crypto');
     }
-    var SVGAdaptor = (function () {
+    var SVGAdaptor = /** @class */ (function () {
         function SVGAdaptor(width, height, embedded, webfonts) {
             this.tilesizew = 64;
             this.tilesizeh = 64;
@@ -116,24 +116,30 @@ var Adaptor;
                             });
                             text += '</text>';
                             defs = create_def(this.webfonts);
+                            this.doc += text; // + defs;
+                            callback(null);
                         }
                         else {
                             error = { code: 1, message: "" };
+                            callback(error);
                         }
                     }
                     else {
                         error = { code: 1, message: "" };
+                        callback(error);
                     }
                 }
                 else {
                     error = { code: 1, message: "" };
+                    callback(error);
                 }
             }
             else {
                 error = { code: 1, message: "" };
+                callback(error);
             }
-            this.doc += text; // + defs;
-            callback(error);
+            //     this.doc += text;// + defs;
+            //         callback(error);
         };
         SVGAdaptor.prototype.Box = function (data, callback) {
             var box = '<rect id="' + data.ID() + '" stroke="' + SVGAdaptor.StrokeColor(data.property.strokewidth, data.property.strokestyle.ToString()) + '" stroke-width="' + data.property.strokewidth + '" fill="' + data.property.fillstyle.ToString() + '" x="' + data.rectangle.location.x + '" y="' + data.rectangle.location.y + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />';
@@ -229,22 +235,22 @@ var Adaptor;
         };
         /*
                 public ImageRect(data: any, callback: (error: any) => void): void {
-        
+
                     let rect = '<rect id="' + data.ID() + '" stroke="none" fill="url(#' + data.ID() + ')" x="' + data.rectangle.location.x + '" y="' + data.rectangle.location.y + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />';
-        
+
                     let path = "";
                     if (data.property.path) {
                         path = data.property.path;
                     }
-        
+
                     this.get_image(path, (error, image_url) => {
-        
+
                         let defs = '<defs>' +
                             '<pattern id="' + data.ID() + '" x="' + data.rectangle.location.x + '" y="' + (data.rectangle.location.y + data.rectangle.size.h) + '" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" patternUnits="userSpaceOnUse" viewBox="0 0 ' + data.rectangle.size.w + ' ' + data.rectangle.size.h + '">' +
                             '<image xlink:href="' + image_url + '" preserveAspectRatio="none" x="0" y="0" width="' + data.rectangle.size.w + '" height="' + data.rectangle.size.h + '" />' +
                             '</pattern>' +
                             '</defs>';
-        
+
                         this.doc += rect + defs;
                         callback(null);
                     });
@@ -315,7 +321,7 @@ var Adaptor;
         return SVGAdaptor;
     }());
     Adaptor.SVGAdaptor = SVGAdaptor;
-    var PDFAdaptor = (function () {
+    var PDFAdaptor = /** @class */ (function () {
         function PDFAdaptor(work_path, paper) {
             this.doc = null;
             this.serif = "";

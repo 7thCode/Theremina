@@ -130,7 +130,6 @@ var ImageControllersModule;
                         file.cancel();
                     });
                     Draw();
-                }).finally(function () {
                 });
             };
             var showImage = function (url) {

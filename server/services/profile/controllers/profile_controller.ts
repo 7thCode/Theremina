@@ -8,21 +8,19 @@
 
 export namespace ProfileModule {
 
-    const fs = require('graceful-fs');
+    const fs: any = require('graceful-fs');
 
-    const Validator = require('jsonschema').Validator;
-    const validator = new Validator();
+    const Validator: any = require('jsonschema').Validator;
+    const validator: any = new Validator();
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const Wrapper = share.Wrapper;
-
-   // const applications_config = share.applications_config;
+    const Wrapper: any = share.Wrapper;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
@@ -54,7 +52,7 @@ export namespace ProfileModule {
             const number: number = 110000;
             Wrapper.FindOne(response, number, LocalAccount, {username: request.user.username}, (response: any, self: any): void => {
                 if (self) {
-                    let validate_result = validator.validate(request.body.local, account_local_schema);
+                    let validate_result: any = validator.validate(request.body.local, account_local_schema);
                     if (validate_result.errors.length === 0) {
                         self.local = request.body.local;
                         self.open = true;
@@ -65,7 +63,7 @@ export namespace ProfileModule {
                         Wrapper.SendError(response, 3, "not valid", validate_result);
                     }
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -87,7 +85,7 @@ export namespace ProfileModule {
                         local: self.local
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }

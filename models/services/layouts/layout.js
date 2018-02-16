@@ -13,7 +13,7 @@ var LayoutModule;
     var Layout = new Schema({});
     Layout.plugin(timestamp);
     Layout.plugin(userdata, {});
-    Layout.index({ name: 1, type: 1, userid: 1 }, { unique: true });
+    Layout.index({ namespace: 1, name: 1, type: 1, userid: 1 }, { unique: true });
     module.exports = mongoose.model('Layout', Layout);
 })(LayoutModule || (LayoutModule = {}));
 //# sourceMappingURL=layout.js.map

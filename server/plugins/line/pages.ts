@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace LinePageRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
 }
 

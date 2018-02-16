@@ -343,7 +343,6 @@ namespace PagesControllersModule {
                     $rootScope.$emit('change_files', {});
                     $rootScope.$emit('change_namespace', {});
                     //    Query();
-                }).finally(() => {
                 });
             };
 

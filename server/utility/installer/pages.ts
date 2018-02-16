@@ -6,19 +6,20 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace InstallerPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express:any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require(process.cwd() + '/server/systems/common/share');
+    const share:any = require(process.cwd() + '/server/systems/common/share');
 
-    const config = share.config;
-    const services_config = share.services_config;
+    const config:any = share.config;
+    const services_config:any = share.services_config;
     const webfonts:any[] = services_config.webfonts;
 
-    let message = config.message;
-
+    const message:any = config.message;
 
     router.get("/", [(request: any, response: any): void => {
         response.render("utility/installer/index", {user: null, message: message, status: 200, fonts:webfonts});

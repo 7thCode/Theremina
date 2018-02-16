@@ -15,7 +15,7 @@ var ArticleModule;
     var Wrapper = share.Wrapper;
     var ArticleModel = require(share.Models("services/articles/article"));
     var validator = require('validator');
-    var Article = (function () {
+    var Article = /** @class */ (function () {
         function Article() {
         }
         /**
@@ -27,8 +27,10 @@ var ArticleModule;
         };
         Article.namespace = function (request) {
             var result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
             }
             return result;
         };
@@ -154,27 +156,32 @@ var ArticleModule;
             var id = request.params.id;
             Wrapper.FindOne(response, 10000, ArticleModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, function (response, article) {
                 if (article) {
-                    article.content = request.body.content;
-                    _.forEach(article.content, function (content, key) {
-                        if (content.type == "quoted") {
-                            if (typeof content.value === 'string') {
-                                article.content[key].value = validator.escape(content.value);
+                    if (request.body.content !== {}) {
+                        article.content = request.body.content;
+                        _.forEach(article.content, function (content, key) {
+                            if (content.type == "quoted") {
+                                if (typeof content.value === 'string') {
+                                    article.content[key].value = validator.escape(content.value);
+                                }
+                                else {
+                                    article.content[key].value = content.value;
+                                }
                             }
-                            else {
-                                article.content[key].value = content.value;
+                            else if (content.type == "html") {
+                                article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
                             }
-                        }
-                        else if (content.type == "html") {
-                            article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
-                        }
-                        else if (content.type == "date") {
-                            article.content[key].value = new Date(content.value);
-                        }
-                    });
-                    article.open = true;
-                    Wrapper.Save(response, 1100, article, function (response, object) {
-                        Wrapper.SendSuccess(response, object);
-                    });
+                            else if (content.type == "date") {
+                                article.content[key].value = new Date(content.value);
+                            }
+                        });
+                        article.open = true;
+                        Wrapper.Save(response, 1100, article, function (response, object) {
+                            Wrapper.SendSuccess(response, object);
+                        });
+                    }
+                    else {
+                        Wrapper.SendWarn(response, 1, "no content", { code: 1, message: "no content" });
+                    }
                 }
                 else {
                     Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
@@ -220,10 +227,11 @@ var ArticleModule;
          * @returns none
          */
         Article.prototype.get_article = function (request, response) {
-            //     let userid = Article.userid(request);
+            var userid = Article.userid(request);
             var namespace = Article.namespace(request);
             var id = request.params.id;
-            Wrapper.FindOne(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { type: 0 }, { _id: id }] }, function (response, article) {
+            // "$and userid query" for security.
+            Wrapper.FindOne(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, { _id: id }] }, function (response, article) {
                 if (article) {
                     Wrapper.SendSuccess(response, article);
                 }
@@ -256,7 +264,6 @@ var ArticleModule;
          * @returns none
          */
         Article.prototype.get_article_query = function (request, response) {
-            //     let userid = Article.userid(request);
             var namespace = Article.namespace(request);
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Find(response, 1500, ArticleModel, { $and: [{ namespace: namespace }, { type: 0 }, query] }, {}, {}, function (response, articles) {
@@ -268,12 +275,24 @@ var ArticleModule;
          * @param response
          * @returns none
          */
+        Article.prototype.get_article_query_with_namespace = function (request, response) {
+            var namespace = request.params.namespace;
+            var query = Wrapper.Decode(request.params.query);
+            Wrapper.Find(response, 1500, ArticleModel, { $and: [{ namespace: namespace }, { type: 0 }, query] }, {}, {}, function (response, articles) {
+                Wrapper.SendSuccess(response, articles);
+            });
+        };
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
         Article.prototype.get_article_query_query = function (request, response) {
-            //       let userid = Article.userid(request);
+            var userid = Article.userid(request);
             var namespace = Article.namespace(request);
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1500, ArticleModel, { $and: [{ namespace: namespace }, { type: 0 }, query] }, {}, option, function (response, articles) {
+            Wrapper.Find(response, 1500, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, query] }, {}, option, function (response, articles) {
                 _.forEach(articles, function (article) {
                     article.content = null;
                 });
@@ -308,12 +327,11 @@ var ArticleModule;
             });
         };
         /**
-         * @param request
-         * @param response
+         * @param userid
+         * @param callback
          * @returns none
          */
         Article.prototype.namespaces = function (userid, callback) {
-            var number = 1400;
             ArticleModel.find({ userid: userid }, { "namespace": 1, "_id": 0 }, {}).then(function (pages) {
                 var result = [];
                 _.forEach(pages, function (page) {

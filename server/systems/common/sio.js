@@ -10,7 +10,7 @@ var Socket;
     // Socket.IO
     var socketio = require('socket.io');
     var _ = require("lodash");
-    var IO = (function () {
+    var IO = /** @class */ (function () {
         function IO(server) {
             this.sio = null;
             this.socket = null;

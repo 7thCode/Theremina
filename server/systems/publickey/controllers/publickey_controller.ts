@@ -8,15 +8,14 @@
 
 export module PublicKeyModule {
 
-    const share = require('../../common/share');
-    const Config = share.config;
-    const Wrapper = share.Wrapper;
-    const Cipher = share.Cipher;
+    const share: any = require('../../common/share');
+    const Config: any = share.config;
+    const Wrapper: any = share.Wrapper;
+    const Cipher: any = share.Cipher;
 
     export class PublicKey {
 
-        public get_fixed_public_key(request: any, response: any): void {
-
+        public get_fixed_public_key(request: any, response: Express.Response): void {
             if (Config.use_publickey) {
                 let systempassphrase: string = request.session.id;
                 Wrapper.SendSuccess(response, Cipher.PublicKey(systempassphrase));
@@ -25,7 +24,7 @@ export module PublicKeyModule {
             }
         }
 
-        public get_public_key(request: any, response: any): void {
+        public get_public_key(request: Express.Request, response: Express.Response): void {
             if (Config.use_publickey) {
                 Wrapper.SendSuccess(response, Cipher.PublicKey(request.user.passphrase));
             } else {
@@ -33,7 +32,7 @@ export module PublicKeyModule {
             }
         }
 
-        public get_access_token(request: any, response: any): void {
+        public get_access_token(request: any, response: Express.Response): void {
             if (Config.use_publickey) {
                 Wrapper.SendSuccess(response, Cipher.FixedCrypt(request.session.id, request.user.passphrase));
             } else {
@@ -41,13 +40,13 @@ export module PublicKeyModule {
             }
         }
 
-        public decrypt_test(request, response) {
+        public decrypt_test(request: Express.Request, response: Express.Response) :void {
             Wrapper.Authenticate(request, response, (req: any, res: any): void => {
                 let passphrase: string = req.user.passphrase;
-                let CipherText = req.params.text;
-                let SecretKey = cryptico.generateRSAKey(passphrase, 1024);  //秘密鍵
-                let Decryption = cryptico.decrypt(CipherText, SecretKey); // 復号
-                let textForm = Decryption.plaintext;
+                let CipherText: string = req.params.text;
+                let SecretKey: string = cryptico.generateRSAKey(passphrase, 1024);  //秘密鍵
+                let Decryption: any = cryptico.decrypt(CipherText, SecretKey); // 復号
+                let textForm: string = Decryption.plaintext;
                 res.send(textForm);
             });
         }

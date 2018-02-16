@@ -8,7 +8,7 @@
 
 export namespace Persistent {
 
-    const fs = require('graceful-fs');
+    const fs: any = require('graceful-fs');
 
     export class Map {
 

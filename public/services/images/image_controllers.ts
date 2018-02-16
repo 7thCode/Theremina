@@ -147,7 +147,6 @@ namespace ImageControllersModule {
                         file.cancel();
                     });
                     Draw();
-                }).finally(() => {
                 });
             };
 

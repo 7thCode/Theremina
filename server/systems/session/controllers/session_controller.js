@@ -10,7 +10,7 @@ var SessionModule;
     var _ = require('lodash');
     var share = require(process.cwd() + '/server/systems/common/share');
     var Wrapper = share.Wrapper;
-    var Session = (function () {
+    var Session = /** @class */ (function () {
         function Session() {
         }
         /**

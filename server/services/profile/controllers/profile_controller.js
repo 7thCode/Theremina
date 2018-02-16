@@ -16,7 +16,6 @@ var ProfileModule;
     var core = require(process.cwd() + '/gs');
     var share = core.share;
     var Wrapper = share.Wrapper;
-    // const applications_config = share.applications_config;
     var LocalAccount = require(share.Models("systems/accounts/account"));
     var account_local_schema = {};
     fs.open(share.Models('applications/accounts/schema.json'), 'ax+', 384, function (error, fd) {
@@ -26,7 +25,7 @@ var ProfileModule;
             });
         }
     });
-    var Profile = (function () {
+    var Profile = /** @class */ (function () {
         function Profile() {
         }
         /**

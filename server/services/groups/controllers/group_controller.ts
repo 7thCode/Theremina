@@ -8,24 +8,24 @@
 
 export namespace GroupModule {
 
-    const fs = require('graceful-fs');
+    const fs: any = require('graceful-fs');
 
-    const Validator = require('jsonschema').Validator;
-    const validator = new Validator();
+    const Validator: any = require('jsonschema').Validator;
+    const validator: any = new Validator();
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const Wrapper = share.Wrapper;
+    const Wrapper: any = share.Wrapper;
 
     const GroupModel: any = require(share.Models("services/groups/group"));
 
-    let group_local_schema = {};
-    fs.open(share.Models('applications/groups/schema.json'), 'ax+', 384, (error, fd) => {
+    let group_local_schema: any = {};
+    fs.open(share.Models('applications/groups/schema.json'), 'ax+', 384, (error: any, fd: any): void => {
         if (!error) {
             fs.close(fd, () => {
                 group_local_schema = JSON.parse(fs.readFileSync(share.Models('applications/groups/schema.json'), 'utf-8'));
@@ -33,8 +33,8 @@ export namespace GroupModule {
         }
     });
 
-    let definition = {group_content: {}};
-    fs.open(share.Models('applications/groups/definition.json'), 'ax+', 384, (error, fd) => {
+    let definition: any = {group_content: {}};
+    fs.open(share.Models('applications/groups/definition.json'), 'ax+', 384, (error: any, fd: any): void => {
         if (!error) {
             fs.close(fd, () => {
                 definition = JSON.parse(fs.readFileSync(share.Models('applications/groups/definition.json'), 'utf-8'));
@@ -49,7 +49,7 @@ export namespace GroupModule {
          * @param request
          * @returns userid
          */
-        static userid(request): string {
+        static userid(request: any): string {
             return request.user.userid;
         }
 
@@ -60,12 +60,12 @@ export namespace GroupModule {
          */
         public own_group(request: any, response: any): void {
             const number: number = 1000;
-            let userid = Group.userid(request);
-            let namespace = "";
-            let name = request.body.name;
+            let userid: string = Group.userid(request);
+            let namespace: string = "";
+            let name: string = request.body.name;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, GroupModel, {$and: [{name: name},{namespace:namespace}, {userid: userid}]}, (response: any, group: any): void => {
+                    Wrapper.FindOne(response, number, GroupModel, {$and: [{name: name}, {namespace: namespace}, {userid: userid}]}, (response: any, group: any): void => {
                         if (!group) {
                             let group: any = new GroupModel();
                             group.userid = userid;
@@ -76,14 +76,14 @@ export namespace GroupModule {
                                 Wrapper.SendSuccess(response, object);
                             });
                         } else {
-                            Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                            Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                         }
                     });
                 } else {
-                    Wrapper.SendError(response, 3, "form name must not contain '/'", {code:3, message: "form name must not contain '/'"});
+                    Wrapper.SendError(response, 3, "form name must not contain '/'", {code: 3, message: "form name must not contain '/'"});
                 }
             } else {
-                Wrapper.SendError(response, 2, "no form name", {code:2, message: "no form name"});
+                Wrapper.SendError(response, 2, "no form name", {code: 2, message: "no form name"});
             }
         }
 
@@ -96,11 +96,11 @@ export namespace GroupModule {
             const number: number = 1000;
             let objectid: any = new mongoose.Types.ObjectId; // Create new id
             let userid: string = objectid.toString();
-            let namespace = "";
-            let name = request.body.name;
+            let namespace: string = "";
+            let name: string = request.body.name;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, GroupModel, {$and: [{name: name},{namespace:namespace}, {userid: userid}]}, (response: any, group: any): void => {
+                    Wrapper.FindOne(response, number, GroupModel, {$and: [{name: name}, {namespace: namespace}, {userid: userid}]}, (response: any, group: any): void => {
                         if (!group) {
                             let group: any = new GroupModel();
                             group.userid = userid;
@@ -111,14 +111,14 @@ export namespace GroupModule {
                                 Wrapper.SendSuccess(response, object);
                             });
                         } else {
-                            Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                            Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                         }
                     });
                 } else {
-                    Wrapper.SendError(response, 3, "form name must not contain '/'",  {code:3, message: "form name must not contain '/'"});
+                    Wrapper.SendError(response, 3, "form name must not contain '/'", {code: 3, message: "form name must not contain '/'"});
                 }
             } else {
-                Wrapper.SendError(response, 2, "no form name", {code:2, message: "no form name"});
+                Wrapper.SendError(response, 2, "no form name", {code: 2, message: "no form name"});
             }
         }
 
@@ -130,9 +130,9 @@ export namespace GroupModule {
         public put_group(request: any, response: any): void {
             const number: number = 1100;
             let userid = Group.userid(request);
-            let namespace = "";
-            let id = request.params.id;
-            Wrapper.FindOne(response, number, GroupModel, {$and: [{_id: id},{namespace:namespace}, {userid: userid}]}, (response: any, group: any): void => {
+            let namespace: string = "";
+            let id: string = request.params.id;
+            Wrapper.FindOne(response, number, GroupModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, group: any): void => {
                 if (group) {
                     let validate_result = validator.validate(request.body.local, group_local_schema);
                     if (validate_result.errors.length === 0) {
@@ -145,7 +145,7 @@ export namespace GroupModule {
                         Wrapper.SendError(response, 3, "not valid", validate_result);
                     }
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -157,16 +157,16 @@ export namespace GroupModule {
          */
         public delete_group(request: any, response: any): void {
             const number: number = 1200;
-            let userid = Group.userid(request);
-            let namespace = "";
-            let id = request.params.id;
-            Wrapper.FindOne(response, number, GroupModel, {$and: [{_id: id},{namespace:namespace}, {userid: userid}]}, (response: any, group: any): void => {
+            let userid: string = Group.userid(request);
+            let namespace: string = "";
+            let id: string = request.params.id;
+            Wrapper.FindOne(response, number, GroupModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, group: any): void => {
                 if (group) {
                     Wrapper.Remove(response, number, group, (response: any): void => {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -178,9 +178,9 @@ export namespace GroupModule {
          */
         public delete_own(request: any, response: any): void {
             const number: number = 1300;
-            let userid = Group.userid(request);
-            let namespace = "";
-            Wrapper.Delete(response, number, GroupModel, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any): void => {
+            let userid: string = Group.userid(request);
+            let namespace: string = "";
+            Wrapper.Delete(response, number, GroupModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -192,13 +192,12 @@ export namespace GroupModule {
          */
         public get_group(request: any, response: any): void {
             const number: number = 1400;
-            //let userid = Group.userid(request);
-            let id = request.params.id;
+            let id: string = request.params.id;
             Wrapper.FindOne(response, number, GroupModel, {_id: id}, (response: any, group: any): void => {
                 if (group) {
                     Wrapper.SendSuccess(response, group);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -209,15 +208,11 @@ export namespace GroupModule {
          * @returns none
          */
         public get_group_query_query(request: any, response: any): void {
-            let userid = Group.userid(request);
-            //let self: any = request.user;
-            //      let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //      let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let namespace = "";
+            let userid: string = Group.userid(request);
+            let namespace: string = "";
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-
-            Wrapper.Find(response, 1500, GroupModel, {$and: [{namespace:namespace},{userid: userid}, query]}, {}, option, (response: any, groups: any): any => {
+            Wrapper.Find(response, 1500, GroupModel, {$and: [{namespace: namespace}, {userid: userid}, query]}, {}, option, (response: any, groups: any): any => {
                 Wrapper.SendSuccess(response, groups);
             });
         }
@@ -228,12 +223,10 @@ export namespace GroupModule {
          * @returns none
          */
         public get_group_count(request: any, response: any): void {
-            let userid = Group.userid(request);
-            let namespace = "";
-            //  let query: any = JSON.parse(decodeURIComponent(request.params.query));
+            let userid: string = Group.userid(request);
+            let namespace: string = "";
             let query: any = Wrapper.Decode(request.params.query);
-
-            Wrapper.Count(response, 2800, GroupModel, {$and: [{namespace:namespace},{userid: userid}, query]}, (response: any, count: any): any => {
+            Wrapper.Count(response, 2800, GroupModel, {$and: [{namespace: namespace}, {userid: userid}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
         }

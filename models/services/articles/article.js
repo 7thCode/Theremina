@@ -8,7 +8,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ArticleModule;
 (function (ArticleModule) {
     var mongoose = require('mongoose');
-    // const request = require('request-promise');
     var Schema = mongoose.Schema;
     var timestamp = require('../../systems/plugins/timestamp/timestamp');
     var userdata = require('../../systems/plugins/userdata/userdata');

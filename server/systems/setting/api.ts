@@ -6,12 +6,14 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace SettingApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require(process.cwd() + '/server/systems/common/share');
+    const share: any = require(process.cwd() + '/server/systems/common/share');
 
     const ExceptionController: any = require("../common/controllers/exception_controller");
     const exception: any = new ExceptionController.Exception();
@@ -25,11 +27,11 @@ export namespace SettingApiRouter {
     router.put('/command/backup', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.backup]);
     router.put('/command/restore', [exception.exception, setting.restore]);
 
-    router.get('/setting/application', [exception.exception, exception.guard, exception.authenticate,auth.is_system, setting.read_application]);
-    router.put('/setting/application', [exception.exception, exception.guard, exception.authenticate,auth.is_system, setting.write_application]);
+    router.get('/setting/application', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_application]);
+    router.put('/setting/application', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.write_application]);
 
-    router.get('/setting/plugins', [exception.exception, exception.guard, exception.authenticate,auth.is_system, setting.read_plugins]);
-    router.put('/setting/plugins', [exception.exception, exception.guard, exception.authenticate,auth.is_system, setting.write_plugins]);
+    router.get('/setting/plugins', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_plugins]);
+    router.put('/setting/plugins', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.write_plugins]);
 
     router.get('/setting/services', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_services]);
     router.put('/setting/services', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.write_services]);
@@ -37,7 +39,7 @@ export namespace SettingApiRouter {
     router.get('/setting/system', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_system]);
     router.put('/setting/system', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.write_system]);
 
-    router.get('/setting/modules', [exception.exception, exception.guard, exception.authenticate,auth.is_system, setting.read_modules]);
+    router.get('/setting/modules', [exception.exception, exception.guard, exception.authenticate, auth.is_system, setting.read_modules]);
 
 }
 

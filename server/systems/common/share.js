@@ -7,7 +7,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ShareModule;
 (function (ShareModule) {
-    //const fs = require('graceful-fs');
     var _config = require('config');
     ShareModule.config = _config.get("systems");
     ShareModule.services_config = _config.get("services");
@@ -57,17 +56,9 @@ var ShareModule;
     ShareModule.Views = function (relpath) {
         return path.join(root_path, "views/" + relpath);
     };
-    var PersistentModel = require("./persistent");
-    ShareModule.Map = new PersistentModel.Map(ShareModule.Persistent("systems/storege.json"));
-    var FileUtility = require("./file_utility");
-    ShareModule.Utility = new FileUtility.Utility(ShareModule.Public(""));
+    ShareModule.FileUtility = require("./file_utility");
+    ShareModule.Utility = new ShareModule.FileUtility.Utility(ShareModule.Public(""));
     ShareModule.Memory = [];
-    var Share = (function () {
-        function Share() {
-        }
-        return Share;
-    }());
-    ShareModule.Share = Share;
 })(ShareModule = exports.ShareModule || (exports.ShareModule = {}));
 module.exports = ShareModule;
 //# sourceMappingURL=share.js.map

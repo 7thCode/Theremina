@@ -262,17 +262,6 @@ var MailerControllersModule;
             var userid = items.userid;
             var formname = items.formname;
             var article = items.article;
-            /*
-            if ((userid + formname) != "") {
-                ArticleService.RenderFragment(userid, formname, article, (result: any): void => {
-                    $scope.$evalAsync(   // $apply
-                        function ($scope) {
-                            $scope.doc = result.resource;
-                        }
-                    );
-                }, error_handler);
-            }
-            */
             $scope.hide = function () {
                 $uibModalInstance.close();
             };

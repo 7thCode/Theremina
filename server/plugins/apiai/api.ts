@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ApiaiApiRouter {
 
-    const express:any = require('express');
-    export const router:any = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
 }
 

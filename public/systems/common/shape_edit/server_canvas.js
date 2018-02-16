@@ -7,7 +7,7 @@
 var server = (typeof window === 'undefined');
 var Server;
 (function (Server) {
-    var Context = (function () {
+    var Context = /** @class */ (function () {
         function Context() {
             this.webkitBackingStorePixelRatio = 1;
             this.mozBackingStorePixelRatio = 1;
@@ -47,13 +47,13 @@ var Server;
         return Context;
     }());
     Server.Context = Context;
-    var Style = (function () {
+    var Style = /** @class */ (function () {
         function Style() {
         }
         return Style;
     }());
     Server.Style = Style;
-    var StubCanvas = (function () {
+    var StubCanvas = /** @class */ (function () {
         function StubCanvas(width, height) {
             this.context = new Context();
             this.style = new Style();

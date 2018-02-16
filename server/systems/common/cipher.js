@@ -9,7 +9,7 @@ var CipherModule;
 (function (CipherModule) {
     var cipher_crypto = require('crypto');
     var cipher_cryptico = require('cryptico');
-    var Cipher = (function () {
+    var Cipher = /** @class */ (function () {
         function Cipher() {
         }
         Cipher.FixedCrypt = function (name, password) {

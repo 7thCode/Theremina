@@ -8,15 +8,15 @@
 
 export namespace ApiAiModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
-    const apiai:any = require('apiai-promise');
+    const apiai: any = require('apiai-promise');
 
-    const core:any = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const plugins_config:any = share.plugins_config;
-    const ai:any = apiai(plugins_config.apiai.token);
+    const plugins_config: any = share.plugins_config;
+    const ai: any = apiai(plugins_config.apiai.token);
 
     export class ApiAi {
 

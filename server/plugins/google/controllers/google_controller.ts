@@ -8,8 +8,8 @@
 
 export namespace GoogleModule {
 
-    const fs = require('graceful-fs');
-    const _  = require('lodash');
+    // const fs = require('graceful-fs');
+   // const _: any = require('lodash');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
@@ -18,11 +18,11 @@ export namespace GoogleModule {
     const googleAuth: any = require('google-auth-library');
     const ga_analytics = require("ga-analytics");
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-    const Wrapper = share.Wrapper;
+    const Wrapper: any = share.Wrapper;
 
-    const plugins_config = share.plugins_config;
+    const plugins_config: any = share.plugins_config;
 
     export class Calendar {
 
@@ -50,11 +50,10 @@ export namespace GoogleModule {
 
         // new auth step1
         public authorize_url(scopes: string[]): string {
-            let authUrl: any = this.oauth2Client.generateAuthUrl({
+            return this.oauth2Client.generateAuthUrl({
                 access_type: 'offline',
                 scope: scopes
             });
-            return authUrl;
         }
 
         // new auth step2
@@ -85,14 +84,14 @@ export namespace GoogleModule {
                 if (!error) {
                     let events: any = response.items;
 
-                    for (var i = 0; i < events.length; i++) {
+                    for (let i = 0; i < events.length; i++) {
                         let event: any = events[i];
                         let start: any = event.start.dateTime || event.start.date;
                         result += start + "-" + event.summary;
                     }
                     callback(null, result);
                 } else {
-                    callback(error, null);
+                    callback(error, "");
                 }
 
             });
@@ -139,7 +138,7 @@ export namespace GoogleModule {
                 if (!error) {
                     callback(null, response.htmlLink);
                 } else {
-                    callback(error, null);
+                    callback(error, "");
                 }
 
             });
@@ -147,7 +146,6 @@ export namespace GoogleModule {
 
         // etc etc...
         public analytics(auth: any, callback: (error: any, result: string) => void): void {
-            let result = "";
             let analytics = google.analytics({auth: auth, version: "v3"});
 
             analytics.data.ga.get({
@@ -160,7 +158,7 @@ export namespace GoogleModule {
                 if (!error) {
                     callback(null, rows);
                 } else {
-                    callback(error, null);
+                    callback(error, "");
                 }
             });
         }
@@ -531,6 +529,7 @@ export namespace GoogleModule {
                 };
         */
     }
+
     /*
         export class FileTransfer {
 

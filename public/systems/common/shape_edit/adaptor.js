@@ -20,7 +20,7 @@ var Adaptor;
         //  var Q = require('q');
         var crypto = require('crypto');
     }
-    var SVGAdaptor = (function () {
+    var SVGAdaptor = /** @class */ (function () {
         function SVGAdaptor(width, height, embedded, webfonts) {
             this.tilesizew = 64;
             this.tilesizeh = 64;
@@ -316,7 +316,7 @@ var Adaptor;
         return SVGAdaptor;
     }());
     Adaptor.SVGAdaptor = SVGAdaptor;
-    var PDFAdaptor = (function () {
+    var PDFAdaptor = /** @class */ (function () {
         function PDFAdaptor(work_path, paper) {
             this.doc = null;
             this.serif = "";

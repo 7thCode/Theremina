@@ -338,7 +338,6 @@ namespace Adaptor {
             }).catch((error) => {
                 callback(error);
             });
-
         }
 
         public Canvas(canvas: any, callback: (error: any) => void): void {
@@ -652,7 +651,6 @@ namespace Adaptor {
             }).catch((error) => {
                 callback(error);
             });
-
         }
 
         public Canvas(canvas: any, callback: (error: any) => void): void {

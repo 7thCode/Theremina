@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace MaintenancePageRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const share = require(process.cwd() + '/server/systems/common/share');
 
@@ -17,7 +19,7 @@ export namespace MaintenancePageRouter {
     const services_config = share.services_config;
     const webfonts:any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message:any = config.message;
 
     router.get("/", [(request: any, response: any): void => {
         response.render("utility/maintenance/index", {user: null, message: message, status: 503, fonts:webfonts});

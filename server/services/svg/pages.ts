@@ -6,22 +6,24 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace SVGPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const auth: any = core.auth;
     const exception: any = core.exception;
     const analysis: any = core.analysis;
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message: any = config.message;
 
     //SVG
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {

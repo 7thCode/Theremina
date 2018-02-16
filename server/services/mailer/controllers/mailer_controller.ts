@@ -8,10 +8,7 @@
 
 export namespace MailerModule {
 
-    const _ = require('lodash');
-    const fs: any = require('graceful-fs');
-
-    const path: any = require('path');
+    const _: any = require('lodash');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -47,7 +44,7 @@ export namespace MailerModule {
             const thanks_title: string = applications_config.mail.thanks_title;
             const done_message: string = applications_config.mail.done_message;
 
-            let referer = request.headers.referer;
+            let referer: string = request.headers.referer;
             if (referer) {
                 let mailer: any = null;
                 let bcc: string | any[] | null = null;
@@ -68,22 +65,22 @@ export namespace MailerModule {
                         break;
                     default:
                 }
-                let referer_url = url.parse(referer);
-                let path = referer_url.pathname;
-                let separated_path = path.split("/");
+                let referer_url: any = url.parse(referer);
+                let path: string = referer_url.pathname;
+                //          let separated_path = path.split("/");
 
-                let userid = request.body.content.userid;
-                let namespace = request.body.content.namespace;
+                let userid: string = request.body.content.userid;
+                let namespace: string = request.body.content.namespace;
 
                 if (userid) {
                     if (request.body.content) {
                         if (request.body.content.thanks) {
                             if (request.body.content.report) {
-                                let thanks_to = request.body.content.thanks;
-                                let report_to = request.body.content.report;
+                                let thanks_to:string = request.body.content.thanks;
+                                let report_to:string = request.body.content.report;
                                 ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
                                     if (record) {
-                                        let datasource = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});
+                                        let datasource:any = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                             create: "",
                                             modify: "",
@@ -94,7 +91,7 @@ export namespace MailerModule {
                                                     if (!error) {
                                                         ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
                                                             if (record) {
-                                                                let datasource = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, namespace, null, true, {});
+                                                                let datasource:any = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, namespace, null, true, {});
                                                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
                                                                     create: "",
                                                                     modify: "",

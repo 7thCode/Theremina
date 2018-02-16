@@ -6,20 +6,19 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace AuthPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require('../common/share');
-    const config = share.config;
+    const share: any = require('../common/share');
+    const config: any = share.config;
 
-    const applications_config = share.applications_config;
+    const applications_config: any = share.applications_config;
 
-    let message = config.message;
-
-   // const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    //const auth: any = new AuthController.Auth;
+    const message: any = config.message;
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception;

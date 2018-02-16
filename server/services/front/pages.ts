@@ -6,23 +6,25 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace PageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const auth: any = core.auth;
     const config: any = share.config;
     const analysis: any = core.analysis;
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message: any = config.message;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
@@ -40,8 +42,7 @@ export namespace PageRouter {
     }]);
 
     router.get("/sitemap.xml", [(request: any, response: any): void => {
-
-        let result = "";
+        let result: string = "";
 
         function MakeSitemap() {
             return new Promise((resolve, reject): void => {
@@ -51,8 +52,8 @@ export namespace PageRouter {
                             ArticleModel.find({$and: [{type: 0}, {userid: account.userid}]}).then((docs: any): void => {
                                 _.forEach(pages, (page: any): void => {
                                     _.forEach(docs, (doc: any): void => {
-                                        let url = config.protocol + "://" + config.domain + "/" + account.userid + "/doc/" + page.name + "/" + doc.name;
-                                        let priority = "1.0";
+                                        let url:string = config.protocol + "://" + config.domain + "/" + account.userid + "/doc/" + page.name + "/" + doc.name;
+                                        let priority:string = "1.0";
                                         result += '<url><loc>' + url + '</loc><priority>' + priority + '</priority></url>';
                                     });
                                 });
@@ -69,7 +70,7 @@ export namespace PageRouter {
         }
 
         MakeSitemap().then((value: any): void => {
-            let r = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+            let r: string = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
                 result
                 + '</urlset>';
             response.setHeader('Content-Type', 'text/xml');
@@ -81,7 +82,7 @@ export namespace PageRouter {
     }]);
 
     router.get("/robots.txt", [(request: any, response: any): void => {
-        let robots = "User-agent: *\n\nSitemap: http://" + config.domain + "/sitemap.xml";
+        let robots: string = "User-agent: *\n\nSitemap: http://" + config.domain + "/sitemap.xml";
         response.setHeader('Content-Type', 'text/plain');
         response.send(robots);
     }]);

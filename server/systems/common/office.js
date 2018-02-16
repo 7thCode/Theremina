@@ -7,7 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var OfficeModule;
 (function (OfficeModule) {
-    var Excel = (function () {
+    var Excel = /** @class */ (function () {
         function Excel() {
         }
         Excel.prototype.ObjectToRow = function (object) {

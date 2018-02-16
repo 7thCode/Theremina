@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace AuthApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
     const passport: any = require("passport");
 
@@ -22,16 +24,16 @@ export namespace AuthApiRouter {
     const exception: any = new ExceptionController.Exception();
 
     router.post("/local/register", [exception.exception, exception.guard, auth.is_enabled_regist_user, auth.post_local_register]);
-    router.get("/register/:token", auth.get_register_token);
+    router.get("/register/:token", [auth.get_register_token]);
 
     router.post("/local/member", [exception.exception, exception.guard, exception.authenticate, auth.is_enabled_regist_member, auth.post_member_register]);
-    router.get("/member/:token", auth.get_member_token);
+    router.get("/member/:token", [auth.get_member_token]);
 
     router.post("/local/username", [exception.exception, exception.guard, exception.authenticate, auth.post_local_username]);
-    router.get("/username/:token", auth.get_username_token);
+    router.get("/username/:token", [auth.get_username_token]);
 
     router.post("/local/password", [exception.exception, exception.guard, auth.post_local_password]);
-    router.get("/password/:token", auth.get_password_token);
+    router.get("/password/:token", [auth.get_password_token]);
 
     router.post("/local/login", [exception.exception, exception.guard, auth.post_local_login]);
     router.post("/logout", [exception.exception, exception.guard, exception.authenticate, auth.logout]);

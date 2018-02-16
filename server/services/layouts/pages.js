@@ -64,7 +64,7 @@ var LayoutsPageRouter;
             result.render('services/layouts/builder/dialogs/delete_confirm_dialog', { message: message });
         }]);
     LayoutsPageRouter.router.get("/render/:userid/:name", [exception.page_catch, function (request, response) {
-            LayoutsModule.Layout.get_svg(request, response, request.params.userid, request.params.name, 2);
+            LayoutsModule.Layout.get_svg(request, response, 2);
         }]);
 })(LayoutsPageRouter = exports.LayoutsPageRouter || (exports.LayoutsPageRouter = {}));
 module.exports = LayoutsPageRouter.router;

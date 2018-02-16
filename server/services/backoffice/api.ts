@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace BackofficeApiRouter {
 
     const express: any = require('express');
-    export const router: any = express.Router();
+    export const router: IRouter = express.Router();
 
 }
 

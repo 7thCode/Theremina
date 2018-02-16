@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ArticleApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -21,7 +23,7 @@ export namespace ArticleApiRouter {
     const ArticleModule: any = require(share.Server("services/articles/controllers/article_controller"));
     const article: any = new ArticleModule.Article;
 
-    router.get("/json/:id", [ [article.get_article_json]]);
+    router.get("/json/:id", [article.get_article_json]);
 
     router.get("/json/query/:query/:option", [article.get_article_query_query_json]);
 
@@ -33,6 +35,8 @@ export namespace ArticleApiRouter {
     router.post("/api/createmany", [exception.exception, exception.guard, exception.authenticate, article.create_article_many]);
 
     router.get('/api/query/:query', [article.get_article_query]);
+    router.get('/api/querynamespace/:namespace/:query', [article.get_article_query_with_namespace]);
+
     router.get('/api/query/:query/:option', [article.get_article_query_query]);
     router.get("/api/count/:query", [article.get_article_count]);
 

@@ -4,14 +4,14 @@
  //opensource.org/licenses/mit-license.php
  */
 
+
 "use strict";
 
 export namespace FileUtility {
 
     const fs: any = require('graceful-fs');
-
-  //  const share = require('./share');
-    //const config = share.config;
+    const exec: any = require('child_process').exec;
+    const path: any = require('path');
 
     export class Utility {
         private current: string = '';
@@ -58,18 +58,6 @@ export namespace FileUtility {
             });
         }
 
-        public delete_folder_recursive(path): void {
-            fs.readdirSync(path).forEach(function (file, index) {
-                let curPath = path + "/" + file;
-                if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                    this.delete_folder_recursive(curPath);
-                } else {
-                    fs.unlinkSync(curPath);
-                }
-            });
-            fs.rmdirSync(path);
-        }
-
         public writefileSync(filename: string, data: string): boolean {
             let result: boolean = false;
             let fd = fs.openSync(filename, 'w');
@@ -89,7 +77,7 @@ export namespace FileUtility {
             fs.open(filename, 'w', (error: any, fd: any): void => {
                 if (!error) {
                     try {
-                        fs.writefile(fd, data, (error: any): void => {
+                        fs.writeFile(fd, data, (error: any): void => {
                             if (!error) {
                                 callback(null);
                             } else {
@@ -105,6 +93,73 @@ export namespace FileUtility {
                 }
             });
         }
+
+        static rm(tmp_path: string, callback: (error) => void): void {
+            exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
+                callback(error);
+            });
+        };
+
+        public unlink(path: string, callback: (error) => void): void {
+            fs.unlink(path, (error) => {
+                callback(error);
+            });
+        }
+
+        public make_dir(path: string, callback: () => void, error: (_error) => void): void {
+            fs.mkdir(path, (_error): void => {
+                if (!_error) {
+                    callback();
+                } else {
+                    if (_error.code == "EEXIST") {
+                        callback();
+                    } else {
+                        error(_error);
+                    }
+                }
+            });
+        };
+
+        public delete_folder_recursive(path): void {
+
+            exec('rm -r ' + path, (error, stdout, stderr) => {
+
+            });
+            /*
+            fs.readdirSync(path).forEach(function (file, index) {
+                let curPath = path + "/" + file;
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    this.delete_folder_recursive(curPath);
+                } else {
+                    fs.unlinkSync(curPath);
+                }
+            });
+            fs.rmdirSync(path);
+            */
+        }
+
+        public create_dir(root: string, pathes: string[], callback: (path: string) => void, error_handler: (error: any) => void): void {
+            let current_path = root;
+            let sequentialExec = (arr: any[]): any => {
+                return arr.reduce((prev, current, index, array) => {
+                    return prev.then((prevResult) => {
+                        return new Promise((resolve, reject) => {
+                            current_path = path.join(current_path, current);
+                            this.make_dir(current_path, () => {
+                                resolve(current);
+                            }, error_handler);
+                        });
+                    });
+                }, Promise.resolve());
+            };
+
+            sequentialExec(pathes).then(function (lastResult) {
+                callback(current_path);
+            }).catch((e) => {
+                error_handler(e);
+            });
+        }
+
     }
 }
 

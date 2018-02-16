@@ -232,7 +232,7 @@ namespace DataControllersModule {
 
             $scope.UplodArticles = (files: any): void => {
                 progress(true);
-                let promises = [];
+                let promises:any[] = [];
                 _.forEach(files, (local_file) => {
                     let deferred = $q.defer();
                     let fileReader: any = new FileReader();
@@ -254,7 +254,6 @@ namespace DataControllersModule {
                         });
                         progress(false);
                     });
-                }).finally(() => {
                 });
             };
 

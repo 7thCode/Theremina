@@ -16,7 +16,7 @@ var MailerModule;
     var AssetModel = require(share.Models("plugins/asset/asset"));
     var MailerModule = require('../../../systems/common/mailer');
     // const validator = require('validator');
-    var Mailer = (function () {
+    var Mailer = /** @class */ (function () {
         function Mailer() {
         }
         /**
@@ -94,9 +94,7 @@ var MailerModule;
          * @returns none
          */
         Mailer.prototype.get_mail_query_query = function (request, response) {
-            var userid = Mailer.userid(request);
-            //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
+            //          let userid = Mailer.userid(request);
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, 1400, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, {}, option, function (response, mails) {
@@ -112,7 +110,6 @@ var MailerModule;
          * @returns none
          */
         Mailer.prototype.get_mail_count = function (request, response) {
-            //           let query: any = JSON.parse(decodeURIComponent(request.params.query));
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, 2800, AssetModel, { $and: [{ userid: config.systems.userid }, query] }, function (response, count) {
                 Wrapper.SendSuccess(response, count);

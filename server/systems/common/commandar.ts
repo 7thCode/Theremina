@@ -8,14 +8,14 @@
 
 export namespace Commandar {
 
-    let execSync = require('child_process').execSync;
+    const execSync: any = require('child_process').execSync;
 
     export class Linux {
 
-        private backupdir:string;
+        private backupdir: string;
 
         constructor() {
-            this.backupdir =  process.cwd() + "/backup";
+            this.backupdir = process.cwd() + "/backup";
         }
 
         public Backup(config): string {

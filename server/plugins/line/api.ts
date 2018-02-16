@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace LineApiRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const line = require('@line/bot-sdk');
 

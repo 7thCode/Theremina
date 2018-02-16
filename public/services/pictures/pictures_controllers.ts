@@ -219,7 +219,6 @@ namespace PicturesControllersModule {
                     });
                     progress(false);
                     Draw();
-                }).finally(() => {
                 });
             };
 
@@ -638,7 +637,6 @@ namespace PicturesControllersModule {
                     });
                     progress(false);
                     Draw();
-                }).finally(() => {
                 });
             };
 

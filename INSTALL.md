@@ -102,7 +102,6 @@
     auth = true
     
      > sudo service mongod restart
-    
 
 ####起動スクリプト
 
@@ -151,8 +150,8 @@
 #####localでmongoをcsvで落とす方法（例）
     mongoexport --host=127.0.0.1  --db test2 --collection businesscards --out businesscard.csv  --type=csv --fields=Template,UpdateDate
 
-
-
+#####メモリー使用量
+    /proc/**PID**/status　の　VmRSS
 
 ##pm2インストール
     see http://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/

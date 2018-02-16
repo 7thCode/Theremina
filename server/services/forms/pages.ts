@@ -8,24 +8,24 @@
 
 export namespace FormPageRouter {
 
-    const express = require('express');
-    export let router = express.Router();
+    const express:any = require('express');
+    export const router = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core:any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
     const config: any = share.config;
-    const services_config = share.services_config;
+    const services_config:any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message:any = config.message;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     export const auth: any = new AuthController.Auth();
 
-    const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    const analysis: any = new AnalysisModule.Analysis;
+  //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+  //  const analysis: any = new AnalysisModule.Analysis;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("services/forms/player/index", {

@@ -33,7 +33,7 @@ var GroupModule;
             });
         }
     });
-    var Group = (function () {
+    var Group = /** @class */ (function () {
         function Group() {
         }
         /**
@@ -186,7 +186,6 @@ var GroupModule;
          */
         Group.prototype.get_group = function (request, response) {
             var number = 1400;
-            //let userid = Group.userid(request);
             var id = request.params.id;
             Wrapper.FindOne(response, number, GroupModel, { _id: id }, function (response, group) {
                 if (group) {
@@ -204,9 +203,6 @@ var GroupModule;
          */
         Group.prototype.get_group_query_query = function (request, response) {
             var userid = Group.userid(request);
-            //let self: any = request.user;
-            //      let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //      let option: any = JSON.parse(decodeURIComponent(request.params.option));
             var namespace = "";
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
@@ -222,7 +218,6 @@ var GroupModule;
         Group.prototype.get_group_count = function (request, response) {
             var userid = Group.userid(request);
             var namespace = "";
-            //  let query: any = JSON.parse(decodeURIComponent(request.params.query));
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, 2800, GroupModel, { $and: [{ namespace: namespace }, { userid: userid }, query] }, function (response, count) {
                 Wrapper.SendSuccess(response, count);

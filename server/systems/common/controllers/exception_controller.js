@@ -9,7 +9,7 @@ var ExceptionModule;
 (function (ExceptionModule) {
     var share = require(process.cwd() + '/server/systems/common/share');
     var Wrapper = share.Wrapper;
-    var Exception = (function () {
+    var Exception = /** @class */ (function () {
         function Exception() {
         }
         Exception.prototype.exception = function (request, response, next) {

@@ -3809,7 +3809,7 @@ namespace ShapeEdit {
                                                         context.restore();
                                                     }
 
-                                                    let current = null;
+                                                    let current:any = null;
                                                     if (this.modifier === Key.shift) { //制限回転
                                                         current = BaseShape.Degree(shape.center, new ShapeEdit.Location(e.offsetX, e.offsetY));
                                                     } else {

@@ -6,15 +6,17 @@
 
 "use strict";
 
+
+
+
 export namespace AccountModule {
 
-    const _ = require('lodash');
-
+    const _: any = require('lodash');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const Wrapper = share.Wrapper;
+    const share: any = require(process.cwd() + '/server/systems/common/share');
+    const Wrapper: any = share.Wrapper;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
@@ -57,14 +59,9 @@ export namespace AccountModule {
          * @returns none
          */
         public get_account_query_query(request: any, response: any): void {
-            let self: any = request.user;
-
-            //     let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //     let option: any = JSON.parse(decodeURIComponent(request.params.option));
-
+            //      let self: any = request.user;
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-
             Wrapper.Find(response, 5000, LocalAccount, query, {}, option, (response: any, accounts: any): any => {
                 Wrapper.SendSuccess(response, accounts);
             });
@@ -78,9 +75,7 @@ export namespace AccountModule {
          * @returns none
          */
         public get_account_count(request: any, response: any): void {
-            //       let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let query: any = Wrapper.Decode(request.params.query);
-
             Wrapper.Count(response, 2800, LocalAccount, query, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
@@ -93,9 +88,9 @@ export namespace AccountModule {
          * @returns none
          */
         public delete_own(request: any, response: any): void {
-            let userid = Accounts.userid(request);
-            let namespace = "";
-            Wrapper.FindOne(response, 5100, LocalAccount, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any, page: any): void => {
+            let userid: string = Accounts.userid(request);
+            let namespace: string = "";
+            Wrapper.FindOne(response, 5100, LocalAccount, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
                     Wrapper.Remove(response, 5100, page, (response: any): void => {
                         Wrapper.SendSuccess(response, {});

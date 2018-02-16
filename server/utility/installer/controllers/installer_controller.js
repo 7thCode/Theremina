@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var InstallerModule;
 (function (InstallerModule) {
     var fs = require('graceful-fs');
-    var Installer = (function () {
+    var Installer = /** @class */ (function () {
         function Installer() {
         }
         Installer.prototype.read = function (request, response) {

@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var EventModule;
 (function (EventModule) {
     var Emitter = require('events');
-    var Event = (function () {
+    var Event = /** @class */ (function () {
         function Event() {
             this.emitter = null;
             this.emitter = new Emitter();

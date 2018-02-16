@@ -19,8 +19,10 @@ var SettingPageRouter;
     var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
     var exception = new ExceptionController.Exception();
     SettingPageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
-            response.render("systems/setting/index", { config: config, user: request.user,
-                role: auth.role(request.user), message: message, status: 200, fonts: webfonts });
+            response.render("systems/setting/index", {
+                config: config, user: request.user,
+                role: auth.role(request.user), message: message, status: 200, fonts: webfonts
+            });
         }]);
     SettingPageRouter.router.get('/dialogs/backup_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('systems/setting/dialogs/backup_confirm_dialog', { message: message });

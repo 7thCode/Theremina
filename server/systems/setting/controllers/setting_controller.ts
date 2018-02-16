@@ -8,11 +8,7 @@
 
 export namespace SettingModule {
 
-    //const fs: any = require('graceful-fs');
-    //const _ = require('lodash');
-
-    const share = require(process.cwd() + '/server/systems/common/share');
- //   const logger: any = share.logger;
+    const share: any = require(process.cwd() + '/server/systems/common/share');
     const Persistent: any = share.Persistent;
     const Wrapper: any = share.Wrapper;
     const config: any = share.config;
@@ -29,9 +25,9 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public backup(request: any, response: any): void {
+        public backup(request: any, response: Express.Response): void {
             if (config.db) {
-                let result = share.Command.Backup(config.db);
+                let result: any = share.Command.Backup(config.db);
                 Wrapper.SendSuccess(response, result);
             } else {
                 Wrapper.SendError(response, 2, "not found", {});
@@ -44,13 +40,13 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public restore(request: any, response: any): void {
+        public restore(request: any, response: Express.Response): void {
             if (request.body.password) {
                 if (request.body.password == config.db.password) {
                     if (config.db) {
                         let result = share.Command.Restore(config.db);
                         Wrapper.SendSuccess(response, result);
-                    }else {
+                    } else {
                         Wrapper.SendError(response, 2, "not found", {});
                     }
                 }
@@ -63,10 +59,10 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public read_application(request: any, response: any): void {
+        public read_application(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
-                let string = file_utility.readfileSync(share.Config("applications/config.json"));
+                let string: any = file_utility.readfileSync(share.Config("applications/config.json"));
                 let setting: any = JSON.parse(string);
                 Wrapper.SendSuccess(response, setting);
             });
@@ -78,7 +74,7 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public write_application(request: any, response: any): void {
+        public write_application(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
                 let data: string = JSON.stringify(request.body.setting, null, 1);
@@ -94,10 +90,10 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public read_plugins(request: any, response: any): void {
+        public read_plugins(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
-                let string = file_utility.readfileSync(share.Config("plugins/config.json"));
+                let string: any = file_utility.readfileSync(share.Config("plugins/config.json"));
                 let setting: any = JSON.parse(string);
                 Wrapper.SendSuccess(response, setting);
             });
@@ -109,7 +105,7 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public write_plugins(request: any, response: any): void {
+        public write_plugins(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
                 let data: string = JSON.stringify(request.body.setting, null, 1);
@@ -125,10 +121,10 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public read_services(request: any, response: any): void {
+        public read_services(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
-                let string = file_utility.readfileSync(share.Config("services/config.json"));
+                let string: any = file_utility.readfileSync(share.Config("services/config.json"));
                 let setting: any = JSON.parse(string);
                 Wrapper.SendSuccess(response, setting);
             });
@@ -140,7 +136,7 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public write_services(request: any, response: any): void {
+        public write_services(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
                 let data: string = JSON.stringify(request.body.setting, null, 1);
@@ -156,10 +152,10 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public read_system(request: any, response: any): void {
+        public read_system(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
-                let string = file_utility.readfileSync(share.Config("systems/config.json"));
+                let string: any = file_utility.readfileSync(share.Config("systems/config.json"));
                 let setting: any = JSON.parse(string);
                 Wrapper.SendSuccess(response, setting);
             });
@@ -171,7 +167,7 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public write_system(request: any, response: any): void {
+        public write_system(request: any, response: Express.Response): void {
             let self: any = request.user;
             Wrapper.If(response, 1000, (self.type == "System"), (response: any): void => {
                 let data: string = JSON.stringify(request.body.setting, null, 1);
@@ -187,8 +183,8 @@ export namespace SettingModule {
          * @param response
          * @returns none
          */
-        public read_modules(request: any, response: any): void {
-            let string = file_utility.readfileSync(share.Config("systems/config.json"));
+        public read_modules(request: any, response: Express.Response): void {
+            let string: any = file_utility.readfileSync(share.Config("systems/config.json"));
             let setting: any = JSON.parse(string);
             Wrapper.If(response, 1000, setting.modules, (response: any): void => {
                 Wrapper.SendSuccess(response, setting.modules);
