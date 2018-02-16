@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace PageRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const _ = require('lodash');
     const minify = require('html-minifier').minify;
@@ -17,6 +19,7 @@ export namespace PageRouter {
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
+    const logger: any = share.logger;
     const auth: any = core.auth;
     const exception: any = core.exception;
     const analysis: any = core.analysis;
@@ -35,7 +38,7 @@ export namespace PageRouter {
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
     const layout: any = new LayoutsModule.Layout;
 
-    let message = config.message;
+    const message: any = config.message;
 
     let render_html = (request: any, response: any): void => {
         resources.render_html(request, (error: { code: number, message: string }, result: any): void => {
@@ -64,8 +67,8 @@ export namespace PageRouter {
         });
     };
 
-    let render_static = (request: any, response: any): void => {
-        resources.render_direct(request, (error: { code: number, message: string }, result: any): void => {
+    let render_static = (request: any, sub_path: string[], response: any): void => {
+        resources.render_direct(request, sub_path, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
                 response.write(result.content);
@@ -74,6 +77,52 @@ export namespace PageRouter {
                 Error(error, request, response);
             }
         });
+    };
+
+    let default_user_id = () => {
+        return applications_config.first_responder["default"].userid;
+    };
+
+    let default_namespace = () => {
+        return applications_config.first_responder["default"].namespace;
+    };
+
+    let default_page = () => {
+        return applications_config.first_responder["default"].page;
+    };
+
+    let default_query = () => {
+        return applications_config.first_responder["default"].query;
+    };
+
+    let default_user_id_by = (namespace: string) => {
+        let userid = default_user_id();
+        try {
+            userid = applications_config.first_responder[namespace].userid;
+        } catch (e) {
+
+        }
+        return userid;
+    };
+
+    let default_page_by = (namespace: string) => {
+        let page = default_page();
+        try {
+            page = applications_config.first_responder[namespace].page;
+        } catch (e) {
+
+        }
+        return page;
+    };
+
+    let default_query_by = (namespace: string) => {
+        let query = default_query();
+        try {
+            query = applications_config.first_responder[namespace].query;
+        } catch (e) {
+
+        }
+        return query;
     };
 
     let Error = (error: { code: number, message: string }, request: any, response: any) => {
@@ -100,6 +149,7 @@ export namespace PageRouter {
                 });
                 break;
             default:
+                logger.error(error.message);
                 response.status(500).render('error', {
                     status: 500,
                     message: error.message,
@@ -109,15 +159,9 @@ export namespace PageRouter {
     };
 
     router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = applications_config.first_responder["default"].page;
-        let query = applications_config.first_responder["default"].query;
-
         resources.render_html({
-            params: {userid: userid, page: page, namespace: namespace},
-            query: query
+            params: {userid: default_user_id(), page: default_page(), namespace: default_namespace()},
+            query: default_query()
         }, (error: { code: number, message: string }, result: any) => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -185,7 +229,6 @@ export namespace PageRouter {
 
     router.get("/shortcut/:name", [exception.page_catch, (request: any, response: any): void => {
         let urls = applications_config.redirect;
-
         let url = urls[request.params.name];
         if (url) {
             response.redirect(302, urls[request.params.name]);
@@ -193,75 +236,21 @@ export namespace PageRouter {
     }]);
 
     router.get("/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = request.params.page;
-        let query = request.query;
-
-        resources.render_direct({
-            params: {userid: userid, page: page, namespace: namespace},
-            query: query
-        }, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
+        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/js/" + request.params.page);
     }]);
 
     router.get("/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = request.params.page;
-        let query = request.query;
-
-        resources.render_direct({
-            params: {userid: userid, page: page, namespace: namespace},
-            query: query
-        }, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
+        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/css/" + request.params.page);
     }]);
 
     router.get("/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = request.params.page;
-        let query = request.query;
-
-        resources.render_direct({
-            params: {userid: userid, page: page, namespace: namespace},
-            query: query
-        }, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
+        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/static/" + request.params.page);
     }]);
 
     router.get("/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = request.params.page;
-        let query = request.query;
-
         resources.render_fragment({
-            params: {userid: userid, page: page, namespace: namespace},
-            query: query
+            params: {userid: default_user_id(), page: request.params.page, namespace: default_namespace()},
+            query: request.query
         }, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -274,18 +263,13 @@ export namespace PageRouter {
     }]);
 
     router.get("/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let page = request.params.page;
-
         let query = request.query;
         if (!Object.keys(query).length) {
-            query = applications_config.first_responder["default"].query;
+            query = default_query();
         }
 
         resources.render_html({
-            params: {userid: userid, page: page, namespace: namespace},
+            params: {userid: default_user_id(), page: request.params.page, namespace: default_namespace()},
             query: query
         }, (error: { code: number, message: string }, result: any) => {
             if (!error) {
@@ -312,113 +296,64 @@ export namespace PageRouter {
             }
         });
     }]);
-
+    /**
+     * public
+     */
     router.get("/img/:name", [exception.page_catch, (request: any, response: any): void => {
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let name = request.params.name;
-        let query = request.query;
+        /*       pictures.get_picture({
+                   params: {userid: default_user_id(), name: request.params.name, namespace: default_namespace()},
+                   query:  request.query
+               }, response);
+       */
+        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/img/" + request.params.name);
 
-        pictures.get_picture({
-            params: {userid: userid, name: name, namespace: namespace},
-            query: query
-        }, response);
     }]);
-
+    /**
+     * public
+     */
     router.get("/svg/:name", [exception.page_catch, (request: any, response: any): void => {
-        let userid = applications_config.first_responder["default"].userid;
-        let namespace = applications_config.first_responder["default"].namespace;
-        let name = request.params.name;
-        let query = request.query;
-
-        layout.get_layout_svg({
-            params: {userid: userid, name: name, namespace: namespace},
-            query: query
-        }, response);
+        /*     layout.get_layout_svg({
+                 params: {userid: default_user_id(), name: request.params.name, namespace: default_namespace()},
+                 query: request.query
+             }, response);
+     */
+        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/svg/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-        render_static(request, response);
+        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/js/" + request.params.page);
     }]);
 
     router.get("/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-        render_static(request, response);
+        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/css/" + request.params.page);
     }]);
 
     router.get("/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-        render_static(request, response);
+        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/static/" + request.params.page);
     }]);
 
     router.get("/:namespace/doc/img/:name", [(request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-
-        pictures.get_picture(request, response);
+        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/img/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/svg/:name", [exception.page_catch, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-
-        layout.get_layout_svg(request, response);
+        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/svg/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-
         let namespace = request.params.namespace;
-
-        let userid = applications_config.first_responder["default"].userid;
-        try {
-            userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-
         let query = request.query;
         if (!Object.keys(query).length) {
-            query = applications_config.first_responder["default"].query;
-            try {
-                query = applications_config.first_responder[namespace].query;
-            } catch (e) {
-
-            }
+            query = default_query_by(namespace);
         }
 
-        let page = request.params.page;
-
         resources.render_html({
-            params: {userid: userid, page: page, namespace: namespace},
+            params: {userid: default_user_id_by(namespace), page: request.params.page, namespace: namespace},
             query: query
         }, (error: { code: number, message: string }, result: any) => {
             if (!error) {
@@ -448,12 +383,8 @@ export namespace PageRouter {
 
     router.get("/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-        request.params.userid = applications_config.first_responder["default"].userid;
-        try {
-            request.params.userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
 
-        }
+        request.params.userid = default_user_id_by(namespace);
 
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
@@ -466,36 +397,15 @@ export namespace PageRouter {
         });
     }]);
 
-
     router.get("/:namespace/doc", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-
         let namespace = request.params.namespace;
-        let userid = applications_config.first_responder["default"].userid;
-        try {
-            userid = applications_config.first_responder[namespace].userid;
-        } catch (e) {
-
-        }
-
-        let page = applications_config.first_responder["default"].page;
-        try {
-            page = applications_config.first_responder[namespace].page;
-        } catch (e) {
-
-        }
-
         let query = request.query;
         if (!Object.keys(query).length) {
-            query = applications_config.first_responder["default"].query;
-            try {
-                query = applications_config.first_responder[namespace].query;
-            } catch (e) {
-
-            }
+            query = default_query_by(namespace);
         }
 
         resources.render_html({
-            params: {userid: userid, page: page, namespace: namespace},
+            params: {userid: default_user_id_by(namespace), page: default_page_by(namespace), namespace: namespace},
             query: query
         }, (error: { code: number, message: string }, result: any) => {
             if (!error) {
@@ -524,18 +434,20 @@ export namespace PageRouter {
     }]);
 
     router.get("/:userid/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        render_static(request, response);
+        render_static(request, ["doc", "js"], response);
     }]);
 
     router.get("/:userid/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        render_static(request, response);
+        render_static(request, ["doc", "css"], response);
     }]);
 
     router.get("/:userid/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        render_static(request, response);
+        render_static(request, ["static"], response);
     }]);
 
-    router.get('/:userid/:namespace/doc/img/:name', pictures.get_picture);
+    router.get('/:userid/:namespace/doc/img/:name', [exception.page_catch, pictures.get_picture]);
+
+    router.get("/:userid/:namespace/doc/svg/:name", [exception.page_catch, layout.get_layout_svg]);
 
     router.get("/:userid/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         render_html(request, response);
@@ -553,25 +465,22 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/:userid/:namespace/svg/:name", [exception.page_catch, (request: any, response: any): void => {
-        layout.get_layout_svg(request, response);
-    }]);
-
-    router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-        let items = [];
-        if (applications_config.sites) {
-            let keys = Object.keys(applications_config.sites);
-            keys.forEach((key: string): void => {
-                items.push(applications_config.sites[key].description);
-            });
-        }
-        result.render('applications/front/dialogs/build_site_dialog',
-            {
-                message: message,
-                items: items
-            });
-    }]);
-
+    /*
+        router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
+            let items = [];
+            if (applications_config.sites) {
+                let keys = Object.keys(applications_config.sites);
+                keys.forEach((key: string): void => {
+                    items.push(applications_config.sites[key].description);
+                });
+            }
+            result.render('applications/front/dialogs/build_site_dialog',
+                {
+                    message: message,
+                    items: items
+                });
+        }]);
+    */
 }
 
 module.exports = PageRouter.router;

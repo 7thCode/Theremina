@@ -6,22 +6,21 @@
 
 "use strict";
 
-//import {Beacon} from "../../../plugins/beacon/controllers/beacon_controller";
-
 export namespace FrontModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
     const fs: any = require('graceful-fs');
 
     const path: any = require('path');
 
     const mongodb: any = require('mongodb');
+    const MongoClient: any = require('mongodb').MongoClient;
+
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const MongoClient = require('mongodb').MongoClient;
-
     const archiver: any = require('archiver');
+    const exec:any = require('child_process').exec;
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -34,8 +33,8 @@ export namespace FrontModule {
 
     export class Front {
 
-        static connect(callback: (error, db) => void): any {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        static connect(): any {
+            return MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
         }
 
         static userid(request): string {
@@ -52,9 +51,9 @@ export namespace FrontModule {
          * @returns none
          */
         static get_file_all(userid: string, tmp_path: string, callback: (error) => void): void {
-            let number: number = 27000;
-            Front.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 27000;
+                Front.connect().then((db) => {
                     let bucket = new mongodb.GridFSBucket(db, {});
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
@@ -96,10 +95,12 @@ export namespace FrontModule {
                             callback({code: error.code, message: error.message});
                         }
                     });
-                } else {
+                }).catch((error) => {
                     callback({code: error.code, message: error.message});
-                }
-            });
+                });
+            } catch (e) {
+                callback({code: e.code, message: e.message});
+            }
         }
 
         /**
@@ -176,7 +177,14 @@ export namespace FrontModule {
          * @param response
          * @returns none
          */
-        public get_all(request: any, response: any): void {
+        public get_all(request: any, response: Express.Response): void {
+
+            let rm = (tmp_path: string, callback: (error) => void): void => {
+                exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
+                    callback(error);
+                });
+            };
+
             let userid = Front.userid(request);
             let tmp_path = path.join("/tmp", request.sessionID);
             fs.mkdir(tmp_path, (error): void => {
@@ -193,10 +201,11 @@ export namespace FrontModule {
                                                         if (!error) {
                                                             response.download(path.join(tmp_path, "data.zip"), (error: any): void => {
                                                                 if (!error) {
-                                                                    let exec = require('child_process').exec;
-                                                                    exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
+                                                                    rm(tmp_path, (error) => {});
+                                                             //       let exec = require('child_process').exec;
+                                                             //       exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
                                                                         //        Wrapper.SendSuccess(response, {code: 0, message: ""});
-                                                                    });
+                                                             //       });
                                                                 } else {
                                                                     Wrapper.SendError(response, error.code, error.message, error);
                                                                 }

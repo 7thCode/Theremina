@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ApiRouter {
 
     const express: any = require("express");
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const core = require(process.cwd() + "/gs");
     const share: any = core.share;
@@ -21,10 +23,10 @@ export namespace ApiRouter {
     const FrontModule: any = require(share.Server("applications/front/controllers/front_controller"));
     const front: any = new FrontModule.Front;
 
-    router.put('/api/upload/:name', [exception.exception, exception.authenticate, front.put_all]);
-    router.get('/api/download', [exception.exception, exception.authenticate, front.get_all]);
+    router.put('/api/upload/:name', [exception.exception, exception.guard, exception.authenticate, front.put_all]);
+    router.get('/api/download', [exception.exception, exception.guard, exception.authenticate, front.get_all]);
 
-    router.post('/api/buildsite/:name/:namespace', [exception.exception, exception.authenticate, front.build]);
+    router.post('/api/buildsite/:name/:namespace', [exception.exception, exception.guard, exception.authenticate, front.build]);
 
     event.emitter.on('register', (param: any): void => {
         //   pages.create_init_user_resources(param.user);
