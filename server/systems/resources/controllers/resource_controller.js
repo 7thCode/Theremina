@@ -5,12 +5,15 @@
  */
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+//import {Pages} from "../../../services/pages/controllers/pages_controller";
+//import {Files} from "../../files/controllers/file_controller";
 var ResourcesModule;
 (function (ResourcesModule) {
-    var fs = require('graceful-fs');
     var _ = require('lodash');
+    var fs = require('graceful-fs');
     var share = require('../../common/share');
     var config = share.config;
+    var event = share.Event;
     var applications_config = share.applications_config;
     var Wrapper = share.Wrapper;
     var ScannerBehaviorModule = require(share.Server("systems/common/html_scanner/scanner_behavior"));
@@ -18,7 +21,7 @@ var ResourcesModule;
     var ResourceModel = require(share.Models("systems/resources/resource"));
     var ArticleModel = require(share.Models("services/articles/article"));
     var LocalAccount = require(share.Models("systems/accounts/account"));
-    var Resource = (function () {
+    var Resource = /** @class */ (function () {
         function Resource() {
         }
         Resource.userid = function (request) {
@@ -26,26 +29,13 @@ var ResourcesModule;
         };
         Resource.namespace = function (request) {
             var result = "";
-            if (request.user.data) {
-                result = request.user.data.namespace;
+            if (request.user) {
+                if (request.user.data) {
+                    result = request.user.data.namespace;
+                }
             }
             return result;
         };
-        /*
-        static namespace(name: string): string {
-            let result = "";
-            if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
-                    }
-                })
-            }
-            return result;
-        }*/
         Resource.localname = function (name) {
             var result = "";
             if (name) {
@@ -61,6 +51,14 @@ var ResourcesModule;
         Resource.make_query = function (userid, type, localname, namespace) {
             return { $and: [{ namespace: namespace }, { userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
         };
+        Resource.cache_write = function (path, content) {
+            event.emitter.emit("cache_write", { path: path, string: content });
+        };
+        ;
+        Resource.cache_invalidate = function (path) {
+            event.emitter.emit("cache_invalidate", { path: path });
+        };
+        ;
         /**
          * @param initresources
          * @returns none
@@ -286,7 +284,9 @@ var ResourcesModule;
                 if (page) {
                     page.content = request.body.content;
                     page.open = true;
+                    var name_1 = page.name;
                     Wrapper.Save(response, number, page, function (response) {
+                        Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -307,7 +307,9 @@ var ResourcesModule;
             var id = request.params.id;
             Wrapper.FindOne(response, number, ResourceModel, { $and: [{ _id: id }, { namespace: namespace }, { userid: userid }] }, function (response, page) {
                 if (page) {
+                    var name_2 = page.name;
                     Wrapper.Remove(response, number, page, function (response) {
+                        Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -431,20 +433,12 @@ var ResourcesModule;
     ResourcesModule.Resource = Resource;
     var mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    var Pages = (function () {
+    var Pages = /** @class */ (function () {
         function Pages() {
         }
-        Pages.connect = function (user) {
-            var result = null;
-            var options = { useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000 };
-            if (user) {
-                result = mongoose.createConnection("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
-            }
-            else {
-                result = mongoose.createConnection("mongodb://" + config.db.address + "/" + config.db.name, options);
-            }
-            return result;
-        };
+        //static connect(callback: (error, db) => void): any {
+        //     MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        // }
         Pages.userid = function (request) {
             return request.user.userid;
         };
@@ -483,6 +477,7 @@ var ResourcesModule;
                             };
                             HtmlScannerModule.Builder.Build(content, datasource, page_init, config, function (error, result) {
                                 if (!error) {
+                                    //              cache_write(request.url, result);
                                     callback(null, { content: result, type: doc.content.type });
                                 }
                                 else {
@@ -551,7 +546,7 @@ var ResourcesModule;
                 }
             });
         };
-        Pages.prototype.render_direct = function (request, callback) {
+        Pages.prototype.render_direct = function (request, sub_path, callback) {
             var userid = request.params.userid;
             var namespace = request.params.namespace;
             Pages.retrieve_account(userid, function (error, account) {
@@ -559,9 +554,17 @@ var ResourcesModule;
                     if (account) {
                         userid = account.userid;
                     }
-                    var page_name = request.params.page;
-                    ResourceModel.findOne({ $and: [{ name: page_name }, { namespace: namespace }, { userid: userid }, { type: 20 }] }).then(function (doc) {
+                    var page_name_3 = request.params.page;
+                    ResourceModel.findOne({ $and: [{ name: page_name_3 }, { namespace: namespace }, { userid: userid }, { type: 20 }] }).then(function (doc) {
                         if (doc) {
+                            var path_1 = [];
+                            path_1.push(userid);
+                            path_1.push(namespace);
+                            sub_path.forEach(function (path_name) {
+                                path_1.push(path_name);
+                            });
+                            path_1.push(page_name_3);
+                            Resource.cache_write(path_1, doc.content.resource);
                             callback(null, { content: doc.content.resource, type: doc.content.type });
                         }
                         else {

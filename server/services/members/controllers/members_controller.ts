@@ -8,25 +8,13 @@
 
 export namespace MembersModule {
 
-    const _ = require('lodash');
-    const fs: any = require('graceful-fs');
-
-    //const mongodb: any = require('mongodb');
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-   // const archiver: any = require('archiver');
-
-    const sharp = require("sharp");
-
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
-  //  const applications_config: any = share.applications_config;
     const Wrapper: any = share.Wrapper;
-
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
-
-    const validator: any = require('validator');
 
     export class Members {
 
@@ -40,9 +28,9 @@ export namespace MembersModule {
          * @returns none
          */
         public get_member(request: any, response: any): void {
-            let userid = Members.userid(request);
+            let userid: string = Members.userid(request);
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2: any = {$and: [query, {userid: userid}]};
 
             Wrapper.FindOne(response, 1000, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -59,9 +47,9 @@ export namespace MembersModule {
          * @returns none
          */
         public put_member(request: any, response: any): void {
-            let userid = Members.userid(request);
+            let userid: string = Members.userid(request);
             let query: any = {username: request.params.username};
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2: any = {$and: [query, {userid: userid}]};
 
             Wrapper.FindOne(response, 1100, LocalAccount, query2, (response: any, account: any): void => {
                 if (account) {
@@ -83,10 +71,10 @@ export namespace MembersModule {
          * @returns none
          */
         public get_member_query_query(request: any, response: any): void {
-            let userid = Members.userid(request);
+            let userid: string = Members.userid(request);
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let option: any = JSON.parse(decodeURIComponent(request.params.option));
-            let query2 = {$and: [query, {userid: userid}]};
+            let query2: any = {$and: [query, {userid: userid}]};
 
             Wrapper.Find(response, 5000, LocalAccount, query2, {}, option, (response: any, accounts: any): any => {
                 Wrapper.SendSuccess(response, accounts);
@@ -100,7 +88,7 @@ export namespace MembersModule {
          * @returns none
          */
         public get_member_count(request: any, response: any): void {
-            let userid = Members.userid(request);
+            let userid: string = Members.userid(request);
             let query: any = JSON.parse(decodeURIComponent(request.params.query));
 
             Wrapper.Count(response, 2800, LocalAccount, {$and: [query, {userid: userid}]}, (response: any, count: any): any => {
@@ -114,7 +102,7 @@ export namespace MembersModule {
          * @returns none
          */
         public delete_own(request: any, response: any): void {
-            let userid = Members.userid(request);
+            let userid: string = Members.userid(request);
             let query: any = {userid: userid};
 
             Wrapper.FindOne(response, 5100, LocalAccount, query, (response: any, page: any): void => {

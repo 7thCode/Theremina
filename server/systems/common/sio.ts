@@ -9,20 +9,20 @@
 export namespace Socket {
 
     // Socket.IO
-    const socketio = require('socket.io');
-    const _ = require("lodash");
+    const socketio: any = require('socket.io');
+    const _: any = require("lodash");
 
     export class IO {
 
-        public sio:any = null;
-        public socket:any = null;
-        public clients = [];
+        public sio: any = null;
+        public socket: any = null;
+        public clients:any[] = [];
 
-        constructor(server) {
+        constructor(server:any) {
             this.sio = socketio.listen(server);
         }
 
-        public wait(event):void {
+        public wait(event:any): void {
 
             this.sio.sockets.on('connection', (socket) => {
 
@@ -34,7 +34,7 @@ export namespace Socket {
 
                 socket.on('server', (data) => {
 
-                    event.emitter.emit('socket',data);
+                    event.emitter.emit('socket', data);
 
                     // all client except self
                     // socket.broadcast.emit('client', {value: data.value});

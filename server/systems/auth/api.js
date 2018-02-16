@@ -16,13 +16,13 @@ var AuthApiRouter;
     var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
     var exception = new ExceptionController.Exception();
     AuthApiRouter.router.post("/local/register", [exception.exception, exception.guard, auth.is_enabled_regist_user, auth.post_local_register]);
-    AuthApiRouter.router.get("/register/:token", auth.get_register_token);
+    AuthApiRouter.router.get("/register/:token", [auth.get_register_token]);
     AuthApiRouter.router.post("/local/member", [exception.exception, exception.guard, exception.authenticate, auth.is_enabled_regist_member, auth.post_member_register]);
-    AuthApiRouter.router.get("/member/:token", auth.get_member_token);
+    AuthApiRouter.router.get("/member/:token", [auth.get_member_token]);
     AuthApiRouter.router.post("/local/username", [exception.exception, exception.guard, exception.authenticate, auth.post_local_username]);
-    AuthApiRouter.router.get("/username/:token", auth.get_username_token);
+    AuthApiRouter.router.get("/username/:token", [auth.get_username_token]);
     AuthApiRouter.router.post("/local/password", [exception.exception, exception.guard, auth.post_local_password]);
-    AuthApiRouter.router.get("/password/:token", auth.get_password_token);
+    AuthApiRouter.router.get("/password/:token", [auth.get_password_token]);
     AuthApiRouter.router.post("/local/login", [exception.exception, exception.guard, auth.post_local_login]);
     AuthApiRouter.router.post("/logout", [exception.exception, exception.guard, exception.authenticate, auth.logout]);
     // facebook

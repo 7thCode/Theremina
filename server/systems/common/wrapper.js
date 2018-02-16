@@ -9,19 +9,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Promised;
 (function (Promised) {
-    var fs = require('graceful-fs');
+    //  const fs: any = require('graceful-fs');
     var _ = require("lodash");
     var result = require("./result");
-    //    const core = require(process.cwd() + '/gs');
-    //    const share: any = core.share;
-    //    const config: any = share.config;
-    //    const logger = share.logger;
-    var config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
-    var log4js = require('log4js');
-    log4js.configure("./config/systems/logs.json");
-    var logger = log4js.getLogger('request');
-    logger.setLevel(config.loglevel);
-    var Wrapper = (function () {
+    // const config: any = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
+    // const log4js: any = require('log4js');
+    //  log4js.configure("./config/systems/logs.json");
+    // const logger: any = log4js.getLogger('request');
+    // logger.setLevel(config.loglevel);
+    var Wrapper = /** @class */ (function () {
         function Wrapper() {
         }
         Wrapper.prototype.BasicHeader = function (response, session) {
@@ -63,7 +59,7 @@ var Promised;
         };
         Wrapper.prototype.FindById = function (res, code, model, id, callback) {
             var _this = this;
-            model.findById(id).then(function (object) {
+            return model.findById(id).then(function (object) {
                 callback(res, object);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -71,7 +67,7 @@ var Promised;
         };
         Wrapper.prototype.FindOne = function (res, code, model, query, callback) {
             var _this = this;
-            model.findOne(query).then(function (doc) {
+            return model.findOne(query).then(function (doc) {
                 callback(res, doc);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -79,23 +75,23 @@ var Promised;
         };
         Wrapper.prototype.Find = function (res, code, model, query, fields, option, callback) {
             var _this = this;
-            model.find(query, fields, option).then(function (docs) {
+            return model.find(query, fields, option).then(function (docs) {
                 callback(res, docs);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
             });
         };
-        Wrapper.prototype.Count = function (response, code, model, query, callback) {
+        Wrapper.prototype.Count = function (res, code, model, query, callback) {
             var _this = this;
-            model.count(query).then(function (count) {
-                callback(response, count);
+            return model.count(query).then(function (count) {
+                callback(res, count);
             }).catch(function (error) {
-                _this.SendError(response, error.code, error.message, error);
+                _this.SendError(res, error.code, error.message, error);
             });
         };
         Wrapper.prototype.FindAndModify = function (res, code, model, query, sort, update, options, callback) {
             var _this = this;
-            model.findAndModify(query, sort, update, options).then(function (docs) {
+            return model.findAndModify(query, sort, update, options).then(function (docs) {
                 callback(res, docs);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -103,7 +99,7 @@ var Promised;
         };
         Wrapper.prototype.Save = function (res, code, instance, callback) {
             var _this = this;
-            instance.save().then(function () {
+            return instance.save().then(function () {
                 callback(res, instance);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -111,7 +107,7 @@ var Promised;
         };
         Wrapper.prototype.Update = function (res, code, model, query, update, callback) {
             var _this = this;
-            model.findOneAndUpdate(query, update, { upsert: false }).then(function () {
+            return model.findOneAndUpdate(query, update, { upsert: false }).then(function () {
                 callback(res);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -119,7 +115,7 @@ var Promised;
         };
         Wrapper.prototype.Upsert = function (res, code, model, query, update, callback) {
             var _this = this;
-            model.update(query, update, { upsert: true, multi: false }).then(function () {
+            return model.update(query, update, { upsert: true, multi: false }).then(function () {
                 callback(res);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -127,7 +123,7 @@ var Promised;
         };
         Wrapper.prototype.Remove = function (res, code, instance, callback) {
             var _this = this;
-            instance.remove().then(function () {
+            return instance.remove().then(function () {
                 callback(res);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -135,7 +131,7 @@ var Promised;
         };
         Wrapper.prototype.Delete = function (res, code, model, query, callback) {
             var _this = this;
-            model.remove(query).then(function () {
+            return model.remove(query).then(function () {
                 callback(res);
             }).catch(function (error) {
                 _this.SendError(res, error.code, error.message, error);
@@ -150,31 +146,31 @@ var Promised;
             }
         };
         Wrapper.prototype.SendWarn = function (response, code, message, object) {
-            logger.warn(message + " " + code);
+            //     logger.warn(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         };
         Wrapper.prototype.SendError = function (response, code, message, object) {
-            logger.error(message + " " + code);
+            //       logger.error(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         };
         Wrapper.prototype.SendForbidden = function (response) {
-            logger.error("Forbidden");
+            //      logger.error("Forbidden");
             if (response) {
                 response.status(403).render("error", { message: "Forbidden...", status: 403 });
             }
         };
         Wrapper.prototype.SendNotFound = function (response) {
-            logger.error("notfound");
+            //        logger.error("notfound");
             if (response) {
                 response.status(404).render("error", { message: "not found", status: 404 });
             }
         };
         Wrapper.prototype.SendFatal = function (response, code, message, object) {
-            logger.fatal(message + " " + code);
+            //          logger.fatal(message + " " + code);
             if (response) {
                 response.status(500).render("error", { message: message, status: 500 });
             }

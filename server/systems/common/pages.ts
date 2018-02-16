@@ -8,15 +8,15 @@
 
 export namespace CommonPageRouter {
 
-    const express = require('express');
-    export let router = express.Router();
+    const express: any = require('express');
+    export const router = express.Router();
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
     const config: any = share.config;
-    let message = config.message;
+    const message: any = config.message;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     export const auth: any = new AuthController.Auth();
@@ -25,8 +25,8 @@ export namespace CommonPageRouter {
         result.render('systems/common/alert_dialog', {message: message});
     }]);
 
-    router.get('/test', [ (request: any, result: any, next: any) => {
-        result.render('systems/test/index', {message: message,config: config, user: request.user});
+    router.get('/test', [(request: any, result: any, next: any) => {
+        result.render('systems/test/index', {message: message, config: config, user: request.user});
     }]);
 
 }

@@ -125,9 +125,9 @@ namespace BlobControllersModule {
 
             let createBlob = (files: any): void => {
                 progress(true);
-                let promises = [];
+                let promises:any[] = [];
                 _.forEach(files, (local_file) => {
-                    let deferred = $q.defer();
+                    let deferred:any = $q.defer();
                     let fileReader: any = new FileReader();
                     fileReader.onload = (event: any): void => {
                         FileService.Create(event.target.result, local_file.name, 4000, (result: any) => {
@@ -146,7 +146,6 @@ namespace BlobControllersModule {
                         file.cancel();
                     });
                     Draw();
-                }).finally(() => {
                 });
             };
 

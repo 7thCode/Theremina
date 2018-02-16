@@ -6,20 +6,22 @@
 
 "use strict";
 
-import {Pages} from "../../../services/pages/controllers/pages_controller";
+//import {Pages} from "../../../services/pages/controllers/pages_controller";
+
+//import {Files} from "../../files/controllers/file_controller";
 
 export namespace ResourcesModule {
 
-    const fs = require('graceful-fs');
-    const _ = require('lodash');
+    const _: any = require('lodash');
+    const fs: any = require('graceful-fs');
 
-    const share = require('../../common/share');
-    const config = share.config;
-    const applications_config = share.applications_config;
+    const share: any = require('../../common/share');
+    const config: any = share.config;
+    const event: any = share.Event;
 
-    const MongoClient = require('mongodb').MongoClient;
+    const applications_config: any = share.applications_config;
 
-    const Wrapper = share.Wrapper;
+    const Wrapper: any = share.Wrapper;
 
     const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
@@ -37,7 +39,7 @@ export namespace ResourcesModule {
         }
 
         static namespace(request: any): string {
-            let result = "";
+            let result: string = "";
             if (request.user) {
                 if (request.user.data) {
                     result = request.user.data.namespace;
@@ -47,31 +49,15 @@ export namespace ResourcesModule {
         }
 
 
-        /*
-        static namespace(name: string): string {
-            let result = "";
-            if (name) {
-                let names = name.split("#");
-                let delimmiter = "";
-                names.forEach((name, index) => {
-                    if (index < (names.length - 1)) {
-                        result += delimmiter + name;
-                        delimmiter = ":";
-                    }
-                })
-            }
-            return result;
-        }*/
-
         static localname(name: string): string {
-            let result = "";
+            let result: string = "";
             if (name) {
                 let names = name.split("#");
                 names.forEach((name, index) => {
                     if (index == (names.length - 1)) {
                         result = name;
                     }
-                })
+                });
             }
             return result;
         }
@@ -79,6 +65,14 @@ export namespace ResourcesModule {
         static make_query(userid: any, type: any, localname: any, namespace: any) {
             return {$and: [{namespace: namespace}, {userid: userid}, {type: type}, {status: 1}, {open: true}, {name: localname}]};
         }
+
+        static cache_write(path: string[], content: string): void {
+            event.emitter.emit("cache_write", {path: path, string: content});
+        };
+
+        static cache_invalidate(path: string): void {
+            event.emitter.emit("cache_invalidate", {path: path});
+        };
 
         /**
          * @param initresources
@@ -147,9 +141,9 @@ export namespace ResourcesModule {
                                           });
                                       }*/
                             });
-                        })
+                        });
                     };
-                    let docs = initresources;
+                    let docs: any = initresources;
                     Promise.all(docs.map((doc: any): void => {
                         return save(doc);
                     })).then((results: any[]): void => {
@@ -174,7 +168,7 @@ export namespace ResourcesModule {
                     let save = (doc: any): any => {
                         return new Promise((resolve: any, reject: any): void => {
 
-                            let filename = process.cwd() + doc.path + '/' + doc.name;
+                            let filename: string = process.cwd() + doc.path + '/' + doc.name;
                             //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
                             let localname: string = Resource.localname(doc.name);
                             let type: string = doc.type;
@@ -187,7 +181,7 @@ export namespace ResourcesModule {
                                     page.namespace = namespace;
                                     page.name = localname;
                                     page.type = type;
-                                    let resource = "";
+                                    let resource: string = "";
                                     try {
                                         fs.statSync(filename);
                                         resource = fs.readFileSync(filename, 'utf-8');
@@ -231,9 +225,9 @@ export namespace ResourcesModule {
                                           });
                                       }*/
                             });
-                        })
+                        });
                     };
-                    let docs = initresources;
+                    let docs: any = initresources;
                     Promise.all(docs.map((doc: any): void => {
                         return save(doc);
                     })).then((results: any[]): void => {
@@ -270,7 +264,7 @@ export namespace ResourcesModule {
                             resource.name = localname;
                             resource.type = type;
 
-                            let page = "";
+                            let page: string = "";
                             if (content.resource) {
                                 page = content.resource;
                             }
@@ -300,7 +294,7 @@ export namespace ResourcesModule {
          * @param response
          * @returns none
          */
-        public put_resource(request: { params: { id: string }, body: { name: string, type: string, content: { resource: any, type: any } } }, response: any): void {
+        public put_resource(request: { params: { id: string }, body: { name: string, type: string, content: { resource: any, type: any } } }, response: Express.Response): void {
             const number: number = 1100;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
@@ -309,7 +303,9 @@ export namespace ResourcesModule {
                 if (page) {
                     page.content = request.body.content;
                     page.open = true;
+                    let name = page.name;
                     Wrapper.Save(response, number, page, (response: any): void => {
+                        Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
@@ -323,14 +319,16 @@ export namespace ResourcesModule {
          * @param response
          * @returns none
          */
-        public delete_resource(request: any, response: any): void {
+        public delete_resource(request: any, response: Express.Response): void {
             const number: number = 1200;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
             let id: string = request.params.id;
             Wrapper.FindOne(response, number, ResourceModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, page: any): void => {
                 if (page) {
+                    let name = page.name;
                     Wrapper.Remove(response, number, page, (response: any): void => {
+                        Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
@@ -344,7 +342,7 @@ export namespace ResourcesModule {
          * @param response
          * @returns none
          */
-        public get_resource(request: any, response: any): void {
+        public get_resource(request: any, response: Express.Response): void {
             const number: number = 1300;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
@@ -363,10 +361,10 @@ export namespace ResourcesModule {
          * @param response
          * @returns none
          */
-        public delete_own(request: any, response: any): void {
+        public delete_own(request: any, response: Express.Response): void {
             const number: number = 1200;
             let userid: string = Resource.userid(request);
-            Wrapper.Delete(response, number, ResourceModel, {userid: userid}, (response: any): void => {
+            Wrapper.Delete(response, number, ResourceModel, {userid: userid}, (response: Express.Response): void => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -376,7 +374,7 @@ export namespace ResourcesModule {
          * @param response
          * @returns none
          */
-        public get_resource_query(request: any, response: any): void {
+        public get_resource_query(request: any, response: Express.Response): void {
             const number: number = 1400;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
@@ -418,7 +416,7 @@ export namespace ResourcesModule {
         public namespaces(userid: string, callback: any): void {
             const number: number = 1400;
             ResourceModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
-                let result = [];
+                let result: string[] = [];
                 _.forEach(pages, (page) => {
                     if (page.namespace) {
                         result.push(page.namespace);
@@ -443,7 +441,7 @@ export namespace ResourcesModule {
                 "content.type": 1,
                 "_id": 0
             }, {}).then((pages: any): void => {
-                let result = [];
+                let result: string[] = [];
                 _.forEach(pages, (page) => {
                     if (page.content.type) {
                         result.push(page.content.type);
@@ -462,15 +460,15 @@ export namespace ResourcesModule {
 
     export class Pages {
 
-        static connect(callback: (error, db) => void): any {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
-        }
+        //static connect(callback: (error, db) => void): any {
+        //     MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        // }
 
         static userid(request: { user: { userid: string } }): string {
             return request.user.userid;
         }
 
-        static retrieve_account(userid, callback: (error: { code: number, message: string }, result: any) => void) {
+        static retrieve_account(userid, callback: (error: { code: number, message: string } | null, result: any) => void) {
             LocalAccount.findOne({username: userid}).then((account: any): void => {
                 callback(null, account);
             }).catch((error: any): void => {
@@ -478,7 +476,7 @@ export namespace ResourcesModule {
             });
         }
 
-        public render_html(request: { params: { userid: string, page: string, namespace: string }, query: any }, callback: (error: { code: number, message: string }, result: any) => void): void {
+        public render_html(request: { params: { userid: string, page: string, namespace: string }, query: any }, callback: (error: { code: number, message: string } | null, result: any) => void): void {
             let userid: string = request.params.userid;
             let namespace: string = request.params.namespace;
             Pages.retrieve_account(userid, (error, account) => {
@@ -490,16 +488,15 @@ export namespace ResourcesModule {
                     let params: any = request.query;
                     ResourceModel.findOne({$and: [{name: page_name}, {namespace: namespace}, {userid: userid}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
-                            let content = doc.content.resource;
-                            let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
+                            let content: any = doc.content.resource;
+                            let datasource: any = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
                                 "Default": ArticleModel,
-
                                 "Article": ArticleModel
                             });
-                            let query = datasource.ToQueryFormat();
-                            let page_datasource = datasource.GetDatasource(query, null);
-                            let page_count = datasource.GetCount(query, null);
-                            let page_init = {
+                            let query: any = datasource.ToQueryFormat();
+                            let page_datasource: any = datasource.GetDatasource(query, null);
+                            let page_count: number = datasource.GetCount(query, null);
+                            let page_init: any = {
                                 name: "#init",
                                 promise: page_datasource,
                                 count: page_count,
@@ -507,7 +504,8 @@ export namespace ResourcesModule {
                             };
                             HtmlScannerModule.Builder.Build(content, datasource, page_init, config, (error: any, result: any): void => {
                                 if (!error) {
-                                    callback(null, {content: result, type: doc.content.type})
+                                    //              cache_write(request.url, result);
+                                    callback(null, {content: result, type: doc.content.type});
                                 } else {
                                     callback({code: 10000, message: error.message}, null);
                                 }
@@ -537,16 +535,16 @@ export namespace ResourcesModule {
                     let params: any = request.query;
                     ResourceModel.findOne({$and: [{name: page_name}, {userid: userid}, {namespace: namespace}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
-                            let content = doc.content.resource;
-                            let datasource = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid, namespace, params, false, {
+                            let content: any = doc.content.resource;
+                            let datasource: any = new ScannerBehaviorModule.CustomBehavior(parent_page_name, page_name, userid, namespace, params, false, {
                                 "Default": ArticleModel,
-                          //      "Account": LocalAccount,
+                                //      "Account": LocalAccount,
                                 "Article": ArticleModel
                             });
-                            let query = datasource.ToQueryFormat();
-                            let page_datasource = datasource.GetDatasource(query, null);
-                            let page_count = datasource.GetCount(query, null);
-                            let page_init = {
+                            let query: any = datasource.ToQueryFormat();
+                            let page_datasource: any = datasource.GetDatasource(query, null);
+                            let page_count: number = datasource.GetCount(query, null);
+                            let page_init: any = {
                                 name: "#init",
                                 promise: page_datasource,
                                 count: page_count,
@@ -554,7 +552,7 @@ export namespace ResourcesModule {
                             };
                             HtmlScannerModule.Builder.Build(content, datasource, page_init, config, (error: any, result: any): void => {
                                 if (!error) {
-                                    callback(null, {content: result, type: doc.content.type})
+                                    callback(null, {content: result, type: doc.content.type});
                                 } else {
                                     callback({code: 10000, message: error.message}, null);
                                 }
@@ -571,7 +569,7 @@ export namespace ResourcesModule {
             });
         }
 
-        public render_direct(request: { params: { userid: string, page: string, namespace: string } }, callback: (error: { code: number, message: string }, result: any) => void): void {
+        public render_direct(request: { params: { userid: string, page: string, namespace: string } }, sub_path: string[], callback: (error: { code: number, message: string } | null, result: any) => void): void {
             let userid: string = request.params.userid;
             let namespace: string = request.params.namespace;
             Pages.retrieve_account(userid, (error, account) => {
@@ -582,7 +580,17 @@ export namespace ResourcesModule {
                     let page_name: string = request.params.page;
                     ResourceModel.findOne({$and: [{name: page_name}, {namespace: namespace}, {userid: userid}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
-                            callback(null, {content: doc.content.resource, type: doc.content.type})
+
+                            let path: string[] = [];
+                            path.push(userid);
+                            path.push(namespace);
+                            sub_path.forEach(path_name => {
+                                path.push(path_name);
+                            });
+                            path.push(page_name);
+
+                            Resource.cache_write(path, doc.content.resource);
+                            callback(null, {content: doc.content.resource, type: doc.content.type});
                         } else {
                             callback({code: 10000, message: "not found."}, null);
                         }
@@ -595,14 +603,14 @@ export namespace ResourcesModule {
             });
         }
 
-        public render_object(userid: string, page_name: string, object: any, callback: (error: { code: number, message: string }, result: any) => void): void {
-            let namespace = "";
+        public render_object(userid: string, page_name: string, object: any, callback: (error: { code: number, message: string } | null, result: any) => void): void {
+            let namespace: string = "";
             ResourceModel.findOne({$and: [{userid: userid}, {namespace: namespace}, {name: page_name}, {type: 20}]}).then((doc: any): void => {
                 if (doc) {
                     let datasource = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, null, true, {});
                     HtmlScannerModule.Builder.Resolve(doc.content.resource, datasource, object, (error: { code: number, message: string }, result: string): void => {
                         if (!error) {
-                            callback(null, {content: result, type: "text/html"})
+                            callback(null, {content: result, type: "text/html"});
                         } else {
                             callback({code: error.code, message: error.message}, null);
                         }

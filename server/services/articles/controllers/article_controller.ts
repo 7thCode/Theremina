@@ -8,19 +8,19 @@
 
 export namespace ArticleModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const Wrapper = share.Wrapper;
+    const Wrapper: any = share.Wrapper;
 
     const ArticleModel: any = require(share.Models("services/articles/article"));
 
-    const validator = require('validator');
+    const validator: any = require('validator');
 
     export class Article {
 
@@ -28,11 +28,11 @@ export namespace ArticleModule {
          * @param request
          * @returns userid
          */
-        static userid(request: any): string {
+        static userid(request: Express.Request): string {
             return request.user.userid;
         }
 
-        static namespace(request: any): string {
+        static namespace(request: Express.Request): string {
             let result = "";
             if (request.user) {
                 if (request.user.data) {
@@ -48,7 +48,7 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public create_article(request: any, response: any): void {
+        public create_article(request: any, response: Express.Response): void {
             if (request.body.name) {
                 let article: any = new ArticleModel();
                 article.userid = Article.userid(request);
@@ -90,10 +90,9 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public create_article_many(request: any, response: any): void {
+        public create_article_many(request: any, response: Express.Response): void {
             if (request.body.articles) {
-                let articles = JSON.parse(request.body.articles);
-
+                let articles:any = JSON.parse(request.body.articles);
                 let save = (data: any, callback: (d) => void, error: (e) => void): any => {
                     if (data) {
                         if (data.name) {
@@ -161,30 +160,34 @@ export namespace ArticleModule {
          * @returns none
          *  {$and: [{_id: id}, {userid: userid}]} -> useridが一致しないと操作不可
          */
-        public put_article(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
-            let id = request.params.id;
+        public put_article(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
+            let id: string = request.params.id;
             Wrapper.FindOne(response, 10000, ArticleModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, article: any): void => {
                 if (article) {
-                    article.content = request.body.content;
-                    _.forEach(article.content, (content: any, key): void => {
-                        if (content.type == "quoted") {//単純記事はエスケープ
-                            if (typeof content.value === 'string') {
-                                article.content[key].value = validator.escape(content.value);
-                            } else {
-                                article.content[key].value = content.value;
+                    if (request.body.content !== {}) {
+                        article.content = request.body.content;
+                        _.forEach(article.content, (content: any, key): void => {
+                            if (content.type == "quoted") {//単純記事はエスケープ
+                                if (typeof content.value === 'string') {
+                                    article.content[key].value = validator.escape(content.value);
+                                } else {
+                                    article.content[key].value = content.value;
+                                }
+                            } else if (content.type == "html") {
+                                article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
+                            } else if (content.type == "date") {
+                                article.content[key].value = new Date(content.value);
                             }
-                        } else if (content.type == "html") {
-                            article.content[key].value = content.value.replace(/\s/g, " "); // replace "C2A0"(U+00A0) to "20"
-                        } else if (content.type == "date") {
-                            article.content[key].value = new Date(content.value);
-                        }
-                    });
-                    article.open = true;
-                    Wrapper.Save(response, 1100, article, (response: any, object: any): void => {
-                        Wrapper.SendSuccess(response, object);
-                    });
+                        });
+                        article.open = true;
+                        Wrapper.Save(response, 1100, article, (response: any, object: any): void => {
+                            Wrapper.SendSuccess(response, object);
+                        });
+                    } else {
+                        Wrapper.SendWarn(response, 1, "no content", {code: 1, message: "no content"});
+                    }
                 } else {
                     Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
@@ -197,9 +200,9 @@ export namespace ArticleModule {
          * @returns none
          * {$and: [{_id: id}, {userid: userid}]} -> useridが一致しないと操作不可
          */
-        public delete_article(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public delete_article(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let id = request.params.id;
             Wrapper.FindOne(response, 10000, ArticleModel, {$and: [{_id: id}, {namespace: namespace}, {userid: userid}]}, (response: any, article: any): void => {
                 if (article) {
@@ -217,9 +220,9 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public delete_own(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public delete_own(request: Express.Request, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             Wrapper.Delete(response, 1300, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
             });
@@ -230,11 +233,12 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article(request: any, response: any): void {
-            //     let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let id = request.params.id;
-            Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, {_id: id}]}, (response: any, article: any): void => {
+            // "$and userid query" for security.
+            Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, {_id: id}]}, (response: any, article: any): void => {
                 if (article) {
                     Wrapper.SendSuccess(response, article);
                 } else {
@@ -248,9 +252,9 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_json(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article_json(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let id = request.params.id;
             Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, {_id: id}]}, (response: any, article: any): void => {
                 if (article) {
@@ -266,9 +270,8 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_query(request: any, response: any): void {
-            //     let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article_query(request: any, response: Express.Response): void {
+            let namespace: string = Article.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
             Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, query]}, {}, {}, (response: any, articles: any): any => {
                 Wrapper.SendSuccess(response, articles);
@@ -280,12 +283,25 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_query_query(request: any, response: any): void {
-            //       let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article_query_with_namespace(request: any, response: Express.Response): void {
+            let namespace: string = request.params.namespace;
+            let query: any = Wrapper.Decode(request.params.query);
+            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, query]}, {}, {}, (response: any, articles: any): any => {
+                Wrapper.SendSuccess(response, articles);
+            });
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
+         */
+        public get_article_query_query(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {type: 0}, query]}, {}, option, (response: any, articles: any): any => {
+            Wrapper.Find(response, 1500, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, {}, option, (response: any, articles: any): any => {
                 _.forEach(articles, (article) => {
                     article.content = null;
                 });
@@ -298,9 +314,9 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_query_query_json(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article_query_query_json(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, {"_id": 0}, option, (response: any, articles: any): any => {
@@ -313,9 +329,9 @@ export namespace ArticleModule {
          * @param response
          * @returns none
          */
-        public get_article_count(request: any, response: any): void {
-            let userid = Article.userid(request);
-            let namespace = Article.namespace(request);
+        public get_article_count(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, 2800, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
@@ -323,15 +339,14 @@ export namespace ArticleModule {
         }
 
         /**
-         * @param request
-         * @param response
+         * @param userid
+         * @param callback
          * @returns none
          */
-        public namespaces(userid: string, callback: any): void {
-            const number: number = 1400;
+        public namespaces(userid: string, callback: (error: any, result: any) => void): void {
             ArticleModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
-                let result:string[] = [];
-                _.forEach(pages, (page:{namespace:string}) => {
+                let result: string[] = [];
+                _.forEach(pages, (page: { namespace: string }) => {
                     if (page.namespace) {
                         result.push(page.namespace);
                     }

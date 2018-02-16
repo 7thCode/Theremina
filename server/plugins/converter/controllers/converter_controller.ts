@@ -8,17 +8,17 @@
 
 export namespace ConverterModule {
 
-    const fs = require('graceful-fs');
-    const _ = require('lodash');
+    const fs: any = require('graceful-fs');
+    const _: any = require('lodash');
 
-    const mongoose = require('mongoose');
+    // const mongoose = require('mongoose');
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const Wrapper = share.Wrapper;
+    const Wrapper: any = share.Wrapper;
 
-    const Exceljs = require("exceljs");
+    const Exceljs: any = require("exceljs");
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 

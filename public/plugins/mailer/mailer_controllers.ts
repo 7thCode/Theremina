@@ -317,18 +317,6 @@ namespace MailerControllersModule {
             let formname = items.formname;
             let article = items.article;
 
-            /*
-            if ((userid + formname) != "") {
-                ArticleService.RenderFragment(userid, formname, article, (result: any): void => {
-                    $scope.$evalAsync(   // $apply
-                        function ($scope) {
-                            $scope.doc = result.resource;
-                        }
-                    );
-                }, error_handler);
-            }
-            */
-
             $scope.hide = (): void => {
                 $uibModalInstance.close();
             };

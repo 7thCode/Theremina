@@ -8,10 +8,10 @@
 
 namespace ScannerBehavior {
 
-    const url = require('url');
-    const moment = require("moment");
-    const _ = require('lodash');
-    const requestpromise = require('request-promise');
+    const url: any = require('url');
+    const moment: any = require("moment");
+    const _: any = require('lodash');
+    const requestpromise: any = require('request-promise');
 
     export interface Behavior {
         isdocument: boolean;
@@ -160,7 +160,7 @@ namespace ScannerBehavior {
                 },
                 substr: (result: string, param: string): string => {
                     try {
-                        let limit =  parseInt(param[0]);
+                        let limit = parseInt(param[0]);
                         if (result.length > limit) {
                             result = result.substr(0, limit) + "...";
                         }
@@ -195,9 +195,8 @@ namespace ScannerBehavior {
                     return result;
                 }
 
-            }
+            };
         }
-
 
         private ParseQueryFormat(query: string) {
             let result = null;
@@ -241,8 +240,8 @@ namespace ScannerBehavior {
             let _query: any = this.default_query;
             if (query_object.q) {
                 try {
-              //      let query = new Function("value", "with (value) {return value;}")(query_object.q);
-              //      _query = {"$and": [this.default_query, query]};
+                    //      let query = new Function("value", "with (value) {return value;}")(query_object.q);
+                    //      _query = {"$and": [this.default_query, query]};
 
                     _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
@@ -425,7 +424,7 @@ namespace ScannerBehavior {
                     let isObject = (value: any): boolean => {
                         let result: boolean = false;
                         if (value !== null) {
-                            result = ( (typeof value === 'function') || (typeof value === 'object') );
+                            result = ((typeof value === 'function') || (typeof value === 'object'));
                         }
                         return result;
                     };

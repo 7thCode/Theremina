@@ -6,23 +6,25 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace LayoutsPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const auth: any = core.auth;
     const exception: any = core.exception;
 
     const config: any = share.config;
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 
-    let message = config.message;
+    const message: any = config.message;
 
     /* GET home page. */
     router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, result: any, next: any): void => {
@@ -60,7 +62,7 @@ export namespace LayoutsPageRouter {
     }]);
 
     router.get('/player/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
-        result.render('services/layouts/player/dialogs/delete_confirm_dialog', {message:message});
+        result.render('services/layouts/player/dialogs/delete_confirm_dialog', {message: message});
     }]);
 
     router.get('/builder/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {

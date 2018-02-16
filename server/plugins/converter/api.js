@@ -11,8 +11,6 @@ var ConverterApiRouter;
     ConverterApiRouter.router = express.Router();
     var core = require(process.cwd() + '/gs');
     var share = core.share;
-    var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
-    var auth = new AuthController.Auth();
     var ConverterModule = require(share.Server("plugins/converter/controllers/converter_controller"));
     var excel = new ConverterModule.Excel();
     var downloader = new ConverterModule.Downloader();

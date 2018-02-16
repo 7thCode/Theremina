@@ -1,5 +1,5 @@
 /**!
- Copyright (c) 2016 7thCode.(http://seventh-code.com/)
+ Copyright (c) 2016 7thCode.(https://seventh-code.com/)
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
@@ -308,17 +308,20 @@ Services.directive('draggablepane', ['$document', function ($document) {
                     });
                     element.bind('mousedown', function ($event) {
                         var result = false;
-                        start_x_1 = element.prop('offsetLeft');
-                        start_y_1 = element.prop('offsetTop');
-                        clicked_x_1 = $event.clientX;
-                        clicked_y_1 = $event.clientY;
-                        var handle_y = clicked_y_1 - start_y_1;
-                        if (handle_y < 30) {
-                            $document.bind('mousemove', mousemove_1);
-                            $document.bind('mouseup', mouseup_1);
-                        }
-                        else {
-                            result = true;
+                        var header = angular.element("#box-header")[0];
+                        if (header) {
+                            start_x_1 = element.prop('offsetLeft');
+                            start_y_1 = element.prop('offsetTop');
+                            clicked_x_1 = $event.clientX;
+                            clicked_y_1 = $event.clientY;
+                            var handle_y = clicked_y_1 - start_y_1;
+                            if (handle_y < header.clientHeight) {
+                                $document.bind('mousemove', mousemove_1);
+                                $document.bind('mouseup', mouseup_1);
+                            }
+                            else {
+                                result = true;
+                            }
                         }
                         return result;
                     });

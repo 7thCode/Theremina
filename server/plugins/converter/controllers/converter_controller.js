@@ -9,13 +9,13 @@ var ConverterModule;
 (function (ConverterModule) {
     var fs = require('graceful-fs');
     var _ = require('lodash');
-    var mongoose = require('mongoose');
+    // const mongoose = require('mongoose');
     var core = require(process.cwd() + '/gs');
     var share = core.share;
     var Wrapper = share.Wrapper;
     var Exceljs = require("exceljs");
     var LocalAccount = require(share.Models("systems/accounts/account"));
-    var Excel = (function () {
+    var Excel = /** @class */ (function () {
         function Excel() {
         }
         Excel.prototype.account = function (request, response) {
@@ -71,7 +71,7 @@ var ConverterModule;
         return Excel;
     }());
     ConverterModule.Excel = Excel;
-    var Downloader = (function () {
+    var Downloader = /** @class */ (function () {
         function Downloader() {
         }
         /**

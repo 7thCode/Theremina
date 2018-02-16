@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var SchedulerModule;
 (function (SchedulerModule) {
     var schedule = require("node-schedule");
-    var Scheduler = (function () {
+    var Scheduler = /** @class */ (function () {
         function Scheduler() {
             this.Scheduled_jobs = [];
         }

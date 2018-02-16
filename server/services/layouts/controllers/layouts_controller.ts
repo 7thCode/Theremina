@@ -6,20 +6,18 @@
 
 "use strict";
 
-import {Pictures} from "../../pictures/controllers/pictures_controller";
-
 export namespace LayoutsModule {
 
     const fs = require('graceful-fs');
     const _ = require('lodash');
 
-    const mongoose = require('mongoose');
+ //   const mongoose = require('mongoose');
 
     const core = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config = share.config;
     const Wrapper = share.Wrapper;
-   // const logger = share.logger;
+    // const logger = share.logger;
 
     const ShapeEditModule: any = core.ShapeEditModule;
     const ServerModule: any = core.ServerModule;
@@ -58,7 +56,6 @@ export namespace LayoutsModule {
         }
 
 
-
         /**
          * @param request
          * @param response
@@ -79,7 +76,6 @@ export namespace LayoutsModule {
         }
 
 
-
         /**
          * @param request
          * @param response
@@ -95,7 +91,7 @@ export namespace LayoutsModule {
             let name = request.body.name;
             if (name) {
                 if (name.indexOf('/') == -1) {
-                    Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, exists: any): void => {
+                    Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type}, {namespace: namespace}, {userid: userid}]}, (response: any, exists: any): void => {
                         if (!exists) {
                             let layout: any = new LayoutModel();
                             layout.userid = userid;
@@ -108,14 +104,14 @@ export namespace LayoutsModule {
                                 Wrapper.SendSuccess(response, object);
                             });
                         } else {
-                            Wrapper.SendWarn(response, 1, "already", {code:1, message:"already"});
+                            Wrapper.SendWarn(response, 1, "already", {code: 1, message: "already"});
                         }
                     });
                 } else {
-                    Wrapper.SendError(response, 3, "article name must not contain '/'", {code:3, message:"article name must not contain '/'"});
+                    Wrapper.SendError(response, 3, "article name must not contain '/'", {code: 3, message: "article name must not contain '/'"});
                 }
             } else {
-                Wrapper.SendWarn(response, 1, "no name", {code:1, message:"no name"});
+                Wrapper.SendWarn(response, 1, "no name", {code: 1, message: "no name"});
             }
         }
 
@@ -154,7 +150,7 @@ export namespace LayoutsModule {
             const namespace: string = Layout.namespace(request);
             let name = request.body.name;
             if (name) {
-                Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, exists: any): void => {
+                Wrapper.FindOne(response, number, LayoutModel, {$and: [{name: name}, {type: layout_type}, {namespace: namespace}, {userid: userid}]}, (response: any, exists: any): void => {
                     if (!exists) {
                         let layout: any = new LayoutModel();
                         layout.userid = userid;
@@ -167,7 +163,7 @@ export namespace LayoutsModule {
                         });
                     } else {
                         let id = request.params.id;
-                        Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, layout: any): void => {
+                        Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: layout_type}, {namespace: namespace}, {userid: userid}]}, (response: any, layout: any): void => {
                             if (layout) {
                                 layout.content = request.body.content;
                                 layout.open = true;
@@ -176,7 +172,7 @@ export namespace LayoutsModule {
                                     Wrapper.SendSuccess(response, object);
                                 });
                             } else {
-                                Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                                Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                             }
                         });
                     }
@@ -213,13 +209,13 @@ export namespace LayoutsModule {
             let userid = Layout.userid(request);
             let namespace: string = Layout.namespace(request);
             let id = request.params.id;
-            Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: layout_type},{namespace:namespace}, {userid: userid}]}, (response: any, layout: any): void => {
+            Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: layout_type}, {namespace: namespace}, {userid: userid}]}, (response: any, layout: any): void => {
                 if (layout) {
                     Wrapper.Remove(response, number, layout, (response: any): void => {
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -233,7 +229,7 @@ export namespace LayoutsModule {
             const number: number = 2300;
             let userid = Layout.userid(request);
             let namespace: string = Layout.namespace(request);
-            Wrapper.Delete(response, number, LayoutModel, {$and: [{namespace:namespace}, {userid: userid}]}, (response: any): void => {
+            Wrapper.Delete(response, number, LayoutModel, {$and: [{namespace: namespace}, {userid: userid}]}, (response: any): void => {
                 Wrapper.SendSuccess(response, {});
             });
         }
@@ -244,11 +240,11 @@ export namespace LayoutsModule {
          * @param response
          * @returns none
          */
-        public namespaces(userid:string, callback:any): void {
+        public namespaces(userid: string, callback: any): void {
             const number: number = 1400;
-            LayoutModel.find( {userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
-                let result:string[] = [];
-                _.forEach(pages, (page:{namespace:string}) => {
+            LayoutModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
+                let result: string[] = [];
+                _.forEach(pages, (page: { namespace: string }) => {
                     if (page.namespace) {
                         result.push(page.namespace);
                     }
@@ -273,7 +269,7 @@ export namespace LayoutsModule {
                 if (layout) {
                     Wrapper.SendSuccess(response, layout);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -288,11 +284,11 @@ export namespace LayoutsModule {
             let userid = Layout.userid(request);
             let namespace: string = Layout.namespace(request);
             let id = request.params.id;
-            Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: 2},{namespace:namespace}, {userid: userid}]}, (response: any, layout: any): void => {
+            Wrapper.FindOne(response, number, LayoutModel, {$and: [{_id: id}, {type: 2}, {namespace: namespace}, {userid: userid}]}, (response: any, layout: any): void => {
                 if (layout) {
                     Wrapper.SendSuccess(response, layout);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -306,14 +302,14 @@ export namespace LayoutsModule {
             const number: number = 2600;
             let userid = Layout.userid(request);
             let namespace: string = Layout.namespace(request);
-         // request.params.namespace;
+            // request.params.namespace;
             //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
             //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
 
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
-            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 1},{namespace:namespace}, {$or: [{userid: userid}, {userid: builder_userid}]}, query]}, {}, option, (response: any, layouts: any): any => {
+            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 1}, {namespace: namespace}, {$or: [{userid: userid}, {userid: builder_userid}]}, query]}, {}, option, (response: any, layouts: any): any => {
 
                 let _layouts = [];
                 _.forEach(layouts, (layout) => {
@@ -343,7 +339,7 @@ export namespace LayoutsModule {
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
-            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 2}, {namespace:namespace},{userid: userid}, query]}, {}, option, (response: any, layouts: any): any => {
+            Wrapper.Find(response, number, LayoutModel, {$and: [{type: 2}, {namespace: namespace}, {userid: userid}, query]}, {}, option, (response: any, layouts: any): any => {
 
                 let _layouts = [];
                 _.forEach(layouts, (layout) => {
@@ -388,7 +384,7 @@ export namespace LayoutsModule {
 
             let query: any = Wrapper.Decode(request.params.query);
 
-            Wrapper.Count(response, number, LayoutModel, {$and: [{type: 2}, {namespace:namespace},{userid: userid}, query]}, (response: any, count: any): any => {
+            Wrapper.Count(response, number, LayoutModel, {$and: [{type: 2}, {namespace: namespace}, {userid: userid}, query]}, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });
         }
@@ -399,11 +395,11 @@ export namespace LayoutsModule {
          * @returns none
          */
         public get_template_svg(request: any, response: any): void {
-
             Layout.get_svg(request, response, 1);
         }
 
         /**
+         * public
          * @param request
          * @param response
          * @returns none
@@ -430,10 +426,10 @@ export namespace LayoutsModule {
             let userid = request.params.userid;
             let name = request.params.name;
 
-            let query: any = {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {userid: userid}]};
+            let query: any = {$and: [{name: name}, {type: layout_type}, {namespace: namespace}, {userid: userid}]};
             switch (layout_type) {
                 case 1:
-                    query = {$and: [{name: name}, {type: layout_type},{namespace:namespace}, {$or: [{userid: userid}, {userid: builder_userid}]}]};
+                    query = {$and: [{name: name}, {type: layout_type}, {namespace: namespace}, {$or: [{userid: userid}, {userid: builder_userid}]}]};
                     break;
                 default :
             }
@@ -474,7 +470,7 @@ export namespace LayoutsModule {
 
                 let servercanvas = new ServerModule.StubCanvas(document.width, document.height);
                 let original_mask = process.umask(0);
-                fs.mkdir(tmp_path,'0777', () => {
+                fs.mkdir(tmp_path, '0777', () => {
                     let adaptor = new AdaptorModule.SVGAdaptor(document.width, document.height, true, webfonts);
                     let canvas: ShapeEdit.Canvas = new ShapeEditModule.Canvas(servercanvas, null, plugins, adaptor, false);
                     ShapeEditModule.Canvas.Load(canvas, document, handlers);
@@ -513,7 +509,7 @@ export namespace LayoutsModule {
 
                 let servercanvas = new ServerModule.StubCanvas(document.width, document.height);
                 let original_mask = process.umask(0);
-                fs.mkdir(tmp_path,'0777', () => {
+                fs.mkdir(tmp_path, '0777', () => {
                     //{size: 'A4', margin: 0, layout: 'portrait'}
                     let adaptor = new AdaptorModule.PDFAdaptor(tmp_path, format);
                     let canvas: ShapeEdit.Canvas = new ShapeEditModule.Canvas(servercanvas, null, plugins, adaptor, false);

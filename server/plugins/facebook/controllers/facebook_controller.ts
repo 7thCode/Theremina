@@ -8,12 +8,12 @@
 
 export namespace FacebookModule {
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const plugins_config = share.plugins_config;
+    const plugins_config: any = share.plugins_config;
 
-    const request = require('request');
+    const request: any = require('request');
 
     export class Facebook {
 
@@ -26,18 +26,18 @@ export namespace FacebookModule {
          * @param response
          * @returns none
          */
-        public bot_hook(req: any, response: any): void {
+        public bot_hook(request: any, response: any): void {
             let verify_token = plugins_config.facebook.token;
-            let token = req.query["hub.verify_token"];
+            let token = request.query["hub.verify_token"];
             if (token == verify_token) {
-                response.send(req.query["hub.challenge"]);
+                response.send(request.query["hub.challenge"]);
             } else {
                 response.send("");
             }
         }
 
         /**
-         * @param request
+         * @param req
          * @param response
          * @returns none
          */
@@ -47,13 +47,13 @@ export namespace FacebookModule {
 
             let receivedMessage = (event) => {
 
-                let sendGenericMessage = (recipientId, messageText) => {
+                let sendGenericMessage = (recipientId:any, messageText:any):void => {
                     // To be expanded in later sections
                 };
 
                 let sendTextMessage = (recipientId: any, messageText: string): void => {
 
-                    let callSendAPI = (messageData): void => {
+                    let callSendAPI:any = (messageData): void => {
                         request({
                             uri: 'https://graph.facebook.com/v2.7/me/messages',
                             qs: {access_token: token},
@@ -64,8 +64,8 @@ export namespace FacebookModule {
                             }
                         }, (error, response, body): void => {
                             if (!error && response.statusCode == 200) {
-                                var recipientId = body.recipient_id;
-                                var messageId = body.message_id;
+                                let recipientId = body.recipient_id;
+                                let messageId = body.message_id;
 
                                 console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId);
                             } else {
@@ -76,7 +76,7 @@ export namespace FacebookModule {
                         });
                     };
 
-                    let messageData = {
+                    let messageData:any = {
                         recipient: {
                             id: recipientId
                         },
@@ -88,15 +88,15 @@ export namespace FacebookModule {
                     callSendAPI(messageData);
                 };
 
-                let senderID = event.sender.id;
-                let recipientID = event.recipient.id;
-                let timeOfMessage = event.timestamp;
-                let message = event.message;
+                let senderID:any = event.sender.id;
+                let recipientID:any = event.recipient.id;
+                let timeOfMessage:any = event.timestamp;
+                let message:any = event.message;
 
                 console.log("Received message for user %d and page %d at %d with message:", senderID, recipientID, timeOfMessage);
                 console.log(JSON.stringify(message));
 
-                let messageId = message.mid;
+        //        let messageId:any = message.mid;
 
                 let messageText = message.text;
                 let messageAttachments = message.attachments;
@@ -117,8 +117,8 @@ export namespace FacebookModule {
             let data = req.body;
             if (data.object === 'page') {
                 data.entry.forEach(function (entry) {
-                    let pageID = entry.id;
-                    let timeOfEvent = entry.time;
+               //     let pageID:any = entry.id;
+               //     let timeOfEvent:any = entry.time;
                     entry.messaging.forEach(function (event) {
                         if (event.message) {
                             receivedMessage(event);

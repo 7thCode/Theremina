@@ -8,10 +8,10 @@
 
 export namespace SessionModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const Wrapper = share.Wrapper;
+    const share: any = require(process.cwd() + '/server/systems/common/share');
+    const Wrapper: any = share.Wrapper;
 
     export class Session {
 
@@ -21,23 +21,23 @@ export namespace SessionModule {
          * @returns none
          */
         public get(request: any, response: any): void {
-            let user = request.session.req.user;
+            let user: any = request.session.req.user;
             if (user) {
-                let result = {
-                    create:user.create,
-                    modify:user.modify,
-                    provider:user.provider,
-                    type:user.type,
-                    auth:user.auth,
-                    userid:user.userid,
-                    username:user.username,
-                    enabled:user.enabled,
-                    local:user.local,
-                    data:user.data
+                let result: any = {
+                    create: user.create,
+                    modify: user.modify,
+                    provider: user.provider,
+                    type: user.type,
+                    auth: user.auth,
+                    userid: user.userid,
+                    username: user.username,
+                    enabled: user.enabled,
+                    local: user.local,
+                    data: user.data
                 };
                 Wrapper.SendSuccess(response, result);
             } else {
-                Wrapper.SendError(response, 2, "not found", {code:2, message:"not found"});
+                Wrapper.SendError(response, 2, "not found", {code: 2, message: "not found"});
             }
         }
 
@@ -47,16 +47,16 @@ export namespace SessionModule {
          * @returns none
          */
         public put(request: any, response: any): void {
-            let user = request.session.req.user;
+            let user: any = request.session.req.user;
             if (user) {
                 if (!user.data) {
-                    user.data = {}
+                    user.data = {};
                 }
-                user.data =_.merge(user.data,request.body.data);
+                user.data = _.merge(user.data, request.body.data);
                 request.session.save();
                 Wrapper.SendSuccess(response, user.data);
             } else {
-                Wrapper.SendError(response, 2, "not found", {code:2, message:"not found"});
+                Wrapper.SendError(response, 2, "not found", {code: 2, message: "not found"});
             }
         }
     }

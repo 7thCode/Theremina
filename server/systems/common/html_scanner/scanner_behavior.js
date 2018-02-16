@@ -10,7 +10,7 @@ var ScannerBehavior;
     var moment = require("moment");
     var _ = require('lodash');
     var requestpromise = require('request-promise');
-    var Params = (function () {
+    var Params = /** @class */ (function () {
         function Params() {
             this.params = {};
         }
@@ -80,7 +80,7 @@ var ScannerBehavior;
         };
         return Params;
     }());
-    var CustomBehavior = (function () {
+    var CustomBehavior = /** @class */ (function () {
         function CustomBehavior(parent_name, name, id, namespace, params, isdocument, models) {
             this.name = "";
             this.parent_name = "";

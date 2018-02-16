@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Commandar;
 (function (Commandar) {
     var execSync = require('child_process').execSync;
-    var Linux = (function () {
+    var Linux = /** @class */ (function () {
         function Linux() {
             this.backupdir = process.cwd() + "/backup";
         }

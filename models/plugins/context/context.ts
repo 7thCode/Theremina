@@ -8,16 +8,16 @@
 
 namespace ContextModule {
 
-    const mongoose = require('mongoose');
+    const mongoose: any = require('mongoose');
     const Schema = mongoose.Schema;
 
     const Context = new Schema({
         type: {type: String, default: "line"},
-        userid:{type: String},
-        context:{}
+        userid: {type: String},
+        context: {}
     });
 
-    Context.index({type:1,userid: 1}, {unique: true});
+    Context.index({type: 1, userid: 1}, {unique: true});
 
     module.exports = mongoose.model('Context', Context);
 }

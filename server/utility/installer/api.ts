@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace InstallerApiRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const InstallerModule: any = require("./controllers/installer_controller");
     const installer: any = new InstallerModule.Installer();

@@ -6,42 +6,38 @@
 
 "use strict";
 
-//import {Files} from "../../../systems/files/controllers/file_controller";
-
 export namespace PicturesModule {
 
-    const _:any = require('lodash');
+    const _: any = require('lodash');
 
-    const Grid:any = require('gridfs-stream');
     const mongodb: any = require('mongodb');
-    const mongoose: any = require('mongoose');
-    mongoose.Promise = global.Promise;
+    const MongoClient: any = require('mongodb').MongoClient;
 
-    const MongoClient = require('mongodb').MongoClient;
-
-    const sharp = require('sharp');
+    const sharp: any = require('sharp');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
+    const event: any = share.Event;
+    const logger: any = share.logger;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
     export class Pictures {
 
-        static connect(callback: (error:any, db:any) => void): any {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        static connect(): any {
+            return MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
         }
 
         static localname(name: string): string {
-            let result:string = "";
+            let result: string = "";
             if (name) {
-                let names = name.split("#");
+                let names: string[] = name.split("#");
                 names.forEach((name, index) => {
                     if (index == (names.length - 1)) {
                         result = name;
                     }
-                })
+                });
             }
             return result;
         }
@@ -54,7 +50,11 @@ export namespace PicturesModule {
             return request.user.username;
         }
 
-        static retrieve_account(userid, callback: (error: { code: number, message: string } | null, result: any) => void):void {
+        static cache_write(path: string[], content: string): void {
+            event.emitter.emit("cache_write", {path: path, stream: content});
+        };
+
+        static retrieve_account(userid: string, callback: (error: { code: number, message: string } | null, result: any) => void): void {
             LocalAccount.findOne({username: userid}).then((account: any): void => {
                 callback(null, account);
             }).catch((error: any): void => {
@@ -62,18 +62,18 @@ export namespace PicturesModule {
             });
         }
 
-        static result_file(db, gfs, collection, namespace, name, userid, response, next, not_found: () => void):void {
+        static result_file(gfs: any, collection: any, namespace: string, name: string, userid: string, response: any, next: any, not_found: () => void): void {
             collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
                 if (!error) {
                     if (item) {
-                    //    let readstream = gfs.createReadStream({_id: item._id});
-                        let readstream = gfs.openDownloadStream(item._id);
+                        let readstream: any = gfs.openDownloadStream(item._id);
                         if (readstream) {
                             response.setHeader("Content-Type", item.metadata.type);
                             response.setHeader("Cache-Control", "no-cache");
                             readstream.on('end', (): void => {
                             });
                             readstream.on('error', (error: any): void => {
+                                logger.error(error.message);
                             });
                             readstream.pipe(response);
                         } else {
@@ -89,7 +89,7 @@ export namespace PicturesModule {
         }
 
         /**
-         *
+         * public
          * @param request
          * @param response
          * @param next
@@ -98,95 +98,103 @@ export namespace PicturesModule {
         public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
             try {
                 let namespace: string = request.params.namespace;
-                let name = Pictures.localname(request.params.name);
-                let size = request.query;
+                let name: string = Pictures.localname(request.params.name);
+                let size: any = request.query;
 
-                Pictures.connect((error, db) => {
-                    if (!error) {
-                //        let gfs = Grid(db, mongoose.mongo); //missing parameter
-                        let gfs = new mongodb.GridFSBucket(db, {});
-                        if (gfs) {
-                            db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        let userid: string = request.params.userid;
-                                        Pictures.retrieve_account(userid, (error: any, account: any): void => {
-                                            if (!error) {
-                                                if (account) {
-                                                    userid = account.userid;
-                                                }
+                let error_handler = (error: any): void => {
+                    logger.error(error.message);
+                };
 
-                                                let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                                collection.findOne(query, (error: any, item: any): void => {
-                                                    if (!error) {
-                                                        if (item) {
-                                                            //let readstream = gfs.createReadStream({_id: item._id});
-                                                            let readstream = gfs.openDownloadStream(item._id);
-                                                            if (readstream) {
-                                                                let type = item.metadata.type;
-                                                                response.setHeader("Content-Type", type);
-                                                                response.setHeader("Cache-Control", config.cache);
-                                                                readstream.on('end', (): void => {
-                                                                });
-                                                                readstream.on('error', (error: any): void => {
-                                                                });
+                Pictures.connect().then((db) => {
+                    let gfs = new mongodb.GridFSBucket(db, {});
+                    if (gfs) {
+                        db.collection('fs.files', (error: any, collection: any): void => {
+                            if (!error) {
+                                if (collection) {
+                                    let userid: string = request.params.userid;
+                                    Pictures.retrieve_account(userid, (error: any, account: any): void => {
+                                        if (!error) {
+                                            if (account) {
+                                                userid = account.userid;
+                                            }
 
-                                                                try {
-                                                                    if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
-                                                                        if (size.w && size.h) {
-                                                                            if (size.l && size.t) {
-                                                                                /*
-                                                                                // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
-                                                                                let extractor = sharp().extract({
-                                                                                    left: parseInt(size.l),
-                                                                                    top: parseInt(size.t),
-                                                                                    width: parseInt(size.w),
-                                                                                    height: parseInt(size.h)
-                                                                                });
-                                                                                readstream = readstream.pipe(extractor);
-                                                                                */
-                                                                            }
-                                                                            let resizer = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
-                                                                            readstream = readstream.pipe(resizer);
+                                            let query: any = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                            collection.findOne(query, (error: any, item: any): void => {
+                                                if (!error) {
+                                                    if (item) {
+                                                        let readstream: any = gfs.openDownloadStream(item._id);
+                                                        if (readstream) {
+                                                            let type = item.metadata.type;
+                                                            response.setHeader("Content-Type", type);
+                                                            response.setHeader("Cache-Control", config.cache);
+                                                            readstream.on('end', (): void => {
+                                                            });
+                                                            readstream.on('error', error_handler);
+
+                                                            try {
+                                                                if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
+                                                                    if (size.w && size.h) {
+                                                                        if (size.l && size.t) {
+                                                                            /*
+                                                                            // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                                                                            let extractor = sharp().extract({
+                                                                                left: parseInt(size.l),
+                                                                                top: parseInt(size.t),
+                                                                                width: parseInt(size.w),
+                                                                                height: parseInt(size.h)
+                                                                            });
+                                                                            readstream = readstream.pipe(extractor);
+                                                                            */
                                                                         }
+                                                                        let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
+                                                                        readstream = readstream.pipe(resizer);
+                                                                    } else {
+                                                                        let _readstream: any = gfs.openDownloadStream(item._id);
+                                                                        let path: string[] = [];
+                                                                        path.push(userid);
+                                                                        path.push(namespace);
+                                                                        path.push("doc"); // todo: いまいちやろこれは。
+                                                                        path.push("img"); // todo: いまいちやろこれは。
+                                                                        path.push(name);
+                                                                        Pictures.cache_write(path, _readstream);
                                                                     }
-                                                                    readstream.pipe(response);
-                                                                } catch (e) {
-                                                                    // NOT FOUND IMAGE.
-                                                                    Pictures.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                        next();
-                                                                    });
                                                                 }
-                                                            } else {
-                                                                next();
+                                                                readstream.pipe(response);
+                                                            } catch (e) {
+                                                                // NOT FOUND IMAGE.
+                                                                Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
+                                                                    next();
+                                                                });
                                                             }
                                                         } else {
-                                                            // NOT FOUND IMAGE.
-                                                            Pictures.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                next();
-                                                            });
+                                                            next();
                                                         }
                                                     } else {
-                                                        next();
+                                                        // NOT FOUND IMAGE.
+                                                        Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
+                                                            next();
+                                                        });
                                                     }
-                                                });
-                                            } else {
-                                                next();
-                                            }
-                                        });
-                                    } else {
-                                        next();
-                                    }
+                                                } else {
+                                                    next();
+                                                }
+                                            });
+                                        } else {
+                                            next();
+                                        }
+                                    });
                                 } else {
                                     next();
                                 }
-                            });
-                        } else {
-                            next();
-                        }
+                            } else {
+                                next();
+                            }
+                        });
                     } else {
                         next();
                     }
+                }).catch((error) => {
+                    next();
                 });
             } catch (e) {
                 next();

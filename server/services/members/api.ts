@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace MembersApiRouter {
 
     const express: any = require("express");
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;

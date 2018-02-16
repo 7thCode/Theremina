@@ -45,7 +45,7 @@ export namespace MailerModule {
          * @param next
          * @returns none
          */
-        public send(request: any, response: any, next: any): void {
+        public send(request: any, response: Express.Response, next: any): void {
 
             let mailer:any | null = null;
             switch (config.mailer.type) {
@@ -114,11 +114,8 @@ export namespace MailerModule {
          * @param response
          * @returns none
          */
-        public get_mail_query_query(request: any, response: any): void {
-            let userid = Mailer.userid(request);
-         //   let query: any = JSON.parse(decodeURIComponent(request.params.query));
-         //   let option: any = JSON.parse(decodeURIComponent(request.params.option));
-
+        public get_mail_query_query(request: any, response: Express.Response): void {
+  //          let userid = Mailer.userid(request);
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
 
@@ -137,9 +134,7 @@ export namespace MailerModule {
          * @param response
          * @returns none
          */
-        public get_mail_count(request: any, response: any): void {
- //           let query: any = JSON.parse(decodeURIComponent(request.params.query));
-
+        public get_mail_count(request: any, response: Express.Response): void {
             let query: any = Wrapper.Decode(request.params.query);
 
             Wrapper.Count(response, 2800, AssetModel, {$and: [{userid: config.systems.userid}, query]}, (response: any, count: any): any => {
@@ -152,7 +147,7 @@ export namespace MailerModule {
          * @param response
          * @returns none
          */
-        public get_mail(request: any, response: any): void {
+        public get_mail(request: any, response: Express.Response): void {
             let id = request.params.id;
             Wrapper.FindOne(response, 1400, AssetModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
                 if (mail) {
@@ -168,7 +163,7 @@ export namespace MailerModule {
          * @param response
          * @returns none
          */
-        public delete_mail(request: any, response: any): void {
+        public delete_mail(request: any, response: Express.Response): void {
             let id = request.params.id;
             Wrapper.FindOne(response, 1300, AssetModel, {$and: [{_id: id}, {userid: config.systems.userid}]}, (response: any, mail: any): void => {
                 if (mail) {

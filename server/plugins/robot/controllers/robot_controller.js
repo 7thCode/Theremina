@@ -14,7 +14,7 @@ var RobotModule;
     var CrawlerModule = require('../../../systems/common/crawler');
     var crawler = new CrawlerModule.Crawler();
     var validator = require('validator');
-    var Robot = (function () {
+    var Robot = /** @class */ (function () {
         function Robot() {
             this.type = {
                 "ANY_TYPE": 0,

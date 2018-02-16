@@ -38,7 +38,7 @@ export namespace RobotModule {
 
         }
 
-        public get(request: any, response: any): void {
+        public get(request: any, response: Express.Response): void {
             const number: number = 1300;
             let url = decodeURIComponent(request.params.url);
             let path = decodeURIComponent(request.params.path);
@@ -55,7 +55,7 @@ export namespace RobotModule {
                     });
                     let unique_urls = _.uniq(urls);
                     Wrapper.SendSuccess(response, unique_urls);
-            } ).catch((error) => {
+            }).catch((error) => {
                 Wrapper.SendError(response, error.code, error.message, error);
             });
 

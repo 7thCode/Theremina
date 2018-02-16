@@ -18,7 +18,7 @@ namespace FormModule {
     Form.plugin(timestamp);
     Form.plugin(userdata, {});
 
-    Form.index({namespace: 1,name: 1, userid: 1, type: 1,status:1, version: 1}, {unique: true});
+    Form.index({namespace: 1, name: 1, userid: 1, type: 1, status: 1, version: 1}, {unique: true});
 
     module.exports = mongoose.model('Page', Form);
 

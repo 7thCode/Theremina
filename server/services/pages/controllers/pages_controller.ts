@@ -6,20 +6,22 @@
 
 "use strict";
 
-//import {Pictures} from "../../pictures/controllers/pictures_controller";
+import * as core from "express-serve-static-core";
+import {RouterOptions} from "express";
 
 export namespace PagesModule {
 
-    const _ = require('lodash');
+    const _: any = require('lodash');
     const fs: any = require('graceful-fs');
-    const MongoClient = require('mongodb').MongoClient;
     const path: any = require('path');
+    const exec: any = require('child_process').exec;
 
     const mongodb: any = require('mongodb');
+    const MongoClient: any = require('mongodb').MongoClient;
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
-    const moment = require("moment");
+    const moment: any = require("moment");
     const archiver: any = require('archiver');
 
     const core: any = require(process.cwd() + '/gs');
@@ -37,16 +39,16 @@ export namespace PagesModule {
 
     export class Pages {
 
-        static connect(callback: (error, db) => void): any {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        static connect(): any {
+            return MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
         }
 
-        static userid(request): string {
+        static userid(request:Express.Request): string {
             return request.user.userid;
         }
 
-        static namespace(request: any): string {
-            let result = "";
+        static namespace(request: Express.Request): string {
+            let result: string = "";
             if (request.user) {
                 if (request.user.data) {
                     result = request.user.data.namespace;
@@ -55,20 +57,21 @@ export namespace PagesModule {
             return result;
         }
 
-
         /**
          *  let userid = Pages.userid(request);
          *  request.sessionID;
          *  let tmp_path = '/tmp/' + sessionid;
          * @param userid
          * @param tmp_path
+         * @param namespace
+         * @param sub_path
          * @param callback
          * @returns none
          */
         static get_file_all(tmp_path: string, userid: string, namespace: string, sub_path: string, callback: (error) => void): void {
-            let number: number = 27000;
-            Pages.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 27000;
+                Pages.connect().then((db) => {
                     let bucket = new mongodb.GridFSBucket(db, {});
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
@@ -85,7 +88,6 @@ export namespace PagesModule {
                                                         .on('end', (): void => {
                                                             resolve({});
                                                         });
-
                                                     let write_file = fs.createWriteStream(path.join(path.join(path.join(tmp_path, namespace), sub_path), doc.filename));
                                                     read_db.pipe(write_file);
                                                 }
@@ -99,7 +101,6 @@ export namespace PagesModule {
                                         }).catch((error: any): void => {
                                             callback(error);
                                         });
-
                                     } else {
                                         callback({code: error.code, message: error.message});
                                     }
@@ -111,11 +112,12 @@ export namespace PagesModule {
                             callback({code: error.code, message: error.message});
                         }
                     });
-                } else {
+                }).catch((error) => {
                     callback({code: error.code, message: error.message});
-                }
-            });
-
+                });
+            } catch (e) {
+                callback({code: e.code, message: e.message});
+            }
         }
 
         /**
@@ -126,13 +128,17 @@ export namespace PagesModule {
          * @returns none
          */
         static get_article_all(tmp_path: string, userid: string, namespace: string, sub_path: string, callback: (error: any) => void): void {
-            ArticleModel.find({$and: [{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
-                fs.writeFile(path.join(path.join(path.join(tmp_path, namespace), sub_path), "/articles.json"), JSON.stringify(docs), (error: any) => {
+            try {
+                ArticleModel.find({$and: [{"namespace": namespace}, {"userid": userid}]}, {}, {}).then((docs: any): void => {
+                    fs.writeFile(path.join(path.join(path.join(tmp_path, namespace), sub_path), "/articles.json"), JSON.stringify(docs), (error: any) => {
+                        callback(error);
+                    });
+                }).catch((error: any): void => {
                     callback(error);
                 });
-            }).catch((error: any): void => {
-                callback(error);
-            });
+            } catch (e) {
+                callback(e);
+            }
         }
 
         /**
@@ -188,12 +194,12 @@ export namespace PagesModule {
          * @param callback
          * @returns none
          */
-        static zip(work: string, target: string, filename:string, callback: (error: any) => void) {
-            let zip_file_name = path.join(work, filename);
-            let archive = archiver.create('zip', {});
-            let output = fs.createWriteStream(zip_file_name);
+        static zip(work: string, target: string, filename: string, callback: (error: any) => void) {
+            let zip_file_name: string = path.join(work, filename);
+            let archive: any = archiver.create('zip', {});
+            let output: any = fs.createWriteStream(zip_file_name);
 
-            let carrent = process.cwd();
+            let carrent: string = process.cwd();
 
             output.on("close", () => {
                 process.chdir(carrent);
@@ -217,17 +223,16 @@ export namespace PagesModule {
          * @param response
          * @returns none
          */
-        public get_all(request: any, response: any): void {
+        public get_all(request: any, response: Express.Response): void {
             let userid: string = Pages.userid(request);
             let namespace: string = Pages.namespace(request);
             let tmp_path: string = path.join("/tmp", request.sessionID);
 
-            let error_handler = (error:any):void => {
+            let error_handler = (error: any): void => {
                 Wrapper.SendError(response, error.code, error.message, error);
             };
 
-            let rm = (tmp_path: string, callback: (error) => void):void => {
-                let exec = require('child_process').exec;
+            let rm = (tmp_path: string, callback: (error) => void): void => {
                 exec('rm -r ' + tmp_path, (error, stdout, stderr) => {
                     callback(error);
                 });
@@ -292,7 +297,7 @@ export namespace PagesModule {
                             });
                         };
             */
-            let make_dir = (path, callback: () => void, error: (_error) => void):void => {
+            let make_dir = (path, callback: () => void, error: (_error) => void): void => {
                 fs.mkdir(path, (_error): void => {
                     if (!_error) {
                         callback();
@@ -327,13 +332,13 @@ export namespace PagesModule {
             }, error_handler);
         }
 
-        public put_all(request: any, response: any): void {
+        public put_all(request: Express.Request, response: Express.Response): void {
         }
 
         public create_init_user_file(user: any): void {
-            let userid = user.userid;
-            Pages.connect((error, db) => {
-                if (!error) {
+            try {
+                let userid = user.userid;
+                Pages.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         let query = {"metadata.userid": config.systems.userid};
                         collection.find(query, (error: any, items: any): void => {
@@ -385,9 +390,12 @@ export namespace PagesModule {
                             }
                         });
                     });
-                } else {
-                }
-            });
+                }).catch((error) => {
+
+                });
+            } catch (e) {
+
+            }
         }
 
         /**
@@ -401,8 +409,8 @@ export namespace PagesModule {
             ResourceModel.find({$and: [{userid: config.systems.userid}, {$and: [{type: {$gte: 20}}, {type: {$lt: 30}}]}]}, {}, {}).then((docs: any): void => {
                 _.forEach(docs, (doc) => {
                     let name: string = doc.name;
-                    let userid = user.userid;
-                    let namespace = doc.namespace;
+                    let userid: string = user.userid;
+                    let namespace: string = doc.namespace;
                     let type: string = doc.type;
                     let content: any = doc.content;
                     ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {
@@ -436,8 +444,8 @@ export namespace PagesModule {
             ArticleModel.find({userid: config.systems.userid}, {}, {}).then((docs: any): void => {
                 _.forEach(docs, (doc) => {
                     let name: string = doc.name;
-                    let userid = user.userid;
-                    let namespace = "";
+                    let userid: string = user.userid;
+                    let namespace: string = "";
                     let type: string = doc.type;
                     let content: any = doc.content;
                     ArticleModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {type: type}, {name: name}]}).then((found: any): void => {

@@ -7,12 +7,14 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace FileApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require(process.cwd() + '/server/systems/common/share');
+    const share: any = require(process.cwd() + '/server/systems/common/share');
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
@@ -24,11 +26,11 @@ export namespace FileApiRouter {
     router.get('/api/query/:query/:option', [exception.exception, exception.guard, exception.authenticate, file.get_file_query_query]);
     router.get('/api/count/:query', [exception.exception, exception.guard, exception.authenticate, file.get_file_query_count]);
 
-    router.get('/api/data/:name', [exception.exception,file.get_file_data_name]);
+    router.get('/api/data/:name', [exception.exception, file.get_file_data_name]);
     router.post('/api/:name/:key', [exception.exception, exception.guard, exception.authenticate, file.post_file_name]);
     router.put('/api/:name/:key', [exception.exception, exception.guard, exception.authenticate, file.put_file_name]);
 
-    router.get('/api/:userid/:name', [exception.exception,file.get_file]);
+    router.get('/api/:userid/:name', [exception.exception, file.get_file]);
 
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, file.delete_own]);
     router.delete('/api/:name/:key', [exception.exception, exception.guard, exception.authenticate, file.delete_file_name]);

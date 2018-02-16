@@ -110,6 +110,37 @@ namespace MembersControllersModule {
 
             };
 
+            $scope.showMemberDialog = (): void => {
+                let modalRegist = $uibModal.open({
+                    controller: 'MemberDialogController',
+                    templateUrl: '/auth/dialogs/memberdialog',
+                    backdrop: "static",
+                    resolve: {
+                        items: (): any => {
+                            return $scope.items;
+                        }
+                    }
+                });
+
+                modalRegist.result.then((): void => {
+                    confirmMember();
+                }, (): void => {
+                });
+            };
+
+            let confirmMember = () => {
+                let modalRegistConfirm = $uibModal.open({
+                    controller: 'MemberConfirmDialogController',
+                    templateUrl: '/auth/dialogs/memberconfirmdialog',
+                    backdrop: "static",
+                    targetEvent: null
+                });
+
+                modalRegistConfirm.result.then((): void => {
+                }, (): void => {
+                });
+            };
+
             $scope.Next = Next;
             $scope.Prev = Prev;
             $scope.Count = Count;
@@ -119,6 +150,57 @@ namespace MembersControllersModule {
             Find(null);
 
         }]);
+
+    MembersControllers.controller('MemberDialogController', ['$scope', '$uibModalInstance', 'AuthService',
+        ($scope: any, $uibModalInstance: any, AuthService: any): void => {
+
+            let progress = (value) => {
+                $scope.$emit('progress', value);
+            };
+
+            $scope.$on('progress', (event, value) => {
+                $scope.progress = value;
+            });
+
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.answer = (items: any): void => {
+                $scope.message = "";
+                progress(true);
+                AuthService.Member($scope.items.username, $scope.items.password, $scope.items.displayName, items, (account) => {
+                    $uibModalInstance.close(account);
+                    progress(false);
+                }, (error, message) => {
+                    $scope.message = message;
+                    progress(false);
+                });
+
+            };
+        }]);
+
+    MembersControllers.controller('MemberConfirmDialogController', ['$scope', '$uibModalInstance',
+        ($scope: any, $uibModalInstance: any): void => {
+
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.answer = (answer): void => {
+                $uibModalInstance.close($scope);
+            };
+
+        }]);
+
 
     MembersControllers.controller('MemberOpenDialogController', ['$scope', '$uibModalInstance', 'items',
         ($scope: any, $uibModalInstance: any, items: any): void => {

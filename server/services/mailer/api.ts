@@ -6,16 +6,15 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace MailerApiRouter {
 
     const express: any = require("express");
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
-    const core = require(process.cwd() + "/gs");
+    const core:any = require(process.cwd() + "/gs");
     const share: any = core.share;
-
-    const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
-    const exception: any = new ExceptionController.Exception();
 
     const MailerModule: any = require(share.Server("services/mailer/controllers/mailer_controller"));
     const mailer: any = new MailerModule.Mailer;

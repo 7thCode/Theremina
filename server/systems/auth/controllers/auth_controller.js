@@ -56,7 +56,7 @@ var AuthModule;
         }
     });
     var use_publickey = config.use_publickey;
-    var Auth = (function () {
+    var Auth = /** @class */ (function () {
         function Auth() {
         }
         Auth.prototype.create_init_user = function (initusers) {
@@ -101,15 +101,6 @@ var AuthModule;
             }
         };
         ;
-        /*    static isSystem(user: any): boolean {
-                //           let result: boolean = (user.type == "System");
-                let result: boolean = false;
-                if (user.auth) {
-                    result = (user.auth == 1);
-                }
-                return result;
-            }
-       */
         Auth._role = function (user) {
             var result = { guest: true, categoly: 0 };
             if (user) {
@@ -117,6 +108,7 @@ var AuthModule;
                     case 1:
                         result.system = true;
                     case 100:
+                    case 101:
                         result.user = true;
                     case 10000:
                         result.guest = true;
@@ -139,6 +131,7 @@ var AuthModule;
                     case 1:
                         result.system = true;
                     case 100:
+                    case 101:
                         result.user = true;
                     case 10000:
                         result.guest = true;
@@ -207,6 +200,48 @@ var AuthModule;
             var user = request.user;
             if (user) {
                 if (Auth._role(user).system) {
+                    next();
+                }
+                else {
+                    Wrapper.SendError(response, 403, "Forbidden.", { code: 403, message: "Forbidden." });
+                }
+            }
+            else {
+                Wrapper.SendError(response, 403, "Forbidden.", { code: 403, message: "Forbidden." });
+            }
+        };
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
+        Auth.prototype.page_is_user = function (request, response, next) {
+            var user = request.user;
+            if (user) {
+                if (Auth._role(user).user) {
+                    next();
+                }
+                else {
+                    response.status(403).render('error', { status: 403, message: "Forbidden...", url: request.url });
+                }
+            }
+            else {
+                response.status(403).render('error', { status: 403, message: "Forbidden...", url: request.url });
+            }
+        };
+        /**
+         *
+         * @param request
+         * @param response
+         * @param next
+         * @returns none
+         */
+        Auth.prototype.is_user = function (request, response, next) {
+            var user = request.user;
+            if (user) {
+                if (Auth._role(user).user) {
                     next();
                 }
                 else {

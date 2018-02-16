@@ -6,6 +6,8 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 namespace App {
 
     const fs: any = require("graceful-fs");
@@ -26,7 +28,7 @@ namespace App {
 
         let install: any = () => {
             const app: any = express();
-            const router: any = express.Router();
+            const router: IRouter = express.Router();
 
             app.set("views", path.join(__dirname, "views"));
             app.set("view engine", "pug");
@@ -183,281 +185,293 @@ namespace App {
             const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
 
             if (config.db.user) {
-                mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options)
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
-            } else {
-                mongoose.connect("mongodb://" + config.db.address + "/" + config.db.name, options)
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+                mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
             }
 
-            //     process.on('uncaughtException', (error: any): void => {
-            //         console.log(error);
-            //         logger.error('Stop.   ' + error);
-            //     });
+            mongoose.connection.on('connected',  () => {
 
-            //   process.on('exit', (code: number): void => {
-            //       logger.info('Stop.   ' + code);
-            //   });
+                app.use(session({
+                    name: config.sessionname,
+                    secret: config.sessionsecret,
+                    resave: false,
+                    rolling: true,
+                    saveUninitialized: true,
+                    cookie: {
+                        maxAge: 365 * 24 * 60 * 60 * 1000
+                    },
+                    store: new MongoStore({
+                        mongooseConnection: mongoose.connection,
+                        ttl: 365 * 24 * 60 * 60,
+                        clear_interval: 60 * 60
+                    })
+                }));
 
-            app.use(session({
-                name: config.sessionname,
-                secret: config.sessionsecret,
-                resave: false,
-                rolling: true,
-                saveUninitialized: true,
-                cookie: {
-                    maxAge: 365 * 24 * 60 * 60 * 1000
-                },
-                store: new MongoStore({
-                    mongooseConnection: mongoose.connection,
-                    ttl: 365 * 24 * 60 * 60,
-                    clear_interval: 60 * 60
-                })
-            }));
+                // passport
+                app.use(passport.initialize());
+                app.use(passport.session());
+                // passport
 
-            // passport
-            app.use(passport.initialize());
-            app.use(passport.session());
-            // passport
+                let load_module: any = (root: string, modules: any): void => {
+                    if (modules) {
+                        modules.forEach((module) => {
+                            let path = root + module.path;
+                            let name = module.name;
+                            app.use("/" + name, require(path + name + "/api"));
+                            app.use("/" + name, require(path + name + "/pages"));
+                        });
+                    }
+                };
 
-            let load_module: any = (root: string, modules: any): void => {
-                if (modules) {
-                    modules.forEach((module) => {
-                        let path = root + module.path;
-                        let name = module.name;
-                        app.use("/" + name, require(path + name + "/api"));
-                        app.use("/" + name, require(path + name + "/pages"));
+                load_module("./server", config.modules);
+                load_module("./server", services_config.modules);
+                load_module("./server", plugins_config.modules);
+                load_module("./server", applications_config.modules);
+
+                // root
+                if (applications_config.services) {
+                    _.forEach(applications_config.services, (service) => {
+                        app.use("/", require(service.lib));
                     });
                 }
-            };
 
-            load_module("./server", config.modules);
-            load_module("./server", services_config.modules);
-            load_module("./server", plugins_config.modules);
-            load_module("./server", applications_config.modules);
-
-            // root
-            if (applications_config.services) {
-                _.forEach(applications_config.services, (service) => {
-                    app.use("/", require(service.lib));
-                });
-            }
-
-            if (config.db.backup) {
-                share.Scheduler.Add({
-                    timing: config.db.backup, name: "backup", job: () => {
-                        share.Command.Backup(config.db);
-                    }
-                });
-            }
-
-            // passport
-            const Account: any = core.LocalAccount;
-            passport.use(new LocalStrategy(Account.authenticate()));
-
-            passport.serializeUser((user, done): void => {
-                switch (user.provider) {
-                    case "facebook":
-                    case "twitter":
-                    case "instagram":
-                    case "googleplus":
-                    case "line":
-                        let objectid: any = new mongoose.Types.ObjectId; // Create new id
-                        user.username = user.id;
-                        user.userid = user.id;
-                        user.enabled = true;
-                        user.passphrase = objectid.toString();
-                        user.publickey = Cipher.PublicKey(user.passphrase);
-                        user.local = definition.account_content;
-                        break;
-                    case "local":
-                        break;
-                    default:
+                if (config.db.backup) {
+                    share.Scheduler.Add({
+                        timing: config.db.backup, name: "backup", job: () => {
+                            share.Command.Backup(config.db);
+                        }
+                    });
                 }
-                done(null, user);
-            });
 
-            passport.deserializeUser((obj, done): void => {
-                done(null, obj);
-            });
+                const CacheModule: any = require(share.Server("systems/common/cache/cache"));
+                let cache = new CacheModule.Cache("public");
 
-            if (config.facebook) {
-                passport.use(new FacebookStrategy(config.facebook.key, (accessToken, refreshToken, profile, done): void => {
-                        process.nextTick((): void => {
-                            done(null, profile);
-                        })
+
+                // passport
+                const Account: any = core.LocalAccount;
+                passport.use(new LocalStrategy(Account.authenticate()));
+
+                passport.serializeUser((user, done): void => {
+                    switch (user.provider) {
+                        case "facebook":
+                        case "twitter":
+                        case "instagram":
+                        case "googleplus":
+                        case "line":
+                            let objectid: any = new mongoose.Types.ObjectId; // Create new id
+                            user.username = user.id;
+                            user.userid = user.id;
+                            user.enabled = true;
+                            user.passphrase = objectid.toString();
+                            user.publickey = Cipher.PublicKey(user.passphrase);
+                            user.local = definition.account_content;
+                            break;
+                        case "local":
+                            break;
+                        default:
                     }
-                ));
-            }
+                    done(null, user);
+                });
 
-            if (config.twitter) {
-                passport.use(new TwitterStrategy(config.twitter.key, (accessToken, refreshToken, profile, done): void => {
-                        process.nextTick((): void => {
-                            done(null, profile);
-                        });
-                    }
-                ));
-            }
+                passport.deserializeUser((obj, done): void => {
+                    done(null, obj);
+                });
 
-            if (config.instagram) {
-                passport.use(new InstagramStrategy(config.instagram.key, (accessToken, refreshToken, profile, done): void => {
-                        process.nextTick((): void => {
-                            done(null, profile);
-                        });
-                    }
-                ));
-            }
+                if (config.facebook) {
+                    passport.use(new FacebookStrategy(config.facebook.key, (accessToken, refreshToken, profile, done): void => {
+                            process.nextTick((): void => {
+                                done(null, profile);
+                            })
+                        }
+                    ));
+                }
 
-            if (config.line) {
-                passport.use(new LineStrategy(config.line.key, (accessToken, refreshToken, profile, done): void => {
-                        process.nextTick((): void => {
-                            done(null, profile);
-                        });
-                    }
-                ));
-            }
+                if (config.twitter) {
+                    passport.use(new TwitterStrategy(config.twitter.key, (accessToken, refreshToken, profile, done): void => {
+                            process.nextTick((): void => {
+                                done(null, profile);
+                            });
+                        }
+                    ));
+                }
 
-            if (config.googleplus) {
-                //          passport.use(new GooglePlusStrategy(config.googleplus.key, (accessToken, refreshToken, profile, done): void => {
-                //                  process.nextTick((): void => {
-                //                      done(null, profile);
-                //                  })
-                //              }
-                //          ));
-            }
-            // passport
+                if (config.instagram) {
+                    passport.use(new InstagramStrategy(config.instagram.key, (accessToken, refreshToken, profile, done): void => {
+                            process.nextTick((): void => {
+                                done(null, profile);
+                            });
+                        }
+                    ));
+                }
 
-            const auth: any = core.auth;
-            auth.create_init_user(config.initusers);
-            auth.create_init_user(services_config.initusers);
-            auth.create_init_user(plugins_config.initusers);
-            auth.create_init_user(applications_config.initusers);
+                if (config.line) {
+                    passport.use(new LineStrategy(config.line.key, (accessToken, refreshToken, profile, done): void => {
+                            process.nextTick((): void => {
+                                done(null, profile);
+                            });
+                        }
+                    ));
+                }
 
-            const file: any = core.file;
-            file.create_init_files(config.systems.userid, config.initfiles, (error, result) => {
-                file.create_init_files(config.systems.userid, services_config.initfiles, (error, result) => {
-                    file.create_init_files(config.systems.userid, plugins_config.initfiles, (error, result) => {
-                        file.create_init_files(config.systems.userid, applications_config.initfiles, (error, result) => {
+                if (config.googleplus) {
+                    //          passport.use(new GooglePlusStrategy(config.googleplus.key, (accessToken, refreshToken, profile, done): void => {
+                    //                  process.nextTick((): void => {
+                    //                      done(null, profile);
+                    //                  })
+                    //              }
+                    //          ));
+                }
+                // passport
 
+                const auth: any = core.auth;
+                auth.create_init_user(config.initusers);
+                auth.create_init_user(services_config.initusers);
+                auth.create_init_user(plugins_config.initusers);
+                auth.create_init_user(applications_config.initusers);
+
+                const file: any = core.file;
+                file.create_init_files(config.systems.userid, config.initfiles, (error, result) => {
+                    file.create_init_files(config.systems.userid, services_config.initfiles, (error, result) => {
+                        file.create_init_files(config.systems.userid, plugins_config.initfiles, (error, result) => {
+                            file.create_init_files(config.systems.userid, applications_config.initfiles, (error, result) => {
+
+                            });
                         });
                     });
                 });
-            });
 
-            const resource: any = core.resource;
-            resource.create_init_resources(config.systems.userid, config.initresources, (error, result) => {
-                resource.create_init_resources(config.systems.userid, services_config.initresources, (error, result) => {
-                    resource.create_init_resources(config.systems.userid, plugins_config.initresources, (error, result) => {
-                        resource.create_init_resources(config.systems.userid, applications_config.initresources, (error, result) => {
+                const resource: any = core.resource;
+                resource.create_init_resources(config.systems.userid, config.initresources, (error, result) => {
+                    resource.create_init_resources(config.systems.userid, services_config.initresources, (error, result) => {
+                        resource.create_init_resources(config.systems.userid, plugins_config.initresources, (error, result) => {
+                            resource.create_init_resources(config.systems.userid, applications_config.initresources, (error, result) => {
 
+                            });
                         });
                     });
                 });
+
+                // services
+                const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
+                const form: any = new FormsController.Form();
+                form.create_init_forms(applications_config.initforms);
+                // services
+
+                // DAV
+                // //   if (config.dav) {
+                //       let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
+                //       let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
+                //       let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
+                //       jsDAV.createServer({
+                //           node: path.join(__dirname, 'public'),
+                //           locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
+                //           authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
+                //           realm: "jsdavtest"
+                //       }, 8001);
+                //       require('cozy-jsdav-fork/lib/CalDAV/plugin');
+                //   }
+                // DAV
+
+                // Slack Bot
+                /*
+                 if (config.slack) {
+                 const Botkit = require('botkit');
+
+                 const controller = Botkit.slackbot({
+                 debug: false
+                 });
+
+                 controller.spawn({
+                 token: config.slack.token
+                 }).startRTM(function (err) {
+                 if (err) {
+                 throw new Error(err);
+                 }
+                 });
+
+                 controller.hears('', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+                 bot.reply(message, 'なーに？');
+                 });
+                 }
+                 */
+                // slack Bot
+
+                let server: any = Serve(config, app);
+                let Socket: any = require('./server/systems/common/sio');
+                let io = new Socket.IO(server);
+                io.wait(config, event);
+
+
+
+                // mailReceiver
+                if (config.receiver) {
+                    const MailerModule: any = require('./server/systems/common/mailer');
+                    let receiver = new MailerModule.MailReceiver();
+                    receiver.connect(config.receiver,
+                        (error) => {
+                            let a = error;
+                        },
+                        (message, body): void => {
+                            let a = message;
+                            let subject = body.subject;
+                            let text = body.text;
+
+                            event.emitter.emit('mail', {message: message, body: body});
+                        });
+                }
+                // mailReceiver
+
+                // error handlers
+                app.use((req, res, next): void => {
+                    let err: any = new Error('Not Found');
+                    err.status = 404;
+                    next(err);
+                });
+
+                if (app.get('env') === 'development') {
+                    app.use((err, req, res, next): void => {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            status: err.status
+                        });
+                    });
+                }
+
+                app.use((err, req, res, next): void => {
+                    if (req.xhr) {
+                        res.status(500).send(err);
+                    } else {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: {}
+                        });
+                    }
+                });
             });
 
-            // services
-            const FormsController: any = require(share.Server("services/forms/controllers/forms_controller"));
-            const form: any = new FormsController.Form();
-            form.create_init_forms(applications_config.initforms);
-            // services
+            mongoose.connection.on('error', (error) =>  {
+                logger.fatal('Mongoose default connection error: ' + error);
+                process.exit(0);
+            });
 
-            // DAV
-            // //   if (config.dav) {
-            //       let jsDAV = require("cozy-jsdav-fork/lib/jsdav");
-            //       let jsDAV_Locks_Backend_FS = require("cozy-jsdav-fork/lib/DAV/plugins/locks/fs");
-            //       let jsDAV_Auth_Backend_File = require("cozy-jsdav-fork/lib/DAV/plugins/auth/file");
-            //       jsDAV.createServer({
-            //           node: path.join(__dirname, 'public'),
-            //           locksBackend: jsDAV_Locks_Backend_FS.new(path.join(__dirname, 'public/lock')),
-            //           authBackend: jsDAV_Auth_Backend_File.new(path.join(__dirname, 'htdigest')),
-            //           realm: "jsdavtest"
-            //       }, 8001);
-            //       require('cozy-jsdav-fork/lib/CalDAV/plugin');
-            //   }
-            // DAV
+            mongoose.connection.on('disconnected',  () =>  {
+                logger.info('Mongoose default connection disconnected');
+            });
 
-            // Slack Bot
-            /*
-             if (config.slack) {
-             const Botkit = require('botkit');
+            event.emitter.on('socket', (data): void => {
 
-             const controller = Botkit.slackbot({
-             debug: false
-             });
-
-             controller.spawn({
-             token: config.slack.token
-             }).startRTM(function (err) {
-             if (err) {
-             throw new Error(err);
-             }
-             });
-
-             controller.hears('', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
-             bot.reply(message, 'なーに？');
-             });
-             }
-             */
-            // slack Bot
+            });
 
             event.emitter.on('mail', (mail): void => {
                 //       let a = mail;
             });
 
-            // mailReceiver
-            if (config.receiver) {
-                const MailerModule: any = require('./server/systems/common/mailer');
-                let receiver = new MailerModule.MailReceiver();
-                receiver.connect(config.receiver,
-                    (error) => {
-                        let a = error;
-                    },
-                    (message, body): void => {
-                        let a = message;
-                        let subject = body.subject;
-                        let text = body.text;
-
-                        event.emitter.emit('mail', {message: message, body: body});
-                    });
-            }
-            // mailReceiver
-
-            // error handlers
-            app.use((req, res, next): void => {
-                let err: any = new Error('Not Found');
-                err.status = 404;
-                next(err);
-            });
-
-            if (app.get('env') === 'development') {
-                app.use((err, req, res, next): void => {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        status: err.status
-                    });
-                });
-            }
-
-            app.use((err, req, res, next): void => {
-                if (req.xhr) {
-                    res.status(500).send(err);
-                } else {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        error: {}
-                    });
-                }
-            });
-
             process.on('SIGINT', (): void => { // for pm2 cluster.
-                logger.info('Stop by SIGINT.');
-                process.exit(0);
+                mongoose.connection.close(() => {
+                    logger.info('Stop by SIGINT.');
+                    process.exit(0);
+                });
             });
 
             process.on('message', (msg): void => {  // for pm2 cluster on windows.
@@ -468,22 +482,12 @@ namespace App {
                     }, 1500);
                 }
             });
-
-            event.emitter.on('socket', (data): void => {
-
-            });
-
-            let server: any = Serve(config, app);
-            let Socket: any = require('./server/systems/common/sio');
-            let io = new Socket.IO(server);
-            io.wait(config, event);
-
         };
 
         let maintenance: any = () => {
 
             const app: any = express();
-            const router: any = express.Router();
+            const router: IRouter = express.Router();
 
             app.set('views', path.join(__dirname, 'views'));
             app.set('view engine', 'pug');

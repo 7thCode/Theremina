@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace GooglePageRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const core = require(process.cwd() + '/gs');
     const auth: any = core.auth;
@@ -17,7 +19,7 @@ export namespace GooglePageRouter {
     const exception: any = core.exception;
 
     const config: any = share.config;
-    let message = config.message;
+    const message : any = config.message;
 
     const services_config = share.services_config;
     const webfonts:any[] = services_config.webfonts;
@@ -32,7 +34,7 @@ export namespace GooglePageRouter {
             let user: any = request.session.req.user;
             if (user) {
                 if (user.tokens) {
-                    let tokens = user.tokens.google_calendar_token;
+                    let tokens:any = user.tokens.google_calendar_token;
                     calendar.authorize(tokens, (client: any, tokens: any): void => {
                         if (client) {
                             calendar.analytics(client, (error: any, result: string): void => {
@@ -65,7 +67,7 @@ export namespace GooglePageRouter {
 
         //step2
         router.get('/callback', (request: any, response: any): void => {
-            let code = request.query.code;
+            let code:any = request.query.code;
             calendar.authorize_callback(code, (client: any, tokens: any): void => {
                 if (client) {
                     let user = request.session.req.user;

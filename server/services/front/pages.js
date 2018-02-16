@@ -12,6 +12,7 @@ var PageRouter;
     var _ = require('lodash');
     var core = require(process.cwd() + '/gs');
     var share = core.share;
+    var auth = core.auth;
     var config = share.config;
     var analysis = core.analysis;
     var services_config = share.services_config;
@@ -24,6 +25,7 @@ var PageRouter;
             response.render("services/front/index", {
                 config: config,
                 user: request.user,
+                role: auth.role(request.user),
                 message: message,
                 status: 200,
                 fonts: webfonts

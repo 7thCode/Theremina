@@ -7,16 +7,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var SettingModule;
 (function (SettingModule) {
-    //const fs: any = require('graceful-fs');
-    //const _ = require('lodash');
     var share = require(process.cwd() + '/server/systems/common/share');
-    //   const logger: any = share.logger;
     var Persistent = share.Persistent;
     var Wrapper = share.Wrapper;
     var config = share.config;
     var Cipher = share.Cipher;
     var file_utility = share.Utility;
-    var Setting = (function () {
+    var Setting = /** @class */ (function () {
         function Setting() {
         }
         /**

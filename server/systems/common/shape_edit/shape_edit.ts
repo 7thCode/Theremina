@@ -370,11 +370,9 @@ namespace ShapeEdit {
                 if (!this._haserror) {
                     try {
                         result = context.createPattern(this.image, "repeat");
-                    }
-                    catch (e) {
+                    } catch (e) {
                         let a = 1;
                     }
-
                 }
             }
             return result;
@@ -388,7 +386,6 @@ namespace ShapeEdit {
                     this.image.crossOrigin = 'Anonymous';
                     this.image.onload = (e: any): void => {
                         this._haserror = false;
-
                         callback();
                     };
                     this.image.onerror = (e: any): void => {

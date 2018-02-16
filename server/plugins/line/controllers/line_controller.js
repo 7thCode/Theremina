@@ -25,7 +25,7 @@ var LineModule;
             version_date: '2017-05-26'
         });
     */
-    var Line = (function () {
+    var Line = /** @class */ (function () {
         function Line() {
         }
         /**

@@ -9,17 +9,19 @@
 
 "use strict";
 
+import {Express} from "express-serve-static-core";
+
 export namespace Promised {
 
-    const fs = require('graceful-fs');
-    const _ = require("lodash");
+  //  const fs: any = require('graceful-fs');
+    const _: any = require("lodash");
     const result: any = require("./result");
 
-    const config = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
-    const log4js = require('log4js');
-    log4js.configure("./config/systems/logs.json");
-    const logger = log4js.getLogger('request');
-    logger.setLevel(config.loglevel);
+   // const config: any = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
+   // const log4js: any = require('log4js');
+  //  log4js.configure("./config/systems/logs.json");
+   // const logger: any = log4js.getLogger('request');
+   // logger.setLevel(config.loglevel);
 
     export class Wrapper {
 
@@ -31,7 +33,7 @@ export namespace Promised {
             return response;
         }
 
-        public Exception(req: any, res: any, callback: (req: any, res: any) => void): void {
+        public Exception(req: Express.Request, res: Express.Response, callback: (req: any, res: any) => void): void {
             try {
                 callback(req, res);
             } catch (e) {
@@ -39,7 +41,7 @@ export namespace Promised {
             }
         }
 
-        public Guard(req: any, res: any, callback: (req: any, res: any) => void): void {
+        public Guard(req: any, res: Express.Response, callback: (req: any, res: any) => void): void {
             if (req.headers["x-requested-with"] === "XMLHttpRequest") {
                 res = this.BasicHeader(res, "");
                 callback(req, res);
@@ -48,7 +50,7 @@ export namespace Promised {
             }
         }
 
-        public Authenticate(req: any, res: any, callback: (req: any, res: any) => void): void {
+        public Authenticate(req: Express.Request, res: Express.Response, callback: (req: any, res: any) => void): void {
             if (req.user) {
                 if (req.isAuthenticated()) {
                     callback(req, res);
@@ -60,15 +62,15 @@ export namespace Promised {
             }
         }
 
-        public FindById(res: any, code: number, model: any, id: any, callback: (res: any, object: any) => void): any {
-           return model.findById(id).then((object: any): void => {
+        public FindById(res: Express.Response, code: number, model: any, id: any, callback: (res: any, object: any) => void): any {
+            return model.findById(id).then((object: any): void => {
                 callback(res, object);
             }).catch((error: any): void => {
                 this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public FindOne(res: any, code: number, model: any, query: any, callback: (res: any, object: any) => void): any {
+        public FindOne(res: Express.Response, code: number, model: any, query: any, callback: (res: any, object: any) => void): any {
             return model.findOne(query).then((doc: any): void => {
                 callback(res, doc);
             }).catch((error: any): void => {
@@ -76,7 +78,7 @@ export namespace Promised {
             });
         }
 
-        public Find(res: any, code: number, model: any, query: any, fields: any, option: any, callback: (res: any, object: any) => void): any {
+        public Find(res: Express.Response, code: number, model: any, query: any, fields: any, option: any, callback: (res: any, object: any) => void): any {
             return model.find(query, fields, option).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
@@ -84,15 +86,15 @@ export namespace Promised {
             });
         }
 
-        public Count(response: any, code: number, model: any, query: any, callback: (response: any, object: any) => void): any {
+        public Count(res: Express.Response, code: number, model: any, query: any, callback: (response: any, object: any) => void): any {
             return model.count(query).then((count) => {
-                callback(response, count);
+                callback(res, count);
             }).catch((error) => {
-                this.SendError(response, error.code, error.message, error);
+                this.SendError(res, error.code, error.message, error);
             });
         }
 
-        public FindAndModify(res: any, code: number, model: any, query: any, sort: any, update: any, options: any, callback: (res: any, object: any) => void): any {
+        public FindAndModify(res: Express.Response, code: number, model: any, query: any, sort: any, update: any, options: any, callback: (res: any, object: any) => void): any {
             return model.findAndModify(query, sort, update, options).then((docs: any): void => {
                 callback(res, docs);
             }).catch((error: any): void => {
@@ -100,7 +102,7 @@ export namespace Promised {
             });
         }
 
-        public Save(res: any, code: number, instance: any, callback: (res: any, object: any) => void): any {
+        public Save(res: Express.Response, code: number, instance: any, callback: (res: any, object: any) => void): any {
             return instance.save().then(() => {
                 callback(res, instance);
             }).catch((error: any): void => {
@@ -108,7 +110,7 @@ export namespace Promised {
             });
         }
 
-        public Update(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
+        public Update(res: Express.Response, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
             return model.findOneAndUpdate(query, update, {upsert: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
@@ -116,7 +118,7 @@ export namespace Promised {
             });
         }
 
-        public Upsert(res: any, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
+        public Upsert(res: Express.Response, code: number, model: any, query: any, update: any, callback: (res: any) => void): any {
             return model.update(query, update, {upsert: true, multi: false}).then(() => {
                 callback(res);
             }).catch((error: any): void => {
@@ -124,7 +126,7 @@ export namespace Promised {
             });
         }
 
-        public Remove(res: any, code: number, instance: any, callback: (res: any) => void): any {
+        public Remove(res: Express.Response, code: number, instance: any, callback: (res: any) => void): any {
             return instance.remove().then(() => {
                 callback(res);
             }).catch((error: any): void => {
@@ -132,7 +134,7 @@ export namespace Promised {
             });
         }
 
-        public Delete(res: any, code: number, model: any, query: any, callback: (res: any) => void): any {
+        public Delete(res: Express.Response, code: number, model: any, query: any, callback: (res: any) => void): any {
             return model.remove(query).then(() => {
                 callback(res);
             }).catch((error: any): void => {
@@ -140,7 +142,7 @@ export namespace Promised {
             });
         }
 
-        public If(res: any, code: number, condition: boolean, callback: (res: any) => void): void {
+        public If(res: Express.Response, code: number, condition: boolean, callback: (res: any) => void): void {
             if (condition) {
                 callback(res);
             } else {
@@ -149,35 +151,35 @@ export namespace Promised {
         }
 
         public SendWarn(response: any, code: number, message: any, object: any): void {
-            logger.warn(message + " " + code);
+       //     logger.warn(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         }
 
         public SendError(response: any, code: number, message: any, object: any): void {
-            logger.error(message + " " + code);
+     //       logger.error(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         }
 
         public SendForbidden(response: any): void {
-            logger.error("Forbidden");
+      //      logger.error("Forbidden");
             if (response) {
                 response.status(403).render("error", {message: "Forbidden...", status: 403});
             }
         }
 
         public SendNotFound(response: any): void {
-            logger.error("notfound");
+    //        logger.error("notfound");
             if (response) {
                 response.status(404).render("error", {message: "not found", status: 404});
             }
         }
 
         public SendFatal(response: any, code: number, message: any, object: any): void {
-            logger.fatal(message + " " + code);
+  //          logger.fatal(message + " " + code);
             if (response) {
                 response.status(500).render("error", {message: message, status: 500});
             }

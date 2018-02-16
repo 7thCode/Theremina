@@ -6,20 +6,19 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace ResourceApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
-  //  const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-  //  const auth: any = new AuthController.Auth;
-
-    const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    const resource = new ResourcesModule.Resource;
+    const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
+    const resource: any = new ResourcesModule.Resource;
 
     router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, resource.delete_own]);
 

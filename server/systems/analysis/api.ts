@@ -6,12 +6,14 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace AnalysisApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const share = require(process.cwd() + '/server/systems/common/share');
+    const share: any = require(process.cwd() + '/server/systems/common/share');
 
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception;

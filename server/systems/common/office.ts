@@ -14,11 +14,11 @@ export namespace OfficeModule {
 
         }
 
-        public ObjectToRow(object:any) : any {
+        public ObjectToRow(object: any): any {
 
         }
 
-        public test():void {
+        public test(): void {
 
         }
 

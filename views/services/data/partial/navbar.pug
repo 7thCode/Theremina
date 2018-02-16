@@ -16,11 +16,11 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
                         ul.dropdown-menu(role="menu")
                             li(ng-class="{disabled: opened}")
                                 a(href="#", ng-click="!opened && CreateArticle();", role="menuitem") #{message.create}
-                            li(ng-class="{disabled: !opened}")
-                                a(href="", ng-click="opened && SaveArticle();", role="menuitem") #{message.save}
+                            //li(ng-class="{disabled: !opened || validate.$invalid}")
+                                a(href="#", ng-click="opened && SaveArticle();", role="menuitem") #{message.save}
                             li.divider
                             li(ng-class="{disabled: !opened}" )
-                                a(href="", ng-click="opened && DeleteArticle();", role="menuitem") #{message.delete}
+                                a(href="#", ng-click="opened && DeleteArticle();", role="menuitem") #{message.delete}
 
                     li.dropdown(ng-class="{disabled: opened}")
                         a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')

@@ -11,7 +11,7 @@ var PublicKeyModule;
     var Config = share.config;
     var Wrapper = share.Wrapper;
     var Cipher = share.Cipher;
-    var PublicKey = (function () {
+    var PublicKey = /** @class */ (function () {
         function PublicKey() {
         }
         PublicKey.prototype.get_fixed_public_key = function (request, response) {

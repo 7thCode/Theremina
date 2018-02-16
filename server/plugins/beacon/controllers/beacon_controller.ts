@@ -6,22 +6,18 @@
 
 "use strict";
 
-import {Files} from "../../../systems/files/controllers/file_controller";
-
 export namespace BeaconModule {
 
-    const _ = require('lodash');
-    const mongodb: any = require('mongodb');
-    const mongoose = require('mongoose');
-    const Grid = require('gridfs-stream');
+    const _: any = require('lodash');
 
-    const core = require(process.cwd() + '/gs');
+    const mongodb: any = require('mongodb');
+    const MongoClient: any = require('mongodb').MongoClient;
+
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
 
-    const MongoClient = require('mongodb').MongoClient;
-
-    const config = share.config;
-    const Cipher = share.Cipher;
+    const config: any = share.config;
+    const Cipher: any = share.Cipher;
 
     export class Beacon {
 
@@ -29,8 +25,8 @@ export namespace BeaconModule {
 
         }
 
-        static connect(callback: (error, db) => void): any {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        static connect(): any {
+            return MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
         }
 
         /**
@@ -46,9 +42,8 @@ export namespace BeaconModule {
                 } catch (e) {
                 }
 
-                Beacon.connect((error, db) => {
-                    if (!error) {
-                     //   let gfs = Grid(db, mongoose.mongo); //missing parameter
+                Beacon.connect().then((db) => {
+
                         let gfs = new mongodb.GridFSBucket(db, {});
                         if (gfs) {
                             db.collection('fs.files', (error: any, collection: any): void => {
@@ -57,7 +52,6 @@ export namespace BeaconModule {
                                         collection.findOne({filename: "blank.png"}, (error: any, item: any): void => {
                                             if (!error) {
                                                 if (item) {
-                                               //     let readstream = gfs.createReadStream({_id: item._id});
                                                     let readstream = gfs.openDownloadStream(item._id);
                                                     if (readstream) {
                                                         response.setHeader("Content-Type", item.metadata.type);
@@ -87,10 +81,11 @@ export namespace BeaconModule {
                         } else {
                             next();
                         }
-                    } else {
-                        next();
-                    }
+
+                }).catch((error) => {
+                    next();
                 });
+
             } catch (e) {
                 next();
             }

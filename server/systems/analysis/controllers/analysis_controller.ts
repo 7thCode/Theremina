@@ -8,12 +8,12 @@
 
 export namespace AnalysisModule {
 
-    const _ = require("lodash");
+    const _: any = require("lodash");
 
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-    const Memory = share.Memory;
+    const share: any = require(process.cwd() + '/server/systems/common/share');
+    const config: any = share.config;
+    const Wrapper: any = share.Wrapper;
+    const Memory: any = share.Memory;
 
     const QueueModel: any = require(share.Models("systems/queues/queue"));
 
@@ -23,8 +23,7 @@ export namespace AnalysisModule {
         }
 
         static process_queue(queue, callback: (error) => void) {
-
-            let promises = [];
+            let promises: any[] = [];
             let write = (data: any): any => {
                 return (): any => {
                     return new Promise((resolve: any, reject: any): void => {
@@ -63,7 +62,7 @@ export namespace AnalysisModule {
             if (Memory.length > config.analysis.count) {
                 Analysis.process_queue(Memory, (): void => {
                     Memory.splice(0, Memory.length);
-                })
+                });
             }
         }
 
@@ -73,7 +72,7 @@ export namespace AnalysisModule {
          * @param next
          * @returns none
          */
-        public page_view(request: any, response: any, next: any): void {
+        public page_view(request: any, response: Express.Response, next: any): void {
 
             let data = {
                 type: "pv",
@@ -87,7 +86,7 @@ export namespace AnalysisModule {
             if (Memory.length > config.analysis.count) {
                 Analysis.process_queue(Memory, (): void => {
                     Memory.splice(0, Memory.length);
-                })
+                });
             }
 
             next();
@@ -98,14 +97,14 @@ export namespace AnalysisModule {
          * @param response
          * @returns none
          */
-        public get_queue(request: any, response: any): void {
+        public get_queue(request: any, response: Express.Response): void {
             const number: number = 1300;
-            let id = request.params.id;
+            let id: string = request.params.id;
             Wrapper.FindOne(response, number, QueueModel, {_id: id}, (response: any, page: any): void => {
                 if (page) {
                     Wrapper.SendSuccess(response, page);
                 } else {
-                    Wrapper.SendWarn(response, 2, "not found", {code:2, message:"not found"});
+                    Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
                 }
             });
         }
@@ -115,14 +114,10 @@ export namespace AnalysisModule {
          * @param response
          * @returns none
          */
-        public get_queue_query(request: any, response: any): void {
+        public get_queue_query(request: any, response: Express.Response): void {
             const number: number = 1400;
-            //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //    let option: any = JSON.parse(decodeURIComponent(request.params.option));
-
             let query: any = Wrapper.Decode(request.params.query);
             let option: any = Wrapper.Decode(request.params.option);
-
             Wrapper.Find(response, number, QueueModel, query, {}, option, (response: any, pages: any): any => {
                 Wrapper.SendSuccess(response, pages);
             });
@@ -133,11 +128,9 @@ export namespace AnalysisModule {
          * @param response
          * @returns none
          */
-        public get_queue_count(request: any, response: any): void {
+        public get_queue_count(request: any, response: Express.Response): void {
             const number: number = 2800;
-            //    let query: any = JSON.parse(decodeURIComponent(request.params.query));
             let query: any = Wrapper.Decode(request.params.query);
-
             Wrapper.Count(response, number, QueueModel, query, (response: any, count: any): any => {
                 Wrapper.SendSuccess(response, count);
             });

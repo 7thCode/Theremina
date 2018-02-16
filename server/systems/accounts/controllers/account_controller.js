@@ -13,7 +13,7 @@ var AccountModule;
     var share = require(process.cwd() + '/server/systems/common/share');
     var Wrapper = share.Wrapper;
     var LocalAccount = require(share.Models("systems/accounts/account"));
-    var Accounts = (function () {
+    var Accounts = /** @class */ (function () {
         function Accounts() {
         }
         Accounts.userid = function (request) {
@@ -52,9 +52,7 @@ var AccountModule;
          * @returns none
          */
         Accounts.prototype.get_account_query_query = function (request, response) {
-            var self = request.user;
-            //     let query: any = JSON.parse(decodeURIComponent(request.params.query));
-            //     let option: any = JSON.parse(decodeURIComponent(request.params.option));
+            //      let self: any = request.user;
             var query = Wrapper.Decode(request.params.query);
             var option = Wrapper.Decode(request.params.option);
             Wrapper.Find(response, 5000, LocalAccount, query, {}, option, function (response, accounts) {
@@ -68,7 +66,6 @@ var AccountModule;
          * @returns none
          */
         Accounts.prototype.get_account_count = function (request, response) {
-            //       let query: any = JSON.parse(decodeURIComponent(request.params.query));
             var query = Wrapper.Decode(request.params.query);
             Wrapper.Count(response, 2800, LocalAccount, query, function (response, count) {
                 Wrapper.SendSuccess(response, count);

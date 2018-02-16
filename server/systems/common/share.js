@@ -7,16 +7,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ShareModule;
 (function (ShareModule) {
-    var fs = require('graceful-fs');
-    ShareModule.config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
-    ShareModule.services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
-    ShareModule.plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
-    ShareModule.applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-    //   const _config = require('config');
-    //   export const config = _config.get('systems');
-    //   export const services_config = _config.get('services');
-    //   export const plugins_config = _config.get('plugins');
-    //   export const applications_config = _config.get('applications');
+    var _config = require('config');
+    ShareModule.config = _config.get("systems");
+    ShareModule.services_config = _config.get("services");
+    ShareModule.plugins_config = _config.get("plugins");
+    ShareModule.applications_config = _config.get("applications");
+    /*
+      export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
+      export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
+      export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
+      export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
+    */
     var _ = require("lodash");
     var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
@@ -55,17 +56,9 @@ var ShareModule;
     ShareModule.Views = function (relpath) {
         return path.join(root_path, "views/" + relpath);
     };
-    var PersistentModel = require("./persistent");
-    ShareModule.Map = new PersistentModel.Map(ShareModule.Persistent("systems/storege.json"));
-    var FileUtility = require("./file_utility");
-    ShareModule.Utility = new FileUtility.Utility(ShareModule.Public(""));
+    ShareModule.FileUtility = require("./file_utility");
+    ShareModule.Utility = new ShareModule.FileUtility.Utility(ShareModule.Public(""));
     ShareModule.Memory = [];
-    var Share = (function () {
-        function Share() {
-        }
-        return Share;
-    }());
-    ShareModule.Share = Share;
 })(ShareModule = exports.ShareModule || (exports.ShareModule = {}));
 module.exports = ShareModule;
 //# sourceMappingURL=share.js.map

@@ -36,7 +36,7 @@ namespace DataSource {
 
     DataSource.static("exec", function () {
         let result_promise = Article.find(this.query).limit(this.limit).skip(this.skip).sort(this.sort).exec();
-        return result_promise
+        return result_promise;
     });
 
 

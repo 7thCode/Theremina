@@ -12,8 +12,6 @@ var ResourceApiRouter;
     var core = require(process.cwd() + '/gs');
     var share = core.share;
     var exception = core.exception;
-    //  const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    //  const auth: any = new AuthController.Auth;
     var ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     var resource = new ResourcesModule.Resource;
     ResourceApiRouter.router.delete('/api/own', [exception.exception, exception.guard, exception.authenticate, resource.delete_own]);

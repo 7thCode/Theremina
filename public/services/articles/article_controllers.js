@@ -174,6 +174,9 @@ var ArticleControllersModule;
                         }
                     });
                 });
+                if (result === {}) {
+                    console.log(page);
+                }
                 return result;
             };
             var Selected = function () {

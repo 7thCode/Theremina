@@ -18,8 +18,8 @@ var FormPageRouter;
     var message = config.message;
     var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     FormPageRouter.auth = new AuthController.Auth();
-    var AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    var analysis = new AnalysisModule.Analysis;
+    //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+    //  const analysis: any = new AnalysisModule.Analysis;
     FormPageRouter.router.get("/", [exception.page_guard, FormPageRouter.auth.page_valid, FormPageRouter.auth.page_is_system, function (request, response) {
             response.render("services/forms/player/index", {
                 config: config,

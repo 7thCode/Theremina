@@ -6,18 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace PicturesApiRouter {
 
     const express: any = require("express");
-    export const router = express.Router();
-
-    const core = require(process.cwd() + "/gs");
-    const share: any = core.share;
-
-    const PicturesModule: any = require(share.Server("services/pictures/controllers/pictures_controller"));
-    const pictures: any = new PicturesModule.Pictures;
-
-    router.get('/:userid/:namespace/doc/img/:name', pictures.get_picture);
+    export const router: IRouter = express.Router();
 
 }
 

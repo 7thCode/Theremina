@@ -6,19 +6,21 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace FormApiRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express:any = require('express');
+    export const router: IRouter = express.Router();
 
-    const core = require(process.cwd() + '/gs');
+    const core:any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const exception: any = core.exception;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     export const auth: any = new AuthController.Auth();
 
-    const FormsModule = require(share.Server("services/forms/controllers/forms_controller"));
+    const FormsModule:any = require(share.Server("services/forms/controllers/forms_controller"));
     const form = new FormsModule.Form;
 
     router.post("/api/create", [exception.exception, exception.guard, exception.authenticate, auth.is_system, form.create_form]);

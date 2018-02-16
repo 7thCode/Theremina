@@ -8,7 +8,7 @@
 
 export namespace ArticleModule {
 
-    const mongoose = require('mongoose');
+    const mongoose: any = require('mongoose');
     const Schema = mongoose.Schema;
     const timestamp: any = require('../../systems/plugins/timestamp/timestamp');
     const userdata: any = require('../../systems/plugins/userdata/userdata');

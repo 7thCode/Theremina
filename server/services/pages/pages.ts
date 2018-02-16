@@ -6,28 +6,30 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace PagesPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
-    const _ = require('lodash');
-    const minify = require('html-minifier').minify;
+    const _: any = require('lodash');
+    const minify: any = require('html-minifier').minify;
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const auth: any = core.auth;
     const exception: any = core.exception;
     const analysis: any = core.analysis;
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
     const PagesModule: any = require(share.Server("services/pages/controllers/pages_controller"));
     const pages: any = new PagesModule.Pages;
 
-    let message = config.message;
+    const message: any = config.message;
 
     //pages
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_user, analysis.page_view, (request: any, response: any): void => {
@@ -41,17 +43,17 @@ export namespace PagesPageRouter {
         });
     }]);
 
-    router.get("/getall/:namespace", [exception.page_guard, auth.page_valid,auth.page_is_user, pages.get_all]);
+    router.get("/getall/:namespace", [exception.page_guard, auth.page_valid, auth.page_is_user, pages.get_all]);
 
-    router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid,auth.page_is_user, (req: any, result: any, next: any) => {
+    router.get('/dialogs/create_dialog', [exception.page_guard, auth.page_valid, auth.page_is_user, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/create_dialog', {message: message});
     }]);
 
-    router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid,auth.page_is_user, (req: any, result: any, next: any) => {
+    router.get('/dialogs/open_dialog', [exception.page_guard, auth.page_valid, auth.page_is_user, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/open_dialog', {message: message});
     }]);
 
-    router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid,auth.page_is_user, (req: any, result: any, next: any) => {
+    router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_user, (req: any, result: any, next: any) => {
         result.render('services/pages/dialogs/delete_confirm_dialog', {message: message});
     }]);
 

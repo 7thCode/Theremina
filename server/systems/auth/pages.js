@@ -13,8 +13,6 @@ var AuthPageRouter;
     var config = share.config;
     var applications_config = share.applications_config;
     var message = config.message;
-    // const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
-    //const auth: any = new AuthController.Auth;
     var ExceptionController = require(share.Server("systems/common/controllers/exception_controller"));
     var exception = new ExceptionController.Exception;
     AuthPageRouter.router.get('/dialogs/registerdialog', [exception.page_catch, function (request, response) {

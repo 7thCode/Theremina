@@ -130,7 +130,6 @@ var FileControllersModule;
                         file.cancel();
                     });
                     Draw();
-                }).finally(function () {
                 });
             };
             var deleteFile = function (filename) {

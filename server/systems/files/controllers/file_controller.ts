@@ -4,36 +4,35 @@
  //opensource.org/licenses/mit-license.php
  */
 
-/// <reference path="../../../../node_modules/@types/node/index.d.ts" />
-/// <reference path="../../../../node_modules/@types/express/index.d.ts" />
-
 "use strict";
 
 export namespace FileModule {
 
-    const _ = require('lodash');
-    const fs = require('graceful-fs');
+    const _: any = require('lodash');
+    const fs: any = require('graceful-fs');
+
+    const path: any = require('path');
 
     const mongodb: any = require('mongodb');
-    const mongoose = require('mongoose');
-    const Grid = require('gridfs-stream');
+    const MongoClient: any = require('mongodb').MongoClient;
 
-    const MongoClient = require('mongodb').MongoClient;
-
-    const share = require(process.cwd() + '/server/systems/common/share');
-    const config = share.config;
-    const Wrapper = share.Wrapper;
-
-    //const result = require(share.Server('systems/common/result'));
+    const share: any = require(process.cwd() + '/server/systems/common/share');
+    const config: any = share.config;
+    const Wrapper: any = share.Wrapper;
+    const event: any = share.Event;
 
     export class Files {
 
         constructor() {
         }
 
-        static to_mime(request) {
-            let type = "image/octet-stream";
-            let index = request.body.url.indexOf(";");
+        static cache_invalidate(path: string): void {
+            event.emitter.emit("cache_invalidate", {path: path});
+        };
+
+        static to_mime(request): string {
+            let type: string = "image/octet-stream";
+            let index: number = request.body.url.indexOf(";");
             if (index > 0) {
                 let types = request.body.url.substring(0, index).split(":");
                 if (types.length == 2) {
@@ -43,12 +42,12 @@ export namespace FileModule {
             return type;
         }
 
-        static connect(callback: (error, db) => void): void {
-            MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
+        static connect(): any {
+            return MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name);
         }
 
         static namespace(request: any): string {
-            let result = "";
+            let result: string = "";
             if (request.user) {
                 if (request.user.data) {
                     result = request.user.data.namespace;
@@ -57,9 +56,8 @@ export namespace FileModule {
             return result;
         }
 
-
         static localname(name: string): string {
-            let result = "";
+            let result: string = "";
             if (name) {
                 let names = name.split("#");
                 names.forEach((name, index) => {
@@ -81,9 +79,7 @@ export namespace FileModule {
 
         static from_local(gfs: any, path_from: string, namespace: string, userid: string, key: number, name: string, mimetype: string, callback: (error: any, file: any) => void): void {
             try {
-
-
-                let writestream = gfs.openUploadStream(name,
+                let writestream: any = gfs.openUploadStream(name,
                     {
                         metadata: {
                             userid: userid,// config.systems.userid,
@@ -94,7 +90,6 @@ export namespace FileModule {
                         }
                     }
                 );
-
 
                 /*
                               let writestream = gfs.createWriteStream({
@@ -109,7 +104,7 @@ export namespace FileModule {
                               });
               */
 
-                let readstream = fs.createReadStream(path_from + '/' + name, {encoding: null, bufferSize: 1});
+                let readstream: any = fs.createReadStream(path_from + '/' + name, {encoding: null, bufferSize: 1});
 
                 readstream.on('error', (error: any): void => {
                     callback(error, null);
@@ -134,8 +129,7 @@ export namespace FileModule {
             collection.findOne({$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}, (error: any, item: any): void => {
                 if (!error) {
                     if (item) {
-                        //      let readstream = gfs.createReadStream({_id: item._id});
-                        let readstream = gfs.openDownloadStream(item._id);
+                        let readstream: any = gfs.openDownloadStream(item._id);
                         if (readstream) {
                             response.setHeader('Content-Type', item.metadata.type);
                             readstream.on('end', (): void => {
@@ -160,12 +154,11 @@ export namespace FileModule {
          * @returns none
          */
         public create_init_files(userid: string, initfiles: any[], callback: (error: any, result: any) => void): void {
-            if (initfiles) {
-                if (initfiles.length > 0) {
-                    Files.connect((error, db) => {
-                        if (!error) {
-                            //   let gfs = Grid(db, mongoose.mongo); //missing parameter
-                            let gfs = new mongodb.GridFSBucket(db, {});
+            try {
+                if (initfiles) {
+                    if (initfiles.length > 0) {
+                        Files.connect().then((db) => {
+                            let gfs: any = new mongodb.GridFSBucket(db, {});
                             if (gfs) {
                                 db.collection('fs.files', (error: any, collection: any): void => {
                                     if (!error) {
@@ -179,12 +172,12 @@ export namespace FileModule {
                                                 if (!error) {
                                                     let save = (doc: any): any => {
                                                         return new Promise((resolve: any, reject: any): void => {
-                                                            let path = process.cwd() + doc.path;
-                                                            let filename = doc.name;
-                                                            let namespace = doc.namespace;
-                                                            let mimetype = doc.content.type;
+                                                            let path: string = process.cwd() + doc.path;
+                                                            let filename: string = doc.name;
+                                                            let namespace: string = doc.namespace;
+                                                            let mimetype: string = doc.content.type;
                                                             let type: number = doc.type;
-                                                            let query = {$and: [{filename: filename}, {"metadata.userid": userid}]};
+                                                            let query: any = {$and: [{filename: filename}, {"metadata.userid": userid}]};
 
                                                             collection.findOne(query, (error: any, item: any): void => {
                                                                 if (!error) {
@@ -206,7 +199,7 @@ export namespace FileModule {
                                                         });
                                                     };
 
-                                                    let docs = initfiles;
+                                                    let docs: any = initfiles;
                                                     Promise.all(docs.map((doc: any): void => {
                                                         return save(doc);
                                                     })).then((results: any[]): void => {
@@ -220,11 +213,15 @@ export namespace FileModule {
                                     }
                                 });
                             }
-                        }
-                    });
-                } else {
-                    callback(null, null);
+                        }).catch((error) => {
+                            callback(error, null);
+                        });
+                    } else {
+                        callback(null, null);
+                    }
                 }
+            } catch (e) {
+                callback(e, null);
             }
         }
 
@@ -233,70 +230,73 @@ export namespace FileModule {
          * @returns none
          */
         public create_files(userid: string, namespace: string, initfiles: any[], callback: (error: any, result: any) => void): void {
-            if (initfiles) {
-                if (initfiles.length > 0) {
-                    Files.connect((error, db) => {
-                        if (!error) {
-                            //      let gfs = Grid(db, mongoose.mongo); //missing parameter
-                            let gfs = new mongodb.GridFSBucket(db, {});
-                            //             if (gfs) {
-                            db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        // ensureIndex
-                                        collection.createIndex({
-                                            "filename": 1,
-                                            "metadata.namespace": 1,
-                                            "metadata.userid": 1
-                                        }, (error) => {
-                                            if (!error) {
-                                                let save = (doc: any): any => {
-                                                    return new Promise((resolve: any, reject: any): void => {
-                                                        let path = process.cwd() + doc.path;
-                                                        let filename = doc.name;
-                                                        let mimetype = doc.content.type;
-                                                        let type: number = doc.type;
-                                                        let query = {$and: [{filename: filename}, {namespace: namespace}, {"metadata.userid": userid}]};
+            try {
+                if (initfiles) {
+                    if (initfiles.length > 0) {
+                        Files.connect().then((db) => {
+                            let gfs: any = new mongodb.GridFSBucket(db, {});
+                            if (gfs) {
+                                db.collection('fs.files', (error: any, collection: any): void => {
+                                    if (!error) {
+                                        if (collection) {
+                                            // ensureIndex
+                                            collection.createIndex({
+                                                "filename": 1,
+                                                "metadata.namespace": 1,
+                                                "metadata.userid": 1
+                                            }, (error) => {
+                                                if (!error) {
+                                                    let save: any = (doc: any): any => {
+                                                        return new Promise((resolve: any, reject: any): void => {
+                                                            let path = process.cwd() + doc.path;
+                                                            let filename = doc.name;
+                                                            let mimetype = doc.content.type;
+                                                            let type: number = doc.type;
+                                                            let query: any = {$and: [{filename: filename}, {namespace: namespace}, {"metadata.userid": userid}]};
 
-                                                        collection.findOne(query, (error: any, item: any): void => {
-                                                            if (!error) {
-                                                                if (!item) {
-                                                                    Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
-                                                                        if (!error) {
-                                                                            resolve(file);
-                                                                        } else {
-                                                                            reject(error);
-                                                                        }
-                                                                    });
+                                                            collection.findOne(query, (error: any, item: any): void => {
+                                                                if (!error) {
+                                                                    if (!item) {
+                                                                        Files.from_local(gfs, path, namespace, userid, type, filename, mimetype, (error: any, file: any): void => {
+                                                                            if (!error) {
+                                                                                resolve(file);
+                                                                            } else {
+                                                                                reject(error);
+                                                                            }
+                                                                        });
+                                                                    } else {
+                                                                        resolve({});
+                                                                    }
                                                                 } else {
-                                                                    resolve({});
+                                                                    reject(error);
                                                                 }
-                                                            } else {
-                                                                reject(error);
-                                                            }
+                                                            });
                                                         });
-                                                    });
-                                                };
+                                                    };
 
-                                                let docs = initfiles;
-                                                Promise.all(docs.map((doc: any): void => {
-                                                    return save(doc);
-                                                })).then((results: any[]): void => {
-                                                    callback(null, results);
-                                                }).catch((error: any): void => {
-                                                    callback(error, null);
-                                                });
-                                            }
-                                        });
+                                                    let docs: any = initfiles;
+                                                    Promise.all(docs.map((doc: any): void => {
+                                                        return save(doc);
+                                                    })).then((results: any[]): void => {
+                                                        callback(null, results);
+                                                    }).catch((error: any): void => {
+                                                        callback(error, null);
+                                                    });
+                                                }
+                                            });
+                                        }
                                     }
-                                }
-                            });
-                            //            }
-                        }
-                    });
-                } else {
-                    callback(null, null);
+                                });
+                            }
+                        }).catch((error) => {
+                            callback(error, null);
+                        });
+                    } else {
+                        callback(null, null);
+                    }
                 }
+            } catch (e) {
+                callback(e, null);
             }
         }
 
@@ -307,12 +307,11 @@ export namespace FileModule {
          * @returns none
          */
         public get_file_query_query(request: any, response: any): void {
-            let number: number = 27000;
-            let userid = Files.userid(request);
-            let namespace: string = Files.namespace(request);
-
-            Files.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 27000;
+                let userid = Files.userid(request);
+                let namespace: string = Files.namespace(request);
+                Files.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
                             if (collection) {
@@ -320,12 +319,12 @@ export namespace FileModule {
                                 let query: any = Wrapper.Decode(request.params.query) || {};
                                 let option: any = Wrapper.Decode(request.params.option) || {};
 
-                                let limit = 10;
+                                let limit: number = 10;
                                 if (option.limit) {
                                     limit = option.limit;
                                 }
 
-                                let skip = 0;
+                                let skip: number = 0;
                                 if (option.skip) {
                                     skip = option.skip;
                                 }
@@ -347,10 +346,12 @@ export namespace FileModule {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
-                } else {
+                }).catch((error) => {
                     Wrapper.SendError(response, error.code, error.message, error);
-                }
-            });
+                });
+            } catch (e) {
+
+            }
         }
 
         /**
@@ -360,12 +361,11 @@ export namespace FileModule {
          * @returns none
          */
         public get_file_query_count(request: any, response: any): void {
-            let number: number = 28000;
-            let userid = Files.userid(request);
-            let namespace: string = Files.namespace(request);
-
-            Files.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 28000;
+                let userid: string = Files.userid(request);
+                let namespace: string = Files.namespace(request);
+                Files.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
                             if (collection) {
@@ -387,21 +387,22 @@ export namespace FileModule {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
-                } else {
+                }).catch((error) => {
                     Wrapper.SendError(response, error.code, error.message, error);
-                }
-            });
+                });
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
+            }
         }
 
         /**
          *
-         * @param request
-         * @param response
-         * @returns none
+         * @param userid
+         * @param callback
          */
         public namespaces(userid: string, callback: any): void {
-            Files.connect((error, db) => {
-                if (!error) {
+            try {
+                Files.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
                             if (collection) {
@@ -425,10 +426,12 @@ export namespace FileModule {
                             callback(error, null);
                         }
                     });
-                } else {
+                }).catch((error) => {
                     callback(error, null);
-                }
-            });
+                });
+            } catch (e) {
+                callback(e, null);
+            }
         }
 
         /**
@@ -441,58 +444,54 @@ export namespace FileModule {
         public get_file(request: any, response: any, next: any): void {
             try {
                 let namespace: string = Files.namespace(request);
-                let name = Files.localname(request.params.name);
-                let userid = request.params.userid;
+                let name: string = Files.localname(request.params.name);
+                let userid: string = request.params.userid;
 
-                Files.connect((error, db) => {
-                    if (!error) {
-                        //          let gfs = Grid(db, mongoose.mongo); //missing parameter
-                        let gfs = new mongodb.GridFSBucket(db, {});
-                        if (gfs) {
-                            db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                        collection.findOne(query, (error: any, item: any): void => {
-                                            if (!error) {
-                                                if (item) {
-                                                    //    let readstream = gfs.createReadStream({_id: item._id});
-                                                    let readstream = gfs.openDownloadStream(item._id);
-                                                    if (readstream) {
-                                                        response.setHeader('Content-Type', item.metadata.type);
-                                                        readstream.on('end', (): void => {
+                Files.connect().then((db) => {
+                    let gfs: any = new mongodb.GridFSBucket(db, {});
+                    if (gfs) {
+                        db.collection('fs.files', (error: any, collection: any): void => {
+                            if (!error) {
+                                if (collection) {
+                                    let query: any = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                    collection.findOne(query, (error: any, item: any): void => {
+                                        if (!error) {
+                                            if (item) {
+                                                let readstream: any = gfs.openDownloadStream(item._id);
+                                                if (readstream) {
+                                                    response.setHeader('Content-Type', item.metadata.type);
+                                                    readstream.on('end', (): void => {
 
-                                                        });
-                                                        readstream.on('error', (error: any): void => {
-
-                                                        });
-                                                        readstream.pipe(response);
-                                                    } else {
-                                                        next();
-                                                    }
-                                                } else {
-                                                    // NOT FOUND IMAGE.
-                                                    Files.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                        next();
                                                     });
+                                                    readstream.on('error', (error: any): void => {
+
+                                                    });
+                                                    readstream.pipe(response);
+                                                } else {
+                                                    next();
                                                 }
                                             } else {
-                                                next();
+                                                // NOT FOUND IMAGE.
+                                                Files.result_file(db, gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
+                                                    next();
+                                                });
                                             }
-                                        });
-                                    } else {
-                                        next();
-                                    }
+                                        } else {
+                                            next();
+                                        }
+                                    });
                                 } else {
                                     next();
                                 }
-                            });
-                        } else {
-                            next();
-                        }
+                            } else {
+                                next();
+                            }
+                        });
                     } else {
                         next();
                     }
+                }).catch((error) => {
+                    next();
                 });
             } catch (e) {
                 next();
@@ -509,75 +508,69 @@ export namespace FileModule {
         public get_file_data_name(request: any, response: any, next: any): void {
             try {
                 let namespace: string = Files.namespace(request);
-                let name = Files.localname(request.params.name);
-                let userid = Files.userid(request);
+                let name: string = Files.localname(request.params.name);
+                let userid: string = Files.userid(request);
 
-                let BinaryToBase64 = (str) => {
+                let BinaryToBase64: any = (str) => {
                     return new Buffer(str, 'binary').toString('base64');
                 };
 
-                Files.connect((error, db) => {
-                    if (!error) {
-                        //   let gfs = Grid(db, mongoose.mongo); //missing parameter
-                        let gfs = new mongodb.GridFSBucket(db, {});
-                        if (gfs) {
-                            db.collection('fs.files', (error: any, collection: any): void => {
-                                if (!error) {
-                                    if (collection) {
-                                        let query = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                        collection.findOne(query, (error: any, item: any): void => {
-                                            if (!error) {
-                                                if (item) {
-                                                    let buffer = new Buffer(0);
-                                                    //    let readstream = gfs.createReadStream({_id: item._id});
-                                                    let readstream = gfs.openDownloadStream(item._id);
-                                                    if (readstream) {
+                Files.connect().then((db) => {
 
-                                                        readstream.on("data", (chunk): void => {
-                                                            buffer = Buffer.concat([buffer, new Buffer(chunk)]);
-                                                        });
-
-                                                        readstream.on('end', (): void => {
-                                                            let dataurl = "data:" + item.metadata.type + ";base64," + BinaryToBase64(buffer);
-                                                            Wrapper.SendSuccess(response, dataurl);
-                                                        });
-
-                                                        readstream.on('error', (error: any): void => {
-                                                            Wrapper.SendError(response, error.code, error.message, error);
-                                                        });
-
-                                                    } else {
-                                                        Wrapper.SendError(response, 10000, "no stream", {
-                                                            code: 10000,
-                                                            message: "no stream"
-                                                        });
-                                                    }
+                    let gfs: any = new mongodb.GridFSBucket(db, {});
+                    if (gfs) {
+                        db.collection('fs.files', (error: any, collection: any): void => {
+                            if (!error) {
+                                if (collection) {
+                                    let query: any = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                    collection.findOne(query, (error: any, item: any): void => {
+                                        if (!error) {
+                                            if (item) {
+                                                let buffer: any = new Buffer(0);
+                                                let readstream: any = gfs.openDownloadStream(item._id);
+                                                if (readstream) {
+                                                    readstream.on("data", (chunk): void => {
+                                                        buffer = Buffer.concat([buffer, new Buffer(chunk)]);
+                                                    });
+                                                    readstream.on('end', (): void => {
+                                                        let dataurl = "data:" + item.metadata.type + ";base64," + BinaryToBase64(buffer);
+                                                        Wrapper.SendSuccess(response, dataurl);
+                                                    });
+                                                    readstream.on('error', (error: any): void => {
+                                                        Wrapper.SendError(response, error.code, error.message, error);
+                                                    });
                                                 } else {
-                                                    Wrapper.SendFatal(response, 10000, "no item", {
+                                                    Wrapper.SendError(response, 10000, "no stream", {
                                                         code: 10000,
-                                                        message: "no item"
+                                                        message: "no stream"
                                                     });
                                                 }
                                             } else {
-                                                Wrapper.SendError(response, error.code, error.message, error);
+                                                Wrapper.SendFatal(response, 10000, "no item", {
+                                                    code: 10000,
+                                                    message: "no item"
+                                                });
                                             }
-                                        });
-                                    } else {
-                                        Wrapper.SendFatal(response, 10000, "no collection", {
-                                            code: 10000,
-                                            message: "no collection"
-                                        });
-                                    }
+                                        } else {
+                                            Wrapper.SendError(response, error.code, error.message, error);
+                                        }
+                                    });
                                 } else {
-                                    Wrapper.SendError(response, error.code, error.message, error);
+                                    Wrapper.SendFatal(response, 10000, "no collection", {
+                                        code: 10000,
+                                        message: "no collection"
+                                    });
                                 }
-                            });
-                        } else {
-                            Wrapper.SendFatal(response, 10000, "no gfs", {code: 10000, message: "no gfs"});
-                        }
+                            } else {
+                                Wrapper.SendError(response, error.code, error.message, error);
+                            }
+                        });
                     } else {
-                        Wrapper.SendError(response, error.code, error.message, error);
+                        Wrapper.SendFatal(response, 10000, "no gfs", {code: 10000, message: "no gfs"});
                     }
+
+                }).catch((error) => {
+                    Wrapper.SendError(response, error.code, error.message, error);
                 });
             } catch (e) {
                 Wrapper.SendFatal(response, e.code, e.message, e);
@@ -591,18 +584,17 @@ export namespace FileModule {
          * @returns none
          */
         public post_file_name(request: any, response: any): void {
-            let number: number = 24000;
-            let namespace: string = Files.namespace(request);
-            let name = Files.localname(request.params.name);
-            let key = request.params.key;
-            let userid = Files.userid(request);
-            let username = Files.username(request);
+            try {
+                let number: number = 24000;
+                let namespace: string = Files.namespace(request);
+                let name = Files.localname(request.params.name);
+                let key = request.params.key;
+                let userid = Files.userid(request);
+                let username = Files.username(request);
 
-            if (name) {
-                if (name.indexOf('/') == -1) {
-                    Files.connect((error, db) => {
-                        if (!error) {
-                            //      let gfs = Grid(db, mongoose.mongo); //missing parameter
+                if (name) {
+                    if (name.indexOf('/') == -1) {
+                        Files.connect().then((db) => {
                             let gfs = new mongodb.GridFSBucket(db, {});
                             if (gfs) {
                                 db.collection('fs.files', (error: any, collection: any): void => {
@@ -612,7 +604,7 @@ export namespace FileModule {
                                             collection.findOne(query, (error: any, item: any): void => {
                                                 if (!error) {
                                                     if (!item) {
-                                                        let parseDataURL = (dataURL: any): any => {
+                                                        let parseDataURL: any = (dataURL: any): any => {
                                                             let result: any = {
                                                                 mediaType: null,
                                                                 encoding: null,
@@ -628,11 +620,10 @@ export namespace FileModule {
                                                             return result;
                                                         };
 
-                                                        let info = parseDataURL(request.body.url);
-                                                        let chunk = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
+                                                        let info: any = parseDataURL(request.body.url);
+                                                        let chunk: any = info.isBase64 ? new Buffer(info.data, 'base64') : new Buffer(unescape(info.data), 'binary');
 
-
-                                                        let writestream = gfs.openUploadStream(name,
+                                                        let writestream: any = gfs.openUploadStream(name,
                                                             {
                                                                 metadata: {
                                                                     userid: userid,
@@ -659,6 +650,8 @@ export namespace FileModule {
                                                         */
                                                         if (writestream) {
                                                             writestream.once('finish', (file: any): void => {
+                                                                //                Files.cache_invalidate(request.url, (error) => {
+                                                                //                });
                                                                 Wrapper.SendSuccess(response, file);
                                                             });
                                                             writestream.write(chunk);
@@ -695,18 +688,20 @@ export namespace FileModule {
                                     message: "no gfs"
                                 });
                             }
-                        } else {
+                        }).catch((error) => {
                             Wrapper.SendError(response, error.code, error.message, error);
-                        }
-                    });
+                        });
+                    } else {
+                        Wrapper.SendError(response, number + 30, "name invalid", {
+                            code: number + 30,
+                            message: "name invalid"
+                        });
+                    }
                 } else {
-                    Wrapper.SendError(response, number + 30, "name invalid", {
-                        code: number + 30,
-                        message: "name invalid"
-                    });
+                    Wrapper.SendWarn(response, 1, "no name", {code: 1, message: "no name"});
                 }
-            } else {
-                Wrapper.SendWarn(response, 1, "no name", {code: 1, message: "no name"});
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
             }
         }
 
@@ -717,32 +712,31 @@ export namespace FileModule {
          * @returns none
          */
         public put_file_name(request: any, response: any): void {
-            let number: number = 25000;
-            let namespace: string = Files.namespace(request);
-            let name = Files.localname(request.params.name);
-            let key = request.params.key;
-            let userid = Files.userid(request);
-            let username = Files.username(request);
+            try {
+                let number: number = 25000;
+                let namespace: string = Files.namespace(request);
+                let name = Files.localname(request.params.name);
+                let key = request.params.key;
+                let userid = Files.userid(request);
+                let username = Files.username(request);
 
-            let parseDataURL = (dataURL: any): any => {
-                let result: any = {
-                    mediaType: null,
-                    encoding: null,
-                    isBase64: null,
-                    data: null
+                let parseDataURL = (dataURL: any): any => {
+                    let result: any = {
+                        mediaType: null,
+                        encoding: null,
+                        isBase64: null,
+                        data: null
+                    };
+                    if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
+                        result.mediaType = RegExp.$1 || 'text/plain';
+                        result.encoding = RegExp.$3 || 'US-ASCII';
+                        result.isBase64 = String(RegExp.$4) === ';base64';
+                        result.data = RegExp.$5;
+                    }
+                    return result;
                 };
-                if (/^data:([^;]+)(;charset=([^,;]+))?(;base64)?,(.*)/.test(dataURL)) {
-                    result.mediaType = RegExp.$1 || 'text/plain';
-                    result.encoding = RegExp.$3 || 'US-ASCII';
-                    result.isBase64 = String(RegExp.$4) === ';base64';
-                    result.data = RegExp.$5;
-                }
-                return result;
-            };
 
-            Files.connect((error, db) => {
-                if (!error) {
-                    //    let gfs = Grid(db, mongoose.mongo); //missing parameter
+                Files.connect().then((db) => {
                     let gfs = new mongodb.GridFSBucket(db, {});
                     if (gfs) {
                         db.collection('fs.files', (error: any, collection: any): void => {
@@ -786,6 +780,7 @@ export namespace FileModule {
 
                                                         if (writestream) {
                                                             writestream.once('finish', (file: any): void => {
+                                                                Files.cache_invalidate(userid + "/" + namespace);
                                                                 Wrapper.SendSuccess(response, file);
                                                             });
                                                             writestream.write(chunk);
@@ -829,7 +824,6 @@ export namespace FileModule {
                                                 */
 
                                                 if (writestream) {
-
                                                     writestream.once('finish', (file: any): void => {
                                                         Wrapper.SendSuccess(response, file);
                                                     });
@@ -860,10 +854,12 @@ export namespace FileModule {
                     } else {
                         Wrapper.SendFatal(response, number + 20, "no gfs", {code: number + 20, message: "no gfs"});
                     }
-                } else {
+                }).catch((error) => {
                     Wrapper.SendError(response, error.code, error.message, error);
-                }
-            });
+                });
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
+            }
         }
 
         /**
@@ -873,13 +869,12 @@ export namespace FileModule {
          * @returns none
          */
         public delete_file_name(request: any, response: any): void {
-            let number: number = 26000;
-            let namespace: string = Files.namespace(request);
-            let name = Files.localname(request.params.name);
-            let userid = Files.userid(request);
-
-            Files.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 26000;
+                let namespace: string = Files.namespace(request);
+                let name = Files.localname(request.params.name);
+                let userid = Files.userid(request);
+                Files.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
                             if (collection) {
@@ -889,6 +884,7 @@ export namespace FileModule {
                                         if (item) {
                                             collection.remove({_id: item._id}, (error): void => {
                                                 if (!error) {
+                                                    Files.cache_invalidate(userid + "/" + namespace);
                                                     Wrapper.SendSuccess(response, {});
                                                 } else {
                                                     Wrapper.SendError(response, error.code, error.message, error);
@@ -914,11 +910,12 @@ export namespace FileModule {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
-                } else {
+                }).catch((error) => {
                     Wrapper.SendError(response, error.code, error.message, error);
-                }
-            });
-
+                });
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
+            }
         }
 
         /**
@@ -928,11 +925,10 @@ export namespace FileModule {
          * @returns none
          */
         public delete_own(request: any, response: any): void {
-            let number: number = 29000;
-            let userid: string = Files.userid(request);
-
-            Files.connect((error, db) => {
-                if (!error) {
+            try {
+                let number: number = 29000;
+                let userid: string = Files.userid(request);
+                Files.connect().then((db) => {
                     db.collection('fs.files', (error: any, collection: any): void => {
                         if (!error) {
                             if (collection) {
@@ -953,10 +949,12 @@ export namespace FileModule {
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                     });
-                } else {
+                }).catch((error) => {
                     Wrapper.SendError(response, error.code, error.message, error);
-                }
-            });
+                });
+            } catch (e) {
+                Wrapper.SendFatal(response, e.code, e.message, e);
+            }
         }
     }
 

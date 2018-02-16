@@ -8,48 +8,48 @@
 
 export namespace ShareModule {
 
-    const _config = require('config');
+    const _config: any = require('config');
 
-    export const config = _config.get("systems");
-    export const services_config = _config.get("services");
-    export const plugins_config = _config.get("plugins");
-    export const applications_config = _config.get("applications");
+    export const config: any = _config.get("systems");
+    export const services_config: any = _config.get("services");
+    export const plugins_config: any = _config.get("plugins");
+    export const applications_config: any = _config.get("applications");
 
-  /*
-    export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
-    export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
-    export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
-    export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-  */
+    /*
+      export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
+      export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
+      export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
+      export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
+    */
 
-    const _ = require("lodash");
+    const _: any = require("lodash");
 
-    const log4js = require('log4js');
+    const log4js: any = require('log4js');
     log4js.configure("./config/systems/logs.json");
 
-    export const logger = log4js.getLogger('request');
+    export const logger: any = log4js.getLogger('request');
     logger.setLevel(config.loglevel);
 
     const Promised: any = require("./wrapper");
-    export const Wrapper = new Promised.Wrapper();
+    export const Wrapper: any = new Promised.Wrapper();
 
     const CipherModule: any = require('./cipher');
-    export const Cipher = CipherModule.Cipher;
+    export const Cipher: any = CipherModule.Cipher;
 
     const EventModule: any = require('./event');
-    export const Event = new EventModule.Event();
+    export const Event: any = new EventModule.Event();
 
     const SchedulerModule = require("./scheduler");
-    export const Scheduler = new SchedulerModule.Scheduler();
+    export const Scheduler: any = new SchedulerModule.Scheduler();
 
     const Commandar = require("./commandar");
-    export const Command = new Commandar.Linux();
+    export const Command: any = new Commandar.Linux();
 
     const path: any = require('path');
 
-    const root_path = process.cwd();
+    const root_path: any = process.cwd();
 
-    export const Root = (relpath: string): string => {
+    export const Root: any = (relpath: string): string => {
         return path.join(root_path, relpath);
     };
 
@@ -77,17 +77,10 @@ export namespace ShareModule {
         return path.join(root_path, "views/" + relpath);
     };
 
-    //const PersistentModel: any = require("./persistent");
-    //export const Map = new PersistentModel.Map(Persistent("systems/storege.json"));
-
-    const FileUtility: any = require("./file_utility");
+    export const FileUtility: any = require("./file_utility");
     export const Utility = new FileUtility.Utility(Public(""));
 
     export let Memory = [];
-
-    //export class Share {
-
-    //}
 
 }
 

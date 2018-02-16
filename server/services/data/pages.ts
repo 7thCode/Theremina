@@ -6,30 +6,28 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace DataPageRouter {
 
-    const express = require('express');
-    export const router = express.Router();
+    const express: any = require('express');
+    export const router: IRouter = express.Router();
 
     const _ = require('lodash');
-    const minify = require('html-minifier').minify;
+    const minify: any = require('html-minifier').minify;
 
-    const core = require(process.cwd() + '/gs');
+    const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
     const auth: any = core.auth;
     const exception: any = core.exception;
- //   const analysis: any = core.analysis;
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    const applications_config = share.applications_config;
+    const applications_config: any = share.applications_config;
 
-    //const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    //const resources = new ResourcesModule.Pages;
-
-    let message = config.message;
+    const message: any = config.message;
 
     //data
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {

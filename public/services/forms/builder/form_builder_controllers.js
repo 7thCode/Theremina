@@ -7,7 +7,7 @@
 var FormBuilderControllersModule;
 (function (FormBuilderControllersModule) {
     var FormBuilderControllers = angular.module('FormBuilderControllers', ['ui.ace']);
-    var RGBAColor = (function () {
+    var RGBAColor = /** @class */ (function () {
         function RGBAColor(r, g, b, a) {
             this.r = r;
             this.g = g;

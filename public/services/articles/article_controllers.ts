@@ -193,6 +193,11 @@ namespace ArticleControllersModule {
                         }
                     })
                 });
+
+                if (result === {}) {
+                    console.log(page);
+                }
+
                 return result;
             };
 
@@ -311,6 +316,8 @@ namespace ArticleControllersModule {
             let SaveArticle = (): void => {
                 progress(true);
                 let new_record: any = Reduce();
+
+
                 ArticleService.Put(current_id, new_record, (result: any): void => {
                     progress(false);
                 }, error_handler);

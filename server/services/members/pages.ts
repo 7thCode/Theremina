@@ -6,10 +6,12 @@
 
 "use strict";
 
+import {IRouter} from "express-serve-static-core";
+
 export namespace MembersPageRouter {
 
     const express = require('express');
-    export const router = express.Router();
+    export const router: IRouter = express.Router();
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -20,10 +22,10 @@ export namespace MembersPageRouter {
     const ExceptionController: any = require(share.Server("systems/common/controllers/exception_controller"));
     const exception: any = new ExceptionController.Exception();
 
-    const services_config = share.services_config;
+    const services_config: any = share.services_config;
     const webfonts: any[] = services_config.webfonts;
 
-    let message = config.message;
+    const message: any = config.message;
 
     // Members
     router.get("/", [exception.page_guard, auth.page_valid, (request: any, response: any): void => {

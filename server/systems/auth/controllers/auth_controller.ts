@@ -8,22 +8,21 @@
 
 export namespace AuthModule {
 
-    const _ = require('lodash');
-
-    const fs = require('graceful-fs');
+    const _: any = require('lodash');
+    const fs: any = require('graceful-fs');
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
     const passport: any = require('passport');
 
-    const crypto = require('crypto');
+    const crypto: any = require('crypto');
 
-    const share = require('../../common/share');
-    const config = share.config;
-    const applications_config = share.applications_config;
+    const share: any = require('../../common/share');
+    const config: any = share.config;
+    const applications_config: any = share.applications_config;
 
-    let message = config.message;
+    const message: any = config.message;
 
     const Wrapper: any = share.Wrapper;
     const logger: any = share.logger;
@@ -75,17 +74,17 @@ export namespace AuthModule {
         timestamp: any;
     }
 
-    let definition = {account_content: {mails: [], nickname: "", tokens: {}}};
+    let definition: any = {account_content: {mails: [], nickname: "", tokens: {}}};
     fs.open(share.Models('applications/accounts/definition.json'), 'ax+', 384, (error, fd) => {
         if (!error) {
             fs.close(fd, () => {
-                let addition = JSON.parse(fs.readFileSync(share.Models('applications/accounts/definition.json'), 'utf-8'));
+                let addition: any = JSON.parse(fs.readFileSync(share.Models('applications/accounts/definition.json'), 'utf-8'));
                 definition = _.merge(definition, addition.account_content);
             });
         }
     });
 
-    const use_publickey = config.use_publickey;
+    const use_publickey: any = config.use_publickey;
 
     export class Auth {
 
@@ -99,7 +98,7 @@ export namespace AuthModule {
                     let type: string = user.type;
                     let auth: number = user.auth;
                     let username: string = user.username;
-                    let userid = user.userid;
+                    let userid: string = user.userid;
                     let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
                     let rootpassword: string = user.password;
@@ -141,16 +140,6 @@ export namespace AuthModule {
             }
         };
 
-        /*    static isSystem(user: any): boolean {
-                //           let result: boolean = (user.type == "System");
-                let result: boolean = false;
-                if (user.auth) {
-                    result = (user.auth == 1);
-                }
-                return result;
-            }
-       */
-
         static _role(user: any): any {
             let result: any = {guest: true, categoly: 0};
             if (user) {
@@ -158,6 +147,7 @@ export namespace AuthModule {
                     case 1:
                         result.system = true;
                     case 100:
+                    case 101:
                         result.user = true;
                     case 10000:
                         result.guest = true;
@@ -182,6 +172,7 @@ export namespace AuthModule {
                     case 1:
                         result.system = true;
                     case 100:
+                    case 101:
                         result.user = true;
                     case 10000:
                         result.guest = true;
@@ -207,7 +198,7 @@ export namespace AuthModule {
          * @returns none
          */
         public page_valid(request: any, response: any, next: any): void {
-            let user = request.user;
+            let user: any = request.user;
             if (user) {
                 if (user.enabled) {
                     next();
@@ -227,7 +218,7 @@ export namespace AuthModule {
          * @returns none
          */
         public page_is_system(request: any, response: any, next: any): void {
-            let user:any = request.user;
+            let user: any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -246,8 +237,8 @@ export namespace AuthModule {
          * @param next
          * @returns none
          */
-        public is_system(request: any, response: any, next: any): void {
-            let user:any = request.user;
+        public is_system(request: Express.Request, response: Express.Response, next: any): void {
+            let user: any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -268,7 +259,7 @@ export namespace AuthModule {
          * @returns none
          */
         public page_is_user(request: any, response: any, next: any): void {
-            let user:any = request.user;
+            let user: any = request.user;
             if (user) {
                 if (Auth._role(user).user) {
                     next();
@@ -287,8 +278,8 @@ export namespace AuthModule {
          * @param next
          * @returns none
          */
-        public is_user(request: any, response: any, next: any): void {
-            let user:any = request.user;
+        public is_user(request: Express.Request, response: Express.Response, next: any): void {
+            let user: any = request.user;
             if (user) {
                 if (Auth._role(user).user) {
                     next();
@@ -307,8 +298,8 @@ export namespace AuthModule {
          * @param next
          * @returns none
          */
-        public is_enabled_regist_user(request: any, response: any, next: any): void {
-            let user:any = request.user;
+        public is_enabled_regist_user(request: Express.Request, response: Express.Response, next: any): void {
+            let user: any = request.user;
             if (user) {
                 if (Auth._role(user).system) {
                     next();
@@ -331,8 +322,8 @@ export namespace AuthModule {
          * @param next
          * @returns none
          */
-        public is_enabled_regist_member(request: any, response: any, next: any): void {
-            let user:any = request.user;
+        public is_enabled_regist_member(request: Express.Request, response: Express.Response, next: any): void {
+            let user: any = request.user;
             if (user) {
                 if (config.regist.member) {
                     next();
@@ -348,7 +339,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public post_local_register(request: any, response: any): void {
+        public post_local_register(request: any, response: Express.Response): void {
             const number: number = 15000;
             let username: string = request.body.username;
             let password: string = request.body.password;
@@ -364,12 +355,12 @@ export namespace AuthModule {
                     if (!account) {
                         try {
 
-                            let metadata = {};
+                            let metadata: any = {};
                             if (request.body.metadata) {
                                 metadata = request.body.metadata;
                             }
 
-                            let tokenValue = {
+                            let tokenValue: any = {
                                 username: username,
                                 password: password,
                                 displayName: request.body.displayName,
@@ -379,12 +370,11 @@ export namespace AuthModule {
                             };
 
                             let token: string = Cipher.FixedCrypt(JSON.stringify(tokenValue), config.tokensecret);
-                            let link = config.protocol + "://" + config.domain + "/auth/register/" + token;
-                            let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
+                            let link: string = config.protocol + "://" + config.domain + "/auth/register/" + token;
+                            let beacon: string = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
-
-                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, "", null, true, {});
+                                    let datasource: any = new ScannerBehaviorModule.CustomBehavior("regist_mail.html", "regist_mail.html", config.systems.userid, "", null, true, {});
                                     HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                         if (!error) {
                                             _mailer.send(username, bcc, message.registconfirmtext, doc, (error: any) => {
@@ -403,7 +393,6 @@ export namespace AuthModule {
                             }).catch((error: any): void => {
                                 Wrapper.SendFatal(response, error.code, error.message, error);
                             });
-
                         } catch (e) {
                             Wrapper.SendFatal(response, e.code, e.message, e);
                         }
@@ -420,7 +409,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public get_register_token(request: any, response: any): void {
+        public get_register_token(request: any, response: Express.Response): void {
 
             Wrapper.Exception(request, response, (request: any, response: any): void => {
                 let token = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
@@ -513,7 +502,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public post_member_register(request: any, response: any): void {
+        public post_member_register(request: any, response: Express.Response): void {
 
             const number: number = 15000;
             let username: string = request.body.username;
@@ -536,7 +525,7 @@ export namespace AuthModule {
                                 metadata.userid = request.user.userid;
                             }
 
-                            let tokenValue = {
+                            let tokenValue: any = {
                                 username: username,
                                 password: password,
                                 displayName: request.body.displayName,
@@ -546,12 +535,11 @@ export namespace AuthModule {
                             };
 
                             let token: string = Cipher.FixedCrypt(JSON.stringify(tokenValue), config.tokensecret);
-                            let link = config.protocol + "://" + config.domain + "/auth/member/" + token;
-                            let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
+                            let link: string = config.protocol + "://" + config.domain + "/auth/member/" + token;
+                            let beacon: string = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                             ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "regist_member_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                 if (record) {
-
-                                    let datasource = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, "", null, true, {});
+                                    let datasource: any = new ScannerBehaviorModule.CustomBehavior("regist_member_mail.html", "regist_member_mail.html", config.systems.userid, "", null, true, {});
                                     HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                         if (!error) {
                                             _mailer.send(username, bcc, message.memberconfirmtext, doc, (error: any) => {
@@ -586,7 +574,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public get_member_token(request: any, response: any): void {
+        public get_member_token(request: any, response: Express.Response): void {
             Wrapper.Exception(request, response, (request: any, response: any): void => {
                 let token: any = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
                 let tokenDateTime: any = token.timestamp;
@@ -596,7 +584,7 @@ export namespace AuthModule {
                         if (!error) {
                             if (!account_data) {
 
-                                let content:any = definition.account_content;
+                                let content: any = definition.account_content;
                                 content.mails.push(token.username);
                                 content.nickname = token.displayName;
 
@@ -678,7 +666,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public post_local_username(request: any, response: any): void {
+        public post_local_username(request: any, response: Express.Response): void {
             const number: number = 19000;
             let username: string = request.body.username;
             let password: string = request.body.password;
@@ -704,8 +692,8 @@ export namespace AuthModule {
                                 };
 
                                 let token: string = Cipher.FixedCrypt(JSON.stringify(tokenValue), config.tokensecret);
-                                let link = config.protocol + "://" + config.domain + "/auth/username/" + token;
-                                let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
+                                let link: string = config.protocol + "://" + config.domain + "/auth/username/" + token;
+                                let beacon: string = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                                 ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "username_mail.html"}, {"type": 12}]}).then((record: any): void => {
                                     if (record) {
 
@@ -784,7 +772,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public post_local_password(request: any, response: any): void {
+        public post_local_password(request: any, response: Express.Response): void {
             const number: number = 21000;
             let username: string = request.body.username;
             let password: string = request.body.password;
@@ -799,19 +787,19 @@ export namespace AuthModule {
                 if (account) {
                     try {
 
-                        let tokenValue = {
+                        let tokenValue: any = {
                             username: username,
                             password: password,
                             timestamp: Date.now()
                         };
 
                         let token: any = Cipher.FixedCrypt(JSON.stringify(tokenValue), config.tokensecret);
-                        let link = config.protocol + "://" + config.domain + "/auth/password/" + token;
-                        let beacon = config.protocol + "://" + config.domain + "/beacon/api/" + token;
+                        let link: string = config.protocol + "://" + config.domain + "/auth/password/" + token;
+                        let beacon: string = config.protocol + "://" + config.domain + "/beacon/api/" + token;
                         ResourceModel.findOne({$and: [{userid: config.systems.userid}, {name: "password_mail.html"}, {"type": 12}]}).then((record: any): void => {
                             if (record) {
 
-                                let datasource = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, "", null, true, {});
+                                let datasource: any = new ScannerBehaviorModule.CustomBehavior("password_mail.html", "password_mail.html", config.systems.userid, "", null, true, {});
                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {"link": link, "beacon": beacon}, (error: any, doc: string) => {
                                     if (!error) {
                                         _mailer.send(username, bcc, message.passwordconfirmtext, doc, (error: any) => {
@@ -845,10 +833,10 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public get_password_token(request: any, response: any): void {
+        public get_password_token(request: any, response: Express.Response): void {
             const number: number = 22000;
             Wrapper.Exception(request, response, (request: any, response: any): void => {
-                let token = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
+                let token: any = Wrapper.Parse(Cipher.FixedDecrypt(request.params.token, config.tokensecret));
                 let tokenDateTime: any = token.timestamp;
                 let nowDate: any = Date.now();
                 if ((tokenDateTime - nowDate) < (config.regist.expire * 60 * 1000)) {
@@ -883,7 +871,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public post_local_login(request: any, response: any): void {
+        public post_local_login(request: any, response: Express.Response): void {
             const number: number = 23000;
             let systempassphrase: string = request.session.id;
             if (request.body.username) {
@@ -928,10 +916,10 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public auth_facebook_callback(request: any, response: any): void {
+        public auth_facebook_callback(request: any, response: Express.Response): void {
             Wrapper.FindOne(response, 1000, LocalAccount, {userid: request.user.username}, (response: any, account: any): void => {
                 if (!account) {
-                    let userid = request.user.id;  //facebook
+                    let userid: string = request.user.id;  //facebook
                     let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
                     let new_account: any = new LocalAccount();
@@ -963,10 +951,10 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public auth_twitter_callback(request: any, response: any): void {
+        public auth_twitter_callback(request: any, response: Express.Response): void {
             Wrapper.FindOne(response, 1000, LocalAccount, {userid: request.user.username}, (response: any, account: any): void => {
                 if (!account) {
-                    let userid = request.user.id;  //twitter
+                    let userid: string = request.user.id;  //twitter
                     let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
                     let new_account: any = new LocalAccount();
@@ -996,10 +984,10 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public auth_instagram_callback(request: any, response: any): void {
+        public auth_instagram_callback(request: any, response: Express.Response): void {
             Wrapper.FindOne(response, 1000, LocalAccount, {userid: request.user.username}, (response: any, account: any): void => {
                 if (!account) {
-                    let userid = request.user.id;
+                    let userid: string = request.user.id;
                     let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
                     let new_account: any = new LocalAccount();
@@ -1029,10 +1017,10 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public auth_line_callback(request: any, response: any): void {
+        public auth_line_callback(request: any, response: Express.Response): void {
             Wrapper.FindOne(response, 1000, LocalAccount, {userid: request.user.username}, (response: any, account: any): void => {
                 if (!account) {
-                    let userid = request.user.id;
+                    let userid: string = request.user.id;
                     let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
 
                     let new_account: any = new LocalAccount();
@@ -1062,7 +1050,7 @@ export namespace AuthModule {
          * @param response
          * @returns none
          */
-        public logout(request: any, response: any): void {
+        public logout(request: any, response: Express.Response): void {
             Auth.auth_event("logout:", request.user);
             request.logout();
             Wrapper.SendSuccess(response, {code: 0, message: ""});
@@ -1075,7 +1063,7 @@ export namespace AuthModule {
          * @param next
          * @returns none
          */
-        public get_server_date(request: any, response: any, next: any): void {
+        public get_server_date(request: any, response: Express.Response, next: any): void {
             Wrapper.SendSuccess(response, new Date());
         }
     }

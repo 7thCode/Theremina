@@ -21,7 +21,7 @@ var HTMLScanner;
     var jsdom = require("jsdom");
     var JSDOM = jsdom.JSDOM;
     var PREFIX = "ds";
-    var NodeScanner = (function () {
+    var NodeScanner = /** @class */ (function () {
         function NodeScanner(callback) {
             this.document_depth = 0;
             this.depth = 0;
@@ -84,7 +84,7 @@ var HTMLScanner;
         return NodeScanner;
     }());
     HTMLScanner.NodeScanner = NodeScanner;
-    var LinkScanner = (function (_super) {
+    var LinkScanner = /** @class */ (function (_super) {
         __extends(LinkScanner, _super);
         function LinkScanner() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -143,7 +143,7 @@ var HTMLScanner;
     *  クエリー文字列を名前、クエリーの結果を値としてオブジェクトを構成。
     *
     * */
-    var DataSourceResolver = (function (_super) {
+    var DataSourceResolver = /** @class */ (function (_super) {
         __extends(DataSourceResolver, _super);
         function DataSourceResolver(datasource, callback) {
             var _this = _super.call(this, callback) || this;
@@ -344,7 +344,7 @@ var HTMLScanner;
     *  URLを名前、HTTP Getの結果を値としてオブジェクトを構成。
     *
     * */
-    var UrlResolver = (function (_super) {
+    var UrlResolver = /** @class */ (function (_super) {
         __extends(UrlResolver, _super);
         function UrlResolver(datasource, config, callback) {
             var _this = _super.call(this, callback) || this;
@@ -507,7 +507,7 @@ var HTMLScanner;
     *  例　　　<div ds:class="fieldname">   ->   <div class="hoge">
     *
     * */
-    var Expander = (function (_super) {
+    var Expander = /** @class */ (function (_super) {
         __extends(Expander, _super);
         function Expander(datasource, callback) {
             var _this = _super.call(this, callback) || this;
@@ -900,7 +900,7 @@ var HTMLScanner;
     *　todo: ３回パースするのはダサダサ。
     *
     * */
-    var Builder = (function () {
+    var Builder = /** @class */ (function () {
         function Builder() {
         }
         Builder.Build = function (source, datasource, page_init, config, callback) {
