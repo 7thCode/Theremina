@@ -236,15 +236,19 @@ export namespace PageRouter {
     }]);
 
     router.get("/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/js/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/js/" + request.params.page);
     }]);
 
     router.get("/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/css/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/css/" + request.params.page);
     }]);
 
     router.get("/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/static/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/static/" + request.params.page);
     }]);
 
     router.get("/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
@@ -305,7 +309,8 @@ export namespace PageRouter {
                    query:  request.query
                }, response);
        */
-        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/img/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/img/" + request.params.name);
 
     }]);
     /**
@@ -317,32 +322,38 @@ export namespace PageRouter {
                  query: request.query
              }, response);
      */
-        response.redirect(302, "/" + default_user_id() + "/" + default_namespace() + "/doc/svg/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/svg/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/js/" + request.params.page);
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/js/" + request.params.page);
     }]);
 
     router.get("/:namespace/doc/css/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/css/" + request.params.page);
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/css/" + request.params.page);
     }]);
 
     router.get("/:namespace/static/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/static/" + request.params.page);
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/static/" + request.params.page);
     }]);
 
     router.get("/:namespace/doc/img/:name", [(request: any, response: any): void => {
+        let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/img/" + request.params.name);
+        response.redirect(302,  prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/img/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/svg/:name", [exception.page_catch, (request: any, response: any): void => {
+        let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302, "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/svg/" + request.params.name);
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/svg/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
