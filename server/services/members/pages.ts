@@ -23,7 +23,7 @@ export namespace MembersPageRouter {
     const exception: any = new ExceptionController.Exception();
 
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const message: any = config.message;
 

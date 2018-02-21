@@ -29,7 +29,7 @@ export namespace LayoutsModule {
 
     const builder_userid = config.systems.userid;// template maker user id
 
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     export class Layout {
 

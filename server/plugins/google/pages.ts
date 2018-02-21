@@ -22,7 +22,7 @@ export namespace GooglePageRouter {
     const message : any = config.message;
 
     const services_config = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts:any[] = services_config.webfonts || [];
     const plugins_config = share.plugins_config;
 
     if (plugins_config.google_api) {

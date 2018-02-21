@@ -45,10 +45,10 @@ namespace ResourcePlayerServicesModule {
             this.$scope = null;
             this.$compile = null;
 
-            let change_watchers = [];
-            let click_watchers = [];
+            let change_watchers: any[] = [];
+            let click_watchers: any[] = [];
 
-            this.SetQuery = (query) => {
+            this.SetQuery = (query: any): void => {
                 this.option.skip = 0;
                 this.query = {key: ""};
                 if (query) {
@@ -56,7 +56,7 @@ namespace ResourcePlayerServicesModule {
                 }
             };
 
-            let init = () => {
+            let init = (): void => {
 
                 this.option = {limit: 40, skip: 0};
                 this.SetQuery(null);
@@ -70,7 +70,7 @@ namespace ResourcePlayerServicesModule {
                 click_watchers = [];
             };
 
-            this.Init = () => {
+            this.Init = (): void => {
                 init();
             };
 

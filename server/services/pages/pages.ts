@@ -24,7 +24,7 @@ export namespace PagesPageRouter {
     const analysis: any = core.analysis;
 
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const PagesModule: any = require(share.Server("services/pages/controllers/pages_controller"));
     const pages: any = new PagesModule.Pages;

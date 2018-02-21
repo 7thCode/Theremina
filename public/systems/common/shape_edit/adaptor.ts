@@ -59,7 +59,7 @@ namespace Adaptor {
         public Bezier(data: any, callback: (error: any) => void): void {
 
             let bezier: string = '<path id="' + data.ID() + '" stroke="' + SVGAdaptor.StrokeColor(data.property.strokewidth, data.property.strokestyle.ToString()) + '" stroke-width="' + data.property.strokewidth + '" stroke-linecap="round" stroke-miterlimit="2" fill="' + data.property.fillstyle.ToString() + '" fill-opacity="' + data.property.fillstyle.a + '" d="';
-            let startpoint: ShapeEdit.Location = null;
+            let startpoint: ShapeEdit.Location | null = null;
             ShapeEdit.CurveShape.Each(data.vertex.list, (vertex) => {
                 bezier += " M " + vertex.x + "," + vertex.y;
                 startpoint = vertex;

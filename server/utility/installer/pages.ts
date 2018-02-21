@@ -17,7 +17,7 @@ export namespace InstallerPageRouter {
 
     const config:any = share.config;
     const services_config:any = share.services_config;
-    const webfonts:any[] = services_config.webfonts;
+    const webfonts:any[] = services_config.webfonts || [];
 
     const message:any = config.message;
 

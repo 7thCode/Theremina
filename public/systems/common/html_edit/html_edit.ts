@@ -127,7 +127,7 @@ namespace HtmlEdit {
             let result = {"name": "", "type": "", "_$": {}, "@": []};
             result.name = node.nodeName;
             result["_$"] = node.attributes;
-            let children = [];
+            let children:any[] = [];
             _.forEach(node.childNodes, (node) => {
                 children.push(this.MakeNode(node));
             });

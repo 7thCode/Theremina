@@ -19,18 +19,18 @@ export namespace ResourcePageRouter {
 
     const config: any = share.config;
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const message: any = config.message;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     const auth: any = new AuthController.Auth();
 
-    const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    const analysis: any = new AnalysisModule.Analysis;
+  //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+  //  const analysis: any = new AnalysisModule.Analysis;
 
     const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
-    // const resources:any = new ResourcesModule.Resource;
+
     const pages: any = new ResourcesModule.Pages;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
@@ -67,8 +67,6 @@ export namespace ResourcePageRouter {
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, (req: any, result: any, next: any) => {
         result.render('systems/resources/builder/dialogs/delete_confirm_dialog', {message: message});
     }]);
-
-    //http://localhost:8000/resources/render/000000000000000000000000/words_index
 
     // New Render
 

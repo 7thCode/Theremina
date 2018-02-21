@@ -17,15 +17,12 @@ export namespace FormPageRouter {
 
     const config: any = share.config;
     const services_config:any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const message:any = config.message;
 
     const AuthController: any = require(share.Server("systems/auth/controllers/auth_controller"));
     export const auth: any = new AuthController.Auth();
-
-  //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-  //  const analysis: any = new AnalysisModule.Analysis;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("services/forms/player/index", {

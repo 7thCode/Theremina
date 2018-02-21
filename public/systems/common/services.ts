@@ -4,12 +4,6 @@
  //opensource.org/licenses/mit-license.php
  */
 
-
-/// <reference path="./shape_edit/shape_edit.ts" />
-/// <reference path="./shape_edit/server_canvas.ts" />
-/// <reference path="./shape_edit/adaptor.ts" />
-/// <reference path="./html_edit/html_edit.ts" />
-
 "use strict";
 
 let Services = angular.module('Services', []);
@@ -437,11 +431,21 @@ Services.directive('draggablepane', ['$document', ($document: any): any => {
 
 Services.filter('length', [(): any => {
     return (s: string, limit: number): string => {
-        let result = s;
+        let result = "";
         if (s) {
             if (s.length > limit) {
                 result = s.slice(0, limit) + "...";
             }
+        }
+        return result;
+    };
+}]);
+
+Services.filter('encode_entity', [(): any => {
+    return (s: string): string => {
+        let result = "";
+        if (s) {
+            result = s.replace(/&amp;/g, "&");
         }
         return result;
     };

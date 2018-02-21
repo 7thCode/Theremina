@@ -386,7 +386,7 @@ namespace SVGControllersModule {
             };
 
             let strokewidthChange = (stroke: number): void => {
-                let color: ShapeEdit.RGBAColor = null;
+                let color: ShapeEdit.RGBAColor | null = null;
                 ShapeEdit.SetCurrentStrokeWidth(stroke);
             };
 
