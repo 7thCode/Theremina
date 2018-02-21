@@ -25,7 +25,7 @@ export namespace PageRouter {
     const analysis: any = core.analysis;
 
     const services_config = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const applications_config = share.applications_config;
 
@@ -237,7 +237,6 @@ export namespace PageRouter {
 
     router.get("/js/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let prefix = applications_config.prefix || "";
-
         response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/js/" + request.params.page);
     }]);
 
@@ -304,11 +303,6 @@ export namespace PageRouter {
      * public
      */
     router.get("/img/:name", [exception.page_catch, (request: any, response: any): void => {
-        /*       pictures.get_picture({
-                   params: {userid: default_user_id(), name: request.params.name, namespace: default_namespace()},
-                   query:  request.query
-               }, response);
-       */
         let prefix = applications_config.prefix || "";
         response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/img/" + request.params.name);
 
@@ -317,11 +311,6 @@ export namespace PageRouter {
      * public
      */
     router.get("/svg/:name", [exception.page_catch, (request: any, response: any): void => {
-        /*     layout.get_layout_svg({
-                 params: {userid: default_user_id(), name: request.params.name, namespace: default_namespace()},
-                 query: request.query
-             }, response);
-     */
         let prefix = applications_config.prefix || "";
         response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/doc/svg/" + request.params.name);
     }]);
@@ -347,7 +336,7 @@ export namespace PageRouter {
     router.get("/:namespace/doc/img/:name", [(request: any, response: any): void => {
         let prefix = applications_config.prefix || "";
         let namespace = request.params.namespace;
-        response.redirect(302,  prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/img/" + request.params.name);
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/doc/img/" + request.params.name);
     }]);
 
     router.get("/:namespace/doc/svg/:name", [exception.page_catch, (request: any, response: any): void => {
@@ -394,9 +383,7 @@ export namespace PageRouter {
 
     router.get("/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
         let namespace = request.params.namespace;
-
         request.params.userid = default_user_id_by(namespace);
-
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
