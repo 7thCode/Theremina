@@ -32,13 +32,13 @@ namespace GroupControllersModule {
                 e.preventDefault();
             });
 
-            let Draw = () => {
-                GroupService.Query((data) => {
+            let Draw = (): void => {
+                GroupService.Query((data: any): void => {
                     $scope.groups = data;
-                    GroupService.Over((hasnext) => {
+                    GroupService.Over((hasnext: any): void => {
                         $scope.over = !hasnext;
                     });
-                    GroupService.Under((hasprev) => {
+                    GroupService.Under((hasprev: any): void => {
                         $scope.under = !hasprev;
                     });
                 }, error_handler);
@@ -187,11 +187,11 @@ namespace GroupControllersModule {
     GroupControllers.controller('GroupOwnDialogController', ['$scope', '$log', '$uibModalInstance', 'GroupService', 'items',
         ($scope: any, $log: any, $uibModalInstance: any, GroupService: any, items: any): void => {
 
-            let progress = (value) => {
+            let progress = (value:any):void => {
                 $scope.$emit('progress', value);
             };
 
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', (event:any, value:any):void => {
                 items.progress = value;
             });
 

@@ -23,7 +23,7 @@ export namespace DataPageRouter {
     const exception: any = core.exception;
 
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const applications_config: any = share.applications_config;
 

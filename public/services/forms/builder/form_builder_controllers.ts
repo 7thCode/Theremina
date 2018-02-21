@@ -460,6 +460,27 @@ namespace FormBuilderControllersModule {
                 });
             };
 
+            let addHtmlArea = (): void => {
+
+                let modalRegist: any = $uibModal.open({
+                    controller: 'FormBuilderAddTextAreaDialogController',
+                    templateUrl: '/forms/dialogs/elements/add_textarea_dialog',
+                    resolve: {
+                        items: null
+                    }
+                });
+
+                modalRegist.result.then((dialog_scope): void => {
+                    let validator = {
+                        min: {value: dialog_scope.min.value, message: dialog_scope.min.message},
+                        max: {value: dialog_scope.max.value, message: dialog_scope.max.message},
+                        required: {value: dialog_scope.required.value, message: dialog_scope.required.message}
+                    };
+                    FormBuilderService.AddElement(ElementsService.HtmlArea(dialog_scope.key, validator));
+                }, (): void => {
+                });
+            };
+
             let addNumber = (): void => {
 
                 let modalRegist: any = $uibModal.open({
@@ -1149,6 +1170,7 @@ namespace FormBuilderControllersModule {
             $scope.addField = addField;
             $scope.addHtmlField = addHtmlField;
             $scope.addTextArea = addTextArea;
+            $scope.addHtmlArea = addHtmlArea;
             $scope.addNumber = addNumber;
             $scope.addDate = addDate;
             $scope.addHtml = addHtml;

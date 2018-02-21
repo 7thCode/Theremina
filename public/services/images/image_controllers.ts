@@ -125,7 +125,7 @@ namespace ImageControllersModule {
 
             let createImage = (files: any): void => {
                 progress(true);
-                let promises = [];
+                let promises:any[] = [];
                 _.forEach(files, (local_file) => {
                     let deferred = $q.defer();
                     let fileReader: any = new FileReader();

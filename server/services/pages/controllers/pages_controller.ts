@@ -124,6 +124,8 @@ export namespace PagesModule {
          *  let userid = Pages.userid(request);
          * @param userid
          * @param tmp_path
+         * @param namespace
+         * @param sub_path
          * @param callback
          * @returns none
          */
@@ -145,6 +147,8 @@ export namespace PagesModule {
          *  let userid = Pages.userid(request);
          * @param userid
          * @param tmp_path
+         * @param namespace
+         * @param sub_path
          * @param callback
          * @returns none
          */

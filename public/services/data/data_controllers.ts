@@ -13,13 +13,13 @@ namespace DataControllersModule {
     DataControllers.controller('DataController', ['$scope', '$rootScope', '$log', '$document', '$q', '$compile', '$uibModal', "FormPlayerService", "ArticleService", 'SessionService',
         ($scope: any, $rootScope: any, $log: any, $document: any, $q: any, $compile: any, $uibModal: any, FormPlayerService: any, ArticleService: any, SessionService: any): void => {
 
-            let pagesize = 40;
+            let pagesize:number = 40;
 
-            let progress = (value) => {
+            let progress = (value:any):void => {
                 $scope.$emit('progress', value);
             };
 
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', (event:any, value:any):void => {
                 $scope.progress = value;
             });
 
@@ -256,7 +256,6 @@ namespace DataControllersModule {
                     });
                 });
             };
-
 
             $scope.SelectPage = (type: string): void => {
                 progress(true);

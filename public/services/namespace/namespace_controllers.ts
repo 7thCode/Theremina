@@ -57,7 +57,7 @@ namespace NamespaceControllersModule {
             });
 
             window.onfocus = () => {
-                GetNamespaces();
+        //        GetNamespaces();
                 //      GetNamespace();
             };
 

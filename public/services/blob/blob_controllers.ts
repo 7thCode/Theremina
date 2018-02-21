@@ -17,11 +17,11 @@ namespace BlobControllersModule {
     BlobControllers.controller('BlobController', ['$scope', '$rootScope', '$uibModal', '$q', '$document', '$log', 'CollectionService', 'FileService',
         function ($scope: any, $rootScope: any, $uibModal: any, $q: any, $document: any, $log: any, CollectionService, FileService): void {
 
-            let progress = (value) => {
+            let progress = (value: any): void => {
                 $scope.$emit('progress', value);
             };
 
-            $scope.$on('progress', (event, value) => {
+            $scope.$on('progress', (event, value): void => {
                 $scope.progress = value;
             });
 
@@ -62,14 +62,14 @@ namespace BlobControllersModule {
             };
 
             let Draw = () => {
-                FileService.Query((result: any) => {
+                FileService.Query((result: any): void => {
                     if (result) {
                         $scope.files = result;
                     }
-                    FileService.Over((hasnext) => {
+                    FileService.Over((hasnext): void => {
                         $scope.over = !hasnext;
                     });
-                    FileService.Under((hasprev) => {
+                    FileService.Under((hasprev): void => {
                         $scope.under = !hasprev;
                     });
                 }, error_handler);
@@ -91,32 +91,32 @@ namespace BlobControllersModule {
                 }, error_handler);
             };
 
-            let Next = () => {
+            let Next = (): void => {
                 progress(true);
-                FileService.Next((result) => {
+                FileService.Next((result): void => {
                     if (result) {
                         $scope.files = result;
                     }
-                    FileService.Over((hasnext) => {
+                    FileService.Over((hasnext): void => {
                         $scope.over = !hasnext;
                     });
-                    FileService.Under((hasprev) => {
+                    FileService.Under((hasprev): void => {
                         $scope.under = !hasprev;
                     });
                     progress(false);
                 }, error_handler);
             };
 
-            let Prev = () => {
+            let Prev = (): void => {
                 progress(true);
-                FileService.Prev((result) => {
+                FileService.Prev((result): void => {
                     if (result) {
                         $scope.files = result;
                     }
-                    FileService.Over((hasnext) => {
+                    FileService.Over((hasnext): void => {
                         $scope.over = !hasnext;
                     });
-                    FileService.Under((hasprev) => {
+                    FileService.Under((hasprev): void => {
                         $scope.under = !hasprev;
                     });
                     progress(false);
@@ -125,9 +125,9 @@ namespace BlobControllersModule {
 
             let createBlob = (files: any): void => {
                 progress(true);
-                let promises:any[] = [];
+                let promises: any[] = [];
                 _.forEach(files, (local_file) => {
-                    let deferred:any = $q.defer();
+                    let deferred: any = $q.defer();
                     let fileReader: any = new FileReader();
                     fileReader.onload = (event: any): void => {
                         FileService.Create(event.target.result, local_file.name, 4000, (result: any) => {

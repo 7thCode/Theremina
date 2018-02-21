@@ -21,7 +21,7 @@ export namespace BlobPageRouter {
     const analysis: any = core.analysis;
 
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const message: any = config.message;
 

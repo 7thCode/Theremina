@@ -6,10 +6,6 @@
 
 "use strict";
 
-//import {Pages} from "../../../services/pages/controllers/pages_controller";
-
-//import {Files} from "../../files/controllers/file_controller";
-
 export namespace ResourcesModule {
 
     const _: any = require('lodash');
@@ -169,7 +165,6 @@ export namespace ResourcesModule {
                         return new Promise((resolve: any, reject: any): void => {
 
                             let filename: string = process.cwd() + doc.path + '/' + doc.name;
-                            //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
                             let localname: string = Resource.localname(doc.name);
                             let type: string = doc.type;
                             let content: any = doc.content;

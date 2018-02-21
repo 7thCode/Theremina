@@ -20,7 +20,7 @@ export namespace LayoutsPageRouter {
 
     const config: any = share.config;
     const services_config: any = share.services_config;
-    const webfonts: any[] = services_config.webfonts;
+    const webfonts: any[] = services_config.webfonts || [];
 
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
 

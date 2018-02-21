@@ -8,8 +8,7 @@
 
 export namespace FormsModule {
 
-    //   const fs = require('graceful-fs');
-    const _ = require('lodash');
+    const _: any = require('lodash');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -60,7 +59,6 @@ export namespace FormsModule {
                 let save = (doc: any): any => {
                     return new Promise((resolve: any, reject: any): void => {
 
-                        //   let namespace: string = Form.namespace(doc.name);
                         let localname: string = Form.localname(doc.name);
                         let userid = doc.userid;
                         let namespace = "";

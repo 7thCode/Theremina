@@ -301,6 +301,7 @@ namespace Adaptor {
                     });
                 }
         */
+
         public Shapes(data: any, callback: (error: any) => void): void {
             let draw = (shape: any): any => {
                 return (): any => {
@@ -380,8 +381,8 @@ namespace Adaptor {
         private pagehight: number = 0;
         private originx: number = 40;
         private originy: number = 40;
-        private nameboxwidth = 250;
-        private valueboxwidth = 250;
+        private nameboxwidth:number = 250;
+        private valueboxwidth:number = 250;
         private boxhight: number = 20;
         private stringoffsetx: number = 3;
         private stringoffsety: number = 2;
@@ -514,7 +515,7 @@ namespace Adaptor {
 
             let _doc = this.doc;
 
-            let path = "";
+            let path:string = "";
             if (data.property.path) {
                 path = data.property.path;
             }
@@ -638,7 +639,7 @@ namespace Adaptor {
                 };
             };
 
-            let promises = [];
+            let promises:any[] = [];
 
             _.forEach(data.Shapes(), (shape) => {
                 promises.push(draw(shape));

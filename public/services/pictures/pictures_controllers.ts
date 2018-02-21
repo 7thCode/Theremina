@@ -557,7 +557,7 @@ namespace PicturesControllersModule {
 
             let createPicture = (files: any): void => {
                 progress(true);
-                let promises = [];
+                let promises:any[] = [];
                 _.forEach(files, (local_file) => {
                     let deferred = $q.defer();
                     //            FileService.Exist({"filename":local_file.name}, (exist) => {
