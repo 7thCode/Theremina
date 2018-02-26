@@ -62,14 +62,14 @@ export namespace ResourcesModule {
             return {$and: [{namespace: namespace}, {userid: userid}, {type: type}, {status: 1}, {open: true}, {name: localname}]};
         }
 
-        static cache_write(path: string[], content: string): void {
+    /*    static cache_write(path: string[], content: string): void {
             event.emitter.emit("cache_write", {path: path, string: content});
         };
 
         static cache_invalidate(path: string): void {
             event.emitter.emit("cache_invalidate", {path: path});
         };
-
+*/
         /**
          * @param initresources
          * @returns none
@@ -300,7 +300,7 @@ export namespace ResourcesModule {
                     page.open = true;
                     let name = page.name;
                     Wrapper.Save(response, number, page, (response: any): void => {
-                        Resource.cache_invalidate(userid + "/" + namespace);
+                    //    Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
@@ -323,7 +323,7 @@ export namespace ResourcesModule {
                 if (page) {
                     let name = page.name;
                     Wrapper.Remove(response, number, page, (response: any): void => {
-                        Resource.cache_invalidate(userid + "/" + namespace);
+           //             Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 } else {
@@ -584,7 +584,7 @@ export namespace ResourcesModule {
                             });
                             path.push(page_name);
 
-                            Resource.cache_write(path, doc.content.resource);
+                            //Resource.cache_write(path, doc.content.resource);
                             callback(null, {content: doc.content.resource, type: doc.content.type});
                         } else {
                             callback({code: 10000, message: "not found."}, null);

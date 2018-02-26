@@ -8,7 +8,7 @@
                 .well.well-sm(style="word-wrap:break-all;") #{config.protocol}://#{config.domain}/{{userid}}/{{namespace}}/doc/{{name}}
             .col-xs-1
                 button.btn.btn-sm.btn-info(type='button', ng-click="Close();" )
-                    i.fa.fa-times-circle
+                    i.fas.fa-times-circle
     .box-body
         .row-fluid
             .col-xs-12
@@ -27,7 +27,7 @@
                                                 .h6 article: {{current_article.name}}
                                                 .box-tools.pull-right
                                                     button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                                                        i.fa.fa-minus
+                                                        i.fas.fa-minus
                                             .box-body
                                                 .flex-row
                                                     ul.flex-auto.nav.nav-tabs
@@ -39,7 +39,7 @@
                                                     .row
                                                         .col-xs-12
                                                             button.btn.btn-info.pull-right(ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
-                                                                i.fa.fa-cloud
+                                                                i.fas.fa-cloud
                                                                 span.hidden-xs.hidden-sm #{message.save}
                                                     .row
                                                         .col-xs-12
@@ -54,11 +54,11 @@
         div
             .box-tools.pull-right
                 button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                    i.fa.fa-minus
+                    i.fas.fa-minus
         div
             .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UplodArticles($files);")
                 button.btn.btn-xs.btn-box-tool(flow-btn type="file")
-                    i.fa.fa-plus-circle.text-primary
+                    i.fas.fa-plus-circle.text-primary
         .row
             .col-xs-12
                 include ../../../systems/common/next_prev
@@ -79,7 +79,7 @@
             li(ng-repeat="article in articles")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
                     a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank")
-                        i.fa.fa-cloud-download
+                        i.fas.fa-cloud-download-alt
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{article.name}}", ng-click="SelectArticle(article._id)")
                         img.center-block.thumbnail(ng-src="{{article.content.type.value | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
                     div(style="height:8rem;text-align:center;")

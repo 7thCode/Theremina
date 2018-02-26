@@ -3,7 +3,7 @@ div
         span.modal-title #{message.deformation}
         span.pull-right
             button.btn.btn-xs.btn-box-tool(type='button', ng-click='cancel()')
-                i.fa.fa-times
+                i.fas.fa-times
         div.h5 {{name}}
     .modal-body
         .row
@@ -61,7 +61,7 @@ div
                     button.btn.btn-primary(type="button", ng-click='answer();', ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}
                     //button.btn.btn-primary(type="button", ng-click='Crop();', ng-disabled="progress || validate.$invalid", aria-label="") Crop
                     button.btn.btn-info(type="button", ng-click='Rotate(1);', ng-disabled="progress || validate.$invalid", aria-label="")
-                        i.fa.fa-rotate-right
+                        i.fas.fa-redo-alt
                 // button.btn.btn-info(type="button", ng-click='Rotate(-1);', ng-disabled="progress || validate.$invalid", aria-label="")
-                //     i.fa.fa-rotate-right
+                //     i.fas.fa-redo-alt
 

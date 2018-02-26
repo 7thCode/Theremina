@@ -91,53 +91,11 @@ export namespace AuthModule {
         constructor() {
 
         }
-/*
-        public create_init_user(initusers: any[]): void {
-            if (initusers) {
-                _.forEach(initusers, (user) => {
-                    let type: string = user.type;
-                    let auth: number = user.auth;
-                    let username: string = user.username;
-                    let userid: string = user.userid;
-                    let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
-                    let rootpassword: string = user.password;
 
-                    Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
-                        if (!account) {
-
-                            let content: any = definition.account_content;
-                            content.mails.push(username);
-                            content.nickname = user.displayName;
-
-                            LocalAccount.register(new LocalAccount({
-                                    userid: userid,
-                                    username: username,
-                                    type: type,
-                                    auth: auth,
-                                    passphrase: passphrase,
-                                    publickey: Cipher.PublicKey(passphrase),
-                                    local: content
-                                }),
-                                rootpassword,
-                                (error: any) => {
-                                    if (error) {
-                                        logger.error(error.message);
-                                    }
-                                });
-                        }
-                    });
-                });
-            }
-        }
-
-*/
-        public create_init_user(initusers: any[]): void {
-            if (initusers) {
-
-                let promises: any = [];
-                _.forEach(initusers, (user) => {
-                    promises.push(new Promise((resolve: any, reject: any): void => {
-                        if (user) {
+        /*
+                public create_init_user(initusers: any[]): void {
+                    if (initusers) {
+                        _.forEach(initusers, (user) => {
                             let type: string = user.type;
                             let auth: number = user.auth;
                             let username: string = user.username;
@@ -163,49 +121,76 @@ export namespace AuthModule {
                                         }),
                                         rootpassword,
                                         (error: any) => {
-                                            if (!error) {
-                                                resolve({});
-                                            } else {
-                                                reject(error);
+                                            if (error) {
+                                                logger.error(error.message);
                                             }
                                         });
                                 }
                             });
+                        });
+                    }
+                }
+
+        */
+        public create_init_user(initusers: any[]): void {
+            if (initusers) {
+                let promises: any = [];
+                _.forEach(initusers, (user) => {
+                    promises.push(new Promise((resolve: any, reject: any): void => {
+                        if (user) {
+                            let type: string = user.type;
+                            let auth: number = user.auth;
+                            let username: string = user.username;
+                            let userid: string = user.userid;
+                            let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
+                            let rootpassword: string = user.password;
+
+                            Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
+                                if (!account) {
+                                    let _promise = new Promise((_resolve: any, _reject: any): void => {
+
+                                        let content: any = {"mails" : [], "nickname": "", "group": ""};// definition.account_content;
+                                        content.mails.push(username);
+                                        content.nickname = user.displayName;
+
+                                        LocalAccount.register(new LocalAccount({
+                                                userid: userid,
+                                                username: username,
+                                                type: type,
+                                                auth: auth,
+                                                passphrase: passphrase,
+                                                publickey: Cipher.PublicKey(passphrase),
+                                                local: content
+                                            }),
+                                            rootpassword,
+                                            (error: any) => {
+                                                if (!error) {
+                                                    _resolve({});
+                                                } else {
+                                                    _reject(error);
+                                                }
+                                            });
+
+                                    });
+                                    _promise.then((results: any[]): void => {
+                                        resolve({});
+                                    }).catch((error: any): void => {
+                                        reject(error);
+                                    });
+                                }
+                            });
+
                         } else {
                             reject({});
                         }
                     }));
                 });
 
-                Promise.all(promises).then((results: any[]): void => {
-
-                }).catch((error: any): void => {
-
+                promises.reduce((prev, current, index, array): any => {
+                    return prev.then(current);
+                }, Promise.resolve()).then(() => {
+                }).catch((error) => {
                 });
-/*
-                let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
-                let readstream = bucket.openDownloadStream(item._id);
-
-                let meta = item.metadata;
-                meta.userid = userid;
-
-                let writestream = bucket.openUploadStream(item.filename, {
-                    contentType: item.contentType,
-                    metadata: meta
-                });
-
-                if (writestream) {
-                    writestream.once('finish', (file: any): void => {
-                        resolve(file);
-                    });
-                    readstream.on('error', (error: any): void => {
-                        reject(error);
-                    });
-                    readstream.pipe(writestream);
-                } else {
-                    reject({});
-                }
-                */
 
             }
         }

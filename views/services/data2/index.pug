@@ -21,7 +21,7 @@ block content
                                 span(ng-show="current_article.name") #{message.name}: {{current_article.name}}
                             .box-tools.pull-right
                                 button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                                    i.fa.fa-minus
+                                    i.fas.fa-minus
                         .box-body
                             .flex-row
                                 ul.flex-auto.nav.nav-tabs
@@ -33,7 +33,7 @@ block content
                                 .flex-row
                                     .flex-auto(style="padding:0 5px;")
                                         button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
-                                            i.fa.fa-cloud
+                                            i.fas.fa-cloud
                                             span.hidden-xs.hidden-sm #{message.save}
                                 .flex-row
                                     .flex-auto(style="padding:0 5px;")
@@ -41,7 +41,7 @@ block content
                                 .flex-row
                                     .flex-auto(style="padding:0 5px;")
                                         button.btn.btn-info.pull-right(style="width:100%;" ng-class="{disabled: !opened}", ng-disabled="progress || validate.$invalid", ng-click="SaveArticle();")
-                                            i.fa.fa-cloud
+                                            i.fas.fa-cloud
                                             span.hidden-xs.hidden-sm #{message.save}
                         .box-footer.clearfix
                             div(ng-bind="message")

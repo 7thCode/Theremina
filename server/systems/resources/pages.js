@@ -14,15 +14,14 @@ var ResourcePageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     var auth = new AuthController.Auth();
-    var AnalysisModule = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    var analysis = new AnalysisModule.Analysis;
-    var ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
-    // const resources:any = new ResourcesModule.Resource;
-    var pages = new ResourcesModule.Pages;
+    //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
+    //  const analysis: any = new AnalysisModule.Analysis;
+    //  const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
+    //   const pages: any = new ResourcesModule.Pages;
     ResourcePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
             response.render("systems/resources/player/index", {
                 config: config,
@@ -53,40 +52,40 @@ var ResourcePageRouter;
     ResourcePageRouter.router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, auth.page_is_system, function (req, result, next) {
             result.render('systems/resources/builder/dialogs/delete_confirm_dialog', { message: message });
         }]);
-    //http://localhost:8000/resources/render/000000000000000000000000/words_index
     // New Render
-    var Error = function (error, request, response) {
-        switch (error.code) {
-            case 10000:
-            case 20000:
-                var userid = request.params.userid;
-                pages.render_object(userid, "error.html", {
-                    status: 404,
-                    message: error.message,
-                    url: request.url
-                }, function (error, result) {
-                    if (!error) {
-                        response.writeHead(200, { 'Content-Type': result.type, 'Cache-Control': config.cache });
-                        response.write(result.content);
-                        response.end();
-                    }
-                    else {
-                        response.status(404).render('error', {
-                            status: 404,
-                            message: error.message,
-                            url: request.url
-                        });
-                    }
-                });
-                break;
-            default:
-                response.status(500).render('error', {
-                    status: 500,
-                    message: error.message,
-                    url: request.url
-                });
-        }
-    };
+    /*
+        let Error = (error: { code: number, message: string }, request: any, response: any) => {
+            switch (error.code) {
+                case 10000:
+                case 20000:
+                    let userid:string = request.params.userid;
+                    pages.render_object(userid, "error.html", {  // user define error
+                        status: 404,
+                        message: error.message,
+                        url: request.url
+                    }, (error: any, result: any) => {
+                        if (!error) {
+                            response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
+                            response.write(result.content);
+                            response.end();
+                        } else {
+                            response.status(404).render('error', {  // system default error
+                                status: 404,
+                                message: error.message,
+                                url: request.url
+                            });
+                        }
+                    });
+                    break;
+                default:
+                    response.status(500).render('error', {
+                        status: 500,
+                        message: error.message,
+                        url: request.url
+                    });
+            }
+        };
+        */
     /*
         let render_static = (request: any,sub_path:string[], response: any): void => {
             pages.render_direct(request, sub_path, (error: { code: number, message: string }, result: any): void => {

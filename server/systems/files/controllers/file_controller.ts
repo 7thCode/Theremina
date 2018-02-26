@@ -780,7 +780,7 @@ export namespace FileModule {
 
                                                         if (writestream) {
                                                             writestream.once('finish', (file: any): void => {
-                                                                Files.cache_invalidate(userid + "/" + namespace);
+                                                                Files.cache_invalidate(userid + "/" + namespace + "/doc/img/" + name);
                                                                 Wrapper.SendSuccess(response, file);
                                                             });
                                                             writestream.write(chunk);
@@ -884,7 +884,7 @@ export namespace FileModule {
                                         if (item) {
                                             collection.remove({_id: item._id}, (error): void => {
                                                 if (!error) {
-                                                    Files.cache_invalidate(userid + "/" + namespace);
+                                                    Files.cache_invalidate(userid + "/" + namespace + "/doc/img/" + name);
                                                     Wrapper.SendSuccess(response, {});
                                                 } else {
                                                     Wrapper.SendError(response, error.code, error.message, error);

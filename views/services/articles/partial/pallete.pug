@@ -4,16 +4,16 @@
             .col-xs-12
                 .box-tools.pull-right
                     button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                        i.fa.fa-minus
+                        i.fas.fa-minus
             .col-xs-12
                 include ../../../systems/common/next_prev
             .col-xs-12
                 .btn-group(role="group", style="margin-top:5px;width:100%")
                     button.btn.btn-sm.btn-primary(ng-click="CreateArticle();",style="width:50%;")
-                        i.fa.fa-plus
+                        i.fas.fa-plus
                         span.hidden-xs.hidden-sm  #{message.create}
                     button.btn.btn-sm.btn-danger(ng-class="{disabled: !opened}", ng-click="DeleteArticle();", ng-disabled="!Selected();",style="width:50%;")
-                        i.fa.fa-trash
+                        i.fas.fa-trash
                         span.hidden-xs.hidden-sm #{message.delete}
     .box-body
         table.table.table-striped(ng-cloak)

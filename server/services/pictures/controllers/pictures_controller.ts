@@ -21,6 +21,8 @@ export namespace PicturesModule {
     const event: any = share.Event;
     const logger: any = share.logger;
 
+    const file_utility: any = share.Utility;
+
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
     export class Pictures {
@@ -97,6 +99,7 @@ export namespace PicturesModule {
          */
         public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
             try {
+                let userid: string = request.params.userid;
                 let namespace: string = request.params.namespace;
                 let name: string = Pictures.localname(request.params.name);
                 let size: any = request.query;
@@ -105,96 +108,99 @@ export namespace PicturesModule {
                     logger.error(error.message);
                 };
 
-                Pictures.connect().then((db) => {
-                    let gfs = new mongodb.GridFSBucket(db, {});
-                    if (gfs) {
-                        db.collection('fs.files', (error: any, collection: any): void => {
-                            if (!error) {
-                                if (collection) {
-                                    let userid: string = request.params.userid;
-                                    Pictures.retrieve_account(userid, (error: any, account: any): void => {
-                                        if (!error) {
-                                            if (account) {
-                                                userid = account.userid;
-                                            }
+                let cache_file = process.cwd() + "/tmp/" + userid + "/" + namespace + "/doc/img/" + name;
+                file_utility.exists(cache_file, () => {
+                    file_utility.read_stream(cache_file).pipe(response); // hit in cache.
+                }, (error) => {
+                    Pictures.connect().then((db) => { //　miss in cache.
+                        let gfs = new mongodb.GridFSBucket(db, {});
+                        if (gfs) {
+                            db.collection('fs.files', (error: any, collection: any): void => {
+                                if (!error) {
+                                    if (collection) {
+                                        Pictures.retrieve_account(userid, (error: any, account: any): void => {
+                                            if (!error) {
+                                                if (account) {
+                                                    userid = account.userid;
+                                                }
 
-                                            let query: any = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
-                                            collection.findOne(query, (error: any, item: any): void => {
-                                                if (!error) {
-                                                    if (item) {
-                                                        let readstream: any = gfs.openDownloadStream(item._id);
-                                                        if (readstream) {
-                                                            let type = item.metadata.type;
-                                                            response.setHeader("Content-Type", type);
-                                                            response.setHeader("Cache-Control", config.cache);
-                                                            readstream.on('end', (): void => {
-                                                            });
-                                                            readstream.on('error', error_handler);
+                                                let query: any = {$and: [{filename: name}, {"metadata.namespace": namespace}, {"metadata.userid": userid}]};
+                                                collection.findOne(query, (error: any, item: any): void => {
+                                                    if (!error) {
+                                                        if (item) {
+                                                            let readstream: any = gfs.openDownloadStream(item._id);
+                                                            if (readstream) {
+                                                                let type = item.metadata.type;
+                                                                response.setHeader("Content-Type", type);
+                                                                response.setHeader("Cache-Control", config.cache);
+                                                                readstream.on('end', (): void => {});
+                                                                readstream.on('error', error_handler);
 
-                                                            try {
-                                                                if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
-                                                                    if (size.w && size.h) {
-                                                                        if (size.l && size.t) {
-                                                                            /*
-                                                                            // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
-                                                                            let extractor = sharp().extract({
-                                                                                left: parseInt(size.l),
-                                                                                top: parseInt(size.t),
-                                                                                width: parseInt(size.w),
-                                                                                height: parseInt(size.h)
-                                                                            });
-                                                                            readstream = readstream.pipe(extractor);
-                                                                            */
+                                                                try {
+                                                                    if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
+                                                                        if (size.w && size.h) {　// 加工
+                                                                            if (size.l && size.t) {
+                                                                                /*
+                                                                                // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                                                                                let extractor = sharp().extract({
+                                                                                    left: parseInt(size.l),
+                                                                                    top: parseInt(size.t),
+                                                                                    width: parseInt(size.w),
+                                                                                    height: parseInt(size.h)
+                                                                                });
+                                                                                readstream = readstream.pipe(extractor);
+                                                                                */
+                                                                            }
+                                                                            let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
+                                                                            readstream = readstream.pipe(resizer);
+                                                                        } else { //加工しないならばコピー。
+                                                                            let copystream: any = gfs.openDownloadStream(item._id);
+                                                                            let path: string[] = [];
+                                                                            path.push(userid);
+                                                                            path.push(namespace);
+                                                                            path.push("doc"); // todo: いまいちやろこれは。
+                                                                            path.push("img"); // todo: いまいちやろこれは。
+                                                                            path.push(name);
+                                                                            Pictures.cache_write(path, copystream);
                                                                         }
-                                                                        let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
-                                                                        readstream = readstream.pipe(resizer);
-                                                                    } else {
-                                                                        let _readstream: any = gfs.openDownloadStream(item._id);
-                                                                        let path: string[] = [];
-                                                                        path.push(userid);
-                                                                        path.push(namespace);
-                                                                        path.push("doc"); // todo: いまいちやろこれは。
-                                                                        path.push("img"); // todo: いまいちやろこれは。
-                                                                        path.push(name);
-                                                                        Pictures.cache_write(path, _readstream);
                                                                     }
+                                                                    readstream.pipe(response);
+                                                                } catch (e) {
+                                                                    // NOT FOUND IMAGE.
+                                                                    Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
+                                                                        next();
+                                                                    });
                                                                 }
-                                                                readstream.pipe(response);
-                                                            } catch (e) {
-                                                                // NOT FOUND IMAGE.
-                                                                Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                    next();
-                                                                });
+                                                            } else {
+                                                                next();
                                                             }
                                                         } else {
-                                                            next();
+                                                            // NOT FOUND IMAGE.
+                                                            Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
+                                                                next();
+                                                            });
                                                         }
                                                     } else {
-                                                        // NOT FOUND IMAGE.
-                                                        Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                            next();
-                                                        });
+                                                        next();
                                                     }
-                                                } else {
-                                                    next();
-                                                }
-                                            });
-                                        } else {
-                                            next();
-                                        }
-                                    });
+                                                });
+                                            } else {
+                                                next();
+                                            }
+                                        });
+                                    } else {
+                                        next();
+                                    }
                                 } else {
                                     next();
                                 }
-                            } else {
-                                next();
-                            }
-                        });
-                    } else {
+                            });
+                        } else {
+                            next();
+                        }
+                    }).catch((error) => {
                         next();
-                    }
-                }).catch((error) => {
-                    next();
+                    });
                 });
             } catch (e) {
                 next();

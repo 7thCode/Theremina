@@ -5,11 +5,11 @@
                 div
                     .box-tools.pull-right
                         button.btn.btn-xs.btn-box-tool(type='button')
-                            i.fa.fa-minus
+                            i.fas.fa-minus
                 div
                     .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createPicture($files);")
                         button.btn.btn-xs.btn-box-tool(flow-btn type="file", flow-attrs="{accept:'.png,.jpg,.gif,.svg'}")
-                            i.fa.fa-plus-circle.text-primary
+                            i.fas.fa-plus-circle.text-primary
         .row
             .col-xs-12
                 include ../../../systems/common/next_prev
@@ -19,9 +19,9 @@
             li(ng-repeat="file in files")
                 div(ng-if="Type(file.metadata.type) == 'image'", ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:8rem;width:8rem;margin-left:auto;margin-right:auto;")
                     button.btn.btn-danger.btn-xs(ng-click="deletePicture(file.filename);", style="position:relative;top:10px;left:1rem;border-radius: 10px")
-                        i.fa.fa-ban(aria-hidden="true")
+                        i.fas.fa-ban(aria-hidden="true")
                     button.btn.btn-success.btn-xs(ng-click="editPicture(file.filename);", style="position:relative;top:10px;left:3rem;border-radius: 10px")
-                        i.fa.fa-pencil(aria-hidden="true")
+                        i.fas.fa-pencil-alt(aria-hidden="true")
                     div(style="height:4rem;")
                         img.center-block.thumbnail(ng-drag="true", ng-drag-data="obj", data-allow-transform="true", ng-src="/{{file.metadata.userid}}/{{namespace}}/doc/img/{{file.filename}}", style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
                     div(style="height:2rem;text-align:center;")

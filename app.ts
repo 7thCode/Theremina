@@ -182,13 +182,15 @@ namespace App {
 
             const MongoStore = require('connect-mongo')(session);
 
-            const options = {useMongoClient: true, keepAlive: 300000, connectTimeoutMS: 1000000};
+            const options = {useMongoClient: true, keepAlive: 1, connectTimeoutMS: 1000000, reconnectTries: 30, reconnectInterval: 2000};
+
+            // const options = {keepAlive: 300000, connectTimeoutMS: 1000000};
 
             if (config.db.user) {
                 mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
             }
 
-            mongoose.connection.on('connected',  () => {
+            mongoose.connection.on('connected', () => {
 
                 app.use(session({
                     name: config.sessionname,
@@ -242,9 +244,13 @@ namespace App {
                     });
                 }
 
-                const CacheModule: any = require(share.Server("systems/common/cache/cache"));
-                let cache = new CacheModule.Cache("public");
+                let cache_root = path.join(process.cwd(), "tmp");
+                if (config.cache_root) {
+                    cache_root = config.cache_root;
+                }
 
+                const CacheModule: any = require(share.Server("systems/common/cache/cache"));
+                let cache = new CacheModule.Cache(cache_root);
 
                 // passport
                 const Account: any = core.LocalAccount;
@@ -280,7 +286,7 @@ namespace App {
                     passport.use(new FacebookStrategy(config.facebook.key, (accessToken, refreshToken, profile, done): void => {
                             process.nextTick((): void => {
                                 done(null, profile);
-                            })
+                            });
                         }
                     ));
                 }
@@ -401,7 +407,6 @@ namespace App {
                 io.wait(config, event);
 
 
-
                 // mailReceiver
                 if (config.receiver) {
                     const MailerModule: any = require('./server/systems/common/mailer');
@@ -450,13 +455,14 @@ namespace App {
                 });
             });
 
-            mongoose.connection.on('error', (error) =>  {
+            mongoose.connection.on('error', (error) => {
                 logger.fatal('Mongoose default connection error: ' + error);
                 process.exit(0);
             });
 
-            mongoose.connection.on('disconnected',  () =>  {
-                logger.info('Mongoose default connection disconnected');
+            mongoose.connection.on('disconnected', () => {
+                logger.fatal('Mongoose default connection disconnected');
+                process.exit(0);
             });
 
             event.emitter.on('socket', (data): void => {

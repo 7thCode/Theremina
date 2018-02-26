@@ -11,13 +11,13 @@ nav.navbar.navbar-fixed-top.navbar-color(style="position:fixed;")
         #bs-navbar.navbar-collapse.collapse.navbar-color(style="padding-right:10px;")
             div
                 span(style="float:right")
-                    button.btn.btn-warning(type="button" ,href='#', ng-click="showPasswordDialog()", aria-label="", style="margin:12px;")
-                        i.fa.fa-key
+                    button.btn.btn-warning(type="button", href='#', ng-click="showPasswordDialog()", aria-label="", style="margin:12px;")
+                        i.fas.fa-key
                         span &nbsp;#{message.password}
                 if !user
                     span(style="float:right")
-                        button.btn.btn-info(type="button" ,href='#', ng-click="showLoginDialog()", aria-label="", style="margin:12px;")
-                            i.fa.fa-sign-in
+                        button.btn.btn-info(type="button", href='#', ng-click="showLoginDialog()", aria-label="", style="margin:12px;")
+                            i.fas.fa-sign-in-alt
                             span &nbsp;#{message.login}
 
 
