@@ -83,6 +83,8 @@ namespace FrontControllersModule {
                     // put logic here for keypress and cut/paste changes
                 },
                 inline: false,
+                cleanup : false,
+                valid_elements : '*[*]',
                 plugins: "visualblocks code table advlist autolink link image lists charmap print preview textcolor",
                 menubar: "table tools",
                 toolbar: "code formatselect | forecolor backcolor bold italic strikethrough underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat",
