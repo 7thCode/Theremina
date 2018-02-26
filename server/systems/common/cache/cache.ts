@@ -24,7 +24,7 @@ export namespace CacheModule {
         private root_path: string;
 
         constructor(root_dir: string) {
-            this.root_path = path.join(process.cwd(), root_dir);
+            this.root_path = root_dir;
 
             event.emitter.on('cache_invalidate', (data: any): void => {
                 this.invalidate(data);
@@ -41,27 +41,46 @@ export namespace CacheModule {
                 logger.error(error.message);
             };
 
-            let path_array: any[] = data.path;
-            let file_name: string = path_array.pop();
+            let target_file = this.root_path;
+            data.path.forEach(path => {
+                target_file += "/" + path;
+            });
 
-            if ("stream" in data) {
-                let readstream = data.stream;
-                file_utility.create_dir(this.root_path, path_array, (target_path) => {
-                    let write_file = fs.createWriteStream(path.join(target_path, file_name));
-                    readstream.pipe(write_file);
-                }, error_handler);
-            } else if ("string" in data) {
-                let content = data.string;
-                file_utility.create_dir(this.root_path, path_array, (target_path) => {
-                    file_utility.writefile(path.join(target_path, file_name), content, (error: any) => {
-                    });
-                }, error_handler);
-            }
+            file_utility.exists(target_file,
+                () => {
+                    let a = 1;
+                },
+                (error) => {
+                    let path_array: any[] = data.path;
+                    let file_name: string = path_array.pop();
+
+                    if ("stream" in data) {
+                        let readstream = data.stream;
+                        file_utility.create_dir(this.root_path, path_array, (target_path: string): void => {
+                            let write_file = fs.createWriteStream(path.join(target_path, file_name));
+                            readstream.pipe(write_file);
+                        }, error_handler);
+                    } else if ("string" in data) {
+                        let content = data.string;
+                        file_utility.create_dir(this.root_path, path_array, (target_path: string): void => {
+                            file_utility.writefile(path.join(target_path, file_name), content, (error: any) => {
+                            });
+                        }, error_handler);
+                    }
+                });
         };
 
         public invalidate(data: any): void {
-            let path_string = path.join(this.root_path, data.path);
-            file_utility.delete_folder_recursive(path_string);
+            let target_file = path.join(this.root_path, data.path);
+            file_utility.exists(target_file,
+                () => {
+                    file_utility.unlink(target_file,(error) => {
+
+                    });
+                },
+                (error) => {
+                    let a = 1;
+                });
         }
     }
 }

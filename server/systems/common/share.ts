@@ -26,9 +26,8 @@ export namespace ShareModule {
 
     const log4js: any = require('log4js');
     log4js.configure("./config/systems/logs.json");
-
     export const logger: any = log4js.getLogger('request');
-    logger.setLevel(config.loglevel);
+  //  logger.setLevel(config.loglevel);
 
     const Promised: any = require("./wrapper");
     export const Wrapper: any = new Promised.Wrapper();

@@ -294,6 +294,21 @@
     再起動
     sudo service nginx configtest
 
+
+####MacOS(Homebrew)
+
+    /usr/local/etc/nginx/nginx.conf
+
+    終了
+    nginx -s stop
+
+    再起動
+    nginx -s reload
+
+
+
+    localhost:8080/,,,,,,
+
 ##Backup
 
 ####full backup
@@ -412,7 +427,7 @@
     > cd ~
     > cd certbot
     > sudo service nginx stop
-    > ./certbot-auto renew -q --no-self-upgrade
+    > sudo ./certbot-auto renew -q --no-self-upgrade
     > sudo service nginx start
     
     証明書の取得時に使用したオプションは

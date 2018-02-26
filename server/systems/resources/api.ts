@@ -32,7 +32,6 @@ export namespace ResourceApiRouter {
     router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, resource.put_resource]);
     router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, resource.delete_resource]);
 
-
 }
 
 module.exports = ResourceApiRouter.router;

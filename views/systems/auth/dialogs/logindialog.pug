@@ -3,7 +3,7 @@ div
         span.h5.modal-title #{message.logindialogtitle}
         span.pull-right
             button.btn.btn-box-tool(type='button', ng-click='cancel()')
-                i.fa.fa-times
+                i.fas.fa-times
     .modal-body
         ng-form(name="validate", ng-submit="answer(items)")
             .row
@@ -38,16 +38,16 @@ div
                     button.btn.btn-primary(tabindex="3", type="button", ng-click='answer(items);validate.$dirty = false;', style="margin:0.5rem;", ng-disabled="progress || validate.$invalid", aria-label="") #{message.ok}
                     if (config.facebook)
                         button.btn.btn-primary(tabindex="4", type="button", ng-click="go('/auth/facebook');", style="margin:0.5rem;background-color:#3B5998;", aria-label="")
-                            i.fa.fa-facebook
+                            i.fab.fa-facebook
                     if (config.twitter)
                         button.btn.btn-primary(tabindex="5", type="button", ng-click="go('/auth/twitter');", style="margin:0.5rem;background-color:#55acee;", aria-label="")
-                            i.fa.fa-twitter-square
+                            i.fab.fa-twitter-square
                     if (config.instagram)
                         button.btn.btn-primary(tabindex="6", type="button", ng-click="go('/auth/instagram');", style="margin:0.5rem;background-color:#3f729b;", aria-label="")
-                            i.fa.fa-instagram
+                            i.fab.fa-instagram
                     if (config.googleplus)
                         button.btn.btn-primary(tabindex="7", type="button", ng-click="go('/auth/googleplus');", style="margin:0.5rem;background-color:#dd4b39;", aria-label="")
-                            i.fa.fa-google-plus
+                            i.fab.fa-google-plus
                     if (config.line)
                         button.btn.btn-primary(tabindex="8", type="button", ng-click="go('/auth/line');", style="margin:0.5rem;background-color:#1dcd00;", aria-label="")
-                            i.fa.fa-empire
+                            i.fab.fa-empire

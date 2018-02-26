@@ -3,7 +3,7 @@ div
         span.h5.modal-title Create
         span.pull-right
             button.btn.btn-xs.btn-box-tool(type='button',ng-click='cancel()')
-                i.fa.fa-times
+                i.fas.fa-times
     .modal-body
         .row
             .col-xs-12(style="word-wrap:break-word;word-break:break-all")
@@ -15,7 +15,7 @@ div
                                 chips(ng-model='sender',style="height: 36px;")
                                     chip-tmpl
                                         .default-chip {{chip}}
-                                            span.fa.fa-times(remove-chip='')
+                                            span.fas.fa-times(remove-chip='')
                                     input#sender(name="", style="background-color:transparent;" chip-control)
 
                             .col-xs-12

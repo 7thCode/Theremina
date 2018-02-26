@@ -2,7 +2,7 @@
     .box-header.with-border
         .box-tools.pull-right
             button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                i.fa.fa-minus
+                i.fas.fa-minus
         .h5.box-title(style="text-color:#ffffffff;" ng-bind="username")
     .box-body
         .col-xs-12
@@ -30,7 +30,7 @@
                         chips(ng-model='mails', style="height: 36px;")
                             chip-tmpl
                                 .default-chip {{chip}}
-                                    span.fa.fa-times(remove-chip='')
+                                    span.fas.fa-times(remove-chip='')
                             input#mails(name="mails", style="background-color:transparent;", chip-control, data-toggle="tooltip", data-placement="top", title=message.mail)
                     .col-xs-12
                         .row(style="margin-top:3rem")

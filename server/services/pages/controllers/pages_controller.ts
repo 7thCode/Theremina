@@ -353,7 +353,9 @@ export namespace PagesModule {
                                         _.forEach(items, (item) => {
                                             promises.push(new Promise((resolve: any, reject: any): void => {
                                                 if (item) {
-                                                    let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                                       //             let bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+                                                    let bucket = new mongoose.mongo.GridFSBucket(db);
+
                                                     let readstream = bucket.openDownloadStream(item._id);
 
                                                     let meta = item.metadata;

@@ -5,8 +5,6 @@
  */
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//import {Pages} from "../../../services/pages/controllers/pages_controller";
-//import {Files} from "../../files/controllers/file_controller";
 var ResourcesModule;
 (function (ResourcesModule) {
     var _ = require('lodash');
@@ -51,14 +49,14 @@ var ResourcesModule;
         Resource.make_query = function (userid, type, localname, namespace) {
             return { $and: [{ namespace: namespace }, { userid: userid }, { type: type }, { status: 1 }, { open: true }, { name: localname }] };
         };
-        Resource.cache_write = function (path, content) {
-            event.emitter.emit("cache_write", { path: path, string: content });
-        };
-        ;
-        Resource.cache_invalidate = function (path) {
-            event.emitter.emit("cache_invalidate", { path: path });
-        };
-        ;
+        /*    static cache_write(path: string[], content: string): void {
+                event.emitter.emit("cache_write", {path: path, string: content});
+            };
+    
+            static cache_invalidate(path: string): void {
+                event.emitter.emit("cache_invalidate", {path: path});
+            };
+    */
         /**
          * @param initresources
          * @returns none
@@ -151,7 +149,6 @@ var ResourcesModule;
                     var save_2 = function (doc) {
                         return new Promise(function (resolve, reject) {
                             var filename = process.cwd() + doc.path + '/' + doc.name;
-                            //    let namespace: string = doc.namespace;// Resource.namespace(doc.name);
                             var localname = Resource.localname(doc.name);
                             var type = doc.type;
                             var content = doc.content;
@@ -286,7 +283,7 @@ var ResourcesModule;
                     page.open = true;
                     var name_1 = page.name;
                     Wrapper.Save(response, number, page, function (response) {
-                        Resource.cache_invalidate(userid + "/" + namespace);
+                        //    Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -309,7 +306,7 @@ var ResourcesModule;
                 if (page) {
                     var name_2 = page.name;
                     Wrapper.Remove(response, number, page, function (response) {
-                        Resource.cache_invalidate(userid + "/" + namespace);
+                        //             Resource.cache_invalidate(userid + "/" + namespace);
                         Wrapper.SendSuccess(response, {});
                     });
                 }
@@ -564,7 +561,7 @@ var ResourcesModule;
                                 path_1.push(path_name);
                             });
                             path_1.push(page_name_3);
-                            Resource.cache_write(path_1, doc.content.resource);
+                            //Resource.cache_write(path, doc.content.resource);
                             callback(null, { content: doc.content.resource, type: doc.content.type });
                         }
                         else {

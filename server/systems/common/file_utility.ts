@@ -140,8 +140,8 @@ export namespace FileUtility {
 
         public create_dir(root: string, pathes: string[], callback: (path: string) => void, error_handler: (error: any) => void): void {
             let current_path = root;
-            let sequentialExec = (arr: any[]): any => {
-                return arr.reduce((prev, current, index, array) => {
+            let sequentialExec = (directorys: any[]): any => {
+                return directorys.reduce((prev, current, index, array) => {
                     return prev.then((prevResult) => {
                         return new Promise((resolve, reject) => {
                             current_path = path.join(current_path, current);
@@ -158,6 +158,22 @@ export namespace FileUtility {
             }).catch((e) => {
                 error_handler(e);
             });
+        }
+
+        public exists(target_file,exist:() => void, notexist:(error) => void) {
+            fs.access(target_file,  (error) => {
+                if (error) {
+                    if (error.code === 'ENOENT') {
+                        notexist(error);
+                    }
+                } else {
+                    exist();
+                }
+            });
+        }
+
+        public read_stream(file_name:string):any {
+            return fs.createReadStream(file_name);
         }
 
     }

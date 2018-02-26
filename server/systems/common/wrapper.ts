@@ -18,15 +18,16 @@ export namespace Promised {
     const result: any = require("./result");
 
    // const config: any = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
-   // const log4js: any = require('log4js');
-  //  log4js.configure("./config/systems/logs.json");
-   // const logger: any = log4js.getLogger('request');
-   // logger.setLevel(config.loglevel);
+    const log4js: any = require('log4js');
+    log4js.configure("./config/systems/logs.json");
+    const logger: any = log4js.getLogger('request');
+//    logger.setLevel(config.loglevel);
 
     export class Wrapper {
 
         public BasicHeader(response: any, session: any): any {
             response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             response.header("Pragma", "no-cache");
             response.header("Cache-Control", "no-cache");
             response.contentType("application/json");
@@ -151,35 +152,35 @@ export namespace Promised {
         }
 
         public SendWarn(response: any, code: number, message: any, object: any): void {
-       //     logger.warn(message + " " + code);
+            logger.warn(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         }
 
         public SendError(response: any, code: number, message: any, object: any): void {
-     //       logger.error(message + " " + code);
+            logger.error(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         }
 
         public SendForbidden(response: any): void {
-      //      logger.error("Forbidden");
+            logger.error("Forbidden");
             if (response) {
                 response.status(403).render("error", {message: "Forbidden...", status: 403});
             }
         }
 
         public SendNotFound(response: any): void {
-    //        logger.error("notfound");
+            logger.error("notfound");
             if (response) {
                 response.status(404).render("error", {message: "not found", status: 404});
             }
         }
 
         public SendFatal(response: any, code: number, message: any, object: any): void {
-  //          logger.fatal(message + " " + code);
+            logger.fatal(message + " " + code);
             if (response) {
                 response.status(500).render("error", {message: message, status: 500});
             }

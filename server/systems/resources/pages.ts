@@ -29,9 +29,9 @@ export namespace ResourcePageRouter {
   //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
   //  const analysis: any = new AnalysisModule.Analysis;
 
-    const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
+  //  const ResourcesModule: any = require(share.Server("systems/resources/controllers/resource_controller"));
 
-    const pages: any = new ResourcesModule.Pages;
+ //   const pages: any = new ResourcesModule.Pages;
 
     router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, (request: any, response: any): void => {
         response.render("systems/resources/player/index", {
@@ -69,7 +69,7 @@ export namespace ResourcePageRouter {
     }]);
 
     // New Render
-
+/*
     let Error = (error: { code: number, message: string }, request: any, response: any) => {
         switch (error.code) {
             case 10000:
@@ -101,6 +101,7 @@ export namespace ResourcePageRouter {
                 });
         }
     };
+    */
     /*
         let render_static = (request: any,sub_path:string[], response: any): void => {
             pages.render_direct(request, sub_path, (error: { code: number, message: string }, result: any): void => {

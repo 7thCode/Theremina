@@ -59,35 +59,98 @@ var AuthModule;
     var Auth = /** @class */ (function () {
         function Auth() {
         }
+        /*
+                public create_init_user(initusers: any[]): void {
+                    if (initusers) {
+                        _.forEach(initusers, (user) => {
+                            let type: string = user.type;
+                            let auth: number = user.auth;
+                            let username: string = user.username;
+                            let userid: string = user.userid;
+                            let passphrase: string = Cipher.FixedCrypt(userid, config.key2);
+                            let rootpassword: string = user.password;
+
+                            Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
+                                if (!account) {
+
+                                    let content: any = definition.account_content;
+                                    content.mails.push(username);
+                                    content.nickname = user.displayName;
+
+                                    LocalAccount.register(new LocalAccount({
+                                            userid: userid,
+                                            username: username,
+                                            type: type,
+                                            auth: auth,
+                                            passphrase: passphrase,
+                                            publickey: Cipher.PublicKey(passphrase),
+                                            local: content
+                                        }),
+                                        rootpassword,
+                                        (error: any) => {
+                                            if (error) {
+                                                logger.error(error.message);
+                                            }
+                                        });
+                                }
+                            });
+                        });
+                    }
+                }
+
+        */
         Auth.prototype.create_init_user = function (initusers) {
             if (initusers) {
+                var promises_1 = [];
                 _.forEach(initusers, function (user) {
-                    var type = user.type;
-                    var auth = user.auth;
-                    var username = user.username;
-                    var userid = user.userid;
-                    var passphrase = Cipher.FixedCrypt(userid, config.key2);
-                    var rootpassword = user.password;
-                    Wrapper.FindOne(null, 1000, LocalAccount, { username: username }, function (response, account) {
-                        if (!account) {
-                            var content = definition.account_content;
-                            content.mails.push(username);
-                            content.nickname = user.displayName;
-                            LocalAccount.register(new LocalAccount({
-                                userid: userid,
-                                username: username,
-                                type: type,
-                                auth: auth,
-                                passphrase: passphrase,
-                                publickey: Cipher.PublicKey(passphrase),
-                                local: content
-                            }), rootpassword, function (error) {
-                                if (error) {
-                                    logger.error(error.message);
+                    promises_1.push(new Promise(function (resolve, reject) {
+                        if (user) {
+                            var type_1 = user.type;
+                            var auth_1 = user.auth;
+                            var username_1 = user.username;
+                            var userid_1 = user.userid;
+                            var passphrase_1 = Cipher.FixedCrypt(userid_1, config.key2);
+                            var rootpassword_1 = user.password;
+                            Wrapper.FindOne(null, 1000, LocalAccount, { username: username_1 }, function (response, account) {
+                                if (!account) {
+                                    var _promise = new Promise(function (_resolve, _reject) {
+                                        var content = { "mails": [], "nickname": "", "group": "" }; // definition.account_content;
+                                        content.mails.push(username_1);
+                                        content.nickname = user.displayName;
+                                        LocalAccount.register(new LocalAccount({
+                                            userid: userid_1,
+                                            username: username_1,
+                                            type: type_1,
+                                            auth: auth_1,
+                                            passphrase: passphrase_1,
+                                            publickey: Cipher.PublicKey(passphrase_1),
+                                            local: content
+                                        }), rootpassword_1, function (error) {
+                                            if (!error) {
+                                                _resolve({});
+                                            }
+                                            else {
+                                                _reject(error);
+                                            }
+                                        });
+                                    });
+                                    _promise.then(function (results) {
+                                        resolve({});
+                                    }).catch(function (error) {
+                                        reject(error);
+                                    });
                                 }
                             });
                         }
-                    });
+                        else {
+                            reject({});
+                        }
+                    }));
+                });
+                promises_1.reduce(function (prev, current, index, array) {
+                    return prev.then(current);
+                }, Promise.resolve()).then(function () {
+                }).catch(function (error) {
                 });
             }
         };
