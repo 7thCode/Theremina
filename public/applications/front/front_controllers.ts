@@ -82,6 +82,10 @@ namespace FrontControllersModule {
                 onChange: function (e) {
                     // put logic here for keypress and cut/paste changes
                 },
+                mode : "textareas",
+                theme : "advanced",
+                force_br_newlines : false,
+                force_p_newlines : false,
                 inline: false,
                 cleanup : false,
                 valid_elements : '*[*]',
@@ -99,7 +103,6 @@ namespace FrontControllersModule {
                             {title: "h6", block: "h6"}
                         ]
                     },
-
                     {
                         title: "Blocks", items: [
                             {title: "p", block: "p"},
@@ -107,7 +110,6 @@ namespace FrontControllersModule {
                             {title: "pre", block: "pre"}
                         ]
                     },
-
                     {
                         title: "Containers", items: [
                             {title: "section", block: "section", wrapper: true, merge_siblings: false},

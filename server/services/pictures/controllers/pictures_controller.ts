@@ -14,6 +14,7 @@ export namespace PicturesModule {
     const MongoClient: any = require('mongodb').MongoClient;
 
     const sharp: any = require('sharp');
+    const path: any = require('path');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -90,6 +91,7 @@ export namespace PicturesModule {
             });
         }
 
+
         /**
          * public
          * @param request
@@ -98,7 +100,7 @@ export namespace PicturesModule {
          * @returns none
          */
         public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
-            logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/static/" + request.params.name );
+            logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/static/" + request.params.name);
             try {
                 let userid: string = request.params.userid;
                 let namespace: string = request.params.namespace;
@@ -111,7 +113,13 @@ export namespace PicturesModule {
 
                 let cache_file = process.cwd() + "/tmp/" + userid + "/" + namespace + "/doc/img/" + name;
                 file_utility.exists(cache_file, () => {
-                    file_utility.read_stream(cache_file).pipe(response); // hit in cache.
+
+                    file_utility.get_header(cache_file,(header) =>{
+                        response.writeHead(200, header);
+             //           response.setHeader("Content-Type", file_utility.get_image_mime(cache_file));
+                        file_utility.read_stream(cache_file).pipe(response); // hit in cache.
+                    });
+
                 }, (error) => {
                     Pictures.connect().then((db) => { //　miss in cache.
                         let gfs = new mongodb.GridFSBucket(db, {});
@@ -134,7 +142,8 @@ export namespace PicturesModule {
                                                                 let type = item.metadata.type;
                                                                 response.setHeader("Content-Type", type);
                                                                 response.setHeader("Cache-Control", config.cache);
-                                                                readstream.on('end', (): void => {});
+                                                                readstream.on('end', (): void => {
+                                                                });
                                                                 readstream.on('error', error_handler);
 
                                                                 try {

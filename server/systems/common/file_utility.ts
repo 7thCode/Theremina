@@ -176,6 +176,35 @@ export namespace FileUtility {
             return fs.createReadStream(file_name);
         }
 
+        static get_image_mime(filename:string):string {
+            let result:string = "";
+            let exitname:string = path.extname(filename);
+            switch (exitname) {
+                case ".jpeg":
+                case ".jpg":
+                    result = "image/jpg";
+                    break;
+                case ".png":
+                    result = "image/png";
+                    break;
+                case ".gif":
+                    result = "image/gif";
+                    break
+            }
+            return result;
+        };
+
+        public get_header(file_path, callback:(header) => void) {
+            fs.stat(file_path, function(error, stat) {
+                if (!error) {
+                    callback({
+                        'Content-Type' :   Utility.get_image_mime(file_path),
+                        'Content-Length' : stat.size
+                    })
+                }
+            });
+        }
+
     }
 }
 
