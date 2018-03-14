@@ -8,7 +8,7 @@
 
 namespace FormBuilderControllersModule {
 
-    let FormBuilderControllers: angular.IModule = angular.module('FormBuilderControllers', ['ui.ace']);
+    let FormBuilderControllers: angular.IModule = angular.module('FormBuilderControllers', ['flow','ui.ace']);
 
     class RGBAColor {
 
@@ -91,8 +91,8 @@ namespace FormBuilderControllersModule {
     const tag_escape = /^(?!.*\u3040-\u30ff).+$/;
     const class_escape = /^(?!.*\u3040-\u30ff).+$/;
 
-    FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
-        function ($scope: any, $document: any, $log: any, $compile: any, $uibModal: any, FormBuilderService: any, ElementsService: any): void {
+    FormBuilderControllers.controller('FormBuilderController', ["$scope","$q", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
+        function ($scope: any,$q:any, $document: any, $log: any, $compile: any, $uibModal: any, FormBuilderService: any, ElementsService: any): void {
 
             let progress = (value) => {
                 $scope.$emit('progress', value);
@@ -537,7 +537,6 @@ namespace FormBuilderControllersModule {
                 }, (): void => {
                 });
             };
-
 
             let addHtml = (): void => {
 
@@ -1098,7 +1097,6 @@ namespace FormBuilderControllersModule {
                 });
 
                 modalRegist.result.then((layout: any): void => {
-
                     $scope.layout = layout;
                     $scope.name = layout.name;
                     $scope.userid = layout.userid;
@@ -1109,7 +1107,6 @@ namespace FormBuilderControllersModule {
                             redraw_select();
                         }
                     });
-
                 }, (): void => {
                 });
             };
@@ -1152,6 +1149,96 @@ namespace FormBuilderControllersModule {
                     });
                 }
             };
+
+/*
+
+            let CreatePages = (files: any): void => {
+                progress(true);
+                let promises = [];
+                _.forEach(files, (local_file) => {
+                    let deferred = $q.defer();
+                    let fileReader: any = new FileReader();
+                    fileReader.onload = (event: any): void => {
+
+                        let modalInstance: any = $uibModal.open({
+                            controller: 'PagesCreateDialogController',
+                            templateUrl: '/pages/dialogs/create_dialog',
+                            resolve: {
+                                items: {parent_scope: $scope, file: local_file.file, target: event.target}
+                            }
+                        });
+
+                        modalInstance.result.then((answer: any): void => { // Answer
+                            deferred.resolve(true);
+                        }, (): void => { // Error
+                            deferred.reject(false);
+                        });
+
+                    };
+
+                    fileReader.readAsText(local_file.file);
+                    promises.push(deferred.promise);
+                });
+
+                $q.all(promises).then((result) => {
+                    progress(false);
+                    files.forEach((file) => {
+                        file.cancel();
+                    });
+
+                    $rootScope.$emit('change_files', {});
+                    $rootScope.$emit('change_namespace', {});
+                    //    Query();
+                });
+            };
+
+*/
+
+            $scope.UploadForms = (files: any): void => {
+                progress(true);
+                let promises = [];
+                _.forEach(files, (local_file) => {
+                    let deferred = $q.defer();
+                    let fileReader: any = new FileReader();
+                    fileReader.onload = (event: any): void => {
+
+                      let f =  event.target.result;
+
+                      deferred.resolve(f.file);
+
+                    };
+                    fileReader.readAsText(local_file.file);
+                    promises.push(deferred.promise);
+                });
+
+                $q.all(promises).then((result) => {
+                    progress(false);
+                    files.forEach((file) => {
+
+
+                        let ff = file;
+                        let fff = ff.file;
+                        let ffff = fff;
+
+                        /*
+
+                        $scope.layout = layout;
+                        $scope.name = layout.name;
+                        $scope.userid = layout.userid;
+                        $scope.opened = true;
+                        FormBuilderService.current_page = layout.content;
+                        FormBuilderService.Draw((event: any): void => {
+                            if (event.name == "exit") {
+                                redraw_select();
+                            }
+                        });
+                        */
+
+                    });
+
+                });
+            };
+
 
             $scope.opened = false;
             $scope.edit_mode = false;

@@ -221,7 +221,6 @@ namespace FormBuilderServicesModule {
                 this.Draw();
             };
 
-
             let collect_family = (current_page:any, root_id:string, hit_indexes:any[]): void => {
                 _.forEach(current_page, (control: any, index: number): void => {
                     let elements = control.elements;

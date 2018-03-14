@@ -15,7 +15,7 @@ var MailerPageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     MailerPageRouter.router.get('/', [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, result, next) {
             result.render('plugins/mailer/index', { config: config, user: request.user,

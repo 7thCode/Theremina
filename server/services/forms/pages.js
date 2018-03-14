@@ -14,12 +14,10 @@ var FormPageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     var AuthController = require(share.Server("systems/auth/controllers/auth_controller"));
     FormPageRouter.auth = new AuthController.Auth();
-    //  const AnalysisModule: any = require(share.Server("systems/analysis/controllers/analysis_controller"));
-    //  const analysis: any = new AnalysisModule.Analysis;
     FormPageRouter.router.get("/", [exception.page_guard, FormPageRouter.auth.page_valid, FormPageRouter.auth.page_is_system, function (request, response) {
             response.render("services/forms/player/index", {
                 config: config,

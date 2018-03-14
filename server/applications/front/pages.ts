@@ -24,21 +24,21 @@ export namespace PageRouter {
     const exception: any = core.exception;
     const analysis: any = core.analysis;
 
+    const message: any = config.message;
+
     const services_config = share.services_config;
     const webfonts: any[] = services_config.webfonts || [];
-
-    const applications_config = share.applications_config;
 
     const ResourcesModule = require(share.Server("systems/resources/controllers/resource_controller"));
     const resources = new ResourcesModule.Pages;
 
-    const PicturesModule: any = require(share.Server("services/pictures/controllers/pictures_controller"));
-    const pictures: any = new PicturesModule.Pictures;
-
     const LayoutsModule: any = require(share.Server("services/layouts/controllers/layouts_controller"));
     const layout: any = new LayoutsModule.Layout;
 
-    const message: any = config.message;
+    const PicturesModule: any = require(share.Server("applications/pictures/controllers/pictures_controller"));
+    const pictures: any = new PicturesModule.Pictures;
+
+    const applications_config = share.applications_config;
 
     let render_html = (request: any, response: any): void => {
         resources.render_html(request, (error: { code: number, message: string }, result: any): void => {

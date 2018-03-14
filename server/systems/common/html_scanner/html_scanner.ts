@@ -515,7 +515,7 @@ namespace HTMLScanner {
     *  ”resolve”タグは、fieldアトリビュートの内容をフィールド名とみなし、解決する。（タグ自体が置き換えられる）
     *  その際、"datasource"ネームスペースのアトリビュートは、値をフィールド名とみなし、値を解決する。
     *
-    *  例　　　<div ds:class="fieldname">   ->   <div class="hoge">
+    *  例 <div ds:class="fieldname">   ->   <div class="hoge">
     *
     * */
     export class Expander extends NodeScanner {
@@ -902,7 +902,7 @@ namespace HTMLScanner {
 
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
-    *　todo: ３回パースするのはダサダサ。
+    *  todo: ３回パースするのはダサダサ。
     *
     * */
     export class Builder {

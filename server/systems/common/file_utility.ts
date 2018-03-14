@@ -13,6 +13,13 @@ export namespace FileUtility {
     const exec: any = require('child_process').exec;
     const path: any = require('path');
 
+    const _config: any = require('config');
+    const config: any = _config.get("systems");
+
+ //   const core: any = require(process.cwd() + '/gs');
+ //   const share: any = core.share;
+ //   const config:any = share.config;
+
     export class Utility {
         private current: string = '';
 
@@ -194,12 +201,15 @@ export namespace FileUtility {
             return result;
         };
 
+        // 'Cache-Control': config.cache
+
         public get_header(file_path, callback:(header) => void) {
-            fs.stat(file_path, function(error, stat) {
+            fs.stat(file_path, (error, stat) => {
                 if (!error) {
                     callback({
-                        'Content-Type' :   Utility.get_image_mime(file_path),
-                        'Content-Length' : stat.size
+                        'Content-Type' : Utility.get_image_mime(file_path),
+                        'Content-Length' : stat.size,
+                        'Cache-Control': config.cache
                     })
                 }
             });

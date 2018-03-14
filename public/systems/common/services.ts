@@ -544,11 +544,9 @@ Services.provider('ShapeEdit', [function (): void {
                 try {
                     _self.object = JSON.parse(value);
                 } catch (e) {
-
                 }
                 _self.adjust(_self.CanvasElement, _self.Wrapper.clientWidth, _self.Wrapper.clientHeight, _self.object.width, _self.object.height, _self.scale);
                 ShapeEdit.Canvas.Load(_self.Canvas, _self.object, _self.Handlers);
-
 
                 _self.IsOpen = true;
                 _self.Canvas.isdirty = false;

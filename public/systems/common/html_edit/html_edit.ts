@@ -86,7 +86,6 @@ namespace HtmlEdit {
                                         try {
                                             result += new Intl.DateTimeFormat(locale).format(values.create);
                                         } catch (e) {
-
                                         }
                                         break;
                                     case "{modify}" :

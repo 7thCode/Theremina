@@ -57,6 +57,8 @@ namespace App {
 
         let normal = () => {
 
+
+
             // initialize
             const morgan: any = require("morgan");
             morgan.format("original", "[:date] :method :url :status :response-time ms");
@@ -80,6 +82,8 @@ namespace App {
             const LineStrategy: any = require("passport-line").Strategy;
             // const GooglePlusStrategy: any = require('passport-google-plus');
             // passport
+
+            console.log("Hundred");
 
             const app: any = express();
 
@@ -187,7 +191,11 @@ namespace App {
             // const options = {keepAlive: 300000, connectTimeoutMS: 1000000};
 
             if (config.db.user) {
-                mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options);
+                mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options)
+                    .catch(error => {
+                        logger.fatal('catch Mongoose exeption. ', error.stack);
+                        process.exit(0);
+                    });
             }
 
             mongoose.connection.on('connected', () => {
@@ -224,17 +232,36 @@ namespace App {
                     }
                 };
 
+                console.log("V1");
+
                 load_module("./server", config.modules);
                 load_module("./server", services_config.modules);
                 load_module("./server", plugins_config.modules);
                 load_module("./server", applications_config.modules);
 
+                console.log("VR");
                 // root
+
+                let load_root_module: any = (root: string, modules: any): void => {
+                    if (modules) {
+                        modules.forEach((module) => {
+                            let path = root + module.path;
+                            let name = module.name;
+                            app.use("/", require(path + name + "/api"));
+                            app.use("/", require(path + name + "/pages"));
+                        });
+                    }
+                };
+
+                load_root_module("./server", applications_config.root_modules);
+
+                /*
                 if (applications_config.services) {
                     _.forEach(applications_config.services, (service) => {
                         app.use("/", require(service.lib));
                     });
                 }
+                */
 
                 if (config.db.backup) {
                     share.Scheduler.Add({
@@ -248,9 +275,8 @@ namespace App {
                 if (config.cache_root) {
                     cache_root = config.cache_root;
                 }
-
                 const CacheModule: any = require(share.Server("systems/common/cache/cache"));
-                let cache = new CacheModule.Cache(cache_root);
+                const cache:any = new CacheModule.Cache(cache_root);
 
                 // passport
                 const Account: any = core.LocalAccount;
@@ -406,7 +432,6 @@ namespace App {
                 let io = new Socket.IO(server);
                 io.wait(config, event);
 
-
                 // mailReceiver
                 if (config.receiver) {
                     const MailerModule: any = require('./server/systems/common/mailer');
@@ -545,10 +570,6 @@ namespace App {
 
         let server = http.createServer(app);
 
-        server.listen(port);
-        server.on('error', onError);
-        server.on('listening', onListening);
-
         function normalizePort(val) {
             let port = parseInt(val, 10);
 
@@ -599,6 +620,12 @@ namespace App {
             };  // for pm2 cluster.
             process.send('ready');
         }
+
+        server.listen(port);
+        server.on('error', onError);
+        server.on('listening', onListening);
+
+        console.log("V2");
 
         return server;
     }

@@ -22,7 +22,7 @@ var ShareModule;
     var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
     ShareModule.logger = log4js.getLogger('request');
-    ShareModule.logger.setLevel(ShareModule.config.loglevel);
+    //  logger.setLevel(config.loglevel);
     var Promised = require("./wrapper");
     ShareModule.Wrapper = new Promised.Wrapper();
     var CipherModule = require('./cipher');

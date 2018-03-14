@@ -14,7 +14,7 @@ export namespace PicturesModule {
     const MongoClient: any = require('mongodb').MongoClient;
 
     const sharp: any = require('sharp');
-    const path: any = require('path');
+  //  const path: any = require('path');
 
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
@@ -91,7 +91,6 @@ export namespace PicturesModule {
             });
         }
 
-
         /**
          * public
          * @param request
@@ -100,7 +99,7 @@ export namespace PicturesModule {
          * @returns none
          */
         public get_picture(request: { params: { userid: string, name: string, namespace: string }, query: any }, response: any, next: any): void {
-            logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/static/" + request.params.name);
+            logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/doc/img/" + request.params.name);
             try {
                 let userid: string = request.params.userid;
                 let namespace: string = request.params.namespace;

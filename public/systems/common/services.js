@@ -3,10 +3,6 @@
  This software is released under the MIT License.
  //opensource.org/licenses/mit-license.php
  */
-/// <reference path="./shape_edit/shape_edit.ts" />
-/// <reference path="./shape_edit/server_canvas.ts" />
-/// <reference path="./shape_edit/adaptor.ts" />
-/// <reference path="./html_edit/html_edit.ts" />
 "use strict";
 var Services = angular.module('Services', []);
 Services.factory('Socket', ["$rootScope", function ($rootScope) {
@@ -375,11 +371,20 @@ Services.directive('draggablepane', ['$document', function ($document) {
     }]);
 Services.filter('length', [function () {
         return function (s, limit) {
-            var result = s;
+            var result = "";
             if (s) {
                 if (s.length > limit) {
                     result = s.slice(0, limit) + "...";
                 }
+            }
+            return result;
+        };
+    }]);
+Services.filter('encode_entity', [function () {
+        return function (s) {
+            var result = "";
+            if (s) {
+                result = s.replace(/&amp;/g, "&");
             }
             return result;
         };

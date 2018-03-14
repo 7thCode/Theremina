@@ -15,7 +15,7 @@ var LayoutsPageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var LayoutsModule = require(share.Server("services/layouts/controllers/layouts_controller"));
     var message = config.message;
     /* GET home page. */

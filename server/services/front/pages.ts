@@ -30,6 +30,10 @@ export namespace PageRouter {
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
     const ArticleModel: any = require(share.Models("services/articles/article"));
 
+    let error_handler = (error) => {
+
+    };
+
     router.get("/", [analysis.page_view, (request: any, response: any): void => {
         response.render("services/front/index", {
             config: config,
@@ -76,7 +80,7 @@ export namespace PageRouter {
             response.setHeader('Content-Type', 'text/xml');
             response.send(r);
         }).catch((error: any): void => {
-
+            error_handler(error);
         });
 
     }]);

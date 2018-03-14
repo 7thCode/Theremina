@@ -372,7 +372,7 @@ namespace ShapeEdit {
                         result = context.createPattern(this.image, "repeat");
                     }
                     catch (e) {
-                        let a = 1;
+
                     }
 
                 }
@@ -580,7 +580,7 @@ namespace ShapeEdit {
                         result = context.createPattern(this.image, "repeat");
                     }
                     catch (e) {
-                        let a = 1;
+
                     }
                 }
             }
@@ -4972,7 +4972,7 @@ namespace ShapeEdit {
             try {
                 result = '{"type":"' + canvas.type + '", "shapes":' + canvas.shapes.Serialize() + ', "width":' + canvas.canvas.width + ', "height":' + canvas.canvas.height + '}';
             } catch (e) {
-                let a = e;
+
             }
             return result;
         }
@@ -5013,7 +5013,7 @@ namespace ShapeEdit {
                     height: canvas.canvas.height
                 };
             } catch (e) {
-                let a = e;
+
             }
             return result;
         }

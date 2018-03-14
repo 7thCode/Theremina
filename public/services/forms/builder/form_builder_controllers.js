@@ -6,7 +6,7 @@
 "use strict";
 var FormBuilderControllersModule;
 (function (FormBuilderControllersModule) {
-    var FormBuilderControllers = angular.module('FormBuilderControllers', ['ui.ace']);
+    var FormBuilderControllers = angular.module('FormBuilderControllers', ['flow', 'ui.ace']);
     var RGBAColor = /** @class */ (function () {
         function RGBAColor(r, g, b, a) {
             this.r = r;
@@ -75,8 +75,8 @@ var FormBuilderControllersModule;
     var key_escape = /^(?!.*(\"|\\|\/|\.)).+$/;
     var tag_escape = /^(?!.*\u3040-\u30ff).+$/;
     var class_escape = /^(?!.*\u3040-\u30ff).+$/;
-    FormBuilderControllers.controller('FormBuilderController', ["$scope", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
-        function ($scope, $document, $log, $compile, $uibModal, FormBuilderService, ElementsService) {
+    FormBuilderControllers.controller('FormBuilderController', ["$scope", "$q", "$document", "$log", "$compile", "$uibModal", "FormBuilderService", "ElementsService",
+        function ($scope, $q, $document, $log, $compile, $uibModal, FormBuilderService, ElementsService) {
             var progress = function (value) {
                 $scope.$emit('progress', value);
             };
@@ -371,6 +371,24 @@ var FormBuilderControllersModule;
                         required: { value: dialog_scope.required.value, message: dialog_scope.required.message }
                     };
                     FormBuilderService.AddElement(ElementsService.TextArea(dialog_scope.key, validator));
+                }, function () {
+                });
+            };
+            var addHtmlArea = function () {
+                var modalRegist = $uibModal.open({
+                    controller: 'FormBuilderAddTextAreaDialogController',
+                    templateUrl: '/forms/dialogs/elements/add_textarea_dialog',
+                    resolve: {
+                        items: null
+                    }
+                });
+                modalRegist.result.then(function (dialog_scope) {
+                    var validator = {
+                        min: { value: dialog_scope.min.value, message: dialog_scope.min.message },
+                        max: { value: dialog_scope.max.value, message: dialog_scope.max.message },
+                        required: { value: dialog_scope.required.value, message: dialog_scope.required.message }
+                    };
+                    FormBuilderService.AddElement(ElementsService.HtmlArea(dialog_scope.key, validator));
                 }, function () {
                 });
             };
@@ -957,6 +975,84 @@ var FormBuilderControllersModule;
                     });
                 }
             };
+            /*
+            
+                        let CreatePages = (files: any): void => {
+                            progress(true);
+                            let promises = [];
+                            _.forEach(files, (local_file) => {
+                                let deferred = $q.defer();
+                                let fileReader: any = new FileReader();
+                                fileReader.onload = (event: any): void => {
+            
+                                    let modalInstance: any = $uibModal.open({
+                                        controller: 'PagesCreateDialogController',
+                                        templateUrl: '/pages/dialogs/create_dialog',
+                                        resolve: {
+                                            items: {parent_scope: $scope, file: local_file.file, target: event.target}
+                                        }
+                                    });
+            
+                                    modalInstance.result.then((answer: any): void => { // Answer
+                                        deferred.resolve(true);
+                                    }, (): void => { // Error
+                                        deferred.reject(false);
+                                    });
+            
+                                };
+            
+                                fileReader.readAsText(local_file.file);
+                                promises.push(deferred.promise);
+                            });
+            
+                            $q.all(promises).then((result) => {
+                                progress(false);
+                                files.forEach((file) => {
+                                    file.cancel();
+                                });
+            
+                                $rootScope.$emit('change_files', {});
+                                $rootScope.$emit('change_namespace', {});
+                                //    Query();
+                            });
+                        };
+            
+            */
+            $scope.UploadForms = function (files) {
+                progress(true);
+                var promises = [];
+                _.forEach(files, function (local_file) {
+                    var deferred = $q.defer();
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (event) {
+                        var f = event.target.result;
+                        deferred.resolve(f.file);
+                    };
+                    fileReader.readAsText(local_file.file);
+                    promises.push(deferred.promise);
+                });
+                $q.all(promises).then(function (result) {
+                    progress(false);
+                    files.forEach(function (file) {
+                        var ff = file;
+                        var fff = ff.file;
+                        var ffff = fff;
+                        /*
+
+                        $scope.layout = layout;
+                        $scope.name = layout.name;
+                        $scope.userid = layout.userid;
+                        $scope.opened = true;
+                        FormBuilderService.current_page = layout.content;
+                        FormBuilderService.Draw((event: any): void => {
+                            if (event.name == "exit") {
+                                redraw_select();
+                            }
+                        });
+                        */
+                    });
+                });
+            };
             $scope.opened = false;
             $scope.edit_mode = false;
             $scope.changeElementContents = changeElementContents;
@@ -973,6 +1069,7 @@ var FormBuilderControllersModule;
             $scope.addField = addField;
             $scope.addHtmlField = addHtmlField;
             $scope.addTextArea = addTextArea;
+            $scope.addHtmlArea = addHtmlArea;
             $scope.addNumber = addNumber;
             $scope.addDate = addDate;
             $scope.addHtml = addHtml;

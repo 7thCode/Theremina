@@ -7,7 +7,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FormsModule;
 (function (FormsModule) {
-    //   const fs = require('graceful-fs');
     var _ = require('lodash');
     var core = require(process.cwd() + '/gs');
     var share = core.share;
@@ -52,7 +51,6 @@ var FormsModule;
             if (docs) {
                 var save_1 = function (doc) {
                     return new Promise(function (resolve, reject) {
-                        //   let namespace: string = Form.namespace(doc.name);
                         var localname = Form.localname(doc.name);
                         var userid = doc.userid;
                         var namespace = "";

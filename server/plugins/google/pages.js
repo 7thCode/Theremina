@@ -16,7 +16,7 @@ var GooglePageRouter;
     var config = share.config;
     var message = config.message;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var plugins_config = share.plugins_config;
     if (plugins_config.google_api) {
         var GoogleModule = require(share.Server("plugins/google/controllers/google_controller"));

@@ -10,9 +10,24 @@ var ScannerBehavior;
     var moment = require("moment");
     var _ = require('lodash');
     var requestpromise = require('request-promise');
+    var default_start = 0;
+    var default_length = 12;
     var Params = /** @class */ (function () {
+        //   private filters: any = {};
         function Params() {
             this.params = {};
+            /*
+            this.filters = {
+                value: (result: string, param: string): string => {
+                    try {
+                        result = "content." + param.trim() + ".value";
+                    } catch (e) {
+this.error_handler(e);
+                    }
+                    return result;
+                }
+            };
+            */
         }
         Params.prototype.FromParams = function (params) {
             this.params = params;
@@ -47,12 +62,12 @@ var ScannerBehavior;
                 keywords.push("so=" + encodeURIComponent(this.params.so));
             }
             if (this.params.l) {
-                keywords.push("l=" + parseInt(this.params.l, 10));
+                keywords.push("l=" + parseInt(this.params.l, default_length));
             }
             if (this.params.s) {
-                keywords.push("s=" + parseInt(this.params.s, 10));
+                keywords.push("s=" + parseInt(this.params.s, default_start));
             }
-            var delimitter = "?";
+            var delimitter = "?"; //  keywords to "?xxxx&yyyy&zzzz"
             _.forEach(keywords, function (keyword) {
                 result += delimitter + keyword;
                 delimitter = "&";
@@ -61,20 +76,20 @@ var ScannerBehavior;
         };
         Params.prototype.ToQueryFormat = function () {
             var result = "";
-            if (this.params["co"]) {
-                result += 'co::' + this.params["co"] + ';';
+            if (this.params.co) {
+                result += 'co::' + this.params.co + ';';
             }
-            if (this.params["q"]) {
-                result += 'q::' + this.params["q"] + ';';
+            if (this.params.q) {
+                result += 'q::' + this.params.q + ';';
             }
-            if (this.params["l"]) {
-                result += 'l::' + this.params["l"] + ';';
+            if (this.params.l) {
+                result += 'l::' + this.params.l + ';';
             }
-            if (this.params["s"]) {
-                result += 's::' + this.params["s"] + ';';
+            if (this.params.s) {
+                result += 's::' + this.params.s + ';';
             }
-            if (this.params["so"]) {
-                result += 'so::' + this.params["so"] + ';';
+            if (this.params.so) {
+                result += 'so::' + this.params.so + ';';
             }
             return result;
         };
@@ -82,6 +97,7 @@ var ScannerBehavior;
     }());
     var CustomBehavior = /** @class */ (function () {
         function CustomBehavior(parent_name, name, id, namespace, params, isdocument, models) {
+            var _this = this;
             this.name = "";
             this.parent_name = "";
             this.id = "";
@@ -104,11 +120,12 @@ var ScannerBehavior;
                             weekdays: ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
                             weekdaysShort: ["日", "月", "火", "水", "木", "金", "土"]
                         });
-                        moment.locale("ja");
+                        //        moment.locale("ja");
                         var date = moment(result);
                         result = date.format(format);
                     }
                     catch (e) {
+                        _this.error_handler(e);
                     }
                     return result;
                 },
@@ -120,6 +137,7 @@ var ScannerBehavior;
                         }
                     }
                     catch (e) {
+                        _this.error_handler(e);
                     }
                     return result;
                 },
@@ -129,6 +147,7 @@ var ScannerBehavior;
                         result = param_object[result];
                     }
                     catch (e) {
+                        _this.error_handler(e);
                     }
                     return result;
                 },
@@ -137,19 +156,23 @@ var ScannerBehavior;
                         result = encodeURIComponent(result);
                     }
                     catch (e) {
+                        _this.error_handler(e);
                     }
                     return result;
                 },
                 add: function (result, param) {
                     try {
-                        result = String(parseInt(result, 10) + parseInt(param[0], 10));
+                        result = String(parseInt(result, 0) + parseInt(param[0], 0));
                     }
                     catch (e) {
+                        _this.error_handler(e);
                     }
                     return result;
                 }
             };
         }
+        CustomBehavior.prototype.error_handler = function (e) {
+        };
         CustomBehavior.prototype.ParseQueryFormat = function (query) {
             var result = null;
             if (query[0] == "#") {
@@ -166,11 +189,11 @@ var ScannerBehavior;
                     case "#query":
                         switch (postfix) {
                             case "self":
-                                result = this.page_params;
+                                result = this.page_params; // #query:self
                                 break;
                             default:
                                 var params = new Params();
-                                params.FromQueryFormat(this.page_params[postfix]);
+                                params.FromQueryFormat(this.page_params[postfix]); // #query:xxxx
                                 result = params.ToParams();
                         }
                         break;
@@ -195,22 +218,25 @@ var ScannerBehavior;
                     _query = { "$and": [this.default_query, Function("return " + query_object.q)()] };
                 }
                 catch (e) {
+                    this.error_handler(e);
                 }
             }
             var limit = 0;
             if (query_object.l) {
                 try {
-                    limit = parseInt(query_object.l, 10);
+                    limit = parseInt(query_object.l, default_length);
                 }
                 catch (e) {
+                    this.error_handler(e);
                 }
             }
             var skip = 0;
             if (query_object.s) {
                 try {
-                    skip = parseInt(query_object.s, 10);
+                    skip = parseInt(query_object.s, default_start);
                 }
                 catch (e) {
+                    this.error_handler(e);
                 }
             }
             var sort = {};
@@ -219,6 +245,7 @@ var ScannerBehavior;
                     sort = JSON.parse(query_object.so);
                 }
                 catch (e) {
+                    this.error_handler(e);
                 }
             }
             var collection = "";
@@ -239,6 +266,7 @@ var ScannerBehavior;
                     _query = { "$and": [this.default_query, Function("return " + query_object.q)()] };
                 }
                 catch (e) {
+                    this.error_handler(e);
                 }
             }
             var collection = "";
@@ -263,7 +291,7 @@ var ScannerBehavior;
                     });
                 }
                 catch (e) {
-                    var a = e;
+                    this.error_handler(e);
                 }
             }
             var collection = "";
@@ -502,7 +530,7 @@ var ScannerBehavior;
                 params.push("ag=" + encodeURIComponent(query_object.ag));
             }
             if (query_object.l) {
-                params.push("l=" + (parseInt(query_object.l, 10)));
+                params.push("l=" + (parseInt(query_object.l, default_length)));
             }
             return params;
         };
@@ -511,7 +539,7 @@ var ScannerBehavior;
             var keywords = [];
             this.ConvertParam(keywords, query_object);
             if (query_object.s) {
-                keywords.push("s=" + parseInt(query_object.s, 10));
+                keywords.push("s=" + parseInt(query_object.s, default_start));
             }
             var delimitter = "?";
             _.forEach(keywords, function (keyword) {
@@ -537,11 +565,11 @@ var ScannerBehavior;
                 });
                 return result;
             };
-            var page_length = parseInt(query_object.l, 10);
+            var page_length = parseInt(query_object.l, default_length);
             if (!page_length) {
                 page_length = 1;
             }
-            var page_start = parseInt(query_object.s, 10);
+            var page_start = parseInt(query_object.s, default_start);
             var index = 0;
             for (var count = 0; count < record_count; count += page_length) {
                 result.push({
@@ -557,7 +585,7 @@ var ScannerBehavior;
             var keywords = [];
             this.ConvertParam(keywords, query_object);
             if (query_object.s) {
-                keywords.push("s=" + (parseInt(query_object.s, 10) + parseInt(query_object.l, 10)));
+                keywords.push("s=" + (parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length)));
             }
             var delimitter = "?";
             _.forEach(keywords, function (keyword) {
@@ -571,7 +599,7 @@ var ScannerBehavior;
             var keywords = [];
             this.ConvertParam(keywords, query_object);
             if (query_object.s) {
-                var s = parseInt(query_object.s, 10) - parseInt(query_object.l, 10);
+                var s = parseInt(query_object.s, default_start) - parseInt(query_object.l, default_length);
                 if (s < 0) {
                     s = 0;
                 }
@@ -587,7 +615,7 @@ var ScannerBehavior;
         CustomBehavior.prototype.HasNext = function (query_object, record_count) {
             var result = false;
             if (query_object.s) {
-                var current_last = parseInt(query_object.s, 10) + parseInt(query_object.l, 10);
+                var current_last = parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length);
                 result = (current_last < record_count);
             }
             return result;
@@ -595,7 +623,7 @@ var ScannerBehavior;
         CustomBehavior.prototype.HasPrev = function (query_object) {
             var result = false;
             if (query_object.s) {
-                var current_last = parseInt(query_object.s, 10);
+                var current_last = parseInt(query_object.s, default_start);
                 result = (current_last > 0);
             }
             return result;
