@@ -29,7 +29,7 @@ export namespace PicturesPageRouter {
     const message: any = config.message;
 
     router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, (request: any, response: any): void => {
-        response.render("services/pictures/index", {
+        response.render("applications/pictures/index", {
             config: config,
             user: request.user,
             role: auth.role(request.user),

@@ -599,7 +599,6 @@ namespace HTMLScanner {
                             default:
                         }
 
-
                         //     if (localname == "include") {
                         //         this.html += this.datasource.ResolveFormat(data, this.fragments[attribute.nodeValue], this);
                         //         resolved = true;
@@ -768,8 +767,6 @@ namespace HTMLScanner {
                                         }
                                     }
                                     break;
-
-
                                 case "include":
                                     if (prefix === PREFIX) {
                                         if (node.attributes) {

@@ -210,8 +210,15 @@ this.error_handler(e);
                         this.error_handler(e);
                     }
                     return result;
+                },
+                strip: (result: string, param: string): string => {
+                    try {
+                        result = result.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'')
+                    } catch (e) {
+                        this.error_handler(e);
+                    }
+                    return result;
                 }
-
             };
         }
 
@@ -436,7 +443,6 @@ this.error_handler(e);
 
                 // parse object path
                 if (path) {
-
                     let isObject = (value: any): boolean => {
                         let result: boolean = false;
                         if (value !== null) {
@@ -503,6 +509,7 @@ this.error_handler(e);
                                             result = this.Query(this.page_params);
                                             break;
                                         default:
+                                            result = this.page_params[postfix];
                                     }
                                     break;
                                 case "#pager" : {
@@ -729,6 +736,10 @@ this.error_handler(e);
                 }
                 result += appender;
             });
+
+       //    let p = this.page_params;
+
+
             return result;
         }
 
