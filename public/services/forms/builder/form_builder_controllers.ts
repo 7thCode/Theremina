@@ -1201,40 +1201,38 @@ namespace FormBuilderControllersModule {
                     let deferred = $q.defer();
                     let fileReader: any = new FileReader();
                     fileReader.onload = (event: any): void => {
-
-                      let f =  event.target.result;
-
-                      deferred.resolve(f.file);
-
+                      deferred.resolve(fileReader.result);
                     };
                     fileReader.readAsText(local_file.file);
                     promises.push(deferred.promise);
                 });
 
-                $q.all(promises).then((result) => {
+                $q.all(promises).then((results) => {
                     progress(false);
-                    files.forEach((file) => {
+                    if (results.length == 1) {
+                      let result = JSON.parse(results[0]);
+                      if (result.value.length >= 1 ) {
+
+                         let layout = result.value[0];
+
+                          $scope.layout = layout;
+                          $scope.name = layout.name;
+                          $scope.userid = layout.userid;
+                          $scope.opened = true;
+                          FormBuilderService.current_page = layout.content;
+                          FormBuilderService.Draw((event: any): void => {
+                              if (event.name == "exit") {
+                                  redraw_select();
+                              }
+                          });
 
 
-                        let ff = file;
-                        let fff = ff.file;
-                        let ffff = fff;
 
-                        /*
+                      }
+                    }
 
-                        $scope.layout = layout;
-                        $scope.name = layout.name;
-                        $scope.userid = layout.userid;
-                        $scope.opened = true;
-                        FormBuilderService.current_page = layout.content;
-                        FormBuilderService.Draw((event: any): void => {
-                            if (event.name == "exit") {
-                                redraw_select();
-                            }
-                        });
-                        */
 
-                    });
+
 
                 });
             };

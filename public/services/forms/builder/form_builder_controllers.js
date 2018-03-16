@@ -1025,32 +1025,29 @@ var FormBuilderControllersModule;
                     var deferred = $q.defer();
                     var fileReader = new FileReader();
                     fileReader.onload = function (event) {
-                        var f = event.target.result;
-                        deferred.resolve(f.file);
+                        deferred.resolve(fileReader.result);
                     };
                     fileReader.readAsText(local_file.file);
                     promises.push(deferred.promise);
                 });
-                $q.all(promises).then(function (result) {
+                $q.all(promises).then(function (results) {
                     progress(false);
-                    files.forEach(function (file) {
-                        var ff = file;
-                        var fff = ff.file;
-                        var ffff = fff;
-                        /*
-
-                        $scope.layout = layout;
-                        $scope.name = layout.name;
-                        $scope.userid = layout.userid;
-                        $scope.opened = true;
-                        FormBuilderService.current_page = layout.content;
-                        FormBuilderService.Draw((event: any): void => {
-                            if (event.name == "exit") {
-                                redraw_select();
-                            }
-                        });
-                        */
-                    });
+                    if (results.length == 1) {
+                        var result = JSON.parse(results[0]);
+                        if (result.value.length >= 1) {
+                            var layout = result.value[0];
+                            $scope.layout = layout;
+                            $scope.name = layout.name;
+                            $scope.userid = layout.userid;
+                            $scope.opened = true;
+                            FormBuilderService.current_page = layout.content;
+                            FormBuilderService.Draw(function (event) {
+                                if (event.name == "exit") {
+                                    redraw_select();
+                                }
+                            });
+                        }
+                    }
                 });
             };
             $scope.opened = false;

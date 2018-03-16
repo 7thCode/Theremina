@@ -230,7 +230,7 @@ namespace DataControllersModule {
                 });
             };
 
-            $scope.UplodArticles = (files: any): void => {
+            $scope.UploadArticles = (files: any): void => {
                 progress(true);
                 let promises:any[] = [];
                 _.forEach(files, (local_file) => {
@@ -252,7 +252,11 @@ namespace DataControllersModule {
                         files.forEach((file) => {
                             file.cancel();
                         });
-                        progress(false);
+
+                        DrawArticles(() => {
+                            progress(false);
+                        });
+
                     });
                 });
             };
@@ -370,6 +374,32 @@ namespace DataControllersModule {
                 });
             };
 
+            $scope.operationArticle = (from_name) => {
+
+                let modalRegist: any = $uibModal.open({
+                    controller: 'DataOperetionDialogController',
+                    templateUrl: '/data/dialogs/operation_dialog',
+                    resolve: {
+                        items: $scope
+                    }
+                });
+
+                modalRegist.result.then((dialog_scope: any): void => {
+                    progress(true);
+                    let to_name: string = dialog_scope.title;
+                    ArticleService.Copy(from_name, to_name, (result: any) => {
+
+
+                        Draw(() => {
+                        });
+
+
+                    }, error_handler);
+                }, (): void => {
+                });
+
+            };
+
             $scope.Find = (newValue: any): void => {
 
                 ArticleService.SetQuery(null);
@@ -483,122 +513,28 @@ namespace DataControllersModule {
                 });
             });
 
-            // tinymce
-            /*
-                    $scope.tinymceOptions =
-                        {
-                            selector: "textarea",  // change this value according to your HTML
-                            height: 500,
-                            theme: 'modern',
-                            plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-                            toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-                            menubar: "table"
-                        };
-            */
-            /*
-
-                    $scope.tinymceOptions = {
-                        selector: 'textarea',
-                        height: 500,
-                        plugins: 'visualblocks code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-                        toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-                        menubar: "table",
-                        content_css: [
-                            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-                            '//www.tinymce.com/css/codepen.min.css'
-                        ],
-                        style_formats: [
-                            { title: 'Headers', items: [
-                                { title: 'h1', block: 'h1' },
-                                { title: 'h2', block: 'h2' },
-                                { title: 'h3', block: 'h3' },
-                                { title: 'h4', block: 'h4' },
-                                { title: 'h5', block: 'h5' },
-                                { title: 'h6', block: 'h6' }
-                            ] },
-
-                            { title: 'Blocks', items: [
-                                { title: 'p', block: 'p' },
-                                { title: 'div', block: 'div' },
-                                { title: 'pre', block: 'pre' }
-                            ] },
-
-                            { title: 'Containers', items: [
-                                { title: 'section', block: 'section', wrapper: true, merge_siblings: false },
-                                { title: 'article', block: 'article', wrapper: true, merge_siblings: false },
-                                { title: 'blockquote', block: 'blockquote', wrapper: true },
-                                { title: 'hgroup', block: 'hgroup', wrapper: true },
-                                { title: 'aside', block: 'aside', wrapper: true },
-                                { title: 'figure', block: 'figure', wrapper: true }
-                            ] }
-                        ],
-                        visualblocks_default_state: true,
-                        end_container_on_empty_block: true
-                    }
-
-            */
-            /*{
-                        selector: 'textarea',
-                        height: 500,
-                        theme: 'modern',
-                        plugins: 'code preview fullpage searchreplace autolink directionality visualblocks visualchars image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern',
-                        toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-                        image_advtab: true,
-                        templates: [],
-                        content_css: ['//fonts.googleapis.com/css?family=Lato:300,300i,400,400i'],
-                        menubar: "table tools",
-                        toolbar: "code"
-                    } */
-//froala
-            //    $scope.froalaOptions = {
-            //        toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
-            //    };
-            /*
-                            $scope.scenario = [
-                                {
-                                    outer: {
-                                        top: -210, left: 80, width: 400, height: 400,
-                                        background: "/applications/img/balloon/right.svg",
-                                        target: "image"
-                                    },
-                                    inner: {
-                                        top: 0, left: 100, width: 300, height: 350,
-                                        content: "<h3>プロファイル画像</h3>" +
-                                        "<br>" +
-                                        "<p>プロファイル画像をドロップしてください</p>" +
-                                        "<button class='btn btn-warning' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                                    },
-                                    _class: "tada",
-                                    style: "animation-duration:1s;animation-delay:0.3s;"
-                                },
-                                {
-                                    outer: {
-                                        top: -250, left: 360, width: 500, height: 500,
-                                        background: "/applications/img/balloon/right.svg",
-                                        target: "image"
-                                    },
-                                    inner: {
-                                        top: 50, left: 150, width: 300, height: 300,
-                                        content: "<h3>ニックネーム</h3>" +
-                                        "<br>" +
-                                        "<p>ニックネームを入力してください</p>" +
-                                        "<button class='btn btn-info' type='button' ng-click='next();' aria-label=''>次へ</button>"
-                                    },
-                                    _class: "shake",
-                                    style: "animation-duration:1s;animation-delay:0.3s;"
-                                }
-                            ];
-                            */
-//  $(".resizeable-box").resizable({
-            //      handleSelector: ".win-size-grip"
-            //  });
-//        $(".panel-left").resizable({
-//            handleSelector: ".splitter",
-//            resizeHeight: false
-            //      });
         }]);
 
     DataControllers.controller('DataCreateDialogController', ['$scope', '$uibModalInstance', 'items',
+        ($scope: any, $uibModalInstance: any, items: any): void => {
+
+            $scope.pages = items.pages;
+
+            $scope.hide = (): void => {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = (): void => {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.answer = (): void => {
+                $uibModalInstance.close($scope);
+            };
+
+        }]);
+
+    DataControllers.controller('DataOperetionDialogController', ['$scope', '$uibModalInstance', 'items',
         ($scope: any, $uibModalInstance: any, items: any): void => {
 
             $scope.pages = items.pages;

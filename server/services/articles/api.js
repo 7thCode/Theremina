@@ -23,6 +23,7 @@ var ArticleApiRouter;
     ArticleApiRouter.router.put("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.put_article]);
     ArticleApiRouter.router.delete("/api/:id", [exception.exception, exception.guard, exception.authenticate, article.delete_article]);
     ArticleApiRouter.router.post("/api/createmany", [exception.exception, exception.guard, exception.authenticate, article.create_article_many]);
+    ArticleApiRouter.router.post("/api/copy/:from_name/:to_name", [exception.exception, exception.guard, exception.authenticate, article.copy_article]);
     ArticleApiRouter.router.get('/api/query/:query', [article.get_article_query]);
     ArticleApiRouter.router.get('/api/querynamespace/:namespace/:query', [article.get_article_query_with_namespace]);
     ArticleApiRouter.router.get('/api/query/:query/:option', [article.get_article_query_query]);

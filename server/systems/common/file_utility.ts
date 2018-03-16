@@ -208,7 +208,7 @@ export namespace FileUtility {
                 if (!error) {
                     callback({
                         'Content-Type' : Utility.get_image_mime(file_path),
-                        'Content-Length' : stat.size,
+                   //     'Content-Length' : stat.size,
                         'Cache-Control': config.cache
                     })
                 }

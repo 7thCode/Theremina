@@ -43,8 +43,14 @@ namespace ArticleServicesModule {
             return $resource('/articles/api/createmany', {}, {});
         }]);
 
-    ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQuery", "ArticleCount", "ArticlesCreateMany",
-        function (ArticleCreate: any, Article: any, ArticleQuery: any, ArticleCount: any, ArticlesCreateMany: any): void {
+    ArticleServices.factory('ArticleCopy', ['$resource',
+        ($resource: any): any => {
+            return $resource('/articles/api/copy/:from_name/:to_name', {from_name: "@from_name", to_name: "@to_name"}, {copy: {method: 'POST'},
+            });
+        }]);
+
+    ArticleServices.service('ArticleService', ["ArticleCreate", "Article", "ArticleQuery", "ArticleCount", "ArticlesCreateMany","ArticleCopy",
+        function (ArticleCreate: any, Article: any, ArticleQuery: any, ArticleCount: any, ArticlesCreateMany: any, ArticleCopy:any): void {
 
             this.SetQuery = (query) => {
                 this.option.skip = 0;
@@ -226,6 +232,25 @@ namespace ArticleServicesModule {
                     if (result) {
                         if (result.code === 0) {
                             this.current_article = null;
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
+                    } else {
+                        error(10000, "network error");
+                    }
+                });
+            };
+
+            this.Copy = (from_name: string, to_name: string, callback: (result: any) => void, error: (code: number, message: string) => void): void => {
+                let article = new ArticleCopy();
+                article.$copy({
+                    from_name: from_name,
+                    to_name: to_name
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            this.current_article = result.value;
                             callback(result.value);
                         } else {
                             error(result.code, result.message);

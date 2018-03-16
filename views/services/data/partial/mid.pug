@@ -56,7 +56,7 @@
                 button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
                     i.fas.fa-minus
         div
-            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UplodArticles($files);")
+            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UploadArticles($files);")
                 button.btn.btn-xs.btn-box-tool(flow-btn type="file")
                     i.fas.fa-plus-circle.text-primary
         .row
@@ -78,8 +78,11 @@
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="article in articles")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
-                    a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank")
+                    a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank" style="position:relative;top:10px;left:2rem;")
                         i.fas.fa-cloud-download-alt
+                    button.btn.btn-success.btn-xs(ng-click="operationArticle(article.name);", style="position:relative;top:10px;left:10.5rem;border-radius: 10px")
+                        i.fas.fa-pencil-alt(aria-hidden="true")
+
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{article.name}}", ng-click="SelectArticle(article._id)")
                         img.center-block.thumbnail(ng-src="{{article.content.type.value | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
                     div(style="height:8rem;text-align:center;")

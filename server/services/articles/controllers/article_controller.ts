@@ -198,6 +198,44 @@ export namespace ArticleModule {
          * @param request
          * @param response
          * @returns none
+         */
+        public copy_article(request: any, response: Express.Response): void {
+            let userid: string = Article.userid(request);
+            let namespace: string = Article.namespace(request);
+            let from_name: string = request.params.from_name;
+            let to_name: string = request.params.to_name;
+            if (from_name !== to_name) {
+                Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, {name: to_name}]}, (response: any, present: any): void => {
+                    if (!present) {
+                        Wrapper.FindOne(response, 1400, ArticleModel, {$and: [{namespace: namespace}, {userid: userid}, {type: 0}, {name: from_name}]}, (response: any, original: any): void => {
+                            if (original) {
+                                let copy: any = new ArticleModel();
+                                copy.userid = original.userid;
+                                copy.namespace = original.namespace;
+                                copy.name = to_name;
+                                copy.type = original.type;
+                                copy.content = original.content;
+                                copy.open = true;
+                                Wrapper.Save(response, 1000, copy, (response: any, object: any): void => {
+                                    Wrapper.SendSuccess(response, object);
+                                });
+                            } else {
+                                Wrapper.SendWarn(response, 2, "not found", {code: 2, message: "not found"});
+                            }
+                        });
+                    } else {
+                        Wrapper.SendWarn(response, 2, "already", {code: 2, message: "already"});
+                    }
+                });
+            } else {
+                Wrapper.SendWarn(response, 2, "same name", {code: 2, message: "same name"});
+            }
+        }
+
+        /**
+         * @param request
+         * @param response
+         * @returns none
          * {$and: [{_id: id}, {userid: userid}]} -> useridが一致しないと操作不可
          */
         public delete_article(request: any, response: Express.Response): void {

@@ -192,6 +192,46 @@ var ArticleModule;
          * @param request
          * @param response
          * @returns none
+         */
+        Article.prototype.copy_article = function (request, response) {
+            var userid = Article.userid(request);
+            var namespace = Article.namespace(request);
+            var from_name = request.params.from_name;
+            var to_name = request.params.to_name;
+            if (from_name !== to_name) {
+                Wrapper.FindOne(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, { name: to_name }] }, function (response, present) {
+                    if (!present) {
+                        Wrapper.FindOne(response, 1400, ArticleModel, { $and: [{ namespace: namespace }, { userid: userid }, { type: 0 }, { name: from_name }] }, function (response, original) {
+                            if (original) {
+                                var copy = new ArticleModel();
+                                copy.userid = original.userid;
+                                copy.namespace = original.namespace;
+                                copy.name = to_name;
+                                copy.type = original.type;
+                                copy.content = original.content;
+                                copy.open = true;
+                                Wrapper.Save(response, 1000, copy, function (response, object) {
+                                    Wrapper.SendSuccess(response, object);
+                                });
+                            }
+                            else {
+                                Wrapper.SendWarn(response, 2, "not found", { code: 2, message: "not found" });
+                            }
+                        });
+                    }
+                    else {
+                        Wrapper.SendWarn(response, 2, "already", { code: 2, message: "already" });
+                    }
+                });
+            }
+            else {
+                Wrapper.SendWarn(response, 2, "same name", { code: 2, message: "same name" });
+            }
+        };
+        /**
+         * @param request
+         * @param response
+         * @returns none
          * {$and: [{_id: id}, {userid: userid}]} -> useridが一致しないと操作不可
          */
         Article.prototype.delete_article = function (request, response) {
