@@ -368,6 +368,8 @@ this.error_handler(e);
         }
 
         public GetUrl(target_url_string: string, parent: any): any {// url
+
+      //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
             let target_url: any = url.resolve(host_string, resolved_url_string);
@@ -406,31 +408,49 @@ this.error_handler(e);
             }
         }
 
-        private ResolveUrl(value: string): string {
-            let result: string = "";
-            this.SplitFormat(value, (element) => {
-                let appender: any = element;
-                let trimed: string = element.trim();
-                switch (trimed) {
-                    case "{#name:document}":
-                        appender = this.parent_name;
+        public UrlValue(sliceed:string):string {
+            let result:string =  "";
+            if (sliceed[0] == "#") {
+                let field_name: string = sliceed;                              // filter_names[0] := #specialname
+                let postfix = "";
+                let split_field_name: string[] = field_name.split(":");
+                if (split_field_name) {
+                    field_name = split_field_name[0];
+                    if (split_field_name.length == 2) {
+                        postfix = split_field_name[1];
+                    }
+                }
+
+                switch (field_name) {
+                    case "#userid" :
+                        result = this.id;
                         break;
-                    case "{#name:self}":
-                        appender = this.name;
+                    case "#namespace" :
+                        result = this.namespace;
                         break;
-                    case "{#userid}" :
-                        appender = this.id;
+                    case "#name":
+                        switch (postfix) {
+                            case "document":
+                                result = this.parent_name;
+                                break;
+                            case "self":
+                            default:
+                                result = this.name;
+                                break;
+                        }
                         break;
-                    case "{#namespace}" :
-                        appender = this.namespace;
-                        break;
-                    case "{#query:self}" :
-                        appender = this.Query(this.page_params);
+                    case "#query" :
+                        switch (postfix) {
+                            case "self":
+                                result = this.Query(this.page_params);
+                                break;
+                            default:
+                                result = this.page_params[postfix];
+                        }
                         break;
                     default:
                 }
-                result += appender;
-            });
+            }
             return result;
         }
 
@@ -737,9 +757,20 @@ this.error_handler(e);
                 result += appender;
             });
 
-       //    let p = this.page_params;
+            return result;
+        }
 
-
+        public ResolveUrl(value: string): string {
+            let result: string = "";
+            this.SplitFormat(value, (element) => {
+                let appender: any = element;
+                let trimed: string = element.trim();
+                if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
+                    let sliceed: string = trimed.slice(1, -1);
+                    appender = this.UrlValue(sliceed.trim());
+                }
+                result += appender;
+            });
             return result;
         }
 

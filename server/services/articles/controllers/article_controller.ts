@@ -42,7 +42,6 @@ export namespace ArticleModule {
             return result;
         }
 
-
         /**
          * @param request
          * @param response

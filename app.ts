@@ -56,9 +56,6 @@ namespace App {
         };
 
         let normal = () => {
-
-
-
             // initialize
             const morgan: any = require("morgan");
             morgan.format("original", "[:date] :method :url :status :response-time ms");
@@ -174,6 +171,8 @@ namespace App {
             }
 
             app.use(express.static(path.join(__dirname, 'public')));
+
+            app.use('/scripts', express.static(path.join(__dirname, 'node_modules')));
 
             let definition = {account_content: {}};
             fs.open(share.Models('applications/accounts/definition.json'), 'ax+', 384, (error, fd) => {

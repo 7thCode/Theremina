@@ -22,14 +22,12 @@
 
 .box.box-primary(style="margin-top:12px;", ng-hide="opened", flow-init)
     .box-header.with-border
-        div
-            .box-tools.pull-right
-                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                    i.fas.fa-minus
-        div
-            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="CreatePages($files);")
-                button.btn.btn-xs.btn-box-tool(flow-btn type="file")
-                    i.fas.fa-plus-circle.text-primary
+        .box-tools.pull-right
+            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                i.fas.fa-minus
+        .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="CreatePages($files);")
+            button.btn.btn-xs.btn-box-tool(flow-btn type="file")
+                i.fas.fa-plus-circle.text-primary
 
         include ../../../services/common/find
 
@@ -41,7 +39,5 @@
                         i.fas.fa-cloud-download-alt
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{page.name}}", ng-click="Get(page)")
                         img.center-block.thumbnail(ng-src="{{page.content.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
-                    div(style="height:8rem;text-align:center;")
-                        .row
-                            .col-xs-12
-                                div(style="word-wrap: break-word;", ng-bind="page.name | filename:10")
+                    .row(style="height:8rem;text-align:center;")
+                        .col-xs-12(style="font-size:1rem;font-weight:500;word-wrap: break-word;", ng-bind="page.name | filename:10")

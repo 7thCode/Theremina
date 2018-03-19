@@ -18,13 +18,6 @@ div
                 select.form-control.no-zoom#mimetype(ng-model="mimetype" ng-options="mimetype for mimetype in all_mimetypes" ng-change="FindMime(mimetype);" required="")
                     option(value="") all
 
-                //select.form-control.no-zoom#mimetype(ng-model="mimetype" ng-change="FindMime(mimetype);")
-                    option(value="") all
-                    option(value="text/html") text/html
-                    option(value="text/css") text/css
-                    option(value="text/javascript") text/javascript
-                    option(value="application/json") application/json
-
         .col-sm-4.col-xs-12
             .form-group
                 label(for="content") content

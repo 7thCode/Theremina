@@ -19,10 +19,4 @@ nav.navbar.navbar-fixed-top.navbar-color(role="navigation")
                                 a(ng-click="SetNamespace(name)") {{name}}
                     li
                         button.btn.btn-warning(type="button", style="margin:14px;", ng-click='OpenSetNamespaceDialog();', ng-disabled="opened", aria-label="") New #{message.namespace}
-            //div
-                if user
-                    span(style="float:right")
-                        button.btn.btn-info(type="button" ,href='#', ng-click="Logout()", aria-label="", style="margin:12px;")
-                            i.fas.fa-sign-in-alt
-                            span &nbsp;#{message.logout}
 

@@ -314,6 +314,7 @@ this.error_handler(e);
             return model.aggregate(aggrigate).exec();
         };
         CustomBehavior.prototype.GetUrl = function (target_url_string, parent) {
+            //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
             var resolved_url_string = this.ResolveUrl(target_url_string);
             var host_string = parent.config.protocol + "://" + parent.config.domain;
             var target_url = url.resolve(host_string, resolved_url_string);
@@ -348,32 +349,48 @@ this.error_handler(e);
                 }
             }
         };
-        CustomBehavior.prototype.ResolveUrl = function (value) {
-            var _this = this;
+        CustomBehavior.prototype.UrlValue = function (sliceed) {
             var result = "";
-            this.SplitFormat(value, function (element) {
-                var appender = element;
-                var trimed = element.trim();
-                switch (trimed) {
-                    case "{#name:document}":
-                        appender = _this.parent_name;
+            if (sliceed[0] == "#") {
+                var field_name = sliceed; // filter_names[0] := #specialname
+                var postfix = "";
+                var split_field_name = field_name.split(":");
+                if (split_field_name) {
+                    field_name = split_field_name[0];
+                    if (split_field_name.length == 2) {
+                        postfix = split_field_name[1];
+                    }
+                }
+                switch (field_name) {
+                    case "#userid":
+                        result = this.id;
                         break;
-                    case "{#name:self}":
-                        appender = _this.name;
+                    case "#namespace":
+                        result = this.namespace;
                         break;
-                    case "{#userid}":
-                        appender = _this.id;
+                    case "#name":
+                        switch (postfix) {
+                            case "document":
+                                result = this.parent_name;
+                                break;
+                            case "self":
+                            default:
+                                result = this.name;
+                                break;
+                        }
                         break;
-                    case "{#namespace}":
-                        appender = _this.namespace;
-                        break;
-                    case "{#query:self}":
-                        appender = _this.Query(_this.page_params);
+                    case "#query":
+                        switch (postfix) {
+                            case "self":
+                                result = this.Query(this.page_params);
+                                break;
+                            default:
+                                result = this.page_params[postfix];
+                        }
                         break;
                     default:
                 }
-                result += appender;
-            });
+            }
             return result;
         };
         CustomBehavior.prototype.FieldValue = function (object, params, position, parent) {
@@ -653,6 +670,20 @@ this.error_handler(e);
                 result += appender;
             });
             //    let p = this.page_params;
+            return result;
+        };
+        CustomBehavior.prototype.ResolveUrl = function (value) {
+            var _this = this;
+            var result = "";
+            this.SplitFormat(value, function (element) {
+                var appender = element;
+                var trimed = element.trim();
+                if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
+                    var sliceed = trimed.slice(1, -1);
+                    appender = _this.UrlValue(sliceed.trim());
+                }
+                result += appender;
+            });
             return result;
         };
         CustomBehavior.prototype.ToQueryFormat = function () {

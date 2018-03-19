@@ -15,19 +15,11 @@ export namespace ShareModule {
     export const plugins_config: any = _config.get("plugins");
     export const applications_config: any = _config.get("applications");
 
-    /*
-      export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
-      export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
-      export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
-      export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-    */
-
     const _: any = require("lodash");
 
     const log4js: any = require('log4js');
     log4js.configure("./config/systems/logs.json");
     export const logger: any = log4js.getLogger('request');
-  //  logger.setLevel(config.loglevel);
 
     const Promised: any = require("./wrapper");
     export const Wrapper: any = new Promised.Wrapper();
