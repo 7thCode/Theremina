@@ -2,14 +2,12 @@
     .box-header.with-border
         .row
             .col-xs-12
-                div
-                    .box-tools.pull-right
-                        button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                            i.fas.fa-minus
-                div
-                    .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createBlob($files);")
-                        button.btn.btn-xs.btn-box-tool(flow-btn type="file")
-                            i.fas.fa-plus-circle.text-primary
+                .box-tools.pull-right
+                    button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                        i.fas.fa-minus
+                .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createBlob($files);")
+                    button.btn.btn-xs.btn-box-tool(flow-btn type="file")
+                        i.fas.fa-plus-circle.text-primary
             .col-xs-12
                 include ../../../systems/common/next_prev
 
@@ -21,7 +19,5 @@
                     div(style="height:8rem;",data-toggle="tooltip" data-placement="top" title="{{file.filename}}")
                         a(download ng-href="/files/api/{{file.metadata.userid}}/{{file.filename}}" target="_blank")
                             img.center-block.thumbnail(ng-src="{{file.metadata.type | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
-                    div(style="height:8rem;text-align:center;")
-                        .row
-                            .col-xs-12
-                                div(style="word-wrap: break-word;", ng-bind="file.filename | filename:10")
+                    div.row(style="height:8rem;text-align:center;")
+                        .col-xs-12(style="font-size:1rem;font-weight:500;word-wrap: break-word;", ng-bind="file.filename | filename:10")

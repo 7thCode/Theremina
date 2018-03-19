@@ -59,6 +59,8 @@ var AuthModule;
     var Auth = /** @class */ (function () {
         function Auth() {
         }
+        Auth.error_handler = function (e) {
+        };
         /*
                 public create_init_user(initusers: any[]): void {
                     if (initusers) {
@@ -151,6 +153,7 @@ var AuthModule;
                     return prev.then(current);
                 }, Promise.resolve()).then(function () {
                 }).catch(function (error) {
+                    Auth.error_handler(error);
                 });
             }
         };

@@ -11,8 +11,8 @@ var ResourcesModule;
     var fs = require('graceful-fs');
     var share = require('../../common/share');
     var config = share.config;
-    var event = share.Event;
-    var applications_config = share.applications_config;
+    //   const event: any = share.Event;
+    //   const applications_config: any = share.applications_config;
     var Wrapper = share.Wrapper;
     var ScannerBehaviorModule = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     var HtmlScannerModule = require(share.Server("systems/common/html_scanner/html_scanner"));
@@ -340,7 +340,7 @@ var ResourcesModule;
          * @returns none
          */
         Resource.prototype.delete_own = function (request, response) {
-            var number = 1200;
+            var number = 2000;
             var userid = Resource.userid(request);
             Wrapper.Delete(response, number, ResourceModel, { userid: userid }, function (response) {
                 Wrapper.SendSuccess(response, {});
@@ -374,7 +374,7 @@ var ResourcesModule;
          * @returns none
          */
         Resource.prototype.get_resource_count = function (request, response) {
-            var number = 2800;
+            var number = 1500;
             var userid = Resource.userid(request);
             var namespace = Resource.namespace(request);
             var query = Wrapper.Decode(request.params.query);
@@ -388,7 +388,6 @@ var ResourcesModule;
          * @returns none
          */
         Resource.prototype.namespaces = function (userid, callback) {
-            var number = 1400;
             ResourceModel.find({ userid: userid }, { "namespace": 1, "_id": 0 }, {}).then(function (pages) {
                 var result = [];
                 _.forEach(pages, function (page) {
@@ -407,7 +406,7 @@ var ResourcesModule;
          * @returns none
          */
         Resource.prototype.get_all_mimetypes = function (request, response) {
-            var number = 2800;
+            var number = 2100;
             var userid = Resource.userid(request);
             var namespace = Resource.namespace(request);
             ResourceModel.find({ $and: [{ namespace: namespace }, { userid: userid }] }, {
@@ -433,9 +432,6 @@ var ResourcesModule;
     var Pages = /** @class */ (function () {
         function Pages() {
         }
-        //static connect(callback: (error, db) => void): any {
-        //     MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
-        // }
         Pages.userid = function (request) {
             return request.user.userid;
         };

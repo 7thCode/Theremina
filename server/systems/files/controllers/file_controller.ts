@@ -329,7 +329,7 @@ export namespace FileModule {
                                     skip = option.skip;
                                 }
 
-                                collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
+                                collection.find({$and: [query, {"metadata.namespace": namespace}, {"metadata.userid": userid}]},{sort:{uploadDate:-1}}).limit(limit).skip(skip).toArray((error: any, docs: any): void => {
                                     if (!error) {
                                         Wrapper.SendSuccess(response, docs);
                                     } else {

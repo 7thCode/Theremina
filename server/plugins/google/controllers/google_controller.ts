@@ -452,7 +452,7 @@ export namespace GoogleModule {
                 };
         */
 
-        //メール   電話	    合計  imp  CTR  CPC	掲載順位    広告費用    直帰率 セッション	ユーザー    PV合計    PV平均    滞在時間	CVR(メール)　CVR(電話)    CVR
+        //メール   電話	    合計  imp  CTR  CPC	掲載順位    広告費用    直帰率 セッション	ユーザー    PV合計    PV平均    滞在時間	CVR(メール) CVR(電話)    CVR
         //worksheet.getCell('A5').value =  { formula: "SUM(C2:C4)" };
         /*
                 public create2(request: any, response: any): void {

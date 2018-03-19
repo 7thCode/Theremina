@@ -13,15 +13,16 @@ var Promised;
     var _ = require("lodash");
     var result = require("./result");
     // const config: any = JSON.parse(fs.readFileSync("./config/systems/config.json", 'utf-8'));
-    // const log4js: any = require('log4js');
-    //  log4js.configure("./config/systems/logs.json");
-    // const logger: any = log4js.getLogger('request');
-    // logger.setLevel(config.loglevel);
+    var log4js = require('log4js');
+    log4js.configure("./config/systems/logs.json");
+    var logger = log4js.getLogger('request');
+    //    logger.setLevel(config.loglevel);
     var Wrapper = /** @class */ (function () {
         function Wrapper() {
         }
         Wrapper.prototype.BasicHeader = function (response, session) {
             response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             response.header("Pragma", "no-cache");
             response.header("Cache-Control", "no-cache");
             response.contentType("application/json");
@@ -146,31 +147,31 @@ var Promised;
             }
         };
         Wrapper.prototype.SendWarn = function (response, code, message, object) {
-            //     logger.warn(message + " " + code);
+            logger.warn(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         };
         Wrapper.prototype.SendError = function (response, code, message, object) {
-            //       logger.error(message + " " + code);
+            logger.error(message + " " + code);
             if (response) {
                 response.jsonp(new result(code, message, object));
             }
         };
         Wrapper.prototype.SendForbidden = function (response) {
-            //      logger.error("Forbidden");
+            logger.error("Forbidden");
             if (response) {
                 response.status(403).render("error", { message: "Forbidden...", status: 403 });
             }
         };
         Wrapper.prototype.SendNotFound = function (response) {
-            //        logger.error("notfound");
+            logger.error("notfound");
             if (response) {
                 response.status(404).render("error", { message: "not found", status: 404 });
             }
         };
         Wrapper.prototype.SendFatal = function (response, code, message, object) {
-            //          logger.fatal(message + " " + code);
+            logger.fatal(message + " " + code);
             if (response) {
                 response.status(500).render("error", { message: message, status: 500 });
             }

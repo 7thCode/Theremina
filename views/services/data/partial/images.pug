@@ -1,16 +1,15 @@
-.box.box-info.pallete-shadow(ng-controller="PictureController", flow-init, draggablepane="image", style="width:300px;height:auto;left:230px;top:210px;background:#f0f0f0;")
+.box.box-info.pallete-shadow(ng-controller="PicturePalleteController", flow-init, draggablepane="image", style="width:300px;height:auto;left:230px;top:210px;background:#f0f0f0;")
     .box-header.with-border#box-header
-        .row
+        .row(style="height:60px;")
             .col-xs-12
-                div
                     .box-tools.pull-right
                         button.btn.btn-xs.btn-box-tool(type='button')
                             i.fas.fa-minus
-                div
+
                     .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="createPicture($files);")
                         button.btn.btn-xs.btn-box-tool(flow-btn type="file", flow-attrs="{accept:'.png,.jpg,.gif,.svg'}")
                             i.fas.fa-plus-circle.text-primary
-        .row
+    .box-header
             .col-xs-12
                 include ../../../systems/common/next_prev
 

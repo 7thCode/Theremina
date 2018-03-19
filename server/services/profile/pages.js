@@ -16,7 +16,7 @@ var ProfilePageRouter;
     var analysis = core.analysis;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     ProfilePageRouter.router.get("/", [exception.page_guard, auth.page_valid, analysis.page_view, function (request, response) {
             response.render("services/profile/index", {

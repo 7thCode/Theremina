@@ -16,11 +16,13 @@ var PageRouter;
     var config = share.config;
     var analysis = core.analysis;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     var LocalAccount = require(share.Models("systems/accounts/account"));
     var ResourceModel = require(share.Models("systems/resources/resource"));
     var ArticleModel = require(share.Models("services/articles/article"));
+    var error_handler = function (error) {
+    };
     PageRouter.router.get("/", [analysis.page_view, function (request, response) {
             response.render("services/front/index", {
                 config: config,
@@ -64,6 +66,7 @@ var PageRouter;
                 response.setHeader('Content-Type', 'text/xml');
                 response.send(r);
             }).catch(function (error) {
+                error_handler(error);
             });
         }]);
     PageRouter.router.get("/robots.txt", [function (request, response) {

@@ -13,6 +13,9 @@ namespace ScannerBehavior {
     const _: any = require('lodash');
     const requestpromise: any = require('request-promise');
 
+    const default_start:number = 0;
+    const default_length:number = 12;
+
     export interface Behavior {
         isdocument: boolean;
 
@@ -32,9 +35,21 @@ namespace ScannerBehavior {
     class Params {
 
         private params: any = {};
+     //   private filters: any = {};
 
         constructor() {
-
+            /*
+            this.filters = {
+                value: (result: string, param: string): string => {
+                    try {
+                        result = "content." + param.trim() + ".value";
+                    } catch (e) {
+this.error_handler(e);
+                    }
+                    return result;
+                }
+            };
+            */
         }
 
         public FromParams(params): void {
@@ -77,14 +92,14 @@ namespace ScannerBehavior {
             }
 
             if (this.params.l) {
-                keywords.push("l=" + parseInt(this.params.l, 10));
+                keywords.push("l=" + parseInt(this.params.l, default_length));
             }
 
             if (this.params.s) {
-                keywords.push("s=" + parseInt(this.params.s, 10));
+                keywords.push("s=" + parseInt(this.params.s, default_start));
             }
 
-            let delimitter: string = "?";
+            let delimitter: string = "?";          //  keywords to "?xxxx&yyyy&zzzz"
             _.forEach(keywords, (keyword) => {
                 result += delimitter + keyword;
                 delimitter = "&";
@@ -95,21 +110,20 @@ namespace ScannerBehavior {
 
         public ToQueryFormat(): string {
             let result: string = "";
-
-            if (this.params["co"]) {
-                result += 'co::' + this.params["co"] + ';';
+            if (this.params.co) {
+                result += 'co::' + this.params.co + ';';
             }
-            if (this.params["q"]) {
-                result += 'q::' + this.params["q"] + ';';
+            if (this.params.q) {
+                result += 'q::' + this.params.q + ';';
             }
-            if (this.params["l"]) {
-                result += 'l::' + this.params["l"] + ';';
+            if (this.params.l) {
+                result += 'l::' + this.params.l + ';';
             }
-            if (this.params["s"]) {
-                result += 's::' + this.params["s"] + ';';
+            if (this.params.s) {
+                result += 's::' + this.params.s + ';';
             }
-            if (this.params["so"]) {
-                result += 'so::' + this.params["so"] + ';';
+            if (this.params.so) {
+                result += 'so::' + this.params.so + ';';
             }
             return result;
         }
@@ -129,6 +143,10 @@ namespace ScannerBehavior {
 
         private default_query: any;
 
+        private error_handler(e) {
+
+        }
+
         constructor(parent_name: string, name: string, id: string, namespace: string, params: any, isdocument: boolean, models: any) {
             this.parent_name = parent_name;
             this.name = name;
@@ -138,7 +156,6 @@ namespace ScannerBehavior {
             this.isdocument = isdocument;
             this.models = models;
             this.default_query = {"userid": this.id};
-
             this.filters = {
                 date: (result: string, param: string): string => {
                     try {
@@ -150,11 +167,11 @@ namespace ScannerBehavior {
                             weekdays: ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
                             weekdaysShort: ["日", "月", "火", "水", "木", "金", "土"]
                         });
-                        moment.locale("ja");
+                        //        moment.locale("ja");
                         let date: any = moment(result);
                         result = date.format(format);
                     } catch (e) {
-
+                        this.error_handler(e);
                     }
                     return result;
                 },
@@ -165,7 +182,7 @@ namespace ScannerBehavior {
                             result = result.substr(0, limit) + "...";
                         }
                     } catch (e) {
-
+                        this.error_handler(e);
                     }
                     return result;
                 },
@@ -174,7 +191,7 @@ namespace ScannerBehavior {
                         let param_object = JSON.parse(param[0]);
                         result = param_object[result];
                     } catch (e) {
-
+                        this.error_handler(e);
                     }
                     return result;
                 },
@@ -182,25 +199,32 @@ namespace ScannerBehavior {
                     try {
                         result = encodeURIComponent(result);
                     } catch (e) {
-
+                        this.error_handler(e);
                     }
                     return result;
                 },
                 add: (result: string, param: string): string => {
                     try {
-                        result = String(parseInt(result, 10) + parseInt(param[0], 10));
+                        result = String(parseInt(result, 0) + parseInt(param[0], 0));
                     } catch (e) {
-
+                        this.error_handler(e);
+                    }
+                    return result;
+                },
+                strip: (result: string, param: string): string => {
+                    try {
+                        result = result.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'')
+                    } catch (e) {
+                        this.error_handler(e);
                     }
                     return result;
                 }
-
             };
         }
 
         private ParseQueryFormat(query: string) {
             let result = null;
-            if (query[0] == "#") {
+            if (query[0] == "#") { // special name (#fieldname:postfix)
                 let field_name: string = "";
                 let postfix: string = "";
                 let split_field_name: string[] = query.split(":");
@@ -214,11 +238,11 @@ namespace ScannerBehavior {
                     case "#query" :
                         switch (postfix) {
                             case "self":
-                                result = this.page_params;
+                                result = this.page_params;  // #query:self
                                 break;
                             default:
                                 let params: any = new Params();
-                                params.FromQueryFormat(this.page_params[postfix]);
+                                params.FromQueryFormat(this.page_params[postfix]); // #query:xxxx
                                 result = params.ToParams();
                         }
                         break;
@@ -242,28 +266,27 @@ namespace ScannerBehavior {
                 try {
                     //      let query = new Function("value", "with (value) {return value;}")(query_object.q);
                     //      _query = {"$and": [this.default_query, query]};
-
                     _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
-
+                    this.error_handler(e);
                 }
             }
 
             let limit: number = 0;
             if (query_object.l) {
                 try {
-                    limit = parseInt(query_object.l, 10);
+                    limit = parseInt(query_object.l, default_length);
                 } catch (e) {
-
+                    this.error_handler(e);
                 }
             }
 
             let skip: number = 0;
             if (query_object.s) {
                 try {
-                    skip = parseInt(query_object.s, 10);
+                    skip = parseInt(query_object.s, default_start);
                 } catch (e) {
-
+                    this.error_handler(e);
                 }
             }
 
@@ -272,7 +295,7 @@ namespace ScannerBehavior {
                 try {
                     sort = JSON.parse(query_object.so);
                 } catch (e) {
-
+                    this.error_handler(e);
                 }
             }
 
@@ -298,7 +321,7 @@ namespace ScannerBehavior {
                 try {
                     _query = {"$and": [this.default_query, Function("return " + query_object.q)()]};
                 } catch (e) {
-
+                    this.error_handler(e);
                 }
             }
 
@@ -327,7 +350,7 @@ namespace ScannerBehavior {
                         aggrigate.push(filter);
                     });
                 } catch (e) {
-                    let a = e;
+                    this.error_handler(e);
                 }
             }
 
@@ -345,6 +368,8 @@ namespace ScannerBehavior {
         }
 
         public GetUrl(target_url_string: string, parent: any): any {// url
+
+      //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
             let target_url: any = url.resolve(host_string, resolved_url_string);
@@ -383,31 +408,49 @@ namespace ScannerBehavior {
             }
         }
 
-        private ResolveUrl(value: string): string {
-            let result: string = "";
-            this.SplitFormat(value, (element) => {
-                let appender: any = element;
-                let trimed: string = element.trim();
-                switch (trimed) {
-                    case "{#name:document}":
-                        appender = this.parent_name;
+        public UrlValue(sliceed:string):string {
+            let result:string =  "";
+            if (sliceed[0] == "#") {
+                let field_name: string = sliceed;                              // filter_names[0] := #specialname
+                let postfix = "";
+                let split_field_name: string[] = field_name.split(":");
+                if (split_field_name) {
+                    field_name = split_field_name[0];
+                    if (split_field_name.length == 2) {
+                        postfix = split_field_name[1];
+                    }
+                }
+
+                switch (field_name) {
+                    case "#userid" :
+                        result = this.id;
                         break;
-                    case "{#name:self}":
-                        appender = this.name;
+                    case "#namespace" :
+                        result = this.namespace;
                         break;
-                    case "{#userid}" :
-                        appender = this.id;
+                    case "#name":
+                        switch (postfix) {
+                            case "document":
+                                result = this.parent_name;
+                                break;
+                            case "self":
+                            default:
+                                result = this.name;
+                                break;
+                        }
                         break;
-                    case "{#namespace}" :
-                        appender = this.namespace;
-                        break;
-                    case "{#query:self}" :
-                        appender = this.Query(this.page_params);
+                    case "#query" :
+                        switch (postfix) {
+                            case "self":
+                                result = this.Query(this.page_params);
+                                break;
+                            default:
+                                result = this.page_params[postfix];
+                        }
                         break;
                     default:
                 }
-                result += appender;
-            });
+            }
             return result;
         }
 
@@ -420,7 +463,6 @@ namespace ScannerBehavior {
 
                 // parse object path
                 if (path) {
-
                     let isObject = (value: any): boolean => {
                         let result: boolean = false;
                         if (value !== null) {
@@ -487,6 +529,7 @@ namespace ScannerBehavior {
                                             result = this.Query(this.page_params);
                                             break;
                                         default:
+                                            result = this.page_params[postfix];
                                     }
                                     break;
                                 case "#pager" : {
@@ -554,7 +597,6 @@ namespace ScannerBehavior {
                         }
                     }
                 }
-
             }
 
             return result;
@@ -579,7 +621,7 @@ namespace ScannerBehavior {
             }
 
             if (query_object.l) {
-                params.push("l=" + (parseInt(query_object.l, 10)));
+                params.push("l=" + (parseInt(query_object.l, default_length)));
             }
 
             return params;
@@ -591,7 +633,7 @@ namespace ScannerBehavior {
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                keywords.push("s=" + parseInt(query_object.s, 10));
+                keywords.push("s=" + parseInt(query_object.s, default_start));
             }
 
             let delimitter: string = "?";
@@ -624,13 +666,12 @@ namespace ScannerBehavior {
                 return result;
             };
 
-
-            let page_length = parseInt(query_object.l, 10);
+            let page_length = parseInt(query_object.l, default_length);
             if (!page_length) {
                 page_length = 1;
             }
 
-            let page_start: number = parseInt(query_object.s, 10);
+            let page_start: number = parseInt(query_object.s, default_start);
 
             let index = 0;
             for (var count = 0; count < record_count; count += page_length) {
@@ -650,7 +691,7 @@ namespace ScannerBehavior {
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                keywords.push("s=" + (parseInt(query_object.s, 10) + parseInt(query_object.l, 10)));
+                keywords.push("s=" + (parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length)));
             }
 
             let delimitter: string = "?";
@@ -668,7 +709,7 @@ namespace ScannerBehavior {
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                let s: number = parseInt(query_object.s, 10) - parseInt(query_object.l, 10);
+                let s: number = parseInt(query_object.s, default_start) - parseInt(query_object.l, default_length);
                 if (s < 0) {
                     s = 0;
                 }
@@ -687,7 +728,7 @@ namespace ScannerBehavior {
         private HasNext(query_object: any, record_count: number): boolean {
             let result: boolean = false;
             if (query_object.s) {
-                let current_last: number = parseInt(query_object.s, 10) + parseInt(query_object.l, 10);
+                let current_last: number = parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length);
                 result = (current_last < record_count);
             }
             return result;
@@ -696,7 +737,7 @@ namespace ScannerBehavior {
         private HasPrev(query_object: any): boolean {
             let result: boolean = false;
             if (query_object.s) {
-                let current_last: number = parseInt(query_object.s, 10);
+                let current_last: number = parseInt(query_object.s, default_start);
                 result = (current_last > 0);
             }
             return result;
@@ -712,6 +753,21 @@ namespace ScannerBehavior {
                         let sliceed: string = trimed.slice(1, -1);
                         appender = this.FieldValue(data, sliceed.trim(), position, parent); // fragment, model
                     }
+                }
+                result += appender;
+            });
+
+            return result;
+        }
+
+        public ResolveUrl(value: string): string {
+            let result: string = "";
+            this.SplitFormat(value, (element) => {
+                let appender: any = element;
+                let trimed: string = element.trim();
+                if ("{" == trimed[0] && trimed[trimed.length - 1] == "}") {
+                    let sliceed: string = trimed.slice(1, -1);
+                    appender = this.UrlValue(sliceed.trim());
                 }
                 result += appender;
             });

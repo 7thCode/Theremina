@@ -34,6 +34,8 @@ export namespace ArticleApiRouter {
 
     router.post("/api/createmany", [exception.exception, exception.guard, exception.authenticate, article.create_article_many]);
 
+    router.post("/api/copy/:from_name/:to_name", [exception.exception, exception.guard, exception.authenticate, article.copy_article]);
+
     router.get('/api/query/:query', [article.get_article_query]);
     router.get('/api/querynamespace/:namespace/:query', [article.get_article_query_with_namespace]);
 

@@ -92,6 +92,10 @@ export namespace AuthModule {
 
         }
 
+        static error_handler(e) {
+
+        }
+
         /*
                 public create_init_user(initusers: any[]): void {
                     if (initusers) {
@@ -148,11 +152,9 @@ export namespace AuthModule {
                             Wrapper.FindOne(null, 1000, LocalAccount, {username: username}, (response: any, account: any): void => {
                                 if (!account) {
                                     let _promise = new Promise((_resolve: any, _reject: any): void => {
-
                                         let content: any = {"mails" : [], "nickname": "", "group": ""};// definition.account_content;
                                         content.mails.push(username);
                                         content.nickname = user.displayName;
-
                                         LocalAccount.register(new LocalAccount({
                                                 userid: userid,
                                                 username: username,
@@ -170,7 +172,6 @@ export namespace AuthModule {
                                                     _reject(error);
                                                 }
                                             });
-
                                     });
                                     _promise.then((results: any[]): void => {
                                         resolve({});
@@ -179,7 +180,6 @@ export namespace AuthModule {
                                     });
                                 }
                             });
-
                         } else {
                             reject({});
                         }
@@ -190,8 +190,8 @@ export namespace AuthModule {
                     return prev.then(current);
                 }, Promise.resolve()).then(() => {
                 }).catch((error) => {
+                    Auth.error_handler(error);
                 });
-
             }
         }
 

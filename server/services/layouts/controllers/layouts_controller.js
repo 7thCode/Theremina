@@ -21,7 +21,7 @@ var LayoutsModule;
     var services_config = share.services_config;
     var LayoutModel = require(share.Models("/services/layouts/layout"));
     var builder_userid = config.systems.userid; // template maker user id
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var Layout = /** @class */ (function () {
         function Layout() {
         }

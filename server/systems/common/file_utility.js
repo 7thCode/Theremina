@@ -10,6 +10,11 @@ var FileUtility;
     var fs = require('graceful-fs');
     var exec = require('child_process').exec;
     var path = require('path');
+    var _config = require('config');
+    var config = _config.get("systems");
+    //   const core: any = require(process.cwd() + '/gs');
+    //   const share: any = core.share;
+    //   const config:any = share.config;
     var Utility = /** @class */ (function () {
         function Utility(current) {
             this.current = '';
@@ -136,8 +141,8 @@ var FileUtility;
         Utility.prototype.create_dir = function (root, pathes, callback, error_handler) {
             var _this = this;
             var current_path = root;
-            var sequentialExec = function (arr) {
-                return arr.reduce(function (prev, current, index, array) {
+            var sequentialExec = function (directorys) {
+                return directorys.reduce(function (prev, current, index, array) {
                     return prev.then(function (prevResult) {
                         return new Promise(function (resolve, reject) {
                             current_path = path.join(current_path, current);
@@ -152,6 +157,51 @@ var FileUtility;
                 callback(current_path);
             }).catch(function (e) {
                 error_handler(e);
+            });
+        };
+        Utility.prototype.exists = function (target_file, exist, notexist) {
+            fs.access(target_file, function (error) {
+                if (error) {
+                    if (error.code === 'ENOENT') {
+                        notexist(error);
+                    }
+                }
+                else {
+                    exist();
+                }
+            });
+        };
+        Utility.prototype.read_stream = function (file_name) {
+            return fs.createReadStream(file_name);
+        };
+        Utility.get_image_mime = function (filename) {
+            var result = "";
+            var exitname = path.extname(filename);
+            switch (exitname) {
+                case ".jpeg":
+                case ".jpg":
+                    result = "image/jpg";
+                    break;
+                case ".png":
+                    result = "image/png";
+                    break;
+                case ".gif":
+                    result = "image/gif";
+                    break;
+            }
+            return result;
+        };
+        ;
+        // 'Cache-Control': config.cache
+        Utility.prototype.get_header = function (file_path, callback) {
+            fs.stat(file_path, function (error, stat) {
+                if (!error) {
+                    callback({
+                        'Content-Type': Utility.get_image_mime(file_path),
+                        //     'Content-Length' : stat.size,
+                        'Cache-Control': config.cache
+                    });
+                }
             });
         };
         return Utility;

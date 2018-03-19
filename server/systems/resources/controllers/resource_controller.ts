@@ -13,19 +13,15 @@ export namespace ResourcesModule {
 
     const share: any = require('../../common/share');
     const config: any = share.config;
-    const event: any = share.Event;
-
-    const applications_config: any = share.applications_config;
+ //   const event: any = share.Event;
+ //   const applications_config: any = share.applications_config;
 
     const Wrapper: any = share.Wrapper;
 
     const ScannerBehaviorModule: any = require(share.Server("systems/common/html_scanner/scanner_behavior"));
     const HtmlScannerModule: any = require(share.Server("systems/common/html_scanner/html_scanner"));
-
     const ResourceModel: any = require(share.Models("systems/resources/resource"));
-
     const ArticleModel: any = require(share.Models("services/articles/article"));
-
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
 
     export class Resource {
@@ -43,7 +39,6 @@ export namespace ResourcesModule {
             }
             return result;
         }
-
 
         static localname(name: string): string {
             let result: string = "";
@@ -357,7 +352,7 @@ export namespace ResourcesModule {
          * @returns none
          */
         public delete_own(request: any, response: Express.Response): void {
-            const number: number = 1200;
+            const number: number = 2000;
             let userid: string = Resource.userid(request);
             Wrapper.Delete(response, number, ResourceModel, {userid: userid}, (response: Express.Response): void => {
                 Wrapper.SendSuccess(response, {});
@@ -393,7 +388,7 @@ export namespace ResourcesModule {
          * @returns none
          */
         public get_resource_count(request: any, response: any): void {
-            const number: number = 2800;
+            const number: number = 1500;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
             let query: any = Wrapper.Decode(request.params.query);
@@ -409,7 +404,6 @@ export namespace ResourcesModule {
          * @returns none
          */
         public namespaces(userid: string, callback: any): void {
-            const number: number = 1400;
             ResourceModel.find({userid: userid}, {"namespace": 1, "_id": 0}, {}).then((pages: any): void => {
                 let result: string[] = [];
                 _.forEach(pages, (page) => {
@@ -429,7 +423,7 @@ export namespace ResourcesModule {
          * @returns none
          */
         public get_all_mimetypes(request: any, response: any): void {
-            const number: number = 2800;
+            const number: number = 2100;
             let userid: string = Resource.userid(request);
             let namespace: string = Resource.namespace(request);
             ResourceModel.find({$and: [{namespace: namespace}, {userid: userid}]}, {
@@ -447,17 +441,12 @@ export namespace ResourcesModule {
                 Wrapper.SendError(response, 2, "mimetype", error);
             });
         }
-
     }
 
     const mongoose: any = require('mongoose');
     mongoose.Promise = global.Promise;
 
     export class Pages {
-
-        //static connect(callback: (error, db) => void): any {
-        //     MongoClient.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, callback);
-        // }
 
         static userid(request: { user: { userid: string } }): string {
             return request.user.userid;

@@ -12,17 +12,10 @@ var ShareModule;
     ShareModule.services_config = _config.get("services");
     ShareModule.plugins_config = _config.get("plugins");
     ShareModule.applications_config = _config.get("applications");
-    /*
-      export const config = JSON.parse(fs.readFileSync('./config/systems/config.json', 'utf-8'));
-      export const services_config = JSON.parse(fs.readFileSync('./config/services/config.json', 'utf-8'));
-      export const plugins_config = JSON.parse(fs.readFileSync('./config/plugins/config.json', 'utf-8'));
-      export const applications_config = JSON.parse(fs.readFileSync('./config/applications/config.json', 'utf-8'));
-    */
     var _ = require("lodash");
     var log4js = require('log4js');
     log4js.configure("./config/systems/logs.json");
     ShareModule.logger = log4js.getLogger('request');
-    ShareModule.logger.setLevel(ShareModule.config.loglevel);
     var Promised = require("./wrapper");
     ShareModule.Wrapper = new Promised.Wrapper();
     var CipherModule = require('./cipher');

@@ -56,6 +56,10 @@ export namespace DataPageRouter {
         result.render('services/data/dialogs/create_dialog', {message: message});
     }]);
 
+    router.get('/dialogs/operation_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
+        result.render('services/data/dialogs/operation_dialog', {message: message});
+    }]);
+
     router.get('/dialogs/delete_confirm_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
         result.render('services/data/dialogs/delete_confirm_dialog', {message: message});
     }]);

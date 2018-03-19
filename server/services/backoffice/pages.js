@@ -15,7 +15,7 @@ var BackofficePageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     BackofficePageRouter.router.get("/", [exception.page_guard, auth.page_valid, auth.page_is_system, function (request, response) {
             response.render("services/backoffice/index", {

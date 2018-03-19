@@ -12,7 +12,7 @@ var InstallerPageRouter;
     var share = require(process.cwd() + '/server/systems/common/share');
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     InstallerPageRouter.router.get("/", [function (request, response) {
             response.render("utility/installer/index", { user: null, message: message, status: 200, fonts: webfonts });

@@ -51,14 +51,12 @@
 
 .box.box-primary(style="margin-top:12px;", ng-hide="opened", flow-init)
     .box-header.with-border
-        div
-            .box-tools.pull-right
-                button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
-                    i.fas.fa-minus
-        div
-            .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UplodArticles($files);")
-                button.btn.btn-xs.btn-box-tool(flow-btn type="file")
-                    i.fas.fa-plus-circle.text-primary
+        .box-tools.pull-right
+            button.btn.btn-xs.btn-box-tool(type='button', data-widget='collapse')
+                i.fas.fa-minus
+        .box-tools.pull-right(flow-name="uploader.flow", flow-files-added="UploadArticles($files);")
+            button.btn.btn-xs.btn-box-tool(flow-btn type="file")
+                i.fas.fa-plus-circle.text-primary
         .row
             .col-xs-12
                 include ../../../systems/common/next_prev
@@ -71,19 +69,18 @@
                 .form-group
                     label(for="content") content
                     input.form-control.no-zoom#content(ng-show="fieldname != ''" ng-model="content", type="text", name='content' ng-change="FindArticles(fieldname,content);")
-                //.row
-                    div {{query_string_before}} - {{query_string_after}}
 
     .box-body(style="height:auto;min-height:80vh;background-color:#e6e6e6; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset", flow-drop, data-toggle="tooltip", data-placement="top", title=message.filedrop)
         ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
             li(ng-repeat="article in articles")
                 div(ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:12rem;width:16rem;margin-left:auto;margin-right:auto;")
-                    a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank")
+                    a.btn.btn-success.btn-xs(download="{{article.name}}.json" ng-href="/articles/json/{{article._id}}", target="_blank" style="position:relative;top:10px;left:2rem;")
                         i.fas.fa-cloud-download-alt
+                    button.btn.btn-primary.btn-xs(ng-click="operationArticle(article.name);", style="position:relative;top:10px;left:10.5rem;border-radius: 10px")
+                        i.fas.fa-copy(aria-hidden="true")
+
                     div(style="height:8rem;", data-toggle="tooltip", data-placement="top", title="{{article.name}}", ng-click="SelectArticle(article._id)")
                         img.center-block.thumbnail(ng-src="{{article.content.type.value | icon}}", style="max-height: 8rem;max-width: 12rem;box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3)")
-                    div(style="height:8rem;text-align:center;")
-                        .row
-                            .col-xs-12
-                                div(style="word-wrap: break-word;", ng-bind="article.name | filename:10")
+                    div.row(style="height:8rem;text-align:center;")
+                        .col-xs-12(style="font-size:1rem;font-weight:500;word-wrap: break-word;", ng-bind="article.name | filename:10")
 

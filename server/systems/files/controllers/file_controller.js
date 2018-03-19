@@ -309,7 +309,7 @@ var FileModule;
                                 if (option.skip) {
                                     skip = option.skip;
                                 }
-                                collection.find({ $and: [query, { "metadata.namespace": namespace_1 }, { "metadata.userid": userid_1 }] }).limit(limit).skip(skip).toArray(function (error, docs) {
+                                collection.find({ $and: [query, { "metadata.namespace": namespace_1 }, { "metadata.userid": userid_1 }] }, { sort: { uploadDate: -1 } }).limit(limit).skip(skip).toArray(function (error, docs) {
                                     if (!error) {
                                         Wrapper.SendSuccess(response, docs);
                                     }
@@ -769,7 +769,7 @@ var FileModule;
                                                         */
                                                         if (writestream) {
                                                             writestream.once('finish', function (file) {
-                                                                Files.cache_invalidate(userid_6 + "/" + namespace_6);
+                                                                Files.cache_invalidate(userid_6 + "/" + namespace_6 + "/doc/img/" + name_4);
                                                                 Wrapper.SendSuccess(response, file);
                                                             });
                                                             writestream.write(chunk);
@@ -875,7 +875,7 @@ var FileModule;
                                         if (item) {
                                             collection.remove({ _id: item._id }, function (error) {
                                                 if (!error) {
-                                                    Files.cache_invalidate(userid_7 + "/" + namespace_7);
+                                                    Files.cache_invalidate(userid_7 + "/" + namespace_7 + "/doc/img/" + name_5);
                                                     Wrapper.SendSuccess(response, {});
                                                 }
                                                 else {

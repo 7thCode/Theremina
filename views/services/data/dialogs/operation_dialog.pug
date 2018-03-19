@@ -8,22 +8,13 @@
                     .row
                         .col-xs-12
                             .form-group
-                                label.control-label(for="name") #{message.articlename}
+                                label.control-label(for="name") New #{message.articlename}
                                 span(ng-messages="validate.title.$error")
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
-
-                            .form-group
-                                label.control-label(for="type") #{message.articletype}
-                                span(ng-messages="validate.title.$error")
-                                    span.error-message(ng-message="required") #{message.required}
-                                select.form-control.no-zoom#type(ng-model="type", name="type", required)
-                                    option(ng-repeat="page in pages") {{page.name}}
-
             .col-xs-12
                 include ../../../systems/common/error_message
-
     .modal-footer
         .row
             .col-xs-12

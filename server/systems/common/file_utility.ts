@@ -13,6 +13,13 @@ export namespace FileUtility {
     const exec: any = require('child_process').exec;
     const path: any = require('path');
 
+    const _config: any = require('config');
+    const config: any = _config.get("systems");
+
+ //   const core: any = require(process.cwd() + '/gs');
+ //   const share: any = core.share;
+ //   const config:any = share.config;
+
     export class Utility {
         private current: string = '';
 
@@ -174,6 +181,38 @@ export namespace FileUtility {
 
         public read_stream(file_name:string):any {
             return fs.createReadStream(file_name);
+        }
+
+        static get_image_mime(filename:string):string {
+            let result:string = "";
+            let exitname:string = path.extname(filename);
+            switch (exitname) {
+                case ".jpeg":
+                case ".jpg":
+                    result = "image/jpg";
+                    break;
+                case ".png":
+                    result = "image/png";
+                    break;
+                case ".gif":
+                    result = "image/gif";
+                    break
+            }
+            return result;
+        };
+
+        // 'Cache-Control': config.cache
+
+        public get_header(file_path, callback:(header) => void) {
+            fs.stat(file_path, (error, stat) => {
+                if (!error) {
+                    callback({
+                        'Content-Type' : Utility.get_image_mime(file_path),
+                   //     'Content-Length' : stat.size,
+                        'Cache-Control': config.cache
+                    })
+                }
+            });
         }
 
     }

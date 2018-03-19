@@ -15,7 +15,7 @@ var RobotPageRouter;
     var exception = core.exception;
     var config = share.config;
     var services_config = share.services_config;
-    var webfonts = services_config.webfonts;
+    var webfonts = services_config.webfonts || [];
     var message = config.message;
     RobotPageRouter.router.get("/", [exception.page_guard, auth.page_valid, function (request, response) {
             response.render("plugins/robot/index", {

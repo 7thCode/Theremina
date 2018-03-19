@@ -8,11 +8,11 @@
 
 import {IRouter} from "express-serve-static-core";
 
-export namespace PicturesApiRouter {
+export namespace BinancePageRouter {
 
-    const express: any = require("express");
+    const express: any = require('express');
     export const router: IRouter = express.Router();
 
 }
 
-module.exports = PicturesApiRouter.router;
+module.exports = BinancePageRouter.router;

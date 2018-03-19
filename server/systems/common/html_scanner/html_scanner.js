@@ -504,7 +504,7 @@ var HTMLScanner;
     *  ”resolve”タグは、fieldアトリビュートの内容をフィールド名とみなし、解決する。（タグ自体が置き換えられる）
     *  その際、"datasource"ネームスペースのアトリビュートは、値をフィールド名とみなし、値を解決する。
     *
-    *  例　　　<div ds:class="fieldname">   ->   <div class="hoge">
+    *  例 <div ds:class="fieldname">   ->   <div class="hoge">
     *
     * */
     var Expander = /** @class */ (function (_super) {
@@ -897,7 +897,7 @@ var HTMLScanner;
     HTMLScanner.Expander = Expander;
     /* Builder
     *  Resolver,Expanderを使用して、HTMLテンプレートを展開する。
-    *　todo: ３回パースするのはダサダサ。
+    *  todo: ３回パースするのはダサダサ。
     *
     * */
     var Builder = /** @class */ (function () {
