@@ -410,6 +410,7 @@ this.error_handler(e);
 
         public UrlValue(sliceed:string):string {
             let result:string =  "";
+
             if (sliceed[0] == "#") {
                 let field_name: string = sliceed;                              // filter_names[0] := #specialname
                 let postfix = "";
@@ -457,7 +458,9 @@ this.error_handler(e);
         public FieldValue(object: any, params: string, position: number, parent: any): any {
             let result: any = null;
             let full_params = params.trim();
+
             if (full_params) {
+                full_params = decodeURIComponent(full_params);
                 let full_param_array: string[] = full_params.split("==");
                 let path: string = full_param_array[0].trim();
 
@@ -784,4 +787,3 @@ this.error_handler(e);
 }
 
 module.exports = ScannerBehavior;
-

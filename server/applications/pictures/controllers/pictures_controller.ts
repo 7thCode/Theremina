@@ -16,6 +16,9 @@ export namespace PicturesModule {
     const sharp: any = require('sharp');
     //  const path: any = require('path');
 
+    const path: any = require('path');
+
+
     const core: any = require(process.cwd() + '/gs');
     const share: any = core.share;
     const config: any = share.config;
@@ -25,8 +28,6 @@ export namespace PicturesModule {
     const file_utility: any = share.Utility;
 
     const LocalAccount: any = require(share.Models("systems/accounts/account"));
-
-
 
     export class Pictures {
 
@@ -104,24 +105,15 @@ export namespace PicturesModule {
             logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/doc/img/" + request.params.name);
 
             let effecter = (readstream, type, size, namespace, copy: () => void, error_handler: (error) => void) => {
-           //     readstream.on('end', (): void => {
-           //     });
+                //     readstream.on('end', (): void => {
+                //     });
                 readstream.on('error', error_handler);
 
                 try {
                     if (type == "image/jpg" || type == "image/jpeg" || type == "image/png") {
                         if (size.w && size.h) {　// 加工
                             if (size.l && size.t) {
-                                /*
                                 // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
-                                let extractor = sharp().extract({
-                                    left: parseInt(size.l),
-                                    top: parseInt(size.t),
-                                    width: parseInt(size.w),
-                                    height: parseInt(size.h)
-                                });
-                                readstream = readstream.pipe(extractor);
-                                */
                             }
                             let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
                             readstream = readstream.pipe(resizer);
@@ -148,21 +140,39 @@ export namespace PicturesModule {
                 let cache_file = process.cwd() + "/tmp/" + userid + "/" + namespace + "/doc/img/" + name;
                 file_utility.exists(cache_file, () => {
 
-                    file_utility.get_header(cache_file, (header) => {
-                        let readstream = file_utility.read_stream(cache_file);
-                        if (readstream) {
-                            let processedstream = effecter(readstream, header['Content-Type'], size, namespace, () => {
-                            }, error_handler);
-
-                            // todo: how to get processed stream size ??
-
-                            response.writeHead(200, header);
-                            processedstream.pipe(response); // hit in cache.
-                        } else {
-                            next();
+                    let get_image_mime = (filename: string) => {
+                        let result: string = "";
+                        let exitname: string = path.extname(filename);
+                        switch (exitname) {
+                            case ".jpeg":
+                            case ".jpg":
+                                result = "image/jpeg";
+                                break;
+                            case ".png":
+                                result = "image/png";
+                                break;
+                            case ".gif":
+                                result = "image/gif";
+                                break;
                         }
-                    });
+                        return result;
+                    };
 
+                    let readstream = file_utility.read_stream(cache_file);
+                    if (readstream) {
+                        let type = get_image_mime(cache_file);
+                        let processedstream = effecter(readstream, type, size, namespace, () => {
+                        }, error_handler);
+                        // todo: how to get processed stream size ??
+                        //        response.writeHead(200, header);
+
+                        response.setHeader("Content-Type", type);
+          //            response.setHeader("Content-Length", item.length);
+                        response.setHeader("Cache-Control", config.cache);
+                        processedstream.pipe(response); // hit in cache.
+                    } else {
+                        next();
+                    }
                 }, (error) => {
                     Pictures.connect().then((db) => { //　miss in cache.
                         let gfs = new mongodb.GridFSBucket(db, {});
@@ -194,56 +204,9 @@ export namespace PicturesModule {
                                                                 }, error_handler);
 
                                                                 response.setHeader("Content-Type", item.metadata.type);
-                                                    //            response.setHeader("Content-Length", item.length);
+                                                //              response.setHeader("Content-Length", item.length);
                                                                 response.setHeader("Cache-Control", config.cache);
                                                                 processedstream.pipe(response);
-
-                                                                /*
-                                                                let type = item.metadata.type;
-                                                                response.setHeader("Content-Type", type);
-                                                                response.setHeader("Cache-Control", config.cache);
-                                                                readstream.on('end', (): void => {
-                                                                });
-                                                                readstream.on('error', error_handler);
-
-                                                                try {
-                                                                    if (type == "image/jpg" || type == "image/jpeg" || type == "image/png" || type == "image/gif") {
-                                                                        if (size.w && size.h) {　// 加工
-                                                                            if (size.l && size.t) {
-                                                                                *?/*
-                                                                                // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
-                                                                                let extractor = sharp().extract({
-                                                                                    left: parseInt(size.l),
-                                                                                    top: parseInt(size.t),
-                                                                                    width: parseInt(size.w),
-                                                                                    height: parseInt(size.h)
-                                                                                });
-                                                                                readstream = readstream.pipe(extractor);
-                                                                                */
-                                                                /*
-                                                                                                                                            }
-                                                                                                                                            let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
-                                                                                                                                            readstream = readstream.pipe(resizer);
-                                                                                                                                        } else { //加工しないならばコピー。
-                                                                                                                                            let copystream: any = gfs.openDownloadStream(item._id);
-                                                                                                                                            let path: string[] = [];
-                                                                                                                                            path.push(userid);
-                                                                                                                                            path.push(namespace);
-                                                                                                                                            path.push("doc"); // todo: いまいちやろこれは。
-                                                                                                                                            path.push("img"); // todo: いまいちやろこれは。
-                                                                                                                                            path.push(name);
-                                                                                                                                            Pictures.cache_write(path, copystream);
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                    readstream.pipe(response);
-                                                                                                                                } catch (e) {
-                                                                                                                                    // NOT FOUND IMAGE.
-                                                                                                                                    Pictures.result_file(gfs, collection, config.systems.namespace, "blank.png", config.systems.userid, response, next, () => {
-                                                                                                                                        next();
-                                                                                                                                    });
-                                                                                                                                }
-                                                                                                                                */
-
                                                             } else {
                                                                 next();
                                                             }
