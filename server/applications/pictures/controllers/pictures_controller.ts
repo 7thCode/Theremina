@@ -110,16 +110,21 @@ export namespace PicturesModule {
                 readstream.on('error', error_handler);
 
                 try {
-                    if (type == "image/jpg" || type == "image/jpeg" || type == "image/png") {
-                        if (size.w && size.h) {　// 加工
-                            if (size.l && size.t) {
-                                // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                    switch (type) {
+                        case "image/jpeg":
+                        case "image/jpg":
+                        case "image/png":
+                            if (size.w && size.h) {　// 加工
+                                if (size.l && size.t) {
+                                    // todo: "clipping" occurs unknown exception at invalid param. if fix that, require original size.
+                                }
+                                let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
+                                readstream = readstream.pipe(resizer);
+                            } else { //加工しないならばコピー。
+                                copy();
                             }
-                            let resizer: any = sharp().resize(parseInt(size.w), parseInt(size.h)).ignoreAspectRatio();
-                            readstream = readstream.pipe(resizer);
-                        } else { //加工しないならばコピー。
-                            copy();
-                        }
+                            break;
+                        default:
                     }
                     return readstream;
                 } catch (e) {
@@ -146,7 +151,7 @@ export namespace PicturesModule {
                         switch (exitname) {
                             case ".jpeg":
                             case ".jpg":
-                                result = "image/jpeg";
+                                result = "image/jpg";
                                 break;
                             case ".png":
                                 result = "image/png";
@@ -157,6 +162,7 @@ export namespace PicturesModule {
                         }
                         return result;
                     };
+
 
                     let readstream = file_utility.read_stream(cache_file);
                     if (readstream) {

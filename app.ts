@@ -197,7 +197,25 @@ namespace App {
                     });
             }
 
-            mongoose.connection.on('connected', () => {
+            mongoose.connection.once('open', () => {
+
+                mongoose.connection.on('connected', () => {
+
+                });
+
+                mongoose.connection.on('disconnected', () => {
+                    logger.fatal('Mongoose default connection disconnected');
+                    process.exit(0);
+                });
+
+                mongoose.connection.on('reconnected', () => {
+                    logger.info('reconnected');
+                });
+
+                mongoose.connection.on('error', (error) => {
+                    logger.fatal('Mongoose default connection error: ' + error);
+                    process.exit(0);
+                });
 
                 app.use(session({
                     name: config.sessionname,
@@ -477,16 +495,6 @@ namespace App {
                         });
                     }
                 });
-            });
-
-            mongoose.connection.on('error', (error) => {
-                logger.fatal('Mongoose default connection error: ' + error);
-                process.exit(0);
-            });
-
-            mongoose.connection.on('disconnected', () => {
-                logger.fatal('Mongoose default connection disconnected');
-                process.exit(0);
             });
 
             event.emitter.on('socket', (data): void => {

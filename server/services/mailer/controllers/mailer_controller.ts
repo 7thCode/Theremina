@@ -78,7 +78,7 @@ export namespace MailerModule {
                             if (request.body.content.report) {
                                 let thanks_to:string = request.body.content.thanks;
                                 let report_to:string = request.body.content.report;
-                                ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: inquiry_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                ResourceModel.findOne({$and: [{namespace: namespace},{userid: config.systems.userid},  {name: inquiry_mail}]}).then((record: any): void => {
                                     if (record) {
                                         let datasource:any = new ScannerBehaviorModule.CustomBehavior(inquiry_mail, inquiry_mail, config.systems.userid, namespace, null, true, {});
                                         HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
@@ -89,7 +89,7 @@ export namespace MailerModule {
                                             if (!error) {
                                                 mailer.send(report_to, bcc, report_title, doc, (error: any): void => {
                                                     if (!error) {
-                                                        ResourceModel.findOne({$and: [{namespace: namespace}, {userid: userid}, {name: thanks_mail}, {"type": mail_type}]}).then((record: any): void => {
+                                                        ResourceModel.findOne({$and: [{namespace: namespace}, {userid: config.systems.userid}, {name: thanks_mail}]}).then((record: any): void => {
                                                             if (record) {
                                                                 let datasource:any = new ScannerBehaviorModule.CustomBehavior(thanks_mail, thanks_mail, config.systems.userid, namespace, null, true, {});
                                                                 HtmlScannerModule.Builder.Resolve(record.content.resource, datasource, {
