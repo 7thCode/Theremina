@@ -645,8 +645,9 @@ namespace HTMLScanner {
             } else {
                 switch (localname.toLowerCase()) {
                     case "link":
-                    case "script":
-                        this.html += "<" + localname + attribute_string + "></" + localname + ">";
+
+                    case "br":
+                        this.html += "<" + localname + attribute_string + "/>";
                         break;
                     default:
                         this.html += "<" + localname + attribute_string + "></" + localname + ">";

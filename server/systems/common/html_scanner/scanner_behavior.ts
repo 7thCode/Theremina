@@ -35,7 +35,7 @@ namespace ScannerBehavior {
     class Params {
 
         private params: any = {};
-     //   private filters: any = {};
+        //   private filters: any = {};
 
         constructor() {
             /*
@@ -50,6 +50,14 @@ this.error_handler(e);
                 }
             };
             */
+        }
+
+        public static ToInt(number_string:string, default_number:number = 0):number {
+            let result:number = default_number;
+            if (number_string) {
+                result = parseInt(number_string, 10);
+            }
+            return result;
         }
 
         public FromParams(params): void {
@@ -92,11 +100,11 @@ this.error_handler(e);
             }
 
             if (this.params.l) {
-                keywords.push("l=" + parseInt(this.params.l, default_length));
+                keywords.push("l=" + Params.ToInt(this.params.l, default_length));
             }
 
             if (this.params.s) {
-                keywords.push("s=" + parseInt(this.params.s, default_start));
+                keywords.push("s=" + Params.ToInt(this.params.s, default_start));
             }
 
             let delimitter: string = "?";          //  keywords to "?xxxx&yyyy&zzzz"
@@ -152,6 +160,8 @@ this.error_handler(e);
             this.name = name;
             this.id = id;
             this.namespace = namespace;
+
+
             this.page_params = params;
             this.isdocument = isdocument;
             this.models = models;
@@ -177,7 +187,7 @@ this.error_handler(e);
                 },
                 substr: (result: string, param: string): string => {
                     try {
-                        let limit = parseInt(param[0]);
+                        let limit = Params.ToInt(param[0]);
                         if (result.length > limit) {
                             result = result.substr(0, limit) + "...";
                         }
@@ -205,7 +215,7 @@ this.error_handler(e);
                 },
                 add: (result: string, param: string): string => {
                     try {
-                        result = String(parseInt(result, 0) + parseInt(param[0], 0));
+                        result = String(Params.ToInt(result, 0) + Params.ToInt(param[0], 0));
                     } catch (e) {
                         this.error_handler(e);
                     }
@@ -275,7 +285,7 @@ this.error_handler(e);
             let limit: number = 0;
             if (query_object.l) {
                 try {
-                    limit = parseInt(query_object.l, default_length);
+                    limit = Params.ToInt(query_object.l, default_length);
                 } catch (e) {
                     this.error_handler(e);
                 }
@@ -284,7 +294,7 @@ this.error_handler(e);
             let skip: number = 0;
             if (query_object.s) {
                 try {
-                    skip = parseInt(query_object.s, default_start);
+                    skip = Params.ToInt(query_object.s, default_start);
                 } catch (e) {
                     this.error_handler(e);
                 }
@@ -369,7 +379,7 @@ this.error_handler(e);
 
         public GetUrl(target_url_string: string, parent: any): any {// url
 
-      //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
+            //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
             let target_url: any = url.resolve(host_string, resolved_url_string);
@@ -397,9 +407,13 @@ this.error_handler(e);
             if (value) {
                 let splited: string[] = value.split("|");
                 if (splited.length > 1) {
-                    _.forEach(splited, (element) => {
+                    _.forEach(splited, (element, index) => {
                         if (element) {
                             callback(element);
+                        } else {
+                            if ( 0 < index && index < splited.length - 1 ) { // ignore reading "", trailing ""
+                                callback("||");
+                            }
                         }
                     });
                 } else {
@@ -624,7 +638,7 @@ this.error_handler(e);
             }
 
             if (query_object.l) {
-                params.push("l=" + (parseInt(query_object.l, default_length)));
+                params.push("l=" + (Params.ToInt(query_object.l, default_length)));
             }
 
             return params;
@@ -636,7 +650,7 @@ this.error_handler(e);
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                keywords.push("s=" + parseInt(query_object.s, default_start));
+                keywords.push("s=" + Params.ToInt(query_object.s, default_start));
             }
 
             let delimitter: string = "?";
@@ -669,12 +683,12 @@ this.error_handler(e);
                 return result;
             };
 
-            let page_length = parseInt(query_object.l, default_length);
+            let page_length = Params.ToInt(query_object.l, default_length);
             if (!page_length) {
                 page_length = 1;
             }
 
-            let page_start: number = parseInt(query_object.s, default_start);
+            let page_start: number = Params.ToInt(query_object.s, default_start);
 
             let index = 0;
             for (var count = 0; count < record_count; count += page_length) {
@@ -694,7 +708,7 @@ this.error_handler(e);
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                keywords.push("s=" + (parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length)));
+                keywords.push("s=" + (Params.ToInt(query_object.s, default_start) + Params.ToInt(query_object.l, default_length)));
             }
 
             let delimitter: string = "?";
@@ -712,7 +726,7 @@ this.error_handler(e);
             this.ConvertParam(keywords, query_object);
 
             if (query_object.s) {
-                let s: number = parseInt(query_object.s, default_start) - parseInt(query_object.l, default_length);
+                let s: number = Params.ToInt(query_object.s, default_start) - Params.ToInt(query_object.l, default_length);
                 if (s < 0) {
                     s = 0;
                 }
@@ -731,7 +745,7 @@ this.error_handler(e);
         private HasNext(query_object: any, record_count: number): boolean {
             let result: boolean = false;
             if (query_object.s) {
-                let current_last: number = parseInt(query_object.s, default_start) + parseInt(query_object.l, default_length);
+                let current_last: number = Params.ToInt(query_object.s, default_start) + Params.ToInt(query_object.l, default_length);
                 result = (current_last < record_count);
             }
             return result;
@@ -740,7 +754,7 @@ this.error_handler(e);
         private HasPrev(query_object: any): boolean {
             let result: boolean = false;
             if (query_object.s) {
-                let current_last: number = parseInt(query_object.s, default_start);
+                let current_last: number = Params.ToInt(query_object.s, default_start);
                 result = (current_last > 0);
             }
             return result;
