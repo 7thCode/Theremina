@@ -182,7 +182,7 @@ var Adaptor;
                     return new Promise(function (resolve, reject) {
                         var _url = url.parse(path);
                         var protocol = _url.protocol;
-                        if (protocol == "data:") {
+                        if (protocol == "data:") { // inplace
                             resolve(path);
                         }
                         else {
@@ -455,7 +455,7 @@ var Adaptor;
             var _url = url.parse(path);
             var protocol = _url.protocol;
             var temp_path = this.path;
-            if (protocol == "data:") {
+            if (protocol == "data:") { // inplace
                 var md5hash = crypto.createHash('md5');
                 md5hash.update(path, 'binary');
                 var file_name = md5hash.digest('hex'); // generate unique filename.
@@ -500,7 +500,7 @@ var Adaptor;
                         callback({ code: 10000, message: "image format not support for PDF :" + ext });
                 }
             }
-            else {
+            else { // remote file
                 var split_path = _url.pathname.split("/");
                 var file_name_1 = split_path[split_path.length - 1];
                 var split_filename = file_name_1.split(/\.(?=[^.]+$)/);

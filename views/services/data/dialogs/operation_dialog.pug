@@ -13,10 +13,8 @@
                                     span.error-message(ng-message="required") #{message.required}
                                     span.error-message(ng-message="maxlength") #{message.long}
                                 input.form-control.no-zoom#name(ng-model="title", type="text", name='title', required, ng-maxlength="50")
-
             .col-xs-12
                 include ../../../systems/common/error_message
-
     .modal-footer
         .row
             .col-xs-12

@@ -49,7 +49,7 @@ var ArticleModule;
                 article_1.content = request.body.content;
                 if (article_1.name.indexOf('/') == -1) {
                     _.forEach(article_1.content, function (content, key) {
-                        if (content.type == "quoted") {
+                        if (content.type == "quoted") { //単純記事はエスケープ
                             if (typeof content.value === 'string') {
                                 article_1.content[key].value = validator.escape(content.value);
                             }
@@ -159,7 +159,7 @@ var ArticleModule;
                     if (request.body.content !== {}) {
                         article.content = request.body.content;
                         _.forEach(article.content, function (content, key) {
-                            if (content.type == "quoted") {
+                            if (content.type == "quoted") { //単純記事はエスケープ
                                 if (typeof content.value === 'string') {
                                     article.content[key].value = validator.escape(content.value);
                                 }

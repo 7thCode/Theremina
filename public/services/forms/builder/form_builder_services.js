@@ -300,7 +300,7 @@ var FormBuilderServicesModule;
                                     "@": contents
                                 }];
                             break;
-                        case "select":// for bootstrap 3
+                        case "select": // for bootstrap 3
                             var contents_model_name = id + "_contents";
                             _this.$scope[contents_model_name] = contents;
                             field = [{
@@ -319,7 +319,7 @@ var FormBuilderServicesModule;
                                     ]
                                 }];
                             break;
-                        case "button":// for bootstrap 3
+                        case "button": // for bootstrap 3
                             field = [
                                 {
                                     "name": "button", "type": "element",

@@ -33,7 +33,7 @@ export namespace PageRouter {
     let error_handler = (error) => {
 
     };
-
+/*
     router.get("/", [analysis.page_view, (request: any, response: any): void => {
         response.render("services/front/index", {
             config: config,
@@ -94,7 +94,7 @@ export namespace PageRouter {
     router.get("/test", [(request: any, response: any): void => {
         response.render("test", {user: request.user, message: message, status: 200});
     }]);
-
+*/
 }
 
 module.exports = PageRouter.router;

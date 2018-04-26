@@ -170,7 +170,7 @@ var AuthModule;
         Auth._role = function (user) {
             var result = { guest: true, categoly: 0 };
             if (user) {
-                switch (user.auth) {
+                switch (user.auth) { // cumulative, it does not "break".
                     case 1:
                         result.system = true;
                     case 100:
@@ -193,7 +193,7 @@ var AuthModule;
         Auth.prototype.role = function (user) {
             var result = { guest: true, categoly: 0 };
             if (user) {
-                switch (user.auth) {
+                switch (user.auth) { // cumulative, it does not "break".
                     case 1:
                         result.system = true;
                     case 100:

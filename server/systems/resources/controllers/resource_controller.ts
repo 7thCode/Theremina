@@ -473,27 +473,38 @@ export namespace ResourcesModule {
                     ResourceModel.findOne({$and: [{name: page_name}, {namespace: namespace}, {userid: userid}, {type: 20}]}).then((doc: any): void => {
                         if (doc) {
                             let content: any = doc.content.resource;
-                            let datasource: any = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
-                                "Default": ArticleModel,
-                                "Article": ArticleModel
-                            });
-                            let query: any = datasource.ToQueryFormat();
-                            let page_datasource: any = datasource.GetDatasource(query, null);
-                            let page_count: number = datasource.GetCount(query, null);
-                            let page_init: any = {
-                                name: "#init",
-                                promise: page_datasource,
-                                count: page_count,
-                                resolved: ""
-                            };
-                            HtmlScannerModule.Builder.Build(content, datasource, page_init, config, (error: any, result: any): void => {
-                                if (!error) {
-                                    //              cache_write(request.url, result);
-                                    callback(null, {content: result, type: doc.content.type});
-                                } else {
-                                    callback({code: 10000, message: error.message}, null);
+
+                            switch (doc.content.type) {
+                                case "text/plain":
+                                case "text/xml":
+                                    callback(null, {content: doc.content.resource, type: doc.content.type});
+                                    break;
+                                default:
+                                {
+                                    let datasource: any = new ScannerBehaviorModule.CustomBehavior(page_name, page_name, userid, namespace, params, true, {
+                                        "Default": ArticleModel,
+                                        "Article": ArticleModel
+                                    });
+                                    let query: any = datasource.ToQueryFormat();
+                                    let page_datasource: any = datasource.GetDatasource(query, null);
+                                    let page_count: number = datasource.GetCount(query, null);
+                                    let page_init: any = {
+                                        name: "#init",
+                                        promise: page_datasource,
+                                        count: page_count,
+                                        resolved: ""
+                                    };
+                                    HtmlScannerModule.Builder.Build(content, datasource, page_init, config, (error: any, result: any): void => {
+                                        if (!error) {
+                                            //              cache_write(request.url, result);
+                                            callback(null, {content: result, type: doc.content.type});
+                                        } else {
+                                            callback({code: 10000, message: error.message}, null);
+                                        }
+                                    });
                                 }
-                            });
+
+                            }
                         } else {
                             callback({code: 10000, message: "page not found."}, null);
                         }

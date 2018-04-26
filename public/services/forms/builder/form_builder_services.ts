@@ -262,7 +262,7 @@ namespace FormBuilderServicesModule {
 
             this.idToNo = (id: string): number => {
                 let result: any = "";
-                for (var i = id.length - 1; i >= 0; i--) {
+                for (let i = id.length - 1; i >= 0; i--) {
                     let c = id[i];
                     if (_.includes(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], c)) {
                         result = c + result;

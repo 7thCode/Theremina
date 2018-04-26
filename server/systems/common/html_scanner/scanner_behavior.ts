@@ -35,21 +35,8 @@ namespace ScannerBehavior {
     class Params {
 
         private params: any = {};
-        //   private filters: any = {};
 
         constructor() {
-            /*
-            this.filters = {
-                value: (result: string, param: string): string => {
-                    try {
-                        result = "content." + param.trim() + ".value";
-                    } catch (e) {
-this.error_handler(e);
-                    }
-                    return result;
-                }
-            };
-            */
         }
 
         public static ToInt(number_string:string, default_number:number = 0):number {
@@ -221,6 +208,14 @@ this.error_handler(e);
                     }
                     return result;
                 },
+                sub: (result: string, param: string): string => {
+                    try {
+                        result = String(Params.ToInt(result, 0) - Params.ToInt(param[0], 0));
+                    } catch (e) {
+                        this.error_handler(e);
+                    }
+                    return result;
+                },
                 strip: (result: string, param: string): string => {
                     try {
                         result = result.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'')
@@ -228,6 +223,9 @@ this.error_handler(e);
                         this.error_handler(e);
                     }
                     return result;
+                },
+                verticalBar:(result: string, param: string): string => {
+                    return "|" + result;
                 }
             };
         }
@@ -379,18 +377,10 @@ this.error_handler(e);
 
         public GetUrl(target_url_string: string, parent: any): any {// url
 
-            //      let resolved_url_string_0: string =  this.FieldValue(object, target_url_string, 0, parent)
             let resolved_url_string: string = this.ResolveUrl(target_url_string);
             let host_string: string = parent.config.protocol + "://" + parent.config.domain;
             let target_url: any = url.resolve(host_string, resolved_url_string);
 
-            //let target_url: any = url.parse(resolved_url_string);
-
-            //  let host: string = target_url.host;
-            //  if (host) {
-            //      host_string = host;
-            //  }
-            //  let url_string: string = host_string + resolved_url_string;
             let options: any = {
                 uri: target_url,
                 method: "GET",
@@ -503,7 +493,7 @@ this.error_handler(e);
                         }
                     };
                     let splited_path: string[] = path.split(".");   // resolve path ex:  a.b.c
-                    if (splited_path.length == 1) {                             // aaa
+                    if (splited_path.length == 1) {
                         if (path[0] == "#") {
                             let field_name: string = path;                              // filter_names[0] := #specialname
                             let postfix: string = "#init";
@@ -598,7 +588,7 @@ this.error_handler(e);
                 }
 
                 // parse filter
-                for (var index: number = 1; index <= full_param_array.length - 1; index++) {     // resolve filter ex:  name(" param ")
+                for (let index: number = 1; index <= full_param_array.length - 1; index++) {     // resolve filter ex:  name(" param ")
                     let filter_func: string = full_param_array[index].trim();
                     if (filter_func) {
                         let filter_names: string[] = filter_func.split('("');             // filter_names :== [' name ', ' param ") ']
@@ -691,7 +681,7 @@ this.error_handler(e);
             let page_start: number = Params.ToInt(query_object.s, default_start);
 
             let index = 0;
-            for (var count = 0; count < record_count; count += page_length) {
+            for (let count = 0; count < record_count; count += page_length) {
                 result.push({
                     "#pager:page": OnePage(count),
                     "index": index + 1,

@@ -27,7 +27,7 @@ div
                                     .col-xs-12
                                         .form-group
                                             label.control-label(for="aspect") #{message.aspect}
-                                            input.form-control.no-zoom#aspect(name="aspect" type="number" min=0.1 max=10.0 step=0.1 ng-model='aspect', ng-change="SizeChange();" required placeholder="W/H")
+                                            input.form-control.no-zoom#aspect(name="aspect" type="number" min=0.01 max=10.00 step=0.01 ng-model='aspect', ng-change="SizeChange();" required placeholder="W/H")
                                     .col-xs-12
                                         .form-group
                                             label.control-label(for="brightness") #{message.brightness}

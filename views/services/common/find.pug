@@ -14,16 +14,11 @@ div
         .col-sm-4.col-xs-6
             .form-group
                 label(for="mimetype") #{message.mimetype}
-
                 select.form-control.no-zoom#mimetype(ng-model="mimetype" ng-options="mimetype for mimetype in all_mimetypes" ng-change="FindMime(mimetype);" required="")
                     option(value="") all
-
         .col-sm-4.col-xs-12
             .form-group
                 label(for="content") content
                 input.form-control.no-zoom#content(ng-model="content", type="text", name='content' ng-change="FindResource(content);")
-
     .row
         div {{query_string_before}} - {{query_string_after}}
-
-

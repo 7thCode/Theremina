@@ -40,7 +40,14 @@ export namespace PageRouter {
 
     const applications_config = share.applications_config;
 
-    let render_html = (request: any, response: any): void => {
+    let root = applications_config.path.root;
+    let css = applications_config.path.css;
+    let js = applications_config.path.js;
+    let img = applications_config.path.img;
+    let svg = applications_config.path.svg;
+    let stat = applications_config.path.stat;
+
+    let render_html = (request: any, response: any, callback: (error) => void): void => {
         resources.render_html(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
@@ -61,29 +68,60 @@ export namespace PageRouter {
                 }
                 response.write(content);
                 response.end();
+                callback(null)
             } else {
-                Error(error, request, response);
+                callback(error);
             }
         });
     };
 
-    let render_static = (request: any, sub_path: string[], response: any): void => {
+    let render_html_by_namespace = (query: any, namespace: string, page: string, response: any, callback: (error) => void): void => {
+        let params = {userid: default_user_id_by(namespace), page: page, namespace: namespace};
+        resources.render_html({params: params, query: query}, (error: { code: number, message: string }, result: any) => {
+            if (!error) {
+                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
+                let content = result.content;
+                if (config.compression) {
+                    content = minify(result.content, {
+                        removeComments: true,
+                        removeCommentsFromCDATA: true,
+                        collapseWhitespace: true,
+                        collapseBooleanAttributes: true,
+                        removeAttributeQuotes: false,
+                        removeRedundantAttributes: false,
+                        useShortDoctype: true,
+                        removeEmptyAttributes: false,
+                        removeOptionalTags: false,
+                        removeEmptyElements: false
+                    });
+                }
+                response.write(content);
+                response.end();
+                callback(null)
+            } else {
+                callback(error);
+            }
+        });
+    };
+
+    let render_static = (request: any, sub_path: string[], response: any, callback: (error) => void): void => {
         resources.render_direct(request, sub_path, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
                 response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
                 response.write(result.content);
                 response.end();
+                callback(null);
             } else {
-                Error(error, request, response);
+                callback(error);
             }
         });
     };
 
-    let default_user_id = () => {
+    let default_user_id = (): string => {
         return applications_config.first_responder["default"].userid;
     };
 
-    let default_namespace = () => {
+    let default_namespace = (): string => {
         return applications_config.first_responder["default"].namespace;
     };
 
@@ -125,6 +163,19 @@ export namespace PageRouter {
         return query;
     };
 
+    let marge_query = (query: any, default_query: any): any => {
+        if (query.sq) {
+        } else {
+            Object.keys(default_query).forEach(key => {
+                if (!query[key]) {
+                    query[key] = default_query[key];
+                }
+            });
+        }
+        return query;
+    };
+
+/*
     let Error = (error: { code: number, message: string }, request: any, response: any) => {
         switch (error.code) {
             case 10000:
@@ -157,41 +208,11 @@ export namespace PageRouter {
                 });
         }
     };
-
-    router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-        logger.trace("pages /");
-        resources.render_html({
-            params: {userid: default_user_id(), page: default_page(), namespace: default_namespace()},
-            query: default_query()
-        }, (error: { code: number, message: string }, result: any) => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                let content = result.content;
-                if (config.compression) {
-                    content = minify(result.content, {
-                        removeComments: true,
-                        removeCommentsFromCDATA: true,
-                        collapseWhitespace: true,
-                        collapseBooleanAttributes: true,
-                        removeAttributeQuotes: false,
-                        removeRedundantAttributes: false,
-                        useShortDoctype: true,
-                        removeEmptyAttributes: false,
-                        removeOptionalTags: false,
-                        removeEmptyElements: false
-                    });
-                }
-                response.write(content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
-    }]);
+*/
 
     router.get("/front", [analysis.page_view, (request: any, response: any): void => {
         logger.trace("pages /front");
-        response.render("services/front/index", {
+        response.render("applications/front/index", {
             config: config,
             user: request.user,
             role: auth.role(request.user),
@@ -232,41 +253,158 @@ export namespace PageRouter {
         });
     }]);
 
-    router.get("/shortcut/:name", [exception.page_catch, (request: any, response: any): void => {
-        logger.trace("pages /shortcut/" + request.params.name);
-        let urls = applications_config.redirect;
-        let url = urls[request.params.name];
-        if (url) {
-            response.redirect(302, urls[request.params.name]);
+    /* redirect */
+    router.get("/shortcut/*", [(request: any, response: any, next): void => {
+        if (applications_config.url_scheme) {
+            let params_path = request.params[0];
+            if (params_path) {
+                let params_path_array = params_path.split("/");
+                if (params_path_array.length > 0) {
+                    let url_schemes = applications_config.url_scheme;
+                    if (url_schemes) {
+                        let url_scheme = url_schemes[params_path_array[0]];
+                        if (url_scheme) {
+                            if (url_scheme.hasnoerror(params_path_array)) {
+                                let url = url_scheme.convert(params_path_array);
+                                if (url) {
+                                    response.redirect(302, url);
+                                } else {
+                                    next();
+                                }
+                            } else {
+                                next();
+                            }
+                        } else {
+                            next();
+                        }
+                    } else {
+                        next();
+                    }
+                } else {
+                    next();
+                }
+            } else {
+                next();
+            }
+
+        } else {
+            next();
         }
     }]);
 
-    let root = applications_config.path.root;
-    let css = applications_config.path.css;
-    let js = applications_config.path.js;
-    let img = applications_config.path.img;
-    let svg = applications_config.path.svg;
-    let stat = applications_config.path.stat;
-
-    router.get("/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + js + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + js + "/" + request.params.page);
+    router.get("/sc/*", [(request: any, response: any, next): void => {
+        if (applications_config.url_scheme) {
+            let params_path = request.params[0];
+            if (params_path) {
+                let params_path_array = params_path.split("/");
+                if (params_path_array.length > 0) {
+                    let url_schemes = applications_config.url_scheme;
+                    if (url_schemes) {
+                        let url_scheme = url_schemes[params_path_array[0]];
+                        if (url_scheme) {
+                            if (url_scheme.hasnoerror(params_path_array)) {
+                                let namespace = url_scheme.namespace;
+                                let page = url_scheme.page;
+                                let query = url_scheme.query(params_path_array);
+                                render_html_by_namespace(query, namespace, page, response, (error):void => {
+                                    if (error) {
+                                        next(error);
+                                    }
+                                });
+                            } else {
+                                next();
+                            }
+                        } else {
+                            next();
+                        }
+                    } else {
+                        next();
+                    }
+                } else {
+                    next();
+                }
+            } else {
+                next();
+            }
+        } else {
+            next();
+        }
     }]);
 
-    router.get("/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + css + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + css + "/" + request.params.page);
+    /* render */
+    router.get("/", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        logger.trace("pages /");
+        let namespace = default_namespace();
+        let page = default_page();
+
+        let query = default_query();
+        render_html_by_namespace(query, namespace, page, response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
     }]);
 
-    router.get("/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + stat + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + stat + "/" + request.params.page);
+    /* render */
+    router.get("/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
+        logger.trace("pages /" + request.params.page);
+        let namespace = default_namespace();
+        let page = request.params.page;
+
+        let query = marge_query(request.query, default_query_by(namespace));
+        render_html_by_namespace(query, namespace, page, response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
     }]);
 
-    router.get("/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    /* render */
+    router.get("/:namespace/" + root, [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/");
+        let namespace = request.params.namespace;
+        let page = default_page_by(namespace);
+
+        let query = marge_query(request.query, default_query_by(namespace));
+        render_html_by_namespace(query, namespace, page, response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
+    }]);
+
+    /* render */
+    router.get("/:namespace/" + root + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + request.params.page);
+        let namespace = request.params.namespace;
+        let page = request.params.page;
+
+        let query = marge_query(request.query, default_query_by(namespace));
+        render_html_by_namespace(query, namespace, page, response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
+    }]);
+
+    /* render */
+    router.get("/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
+        logger.trace("pages /" + request.params.namespace + "/fragment/" + request.params.parent + "/" + request.params.page);
+        let namespace = request.params.namespace;
+        request.params.userid = default_user_id_by(namespace);
+        resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
+            if (!error) {
+                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
+                response.write(result.content);
+                response.end();
+            } else {
+                next(error);
+            }
+        });
+    }]);
+
+    /* render */
+    router.get("/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
         logger.trace("pages /fragment/" + request.params.parent + "/" + request.params.page);
         resources.render_fragment({
             params: {userid: default_user_id(), page: request.params.page, namespace: default_namespace()},
@@ -277,235 +415,59 @@ export namespace PageRouter {
                 response.write(result.content);
                 response.end();
             } else {
-                Error(error, request, response);
+                next(error);
             }
         });
     }]);
 
-    router.get("/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next: any): void => {
-        logger.trace("pages /" + request.params.page);
-        let query = request.query;
-        if (query.sq) {
-
-        } else {
-            let default_query = default_query_by(default_namespace());
-            Object.keys(default_query).forEach(key => {
-                if (!query[key]) {
-                    query[key] = default_query[key];
-                }
-            });
-        }
-
-        resources.render_html({
-            params: {userid: default_user_id(), page: request.params.page, namespace: default_namespace()},
-            query: query
-        }, (error: { code: number, message: string }, result: any) => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                let content = result.content;
-                if (config.compression) {
-                    content = minify(result.content, {
-                        removeComments: true,
-                        removeCommentsFromCDATA: true,
-                        collapseWhitespace: true,
-                        collapseBooleanAttributes: true,
-                        removeAttributeQuotes: false,
-                        removeRedundantAttributes: false,
-                        useShortDoctype: true,
-                        removeEmptyAttributes: false,
-                        removeOptionalTags: false,
-                        removeEmptyElements: false
-                    });
-                }
-                response.write(content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
-    }]);
-    /**
-     * public
-     */
-    router.get("/" + img + "/:name", [exception.page_catch, (request: any, response: any): void => {
-        logger.trace("pages /" + img + "/" + request.params.name);
-        let prefix = applications_config.prefix || "";
-        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + img + "/" + request.params.name);
-
-    }]);
-    /**
-     * public
-     */
-    router.get("/" + svg + "/:name", [exception.page_catch, (request: any, response: any): void => {
-        logger.trace("pages /" + svg + "/" + request.params.name);
-        let prefix = applications_config.prefix || "";
-        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + svg + "/" + request.params.name);
-    }]);
-
-    router.get("/:namespace/" + root + "/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + js + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        let namespace = request.params.namespace;
-        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + js + "/" + request.params.page);
-    }]);
-
-    router.get("/:namespace/" + root + "/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + css + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        let namespace = request.params.namespace;
-        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + css + "/" + request.params.page);
-    }]);
-
-    router.get("/:namespace/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + stat + "/" + request.params.page);
-        let prefix = applications_config.prefix || "";
-        let namespace = request.params.namespace;
-        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/static/" + request.params.page);
-    }]);
-
-
-    router.get("/:namespace/" + root + "/" + img + "/:name", [(request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + img + "/" + request.params.name);
-        let prefix = applications_config.prefix || "";
-        let namespace = request.params.namespace;
-        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + img + "/" + request.params.name);
-    }]);
-
-    router.get("/:namespace/" + root + "/" + svg + "/:name", [exception.page_catch, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + svg + "/" + request.params.name);
-        let prefix = applications_config.prefix || "";
-        let namespace = request.params.namespace;
-        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + svg + "/" + request.params.name);
-    }]);
-
-    router.get("/:namespace/" + root + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + request.params.page);
-        let namespace = request.params.namespace;
-        let query = request.query;
-        if (query.sq) {
-
-        } else {
-            let default_query = default_query_by(namespace);
-            Object.keys(default_query).forEach(key => {
-                if (!query[key]) {
-                    query[key] = default_query[key];
-                }
-            });
-        }
-
-        resources.render_html({
-            params: {userid: default_user_id_by(namespace), page: request.params.page, namespace: namespace},
-            query: query
-        }, (error: { code: number, message: string }, result: any) => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                let content = result.content;
-                if (config.compression) {
-                    content = minify(result.content, {
-                        removeComments: true,
-                        removeCommentsFromCDATA: true,
-                        collapseWhitespace: true,
-                        collapseBooleanAttributes: true,
-                        removeAttributeQuotes: false,
-                        removeRedundantAttributes: false,
-                        useShortDoctype: true,
-                        removeEmptyAttributes: false,
-                        removeOptionalTags: false,
-                        removeEmptyElements: false
-                    });
-                }
-                response.write(content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
-    }]);
-
-    router.get("/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/fragment/" + request.params.parent + "/" + request.params.page);
-        let namespace = request.params.namespace;
-        request.params.userid = default_user_id_by(namespace);
-        resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                response.write(result.content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
-    }]);
-
-    router.get("/:namespace/" + root, [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.namespace + "/" + root + "/");
-        let namespace = request.params.namespace;
-        let query = request.query;
-        if (query.sq) {
-
-        } else {
-            let default_query = default_query_by(namespace);
-            Object.keys(default_query).forEach(key => {
-                if (!query[key]) {
-                    query[key] = default_query[key];
-                }
-            });
-        }
-
-        resources.render_html({
-            params: {userid: default_user_id_by(namespace), page: default_page_by(namespace), namespace: namespace},
-            query: query
-        }, (error: { code: number, message: string }, result: any) => {
-            if (!error) {
-                response.writeHead(200, {'Content-Type': result.type, 'Cache-Control': config.cache});
-                let content = result.content;
-                if (config.compression) {
-                    content = minify(result.content, {
-                        removeComments: true,
-                        removeCommentsFromCDATA: true,
-                        collapseWhitespace: true,
-                        collapseBooleanAttributes: true,
-                        removeAttributeQuotes: false,
-                        removeRedundantAttributes: false,
-                        useShortDoctype: true,
-                        removeEmptyAttributes: false,
-                        removeOptionalTags: false,
-                        removeEmptyElements: false
-                    });
-                }
-                response.write(content);
-                response.end();
-            } else {
-                Error(error, request, response);
-            }
-        });
-    }]);
-
-    router.get("/:userid/:namespace/" + root + "/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    /* render */
+    router.get("/:userid/:namespace/" + root + "/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
         logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + root + "/" + js + "/" + request.params.page);
-        render_static(request, [root, js], response);
+        render_static(request, [root, js], response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
     }]);
 
-    router.get("/:userid/:namespace/" + root + "/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    /* render */
+    router.get("/:userid/:namespace/" + root + "/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
         logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + root + "/" + css + "/" + request.params.page);
-        render_static(request, [root, css], response);
+        render_static(request, [root, css], response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
     }]);
 
-    router.get("/:userid/:namespace/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + stat + "/" + request.params.page);
-        render_static(request, [stat], response);
-    }]);
-
+    /* render */
     router.get("/:userid/:namespace/" + root + "/" + img + "/:name", [exception.page_catch, pictures.get_picture]);
 
+    /* render */
     router.get("/:userid/:namespace/" + root + "/" + svg + "/:name", [exception.page_catch, layout.get_layout_svg]);
 
-    router.get("/:userid/:namespace/" + root + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
-        logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + root + "/" + request.params.page);
-        render_html(request, response);
+    /* render */
+    router.get("/:userid/:namespace/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
+        logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + stat + "/" + request.params.page);
+        render_static(request, [stat], response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
     }]);
 
-    router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+    /* render */
+    router.get("/:userid/:namespace/" + root + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
+        logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/" + root + "/" + request.params.page);
+        render_html(request, response, (error):void => {
+            if (error) {
+                next(error);
+            }
+        });
+    }]);
+
+    /* render */
+    router.get("/:userid/:namespace/fragment/:parent/:page", [exception.page_catch, analysis.page_view, (request: any, response: any, next): void => {
         logger.trace("pages /" + request.params.userid + "/" + request.params.namespace + "/fragment/" + request.params.parent + "/" + request.params.page);
         resources.render_fragment(request, (error: { code: number, message: string }, result: any): void => {
             if (!error) {
@@ -513,27 +475,86 @@ export namespace PageRouter {
                 response.write(result.content);
                 response.end();
             } else {
-                Error(error, request, response);
+                next(error);
             }
         });
     }]);
 
-    /*
-        router.get('/front/dialogs/build_site_dialog', [exception.page_guard, auth.page_valid, (req: any, result: any, next: any) => {
-            let items = [];
-            if (applications_config.sites) {
-                let keys = Object.keys(applications_config.sites);
-                keys.forEach((key: string): void => {
-                    items.push(applications_config.sites[key].description);
-                });
-            }
-            result.render('applications/front/dialogs/build_site_dialog',
-                {
-                    message: message,
-                    items: items
-                });
-        }]);
-    */
+    /* redirect */
+    router.get("/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + js + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + js + "/" + request.params.page);
+    }]);
+
+    /* redirect */
+    router.get("/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + css + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + css + "/" + request.params.page);
+    }]);
+
+    /* redirect */
+    router.get("/" + img + "/:name", [exception.page_catch, (request: any, response: any): void => {
+        logger.trace("pages /" + img + "/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + img + "/" + request.params.name);
+    }]);
+
+    /* redirect */
+    router.get("/" + svg + "/:name", [exception.page_catch, (request: any, response: any): void => {
+        logger.trace("pages /" + svg + "/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + root + "/" + svg + "/" + request.params.name);
+    }]);
+
+    /* redirect */
+    router.get("/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + stat + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        response.redirect(302, prefix + "/" + default_user_id() + "/" + default_namespace() + "/" + stat + "/" + request.params.page);
+    }]);
+
+    /* redirect */
+    router.get("/:namespace/" + root + "/" + js + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + js + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        let namespace = request.params.namespace;
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + js + "/" + request.params.page);
+    }]);
+
+    /* redirect */
+    router.get("/:namespace/" + root + "/" + css + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + css + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        let namespace = request.params.namespace;
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + css + "/" + request.params.page);
+    }]);
+
+    /* redirect */
+    router.get("/:namespace/" + root + "/" + img + "/:name", [(request: any, response: any): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + img + "/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        let namespace = request.params.namespace;
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + img + "/" + request.params.name);
+    }]);
+
+    /* redirect */
+    router.get("/:namespace/" + root + "/" + svg + "/:name", [exception.page_catch, (request: any, response: any): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + root + "/" + svg + "/" + request.params.name);
+        let prefix = applications_config.prefix || "";
+        let namespace = request.params.namespace;
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/" + root + "/" + svg + "/" + request.params.name);
+    }]);
+
+    /* redirect */
+    router.get("/:namespace/" + stat + "/:page", [exception.page_catch, analysis.page_view, (request: any, response: any): void => {
+        logger.trace("pages /" + request.params.namespace + "/" + stat + "/" + request.params.page);
+        let prefix = applications_config.prefix || "";
+        let namespace = request.params.namespace;
+        response.redirect(302, prefix + "/" + default_user_id_by(namespace) + "/" + namespace + "/static/" + request.params.page);
+    }]);
+
 }
 
 module.exports = PageRouter.router;

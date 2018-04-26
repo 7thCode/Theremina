@@ -85,28 +85,28 @@
     USERID --|
              |
              |             
-             |-----doc--------|　展開内容は再帰的に評価/展開される。　
+             |-----doc--------| 展開内容は再帰的に評価/展開される。
              |                |
              |                |
              |                |                          
-             |                |----img------|　展開内容は単純に展開される。
+             |                |----img------| 展開内容は単純に展開される。
              |                |             |
              |                |
              |                |             
-             |                |----static---|　展開内容は単純に展開される。
+             |                |----static---| 展開内容は単純に展開される。
              |                |             |
              |                |
              |                |             
-             |                |----img------|　展開内容は単純に展開される。
+             |                |----img------| 展開内容は単純に展開される。
              |                |             |    
              |                |
              |                |             
-             |                |----js-------|　展開内容は単純に展開される。
+             |                |----js-------| 展開内容は単純に展開される。
              |                              |        
              |                              
              |
              |             
-             |----fragment----|　展開内容は再帰的に評価/展開される。
+             |----fragment----| 展開内容は再帰的に評価/展開される。
                               |
              
              
@@ -119,7 +119,7 @@
     QUERY ::= クエリー式
     SKIP ::= スキップ数
     LIMIT ::= リミット
-    SORT　::= ソート式
+    SORT  ::= ソート式
     
     
     レンダリングを行い、フラグメントを返す。
@@ -131,13 +131,13 @@
     QUERY ::= クエリー式
     SKIP ::= スキップ数
     LIMIT ::= リミット
-    SORT　::= ソート式
+    SORT  ::= ソート式
     
     フラグメントは呼び元のドキュメント名とクエリーを引き継ぐ。
      
     
     レンダリングを行わず、フラグメントを返す。
-    http://DOMAIN/USERID/direct/FRAGMENTNAME
+    http://DOMAIN/USERID/static/FRAGMENTNAME
         
     画像
     http://DOMAIN/USERID/photos/FILENAME
@@ -179,8 +179,9 @@
         #name:self
         #name:document
         #userid
-        #query:self
-        #position
+        #query:self         - query式
+        #query:param_name   - query_paramのparam_name参照
+        #position           - repeatのindex(0 origin)
         #pager
         
             #pager:page
@@ -213,13 +214,14 @@
     参照URL内で使用可能 
     
     例
-        <LINK rel="stylesheet" href="/direct/|{#userid}|/style.css">
+        <LINK rel="stylesheet" href="/static/|{#userid}|/style.css">
         
         は
         
-        <LINK rel="stylesheet" href="/direct/000000000000000000000000/style.css">
+        <LINK rel="stylesheet" href="/static/000000000000000000000000/style.css">
     
         と展開される。
+
 ####Position
 
     特殊なfield_name”#position”は、クエリーデータのシーケンスを返す。
@@ -399,12 +401,84 @@
   
 #####if
 
+    フィールド存在
     <ds:if exist='field_name'>
     	   
     </ds:if>
     
-    
-    
+    定数値一致(field_name == value)
+    <ds:if exist='field_name' match="value">
+        	   
+    </ds:if>
+        
+    フィールド値一致(field_name1.value == field_name2.value)
+    <ds:if exist='field_name1' equal="field_name2">
+            	   
+    </ds:if>    
+
+    フィールド値評価(field_name1.value == function(value) { return script })
+    <ds:if exist="field_name1" condition="script">
+
+    </ds:if>
+
+    ex.
+
+    クエリーフィールド参照
+
+    <ds:if exist='#query:param_name' match="value">
+
+    </ds:if>
+
+#####Filter
+
+   Date to string
+
+        {field == date("date format")}
+
+   Ex.
+        {日時.value == date("YYYY年MM月DD日(ddd)")}
+
+
+   部分文字列
+
+        {field == substr("num")}
+
+    Ex.
+        {field == substr("1")}
+
+
+    値変換
+
+        {field == convert("{"key1":"value1","key2":"value2"}")}
+
+    Ex.
+
+        {種別.value == convert("{"注意":"btn-danger","危険":"btn-danger"}")
+
+
+
+   EncodeURIComponent
+
+        {field == encodeURIComponent("")}
+
+
+    Ex.
+
+        {field == encodeURIComponent("")}
+
+
+
+    Numeric Add
+
+        {field == add("num")}
+
+
+   HTML Strip
+
+        {field == strip("HTML")}
+
+
+
 
 #####Elements
 
@@ -460,180 +534,23 @@
 #####例  
   
 ######ドキュメント”index”
-  
-    http://localhost:8000/doc/000000000000000000000000/test?l=10&s=0
-    
-        <!DOCTYPE html>
-        <html lang="ja">
-        <head>
-        	<meta ds:include="/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/head.html"/>
-        </head>
-        <body>
-        <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/nav.html|{#query:self}'></ds:include>
-        <div class="container" style="margin-top:70px;">
-        	<div class="jumbotron jumbotron-fluid">
-        		<div class="container">
-        			<h1 class="display-3">Fluid jumbotron</h1>
-        			<p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-        			<img src="img/img16.jpg?w=100&h=100"/>
-        		</div>
-        	</div>
-        	<div class="card">
-        		<div class="card-header">query from url</div>
-        		<div class="card-body">
-        			<div class="row" style="column-count: 3;">
-        				<ds:foreach scope='#init'>
-        					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-        						<div class="card">
-        							<ds:resolve scope='content'>
-        								<img class="card-img-top" ds:src="{image.value}">
-        								<div class="card-body">
-        									<ds:if exist='title.value'>
-        										<div ds:style="{klass.value}">
-        											<ds:h4 class="card-title">{#position}|. |{title.value}</ds:h4>
-        										</div>
-        									</ds:if>
-        									<ds:div class="card-text" style="font-size:1vw">{desc.value}</ds:div>
-        								</div>
-        							</ds:resolve>
-        							<div class="card-footer d-flex justify-content-end">
-        								<ds:small class="text-muted">{create == date("MM月DD日")}</ds:small>
-        							</div>
-        						</div>
-        					</div>
-        				</ds:foreach>
-        			</div>
-        		</div>
-        		<div class="d-flex justify-content-center">
-                     <ds:include src='/|{#userid}|/|{#namespace}|/fragment/|{#name:self}|/pagenator.html|{#query:self}'></ds:include>
-        		</div>
-        	</div>
-        	<div class="card">
-        		<div class="card-header">static query</div>
-        		<div class="card-body">
-        			<ds:foreach query='q::{"content.title.value":"a"};'>
-        				<div class="card">
-        					<ds:resolve scope='content'>
-        						<img class="card-img-top" ds:src="{image.value}">
-        						<div class="card-body">
-        							<ds:if exist='title.value'>
-        								<div ds:style="{klass.value}">
-        									<ds:h4 class="card-title">{title.value}</ds:h4>
-        								</div>
-        							</ds:if>
-        							<ds:p class="card-text">{desc.value}</ds:p>
-        						</div>
-        					</ds:resolve>
-        				</div>
-        			</ds:foreach>
-        		</div>
-        	</div>
-        </div>
-        <ds:include src='/|{#userid}|/|{#namespace}|/static/scripts.html'></ds:include>
-        </body>
-        </html>
-    
-    
-    
+
 ######フラグメント"pagenator"
     
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                <ds:if exist='#hasprev:#init'>
-                    <li class="page-item">
-                        <a class="page-link" ds:href="|{#name:document}|{#query:prev}|">Prev</a>
-                    </li>
-                </ds:if>
-                <ds:foreach scope='#pager:#init'>
-                    <li class="page-item">
-                        <ds:if exist='#pager:current'>
-                            <ds:a class="page-link" style="color:#ff0000;" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
-                        </ds:if>
-                        <ds:ifn exist='#pager:current'>
-                            <ds:a class="page-link" ds:href="|{#name:document}|{#pager:page}|">{#pager:index}</ds:a>
-                        </ds:ifn>
-                    </li>
-                </ds:foreach>
-                <ds:if exist='#hasnext:#init'>
-                    <li class="page-item">
-                        <a class="page-link" ds:href="|{#name:document}|{#query:next}|">Next</a>
-                    </li>
-                </ds:if>
-            </ul>
-        </nav>
-    
+
     
     
 ######フラグメント"nav"
     
-    	<nav class="navbar navbar-expand-sm navbar-light fixed-top bg-light">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Disabled1</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    	    
+
     	    
     	    
 ######フラグメント"head"	    
-    
-	    	<meta charset="utf-8">
-        	<meta http-equiv="X-UA-Compatible"  content="IE=edge">
-        
-        	<meta name="viewport" content="width=device-width, initial-scale=1">
-        
-        	<meta query='q::{"content.type.value":"free"};' ds:title="{content.title.value}">
-        	<meta name="description" query='q::{"content.type.value":"free"};' ds:content="{content.title.value}" />
-        	<meta name="keywords" query='q::{"content.type.value":"free"};' ds:content="{content.title.value}" />
-        		
-            <meta name="Robots" content="index,follow">
-        	<meta name="author" content="">
-        	
-        	<meta property="og:title" content="" >
-        	<meta property="og:image" content="" >
-        	<meta property="og:url" content="" >
-        	<meta property="og:site_name" content="" >
-        	<meta property="og:description" content="" >
-        	<meta name="twitter:title" content="" >
-        	<meta name="twitter:image" content="" >
-        	<meta name="twitter:url" content="" >
-        	<meta name="twitter:card" content="" >
-        
-        	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabimincho.css" rel="stylesheet" async>
-        	<LINK href="https://fonts.googleapis.com/earlyaccess/sawarabigothic.css" rel="stylesheet" async>
-        	<LINK href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" async>
-        	<LINK href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" async>
-        	<LINK href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
-        	<LINK href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700"  rel="stylesheet">
-        	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-        	<LINK rel="stylesheet" href="css/style.css">
-        	<SCRIPT src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" ></SCRIPT>
-    
+
     
 ######フラグメント"script"
     
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="js/main.js"></script>
-    	
-    
-    
+
     
     
     
@@ -734,7 +651,7 @@
                 |
        サーバサイドモデル(model)
                 |
-     　パーシステント　         
+       パーシステント
                 
                 
 ###クレイアントサイドHTML
@@ -808,4 +725,11 @@
             HtmlEditModuleモジュール
      
     
-#memo  
+#memo
+
+
+
+
+
+
+

@@ -795,6 +795,15 @@ namespace HTMLScanner {
                                                     if (result === match.nodeValue) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
+                                                } else if (node.attributes.condition) {
+                                                    let condition: any = node.attributes.condition.nodeValue;
+                                                    let evel_result = false;
+                                                    try {
+                                                         evel_result = new Function("value", "with (value) { return " + condition + "}")(result);
+                                                    } catch (e) {}
+                                                    if (evel_result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
                                                 } else {
                                                     if (result) {
                                                         this.ResolveChildren(node, data, position);
@@ -819,6 +828,15 @@ namespace HTMLScanner {
                                                 } else if (node.attributes.match) {
                                                     let match: any = node.attributes.match;
                                                     if (result !== match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                } else if (node.attributes.condition) {
+                                                    let condition: any = node.attributes.condition.nodeValue;
+                                                    let evel_result = false;
+                                                    try {
+                                                        evel_result = new Function("value", "with (value) { return " + condition + "}")(result);
+                                                    } catch (e) {}
+                                                    if (!evel_result) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 } else {

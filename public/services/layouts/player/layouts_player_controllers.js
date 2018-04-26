@@ -352,7 +352,7 @@ var PlayerControllersModule;
                     ShapeEdit.Canvas.shapes.getShapeByType("Text", shapes);
                     lookup_value(shapes, ArticleService.current_article.content, {
                         text: function (text, value) {
-                            switch (value.type) {
+                            switch (value.type) { //data type?
                                 case "array":
                                     var s_1 = "";
                                     var delimiter_1 = "";
@@ -434,7 +434,7 @@ var PlayerControllersModule;
                     ShapeEdit.Canvas.shapes.getShapeByType("Text", shapes);
                     lookup_value(shapes, result.content, {
                         text: function (text, value) {
-                            switch (value.type) {
+                            switch (value.type) { //data type?
                                 case "array":
                                     var s_2 = "";
                                     var delimiter_2 = "";

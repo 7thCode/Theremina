@@ -16,6 +16,8 @@ namespace GulpModule {
     let pump = require('pump');
     let minify = composer(uglifyjs, console);
 
+    const babel = require('gulp-babel');
+
     gulp.task('clean', (cb) => {
         rimraf('./product/blog0', cb);
     });
@@ -104,9 +106,10 @@ namespace GulpModule {
             {base: '..'}
         )
             .pipe(typescript({target: "ES5", removeComments: true}))
+   //       .pipe(typescript({target: "ES6", removeComments: true}))
+   //       .pipe(babel({presets: ['@babel/env']}))
             .pipe(gulp.dest('./'));
     });
-
 
     gulp.task('scriptcpy', ['copy'], () => {
 

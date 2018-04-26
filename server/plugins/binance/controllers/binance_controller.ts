@@ -41,7 +41,7 @@ export namespace BinanceModule {
         public get_prices(request: any, response: any, next: any): void {
             try {
                 binance.bookTickers((error, ticker) => {
-                    console.log("bookTickers()", ticker);
+      //              console.log("bookTickers()", ticker);
                 });
             } catch (e) {
                 next();

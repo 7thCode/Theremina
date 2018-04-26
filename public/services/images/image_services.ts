@@ -142,7 +142,7 @@ namespace ImageServicesModule {
                         ctx.drawImage(image, 0, 0, image.width, image.height);
                         let bitmap = ctx.getImageData(0, 0, image.width, image.height);
 
-                        for (var i = 0; i < bitmap.data.length; i += 4) {
+                        for (let i = 0; i < bitmap.data.length; i += 4) {
                             bitmap.data[i] += adjustment;
                             bitmap.data[i + 1] += adjustment;
                             bitmap.data[i + 2] += adjustment;

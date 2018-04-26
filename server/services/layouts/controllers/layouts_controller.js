@@ -502,7 +502,7 @@ var LayoutsModule;
             var delete_folder_recursive = function (path) {
                 fs.readdirSync(path).forEach(function (file) {
                     var curPath = path + "/" + file;
-                    if (fs.lstatSync(curPath).isDirectory()) {
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
                         delete_folder_recursive(curPath);
                     }
                     else {
@@ -532,7 +532,7 @@ var LayoutsModule;
             var delete_folder_recursive = function (path) {
                 fs.readdirSync(path).forEach(function (file) {
                     var curPath = path + "/" + file;
-                    if (fs.lstatSync(curPath).isDirectory()) {
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
                         delete_folder_recursive(curPath);
                     }
                     else {

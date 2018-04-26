@@ -175,7 +175,7 @@ var ArticleControllersModule;
                     });
                 });
                 if (result === {}) {
-                    console.log(page);
+                    //                  console.log(page);
                 }
                 return result;
             };

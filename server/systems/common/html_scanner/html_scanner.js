@@ -95,7 +95,7 @@ var HTMLScanner;
         LinkScanner.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1:// element
+                    case 1: // element
                         switch (node.localName) {
                             case "a":
                                 this.ScanLinks(node, data);
@@ -187,7 +187,7 @@ var HTMLScanner;
         DataSourceResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1:// element
+                    case 1: // element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = DataSourceResolver.prefix(tagname);
@@ -264,7 +264,7 @@ var HTMLScanner;
                 this.callback({ code: 1, message: "ResolveDataSource dom is null." }, undefined);
             }
             this.document_depth--;
-            if (this.document_depth === 0) {
+            if (this.document_depth === 0) { // promise all(record) then Prmise All(count)
                 // resolve all [record reference] in document.
                 Promise.all(this.datasource_promises.map(function (doc) {
                     var result1 = undefined;
@@ -388,7 +388,7 @@ var HTMLScanner;
         UrlResolver.prototype.ScanNode = function (node, data, position) {
             if (node) {
                 switch (node.nodeType) {
-                    case 1:// element
+                    case 1: // element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = UrlResolver.prefix(tagname);
@@ -627,8 +627,8 @@ var HTMLScanner;
             else {
                 switch (localname.toLowerCase()) {
                     case "link":
-                    case "script":
-                        this.html += "<" + localname + attribute_string + "></" + localname + ">";
+                    case "br":
+                        this.html += "<" + localname + attribute_string + "/>";
                         break;
                     default:
                         this.html += "<" + localname + attribute_string + "></" + localname + ">";
@@ -648,7 +648,7 @@ var HTMLScanner;
             var _this = this;
             if (node) {
                 switch (node.nodeType) {
-                    case 1:// element
+                    case 1: // element
                         var tagname = node.localName;
                         if (tagname) {
                             var prefix = Expander.prefix(tagname);
@@ -670,7 +670,7 @@ var HTMLScanner;
                                 case "foreach":
                                     if (prefix === PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
+                                            if (node.attributes.query) { // query="{}"
                                                 var query = node.attributes.query;
                                                 var result = this.fragments[query.nodeValue].content;
                                                 if (result) {
@@ -679,7 +679,7 @@ var HTMLScanner;
                                                     });
                                                 }
                                             }
-                                            else if (node.attributes.aggrigate) {
+                                            else if (node.attributes.aggrigate) { // aggrigate
                                                 var aggrigate = node.attributes.aggrigate;
                                                 var result = this.fragments[aggrigate.nodeValue].content;
                                                 if (result) {
@@ -688,14 +688,14 @@ var HTMLScanner;
                                                     });
                                                 }
                                             }
-                                            else if (node.attributes.field) {
+                                            else if (node.attributes.field) { // field="{a.b.c}"
                                                 var field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1,
                                                 }, position, this);
                                             }
-                                            else if (node.attributes.scope) {
+                                            else if (node.attributes.scope) { // scope="a.b.c"
                                                 if (data) {
                                                     var scope = node.attributes.scope;
                                                     var result = this.datasource.FieldValue(data, scope.nodeValue, position, this); // fragment
@@ -714,7 +714,7 @@ var HTMLScanner;
                                 case "resolve":
                                     if (prefix === PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.query) {
+                                            if (node.attributes.query) { // query="{}"
                                                 var query = node.attributes.query;
                                                 var current_datasource_1 = this.fragments[query.nodeValue].content;
                                                 _.forEach(node.childNodes, function (childnode, index) {
@@ -722,7 +722,7 @@ var HTMLScanner;
                                                     _this.ScanNode(childnode, current_datasource_1[0], 0);
                                                 });
                                             }
-                                            else if (node.attributes.aggrigate) {
+                                            else if (node.attributes.aggrigate) { // aggrigate
                                                 var aggrigate = node.attributes.aggrigate;
                                                 var result = this.fragments[aggrigate.nodeValue].content;
                                                 if (result) {
@@ -731,14 +731,14 @@ var HTMLScanner;
                                                     });
                                                 }
                                             }
-                                            else if (node.attributes.field) {
+                                            else if (node.attributes.field) { // field="{a.b.c}"
                                                 var field = node.attributes.field;
                                                 this.html += this.datasource.ResolveFormat(data, {
                                                     content: field.nodeValue,
                                                     count: 1,
                                                 }, position, this);
                                             }
-                                            else if (node.attributes.scope) {
+                                            else if (node.attributes.scope) { // scope="a.b.c"
                                                 if (data) {
                                                     var scope = node.attributes.scope;
                                                     var result = this.datasource.FieldValue(data, scope.nodeValue, position, this);
@@ -760,7 +760,7 @@ var HTMLScanner;
                                 case "include":
                                     if (prefix === PREFIX) {
                                         if (node.attributes) {
-                                            if (node.attributes.src) {
+                                            if (node.attributes.src) { // src="url"
                                                 var src = node.attributes.src;
                                                 this.html += this.datasource.ResolveFormat(data, this.fragments[src.nodeValue], position, this);
                                             }
@@ -783,6 +783,17 @@ var HTMLScanner;
                                                 else if (node.attributes.match) {
                                                     var match = node.attributes.match;
                                                     if (result === match.nodeValue) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
+                                                else if (node.attributes.condition) {
+                                                    var condition = node.attributes.condition.nodeValue;
+                                                    var evel_result = false;
+                                                    try {
+                                                        evel_result = new Function("value", "with (value) { return " + condition + "}")(result);
+                                                    }
+                                                    catch (e) { }
+                                                    if (evel_result) {
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
@@ -814,6 +825,17 @@ var HTMLScanner;
                                                         this.ResolveChildren(node, data, position);
                                                     }
                                                 }
+                                                else if (node.attributes.condition) {
+                                                    var condition = node.attributes.condition.nodeValue;
+                                                    var evel_result = false;
+                                                    try {
+                                                        evel_result = new Function("value", "with (value) { return " + condition + "}")(result);
+                                                    }
+                                                    catch (e) { }
+                                                    if (!evel_result) {
+                                                        this.ResolveChildren(node, data, position);
+                                                    }
+                                                }
                                                 else {
                                                     if (!result) {
                                                         this.ResolveChildren(node, data, position);
@@ -829,8 +851,8 @@ var HTMLScanner;
                             }
                         }
                         break;
-                    case 3:// text
-                        if (node.parentNode) {
+                    case 3: // text
+                        if (node.parentNode) { // field="{a.b.c}"
                             var parent_name = node.parentNode.localName;
                             var prefix = Expander.prefix(parent_name);
                             if (prefix === PREFIX) {

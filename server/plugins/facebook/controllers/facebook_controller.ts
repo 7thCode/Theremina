@@ -67,11 +67,11 @@ export namespace FacebookModule {
                                 let recipientId = body.recipient_id;
                                 let messageId = body.message_id;
 
-                                console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId);
+                  //              console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId);
                             } else {
-                                console.error("Unable to send message.");
-                                console.error(response);
-                                console.error(error);
+                   //             console.error("Unable to send message.");
+                    //            console.error(response);
+                    //            console.error(error);
                             }
                         });
                     };
@@ -93,8 +93,8 @@ export namespace FacebookModule {
                 let timeOfMessage:any = event.timestamp;
                 let message:any = event.message;
 
-                console.log("Received message for user %d and page %d at %d with message:", senderID, recipientID, timeOfMessage);
-                console.log(JSON.stringify(message));
+         //       console.log("Received message for user %d and page %d at %d with message:", senderID, recipientID, timeOfMessage);
+       //         console.log(JSON.stringify(message));
 
         //        let messageId:any = message.mid;
 
@@ -123,7 +123,7 @@ export namespace FacebookModule {
                         if (event.message) {
                             receivedMessage(event);
                         } else {
-                            console.log("Webhook received unknown event: ", event);
+              //              console.log("Webhook received unknown event: ", event);
                         }
                     });
                 });

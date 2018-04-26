@@ -1011,13 +1011,13 @@ var FileModule;
                                     Wrapper.SendSuccess(response, {});
                                 }
                                 else {
-                                    console.log("writeFile : " + error.message);
+                                    //                         console.log("writeFile : " + error.message);
                                     Wrapper.SendError(response, error.code, error.message, error);
                                 }
                             });
                         }
                         else {
-                            console.log("mkdir : " + error.message);
+                            //              console.log("mkdir : " + error.message);
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                         process.umask(original_mask_1);
@@ -1034,7 +1034,7 @@ var FileModule;
             var delete_folder_recursive = function (path) {
                 fs.readdirSync(path).forEach(function (file) {
                     var curPath = path + "/" + file;
-                    if (fs.lstatSync(curPath).isDirectory()) {
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
                         delete_folder_recursive(curPath);
                     }
                     else {

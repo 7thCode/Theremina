@@ -180,7 +180,7 @@ var FileUtility;
             switch (exitname) {
                 case ".jpeg":
                 case ".jpg":
-                    result = "image/jpg";
+                    result = "image/jpeg";
                     break;
                 case ".png":
                     result = "image/png";

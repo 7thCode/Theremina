@@ -78,7 +78,7 @@ var LineModule;
                                     if (result) {
                                         result.context = watson_response.context;
                                     }
-                                    else {
+                                    else { // firsttime
                                         result = new ContextModel();
                                         result.type = "line";
                                         result.userid = line_event.source.userId;

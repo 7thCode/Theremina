@@ -455,28 +455,37 @@ var ResourcesModule;
                     ResourceModel.findOne({ $and: [{ name: page_name_1 }, { namespace: namespace }, { userid: userid }, { type: 20 }] }).then(function (doc) {
                         if (doc) {
                             var content = doc.content.resource;
-                            var datasource = new ScannerBehaviorModule.CustomBehavior(page_name_1, page_name_1, userid, namespace, params_1, true, {
-                                "Default": ArticleModel,
-                                "Article": ArticleModel
-                            });
-                            var query = datasource.ToQueryFormat();
-                            var page_datasource = datasource.GetDatasource(query, null);
-                            var page_count = datasource.GetCount(query, null);
-                            var page_init = {
-                                name: "#init",
-                                promise: page_datasource,
-                                count: page_count,
-                                resolved: ""
-                            };
-                            HtmlScannerModule.Builder.Build(content, datasource, page_init, config, function (error, result) {
-                                if (!error) {
-                                    //              cache_write(request.url, result);
-                                    callback(null, { content: result, type: doc.content.type });
-                                }
-                                else {
-                                    callback({ code: 10000, message: error.message }, null);
-                                }
-                            });
+                            switch (doc.content.type) {
+                                case "text/plain":
+                                case "text/xml":
+                                    callback(null, { content: doc.content.resource, type: doc.content.type });
+                                    break;
+                                default:
+                                    {
+                                        var datasource = new ScannerBehaviorModule.CustomBehavior(page_name_1, page_name_1, userid, namespace, params_1, true, {
+                                            "Default": ArticleModel,
+                                            "Article": ArticleModel
+                                        });
+                                        var query = datasource.ToQueryFormat();
+                                        var page_datasource = datasource.GetDatasource(query, null);
+                                        var page_count = datasource.GetCount(query, null);
+                                        var page_init = {
+                                            name: "#init",
+                                            promise: page_datasource,
+                                            count: page_count,
+                                            resolved: ""
+                                        };
+                                        HtmlScannerModule.Builder.Build(content, datasource, page_init, config, function (error, result) {
+                                            if (!error) {
+                                                //              cache_write(request.url, result);
+                                                callback(null, { content: result, type: doc.content.type });
+                                            }
+                                            else {
+                                                callback({ code: 10000, message: error.message }, null);
+                                            }
+                                        });
+                                    }
+                            }
                         }
                         else {
                             callback({ code: 10000, message: "page not found." }, null);

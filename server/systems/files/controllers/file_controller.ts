@@ -1016,12 +1016,12 @@ export namespace FileModule {
                                 if (!error) {
                                     Wrapper.SendSuccess(response, {});
                                 } else {
-                                    console.log("writeFile : " + error.message);
+           //                         console.log("writeFile : " + error.message);
                                     Wrapper.SendError(response, error.code, error.message, error);
                                 }
                             });
                         } else {
-                            console.log("mkdir : " + error.message);
+              //              console.log("mkdir : " + error.message);
                             Wrapper.SendError(response, error.code, error.message, error);
                         }
                         process.umask(original_mask);

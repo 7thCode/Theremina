@@ -1,4 +1,4 @@
-.box.box-info.pallete-shadow(ng-controller="PicturePalleteController", flow-init, draggablepane="image", style="width:300px;height:auto;left:230px;top:210px;background:#f0f0f0;")
+.box.box-info.pallete-shadow(ng-controller="PictureController", flow-init, draggablepane="image", style="width:300px;height:auto;left:230px;top:210px;background:#f0f0f0;")
     .box-header.with-border#box-header
         .row(style="height:60px;")
             .col-xs-12
@@ -10,11 +10,12 @@
                         button.btn.btn-xs.btn-box-tool(flow-btn type="file", flow-attrs="{accept:'.png,.jpg,.gif,.svg'}")
                             i.fas.fa-plus-circle.text-primary
     .box-header
+        .row
             .col-xs-12
                 include ../../../systems/common/next_prev
 
     .box-body#images(style="height:100%;background-color:#f0f0f0; box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.3) inset" flow-drop)
-        ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px")
+        ul.nav.nav-pills.draggable-objects(ng-cloak, style="min-height:120px;overflow:scroll;height:280px;")
             li(ng-repeat="file in files")
                 div(ng-if="Type(file.metadata.type) == 'image'", ng-class="{selected: hover}", ng-mouseenter="hover = true", ng-mouseleave="hover = false", style="height:8rem;width:8rem;margin-left:auto;margin-right:auto;")
                     button.btn.btn-danger.btn-xs(ng-click="deletePicture(file.filename);", style="position:relative;top:10px;left:1rem;border-radius: 10px")
@@ -25,5 +26,3 @@
                         img.center-block.thumbnail(ng-drag="true", ng-drag-data="obj", data-allow-transform="true", ng-src="/{{file.metadata.userid}}/{{namespace}}/doc/img/{{file.filename}}", style="max-height:4rem;max-width:4rem;border: 1px #404040 solid;")
                     div(style="height:2rem;text-align:center;")
                         div(style="word-wrap: break-word;font-size:1rem;" ng-bind="file.filename | filename:10")
-
-

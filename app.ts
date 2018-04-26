@@ -193,28 +193,28 @@ namespace App {
                 mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.address + "/" + config.db.name, options)
                     .catch(error => {
                         logger.fatal('catch Mongoose exeption. ', error.stack);
-                        process.exit(0);
+                        process.exit(1);
                     });
             }
 
             mongoose.connection.once('open', () => {
 
                 mongoose.connection.on('connected', () => {
-
+                    logger.fatal('connected');
                 });
 
                 mongoose.connection.on('disconnected', () => {
                     logger.fatal('Mongoose default connection disconnected');
-                    process.exit(0);
+                    process.exit(1);
                 });
 
                 mongoose.connection.on('reconnected', () => {
-                    logger.info('reconnected');
+                    logger.fatal('reconnected');
                 });
 
                 mongoose.connection.on('error', (error) => {
                     logger.fatal('Mongoose default connection error: ' + error);
-                    process.exit(0);
+                    process.exit(1);
                 });
 
                 app.use(session({
@@ -535,7 +535,6 @@ namespace App {
             app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
             app.use(express.static(path.join(__dirname, 'public')));
-
 
             const core = require(process.cwd() + '/gs');
             const share: any = core.share;
