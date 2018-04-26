@@ -4,7 +4,10 @@
  //opensource.org/licenses/mit-license.php
  */
 
+
 "use strict";
+
+import {Schema} from "jsonschema";
 
 export namespace AssetModule {
 

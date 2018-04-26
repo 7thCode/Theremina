@@ -3,30 +3,35 @@
   font-family: 'Source Code Pro', monospace;
 }
 .brand-font-local {
-  font-family: 'Miss Fajardose', cursive;
+  font-family: 'Fascinate', cursive;
   font-size: 3.2rem;
   font-weight: 500;
+  color: #f96800;
 }
 .wrapper-color {
-  background: #1565C0;
+  background: #7495c0;
 }
 .sidebar-color {
-  background: #1A237E;
+  background: #343335;
 }
 .navbar-color {
-  background: #e53935;
+  background: #242324;
+}
+/* navbar-button */
+.navbar-button {
+  box-shadow: 2px 2px 2px #06307e;
 }
 .wrapper-color-invert {
-  background: #0b3564;
+  background: #40628e;
 }
 .sidebar-color-invert {
-  background: #090c29;
+  background: #010101;
 }
 .navbar-color-invert {
-  background: #9f1815;
+  background: #000000;
 }
 .pallete-background {
-  background: #ffffff;
+  background: #c7c7c7;
 }
 a {
   color: #ffffff;
@@ -83,4 +88,14 @@ body {
   right: 0;
   cursor: nwse-resize;
   background: url(../img/wingrip.png) no-repeat;
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.row-eq-height .panel {
+  height: 97%;
+  margin-bottom: 3%;
 }

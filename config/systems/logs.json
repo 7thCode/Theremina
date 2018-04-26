@@ -6,5 +6,6 @@
       "filename": "logs/request.log",
       "pattern": "-dd"
     }
-  ]
+  ],
+  "levels": {"request": "TRACE"}
 }

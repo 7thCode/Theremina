@@ -17,7 +17,6 @@ html(lang="ja")
         include ../../systems/common/stylesheets
         include ../../services/common/stylesheets
         include ../../plugins/common/stylesheets
-        include ../../applications/common/stylesheets
 
         include ../../plugins/common/google_analytics
 
@@ -28,25 +27,19 @@ html(lang="ja")
         a(href="//browsehappy.com/") update
         != '\n<![endif]-->\n'
 
-    body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController",style="background:#eeeeee;")
-        .wrapper
+    body.ui.hold-transition.skin-white.sidebar-mini.fixed(ng-app="FrontApplication", ng-controller="FrontController", style="background:#eeeeee;")
+        .wrapper(ng-controller="NamespaceController")
             header.main-header(style="margin-top:1rem;")
             if user
-                include ./partial/front_sidebar
+                include ../../applications/front/partial/front_sidebar
                 .content-wrapper(style="padding-top: 50px;overflow:scroll;")
                     include ../common/navbar
                     include ./partial/logged
             else
-                div
+                div(ng-controller="LoginController")
                     include ../common/no_logged_navbar
                     include ./partial/no_logged
-
-                guidance(scenario="{{scenario}}")
-
 
 include ../../systems/common/scripts
 include ../../services/common/scripts
 include ../../plugins/common/scripts
-include ../../applications/common/scripts
-
-script(src='/bower_components/AdminLTE/dist/js/app.min.js')

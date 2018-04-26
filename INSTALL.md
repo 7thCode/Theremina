@@ -126,6 +126,10 @@
     > use blog0
     > db.createUser({user:"blog0master", pwd:"33550336", roles:[ "readWrite", "dbOwner" ]})
 
+#####Index
+
+    > db.fs.files.createIndex({ "filename" : 1, "uploadDate" : 1 })
+
 ####ログ
 ##### Ubuntu
     /var/log/mongodb
@@ -151,7 +155,7 @@
     mongoexport --host=127.0.0.1  --db test2 --collection businesscards --out businesscard.csv  --type=csv --fields=Template,UpdateDate
 
 #####メモリー使用量
-    /proc/**PID**/status　の　VmRSS
+    /proc/**PID**/statusのVmRSS
 
 ##pm2インストール
     see http://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/
@@ -212,7 +216,7 @@
 
 ####最新版インストール
 
-    /etc/apt/sources.list　に追記
+    /etc/apt/sources.listに追記
 
     deb http://nginx.org/packages/ubuntu/ trusty nginx
     
@@ -319,7 +323,7 @@
     
     
     3.0以降
-    > sudo　mongodump --authenticationDatabase admin -u oda -p zz0101
+    > sudo mongodump --authenticationDatabase admin -u oda -p zz0101
 
 
 ####full restore
@@ -389,7 +393,7 @@
     
     https://myaccount.google.com/u/1/security
     
-    安全性の低いアプリの許可: 有効　とする
+    安全性の低いアプリの許可: 有効とする
     
 ####Let's Encrypt（HTTPSの認証)
 
@@ -410,18 +414,27 @@
     > ./certbot-auto certonly
     > sudo service nginx start
 
+
+
+
     
     実行
     
     > cd ~
-    > cd ceartbot
+    > cd cartbot
     > sudo service nginx stop
     > ./certbot-auto certonly --no-self-upgrade -n --standalone  --agree-tos --email oda.mikio@gmail.com -d www.aaa.com
     > sudo service nginx start
     
     -nginxってのが使える？使うと楽？
-    
-    
+
+;
+    複数
+
+    > cd ~
+    > cd certbot
+    > sudo ./certbot-auto certonly --nginx -d broad-e.co.jp -d www.broad-e.co.jp
+
     更新
     
     > cd ~
@@ -433,7 +446,6 @@
     証明書の取得時に使用したオプションは
     
     /etc/letsencrypt/renewal/${DOMAIN}.conf
-   
    
 ##openssl
    
@@ -698,3 +710,4 @@
   Google Map API Key
    
         https://developers.google.com/maps/web/
+

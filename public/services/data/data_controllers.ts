@@ -376,6 +376,8 @@ namespace DataControllersModule {
 
             $scope.operationArticle = (from_name) => {
 
+                $scope.from_name = from_name;
+
                 let modalRegist: any = $uibModal.open({
                     controller: 'DataOperetionDialogController',
                     templateUrl: '/data/dialogs/operation_dialog',
@@ -388,12 +390,8 @@ namespace DataControllersModule {
                     progress(true);
                     let to_name: string = dialog_scope.title;
                     ArticleService.Copy(from_name, to_name, (result: any) => {
-
-
                         Draw(() => {
                         });
-
-
                     }, error_handler);
                 }, (): void => {
                 });
@@ -537,7 +535,8 @@ namespace DataControllersModule {
     DataControllers.controller('DataOperetionDialogController', ['$scope', '$uibModalInstance', 'items',
         ($scope: any, $uibModalInstance: any, items: any): void => {
 
-            $scope.pages = items.pages;
+            let from_name = items.from_name;
+            $scope.title = from_name + "(1)";
 
             $scope.hide = (): void => {
                 $uibModalInstance.close();

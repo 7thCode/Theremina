@@ -5,15 +5,22 @@
     <body>
 
         <sample></sample>
+        <bindinput1></bindinput1>
+        <bindinput2 init="hello!!!!"></bindinput2>
+    <!--    <timer></timer> -->
 
         <!-- precompile -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/riot@3.7/riot.min.js"></script>
         <script src="sample.js"></script> -->
 
         <!-- demand -->
-        <script type="riot/tag" src="sample.tag"></script>
-        <script src="https://cdn.jsdelivr.net/npm/riot@3.7/riot+compiler.min.js"></script>
-
+        <script type="riot/tag" src="/riot/sample.tag"></script>
+        <script type="riot/tag" src="/riot/bindinput1.tag"></script>
+        <script type="riot/tag" src="/riot/bindinput2.tag"></script>
+        <!--<script type="riot/tag" src="/riot/timer.js"></script> -->
+        <!--<script src="https://cdn.jsdelivr.net/npm/riot@3.7/riot+compiler.min.js"></script>-->
+        <script src="/scripts/riot/riot+compiler.js"></script>
+       <!-- <script src="/scripts/riot-typescript/riot-ts.globals.js"></script> -->
         <script>riot.mount('*')</script>
     </body>
 </html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue</title>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    <style>
+        .null-error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card"  style="margin:2rem;width:18rem;">
+        <div class="card-header">
+            Example
+        </div>
+        <div class="card-body">
+            <div class="row">
+
+                <h5 class="col-12 card-text" style="margin:1rem 0;">Button</h5>
+                <div class="col-12" id="buttons" style="margin:1rem 0;">
+                    <div class="btn-group">
+                        <my-button></my-button>
+                        <my-button></my-button>
+                        <my-button></my-button>
+                    </div>
+                </div>
+
+                <h5 class="col-12 card-text" style="margin:1rem 0;">Field</h5>
+                <div class="col-12" id="field" style="margin:1rem 0;">
+                    <my-input></my-input>
+                </div>
+
+                <h5 class="col-12 card-text" style="margin:1rem 0;">Test</h5>
+                <div class="col-12 buttonlist">
+                <p>Length: {{ length }}</p>
+                <ul class="list-group">
+                    <li class="list-group-item" v-for="(item, i) in list" :key="item">{{ item }}
+                        <button class="btn btn-info float-right" @click="list.splice(i, 1)">remove</button>
+                    </li>
+                </ul>
+                <button class="btn btn-warning" @click="addItem">add</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+<script src="./vue/main.js"></script>
+</body>
+</html>

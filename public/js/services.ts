@@ -6,7 +6,7 @@
 
 "use strict";
 
-
+namespace ServicesModule {
 
     let Services: angular.IModule = angular.module('Services', []);
 
@@ -91,8 +91,15 @@
             });
         }]);
 
-    Services.service('ArticleService', ["ArticleQuery",
-        function (ArticleQuery: any): void {
+    Services.factory('ArticleQueryNamespace', ['$resource',
+        ($resource: any): any => {
+            return $resource("/articles/api/querynamespace/:namespace/:query", {namespace: "@namespace", query: '@query'}, {
+                query: {method: 'GET'}
+            });
+        }]);
+
+    Services.service('ArticleService', ["ArticleQuery", "ArticleQueryNamespace",
+        function (ArticleQuery: any, ArticleQueryNamespace: any): void {
 
             this.Query = (query_formula, callback: (result: any) => void, error: (code: number, message: string) => void) => {
                 ArticleQuery.query({
@@ -110,4 +117,22 @@
                 });
             };
 
+            this.QueryNamespace = (query_formula, namespace, callback: (result: any) => void, error: (code: number, message: string) => void) => {
+                ArticleQueryNamespace.query({
+                    namespace: namespace,
+                    query: query_formula
+                }, (result: any): void => {
+                    if (result) {
+                        if (result.code === 0) {
+                            callback(result.value);
+                        } else {
+                            error(result.code, result.message);
+                        }
+                    } else {
+                        error(10000, "network error");
+                    }
+                });
+            };
+
         }]);
+}

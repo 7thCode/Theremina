@@ -50,7 +50,7 @@ let handshake_receive_port: number = 41234;
 
 let init = () => {
     let interfaces = os.networkInterfaces();
-    for (var dev in interfaces) {
+    for (let dev in interfaces) {
         interfaces[dev].forEach((details) => {
             if (!details.internal) {
                 switch (details.family) {
@@ -79,7 +79,7 @@ let poll = () => {
         directory = JSON.parse(buffer);
 
 
-        console.log("Resp " + JSON.stringify(directory));
+  //      console.log("Resp " + JSON.stringify(directory));
 
 
         poller.close();
@@ -106,7 +106,7 @@ let select = () => {
             directory[rinfo.address.split(".")[3] * 1] = 1;
 
 
-            console.log("Recv " + JSON.stringify(directory));
+   //         console.log("Recv " + JSON.stringify(directory));
 
 
             let buffer = JSON.stringify(directory);

@@ -9,64 +9,64 @@ aside.main-sidebar.sidebar-color(ng-controller="LoginController")
                         a(href='#') #{user.local.nickname}
                     p
                         a(href='#')
-                            i.fa.fa-circle.text-success
+                            i.fas.fa-circle.text-success
                             |  #{user.type}
             ul.sidebar-menu(style="font-weight: 500")
                 li
                     a(href='/self')
-                        i.fa.fa-user-circle.text-primary
-                        span #{message.profile}
+                        i.fas.fa-user-circle.text-primary
+                        span &nbsp; #{message.profile}
                 if role.user
                     li
                         a(href="/pages")
-                            i.fa.fa-file-text.text-success
-                            span #{message.page}
+                            i.fas.fa-file-alt.text-success
+                            span &nbsp; #{message.page}
                 li
                     a(href="/data")
-                        i.fa.fa-database.text-primary
-                        span #{message.article}
+                        i.fas.fa-database.text-primary
+                        span &nbsp; #{message.article}
                 li
                     a(href="/pictures")
-                        i.fa.fa-file.text-success
-                        span #{message.picture}
+                        i.fas.fa-file.text-success
+                        span &nbsp; #{message.picture}
                 li
                     a(href="/svg")
-                        i.fa.fa-file-image-o.text-info
-                        span #{message.illust}
+                        i.fas.fa-file-image.text-info
+                        span &nbsp; #{message.illust}
                 li
                     a(href="/blob")
-                        i.fa.fa-file-text.text-info
-                        span #{message.blob}
+                        i.fas.fa-file-alt.text-info
+                        span &nbsp; #{message.blob}
 
                 if role.user
                     if config.regist.member
                         li
                             a(href="/members")
-                                i.fa.fa-user-plus.fa-fw.text-warning
-                                span #{message.member}
+                                i.fas.fa-user-plus.fa-fw.text-warning
+                                span &nbsp; #{message.member}
 
                 if role.categoly == 0
                     li
                         a(href='#', ng-click="showPasswordDialog()")
-                            i.fa.fa-key.fa-fw.text-danger
-                            span #{message.password}
+                            i.fas.fa-key.fa-fw.text-danger
+                            span &nbsp; #{message.password}
                 if role.system
                     li
                         a(href='/backoffice')
                             span.fa-stack
-                                i.fa.fa-cog.fa-spin.text-info
-                                i.fa.fa-cog.fa-spin.fa-rotate-180.text-danger
-                            span #{message.backoffice}
+                                i.fas.fa-cog.fa-spin.text-info
+                                i.fas.fa-cog.fa-spin.fa-rotate-180.text-danger
+                            span &nbsp; #{message.backoffice}
 
                 li
                     a(href="/pages/getall/{{namespace}}")
-                        i.fa.fa-download.fa-fw.text-danger
-                        span Backup &nbsp;({{namespace}})
+                        i.fas.fa-download.fa-fw.text-danger
+                        span &nbsp; Backup &nbsp;({{namespace}})
 
                 li
                     a(href='#', ng-click="Logout()")
-                        i.fa.fa-sign-out
-                        span #{message.logout}
+                        i.fas.fa-sign-out-alt
+                        span &nbsp; #{message.logout}
                 //li
                     a(href='#')
                         input(type="checkbox" data-layout="sidebar-collapse")

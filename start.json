@@ -1,10 +1,39 @@
 {
-  "name" : "start",
-  "script" : "./bin/start",
-  "env": {
-    "NODE_ENV" : "development"
+  "cookie": {
+    "originalMaxAge": 31535999999,
+    "expires": "2019-01-24T03:32:47.539Z",
+    "httpOnly": true,
+    "path": "/"
   },
-  "env_production": {
-    "NODE_ENV" : "production"
+  "passport": {
+    "user": {
+      "_id": "5a67fdf7c2f7ec32fc77f113",
+      "modify": "2018-01-24T03:31:04.778Z",
+      "create": "2018-01-24T03:31:04.778Z",
+      "salt": "a0364db1a3c46f3de8e3ee0589ff5c6d9c6572ac283fd2da0ca0b5034ddda559",
+      "hash": "268092148beb5fd7341cb8662124811f6493570b9094bc666ed29907edf8afd036c20223d592c65a521c068981d2c82807eb59057ee92401269bece7b4e1e3b01e14055b2c60dc5116bde10124b7e1ca42f28a4f3c7a1b3ca6c568ddde61a52a21268c78eebe2301ed525c2915c18691dd6fcbf788ae8431249beb37e2199c08509b4c002b07c077b9ee1d977ede6266499670c5423d1f585e551ce8aaf0fd12048245a029235b5bcf3489e15818758505a608584700ad17383791f33640da6a759b9debc35fcca421724acbb62a17bbab922be92474a245c4352f388e9fc3ff76bad4d59af5104b607725f23e70e63e54f8399285f8cad0eeb0d1fc5c8a13d55aec427b69d44e7f7aa322a77d42edaae59133488521a8f365ee4e245e2f834449ecc405a53c6315c56e46faeb806cdfbea27f236fbe38e48e1b744838b10ff942363d14525b38b00c83de325b0e4bbf383c3a584590bf128dd562560aba32285e3968e603e1635d7c7d9b632d1e2f2e531e4536c195f3c92cee2ab222c18aac759a2ac06d1d48b380b5aaf9858f68160a55b1c084671b479b6fa4decd26b8094e5e757958206961fd65a981b6c9cdedf961cd7b57b78e34efba336539364a66169b74a2d4ab21107b087f3f8ab0c21ca006c3cd3056c0f88285997814d86d5c690d6fe38017f52d95c4614cdc91c74e2d53fe90834cdbd75859767840c4c08f",
+      "userid": "000000000000000000000000",
+      "username": "oda.mikio@gmail.com",
+      "local": {
+        "mails": [
+          "oda.mikio@gmail.com"
+        ],
+        "nickname": "oda"
+      },
+      "__v": 0,
+      "enabled": true,
+      "publickey": "hfg7sHBXGhiyVsY3kPMJErgN8T7GLulWR/8n6JMIOQgqiQMvkZinG5PIRI7Fne4U29vnXRIJo9eW18QMu4UlBbSLgm4nSXgqIhr0YIriU82nueQFRqPUIwBfZ5HRk2hqih9/mkoKhE4+FpVZNG/9HMgsbZVmlbkdjGFr8l9wDZM=",
+      "passphrase": "cc70ce810b3113a25eced64b0558e5ffb2f6367585d34f08650b0a55dd392a6f",
+      "role": "",
+      "auth": 1,
+      "type": "System",
+      "provider": "local",
+      "data": {
+        "namespace": "blog"
+      }
+    }
   }
 }
+
+
+
